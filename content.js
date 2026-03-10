@@ -408,22 +408,6 @@ function createModal() {
 }
 
 /**
- * Update the loading text to show tweet excerpt
- */
-function updateLoadingText(modal, tweetText) {
-  const loadingTextElement = modal.querySelector('.ai-reply-loading-text');
-  
-  if (!loadingTextElement) return;
-  
-  // Create an excerpt (first 80 characters)
-  const excerpt = tweetText.length > 80 
-    ? tweetText.substring(0, 80) + '...' 
-    : tweetText;
-  
-  loadingTextElement.textContent = `Generating reply for: "${excerpt}"`;
-}
-
-/**
  * Position the modal near the clicked button
  */
 function positionModal(modal, anchorButton) {
@@ -502,22 +486,6 @@ async function openModal(anchorButton) {
   if (currentModal) {
     closeModal();
   }
-
-  // Check if API key is set
-  const apiKey = await getApiKey();
-  if (!apiKey) {
-    // Show error message if no API key is configured
-    alert('Please configure your Grok API key in the extension popup first.');
-    return;
-  }
-  
-  // Extract the tweet text
-  const tweetText = extractTweetText(anchorButton);
-  
-  if (!tweetText) {
-    alert('Could not extract tweet text. Please try again.');
-    return;
-  }
   
   // Create and add modal to DOM
   const modal = createModal();
@@ -526,9 +494,6 @@ async function openModal(anchorButton) {
   
   // Position the modal
   positionModal(modal, anchorButton);
-  
-  // Update loading text to show tweet excerpt
-  updateLoadingText(modal, tweetText);
   
   // Add event listeners
   setupModalEventListeners(modal);
@@ -546,19 +511,11 @@ async function openModal(anchorButton) {
     console.log('Using cached response for:', tweetUrl);
     showGeneratedReply(modal, cachedResponse);
   } else {
-    // Call Grok API to generate reply
-    try {
-      const generatedReply = await callGrokAPI(tweetText, apiKey);
-      
-      // Cache the response if we're on a tweet detail page
-      if (tweetUrl) {
-        responseCache.set(tweetUrl, generatedReply);
-        console.log('Response cached for:', tweetUrl);
-      }
-      
-      showGeneratedReply(modal, generatedReply);
-    } catch (error) {
-      showError(modal, error.message);
+    // No cached response - show loading state
+    console.log('No cached response available, showing loading state');
+    const loadingTextElement = modal.querySelector('.ai-reply-loading-text');
+    if (loadingTextElement) {
+      loadingTextElement.textContent = 'Generating response...';
     }
   }
 }
