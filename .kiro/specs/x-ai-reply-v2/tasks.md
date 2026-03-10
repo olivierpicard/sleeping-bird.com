@@ -1,10 +1,11 @@
 # Tasks - X.com AI Reply V2
 
-- [x] Task 1: Remove the Insert Reply button and auto-insert on response selection
+- [x] Task 1: Remove the Insert Reply button and copy to clipboard on response selection
   - Remove the "Insert Reply" button from the modal footer
   - Remove the `ai-reply-modal-footer` section from the modal HTML and its CSS styles
-  - When a response card is clicked, insert that reply directly into the composer and close the modal
-  - Visible result: modal no longer has a footer with an Insert button; clicking a response inserts it
+  - When a response card is clicked, copy that reply to the clipboard and close the modal
+  - Show brief "✓ Copied to clipboard!" feedback before closing
+  - Visible result: modal no longer has a footer with an Insert button; clicking a response copies it to clipboard
 
 - [ ] Task 2: Start generating the AI response on post click (URL change detection)
   - Add a URL change listener (using `popstate`, `pushState`/`replaceState` interception, or polling) to detect when the user navigates to a tweet detail page (e.g. `/status/` URL pattern)

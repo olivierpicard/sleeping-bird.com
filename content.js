@@ -450,100 +450,15 @@ function showError(modal, errorMessage) {
  * Insert the generated reply into X.com's reply composer
  * @param {string} replyText - The text to insert
  */
-async function insertReplyIntoComposer(replyText) {
-  // Step 1: Find the reply composer input field
-  // X.com uses Draft.js with contenteditable divs
-  let composerInput = document.querySelector('[data-testid="tweetTextarea_0"]');
-  
-  // If the reply box isn't open yet, try to open it
-  if (!composerInput) {
-    console.log('Reply composer not found, attempting to open it');
-    
-    // Find and click the reply button to open the composer
-    const replyButton = document.querySelector('[data-testid="reply"]');
-    if (replyButton) {
-      replyButton.click();
-      
-      // Wait for the composer to appear
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      // Try to find the composer again
-      composerInput = document.querySelector('[data-testid="tweetTextarea_0"]');
-    }
+async function copyReplyToClipboard(replyText) {
+  try {
+    await navigator.clipboard.writeText(replyText);
+    console.log('Reply text copied to clipboard');
+    return true;
+  } catch (err) {
+    console.error('Failed to copy to clipboard:', err);
+    return false;
   }
-  
-  if (!composerInput) {
-    console.error('Could not find or open reply composer');
-    alert('Could not find the reply box. Please open it manually and try again.');
-    return;
-  }
-  
-  // Step 2: Focus the input to ensure it's ready
-  composerInput.focus();
-  
-  // Step 3: Insert the text into the Draft.js editor
-  // X.com uses Draft.js which requires special handling
-  
-  // Method 1: Try to use execCommand (works for some contenteditable)
-  const selection = window.getSelection();
-  const range = document.createRange();
-  
-  // Clear any existing content first
-  composerInput.textContent = '';
-  
-  // Set cursor at the beginning
-  range.selectNodeContents(composerInput);
-  range.collapse(true);
-  selection.removeAllRanges();
-  selection.addRange(range);
-  
-  // Insert the text
-  document.execCommand('insertText', false, replyText);
-  
-  // Step 4: Dispatch input events to notify X.com's React/Draft.js
-  // This is crucial for X.com to recognize the text change
-  const inputEvent = new InputEvent('input', {
-    bubbles: true,
-    cancelable: true,
-    inputType: 'insertText',
-    data: replyText
-  });
-  composerInput.dispatchEvent(inputEvent);
-  
-  // Also dispatch a change event for good measure
-  const changeEvent = new Event('change', { bubbles: true });
-  composerInput.dispatchEvent(changeEvent);
-  
-  // Dispatch beforeinput event (some frameworks listen to this)
-  const beforeInputEvent = new InputEvent('beforeinput', {
-    bubbles: true,
-    cancelable: true,
-    inputType: 'insertText',
-    data: replyText
-  });
-  composerInput.dispatchEvent(beforeInputEvent);
-  
-  // Step 5: Trigger React's internal state update
-  // Find the React fiber node and trigger a state update
-  const reactKey = Object.keys(composerInput).find(key => 
-    key.startsWith('__reactProps') || key.startsWith('__reactFiber')
-  );
-  
-  if (reactKey) {
-    console.log('Found React key, triggering React update');
-    // Trigger a React synthetic event
-    const nativeInputValueSetter = Object.getOwnPropertyDescriptor(
-      window.HTMLDivElement.prototype,
-      'textContent'
-    ).set;
-    
-    nativeInputValueSetter.call(composerInput, replyText);
-    
-    const reactInputEvent = new Event('input', { bubbles: true });
-    composerInput.dispatchEvent(reactInputEvent);
-  }
-  
-  console.log('Reply text inserted successfully');
 }
 
 /**
@@ -601,7 +516,7 @@ function setupModalEventListeners(modal) {
   const previewArea = modal.querySelector('.ai-reply-preview-area');
   previewArea.addEventListener('click', async (e) => {
     e.stopPropagation();
-    console.log('Preview area clicked, inserting reply');
+    console.log('Preview area clicked, copying reply to clipboard');
     
     // Get the generated reply text
     const previewText = modal.querySelector('.ai-reply-preview-text');
@@ -613,14 +528,25 @@ function setupModalEventListeners(modal) {
     
     const replyText = previewText.textContent;
     if (!replyText || replyText.includes('⚠️ Error')) {
-      console.error('No valid reply text to insert');
+      console.error('No valid reply text to copy');
       closeModal();
       return;
     }
     
-    // Insert the reply into the compose box
-    await insertReplyIntoComposer(replyText);
+    // Copy the reply to clipboard
+    const success = await copyReplyToClipboard(replyText);
     
-    closeModal();
+    if (success) {
+      // Show brief feedback that text was copied
+      const originalText = previewText.textContent;
+      previewText.textContent = '✓ Copied to clipboard!';
+      
+      setTimeout(() => {
+        closeModal();
+      }, 500);
+    } else {
+      console.error('Failed to copy to clipboard');
+      closeModal();
+    }
   });
 }
