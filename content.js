@@ -177,10 +177,6 @@ function createModal() {
           <div class="ai-reply-preview-text"></div>
         </div>
       </div>
-      
-      <div class="ai-reply-modal-footer">
-        <button class="ai-reply-insert-btn">Insert Reply</button>
-      </div>
     </div>
   `;
   
@@ -601,11 +597,11 @@ function setupModalEventListeners(modal) {
   };
   document.addEventListener('keydown', escapeHandler);
   
-  // Insert button
-  const insertBtn = modal.querySelector('.ai-reply-insert-btn');
-  insertBtn.addEventListener('click', async (e) => {
+  // Click on preview area to insert reply
+  const previewArea = modal.querySelector('.ai-reply-preview-area');
+  previewArea.addEventListener('click', async (e) => {
     e.stopPropagation();
-    console.log('Insert Reply clicked');
+    console.log('Preview area clicked, inserting reply');
     
     // Get the generated reply text
     const previewText = modal.querySelector('.ai-reply-preview-text');
