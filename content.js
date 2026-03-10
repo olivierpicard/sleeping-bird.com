@@ -188,6 +188,22 @@ function createModal() {
 }
 
 /**
+ * Update the loading text to show tweet excerpt
+ */
+function updateLoadingText(modal, tweetText) {
+  const loadingTextElement = modal.querySelector('.ai-reply-loading-text');
+  
+  if (!loadingTextElement) return;
+  
+  // Create an excerpt (first 80 characters)
+  const excerpt = tweetText.length > 80 
+    ? tweetText.substring(0, 80) + '...' 
+    : tweetText;
+  
+  loadingTextElement.textContent = `Generating reply for: "${excerpt}"`;
+}
+
+/**
  * Position the modal near the clicked button
  */
 function positionModal(modal, anchorButton) {
@@ -218,6 +234,47 @@ function positionModal(modal, anchorButton) {
 }
 
 /**
+ * Extract tweet text from the DOM
+ * Finds the original tweet that the user is replying to
+ */
+function extractTweetText(anchorButton) {
+  // Strategy 1: Find the tweet article that contains the compose toolbar
+  // The compose toolbar is inside the tweet article when replying inline
+  let tweetArticle = anchorButton.closest('article[data-testid="tweet"]');
+  
+  // Strategy 2: If not found (e.g., in a modal or separate compose area),
+  // look for the main tweet on the page
+  if (!tweetArticle) {
+    console.log('Not in tweet article, searching for main tweet on page');
+    const allTweets = document.querySelectorAll('article[data-testid="tweet"]');
+    
+    // Get the first tweet (usually the one being replied to)
+    if (allTweets.length > 0) {
+      tweetArticle = allTweets[0];
+    }
+  }
+  
+  if (!tweetArticle) {
+    console.warn('Could not find any tweet article on page');
+    return null;
+  }
+  
+  // Find the tweet text element within the article
+  const tweetTextElement = tweetArticle.querySelector('[data-testid="tweetText"]');
+  
+  if (!tweetTextElement) {
+    console.warn('Could not find tweet text element in article');
+    return null;
+  }
+  
+  // Extract the text content
+  const tweetText = tweetTextElement.textContent.trim();
+  console.log('Extracted tweet text:', tweetText);
+  
+  return tweetText;
+}
+
+/**
  * Open the modal
  */
 async function openModal(anchorButton) {
@@ -234,6 +291,14 @@ async function openModal(anchorButton) {
     return;
   }
   
+  // Extract the tweet text
+  const tweetText = extractTweetText(anchorButton);
+  
+  if (!tweetText) {
+    alert('Could not extract tweet text. Please try again.');
+    return;
+  }
+  
   // Create and add modal to DOM
   const modal = createModal();
   document.body.appendChild(modal);
@@ -241,6 +306,9 @@ async function openModal(anchorButton) {
   
   // Position the modal
   positionModal(modal, anchorButton);
+  
+  // Update loading text to show tweet excerpt
+  updateLoadingText(modal, tweetText);
   
   // Add event listeners
   setupModalEventListeners(modal);
@@ -250,8 +318,8 @@ async function openModal(anchorButton) {
     modal.classList.add('ai-reply-modal-visible');
   });
 
-  // TODO: In future tasks, use the apiKey to make API calls
-  console.log('API key is configured, ready for API calls');
+  // TODO: In Task 6, call Grok API with tweetText and apiKey
+  console.log('Ready to generate reply for tweet:', tweetText);
 }
 
 /**

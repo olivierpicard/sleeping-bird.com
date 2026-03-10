@@ -26,7 +26,7 @@
   - In `content.js`, read the key from storage before making API calls
   - Visible result: user can open the extension popup, enter their key, and see it saved
 
-- [ ] Task 5: Extract the tweet text on icon click
+- [x] Task 5: Extract the tweet text on icon click
   - When the user clicks the AI icon on a tweet, grab the tweet's text content from the DOM
   - Pass it to the modal so it's ready for the API call
   - Visible result: the modal shows "Generating reply for: [tweet excerpt]..." while loading
