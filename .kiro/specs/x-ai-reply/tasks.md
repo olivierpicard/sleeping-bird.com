@@ -12,7 +12,7 @@
   - Style it to blend with X.com's native icon row
   - Visible result: when composing a reply or comment, the AI icon appears in the toolbar next to Grok
 
-- [ ] Task 3: Build the dismissable modal UI
+- [x] Task 3: Build the dismissable modal UI
   - On icon click, open a small floating modal anchored near the tweet
   - Modal contains: a loading spinner area, a text preview area, an "Insert Reply" button, and a close (✕) button
   - Clicking outside or pressing Escape dismisses the modal

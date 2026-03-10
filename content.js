@@ -22,11 +22,11 @@ function createAIReplyIcon() {
     </div>
   `;
   
-  // Add click handler (will be used in later tasks)
+  // Add click handler to open modal
   button.addEventListener('click', (e) => {
     e.stopPropagation();
     console.log('AI Reply icon clicked');
-    // TODO: Open modal (Task 3)
+    openModal(button);
   });
   
   return button;
@@ -126,4 +126,165 @@ if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', initObserver);
 } else {
   initObserver();
+}
+
+/**
+ * Modal Management
+ */
+
+let currentModal = null;
+
+/**
+ * Create the modal HTML structure
+ */
+function createModal() {
+  const modal = document.createElement('div');
+  modal.className = 'ai-reply-modal-overlay';
+  
+  modal.innerHTML = `
+    <div class="ai-reply-modal">
+      <div class="ai-reply-modal-header">
+        <h3 class="ai-reply-modal-title">AI Reply Generator</h3>
+        <button class="ai-reply-modal-close" aria-label="Close modal">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+            <path d="M10.59 12L4.54 5.96l1.42-1.42L12 10.59l6.04-6.05 1.42 1.42L13.41 12l6.05 6.04-1.42 1.42L12 13.41l-6.04 6.05-1.42-1.42L10.59 12z"></path>
+          </svg>
+        </button>
+      </div>
+      
+      <div class="ai-reply-modal-body">
+        <div class="ai-reply-loading-area">
+          <div class="ai-reply-spinner"></div>
+          <p class="ai-reply-loading-text">Generating reply...</p>
+        </div>
+        
+        <div class="ai-reply-preview-area" style="display: none;">
+          <div class="ai-reply-preview-text"></div>
+        </div>
+      </div>
+      
+      <div class="ai-reply-modal-footer">
+        <button class="ai-reply-insert-btn">Insert Reply</button>
+      </div>
+    </div>
+  `;
+  
+  return modal;
+}
+
+/**
+ * Position the modal near the clicked button
+ */
+function positionModal(modal, anchorButton) {
+  const modalContent = modal.querySelector('.ai-reply-modal');
+  const rect = anchorButton.getBoundingClientRect();
+  
+  // Position below and slightly to the right of the button
+  const top = rect.bottom + 8;
+  const left = rect.left;
+  
+  modalContent.style.top = `${top}px`;
+  modalContent.style.left = `${left}px`;
+  
+  // Ensure modal stays within viewport
+  requestAnimationFrame(() => {
+    const modalRect = modalContent.getBoundingClientRect();
+    
+    // Adjust if modal goes off right edge
+    if (modalRect.right > window.innerWidth - 16) {
+      modalContent.style.left = `${window.innerWidth - modalRect.width - 16}px`;
+    }
+    
+    // Adjust if modal goes off bottom edge
+    if (modalRect.bottom > window.innerHeight - 16) {
+      modalContent.style.top = `${rect.top - modalRect.height - 8}px`;
+    }
+  });
+}
+
+/**
+ * Open the modal
+ */
+function openModal(anchorButton) {
+  // Close existing modal if any
+  if (currentModal) {
+    closeModal();
+  }
+  
+  // Create and add modal to DOM
+  const modal = createModal();
+  document.body.appendChild(modal);
+  currentModal = modal;
+  
+  // Position the modal
+  positionModal(modal, anchorButton);
+  
+  // Add event listeners
+  setupModalEventListeners(modal);
+  
+  // Animate in
+  requestAnimationFrame(() => {
+    modal.classList.add('ai-reply-modal-visible');
+  });
+}
+
+/**
+ * Close the modal
+ */
+function closeModal() {
+  if (!currentModal) return;
+  
+  // Animate out
+  currentModal.classList.remove('ai-reply-modal-visible');
+  
+  // Remove from DOM after animation
+  setTimeout(() => {
+    if (currentModal && currentModal.parentNode) {
+      currentModal.parentNode.removeChild(currentModal);
+    }
+    currentModal = null;
+  }, 200);
+}
+
+/**
+ * Setup event listeners for modal interactions
+ */
+function setupModalEventListeners(modal) {
+  // Close button
+  const closeBtn = modal.querySelector('.ai-reply-modal-close');
+  closeBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    closeModal();
+  });
+  
+  // Click outside to close
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) {
+      closeModal();
+    }
+  });
+  
+  // Prevent clicks inside modal from closing it
+  const modalContent = modal.querySelector('.ai-reply-modal');
+  modalContent.addEventListener('click', (e) => {
+    e.stopPropagation();
+  });
+  
+  // Escape key to close
+  const escapeHandler = (e) => {
+    if (e.key === 'Escape') {
+      closeModal();
+      document.removeEventListener('keydown', escapeHandler);
+    }
+  };
+  document.addEventListener('keydown', escapeHandler);
+  
+  // Insert button (placeholder for now)
+  const insertBtn = modal.querySelector('.ai-reply-insert-btn');
+  insertBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    console.log('Insert Reply clicked');
+    // TODO: Insert reply into compose box (Task 7)
+    closeModal();
+  });
 }
