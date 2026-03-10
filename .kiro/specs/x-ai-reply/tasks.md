@@ -39,7 +39,7 @@
   - Handle errors gracefully (missing key, network error, rate limit) with user-friendly messages
   - Visible result: after clicking the icon, the modal shows a generated reply
 
-- [ ] Task 7: Insert the generated reply into X.com's reply field
+- [x] Task 7: Insert the generated reply into X.com's reply field
   - On "Insert Reply" button click, find the tweet's reply composer input in the DOM
   - If the reply box isn't open, simulate a click on the native reply icon first to open it
   - Insert the generated text into the reply input field (handle X.com's contenteditable/draft.js input)

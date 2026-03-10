@@ -336,15 +336,23 @@ async function openModal(anchorButton) {
 async function callGrokAPI(tweetText, apiKey) {
   const endpoint = 'https://api.x.ai/v1/chat/completions';
   
-  const systemPrompt = `You are a thoughtful social media assistant. Your task is to craft insightful, valuable replies to tweets.
+  const systemPrompt = `You are a thoughtful twitter assistant. Your task is to craft insightful, valuable replies to tweets.
 
 Guidelines:
 - NO generic responses like "Great point!" or "Thanks for sharing"
 - Bring a NEW angle, insight, or perspective to the conversation
-- Be concise (1-3 sentences max)
-- Be authentic and conversational
-- Add value through: a relevant question, a complementary insight, a constructive challenge, or a useful resource
+- Be concise
+- Be authentic
+- Be positive
+- Make humble yet very human-like response
+- Use simple and basic vocabulary
+- Use every day oral vocabulary
+- Make the reply feel human, not AI-generated
+- Add value through: a complementary insight, a constructive challenge, a useful resource, or an unpopullar opnion
+- Let people knpw your conviction but respect others
 - Avoid clichés and platitudes
+- Make the sentence natural and human-like
+- Use short sentences and emojis when appropriate
 - Match the tone of the original tweet (professional, casual, humorous, etc.)`;
 
   const userPrompt = `Generate a thoughtful reply to this tweet:\n\n"${tweetText}"`;
@@ -443,6 +451,106 @@ function showError(modal, errorMessage) {
 }
 
 /**
+ * Insert the generated reply into X.com's reply composer
+ * @param {string} replyText - The text to insert
+ */
+async function insertReplyIntoComposer(replyText) {
+  // Step 1: Find the reply composer input field
+  // X.com uses Draft.js with contenteditable divs
+  let composerInput = document.querySelector('[data-testid="tweetTextarea_0"]');
+  
+  // If the reply box isn't open yet, try to open it
+  if (!composerInput) {
+    console.log('Reply composer not found, attempting to open it');
+    
+    // Find and click the reply button to open the composer
+    const replyButton = document.querySelector('[data-testid="reply"]');
+    if (replyButton) {
+      replyButton.click();
+      
+      // Wait for the composer to appear
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      // Try to find the composer again
+      composerInput = document.querySelector('[data-testid="tweetTextarea_0"]');
+    }
+  }
+  
+  if (!composerInput) {
+    console.error('Could not find or open reply composer');
+    alert('Could not find the reply box. Please open it manually and try again.');
+    return;
+  }
+  
+  // Step 2: Focus the input to ensure it's ready
+  composerInput.focus();
+  
+  // Step 3: Insert the text into the Draft.js editor
+  // X.com uses Draft.js which requires special handling
+  
+  // Method 1: Try to use execCommand (works for some contenteditable)
+  const selection = window.getSelection();
+  const range = document.createRange();
+  
+  // Clear any existing content first
+  composerInput.textContent = '';
+  
+  // Set cursor at the beginning
+  range.selectNodeContents(composerInput);
+  range.collapse(true);
+  selection.removeAllRanges();
+  selection.addRange(range);
+  
+  // Insert the text
+  document.execCommand('insertText', false, replyText);
+  
+  // Step 4: Dispatch input events to notify X.com's React/Draft.js
+  // This is crucial for X.com to recognize the text change
+  const inputEvent = new InputEvent('input', {
+    bubbles: true,
+    cancelable: true,
+    inputType: 'insertText',
+    data: replyText
+  });
+  composerInput.dispatchEvent(inputEvent);
+  
+  // Also dispatch a change event for good measure
+  const changeEvent = new Event('change', { bubbles: true });
+  composerInput.dispatchEvent(changeEvent);
+  
+  // Dispatch beforeinput event (some frameworks listen to this)
+  const beforeInputEvent = new InputEvent('beforeinput', {
+    bubbles: true,
+    cancelable: true,
+    inputType: 'insertText',
+    data: replyText
+  });
+  composerInput.dispatchEvent(beforeInputEvent);
+  
+  // Step 5: Trigger React's internal state update
+  // Find the React fiber node and trigger a state update
+  const reactKey = Object.keys(composerInput).find(key => 
+    key.startsWith('__reactProps') || key.startsWith('__reactFiber')
+  );
+  
+  if (reactKey) {
+    console.log('Found React key, triggering React update');
+    // Trigger a React synthetic event
+    const nativeInputValueSetter = Object.getOwnPropertyDescriptor(
+      window.HTMLDivElement.prototype,
+      'textContent'
+    ).set;
+    
+    nativeInputValueSetter.call(composerInput, replyText);
+    
+    const reactInputEvent = new Event('input', { bubbles: true });
+    composerInput.dispatchEvent(reactInputEvent);
+  }
+  
+  console.log('Reply text inserted successfully');
+}
+
+/**
  * Close the modal
  */
 function closeModal() {
@@ -493,12 +601,30 @@ function setupModalEventListeners(modal) {
   };
   document.addEventListener('keydown', escapeHandler);
   
-  // Insert button (placeholder for now)
+  // Insert button
   const insertBtn = modal.querySelector('.ai-reply-insert-btn');
-  insertBtn.addEventListener('click', (e) => {
+  insertBtn.addEventListener('click', async (e) => {
     e.stopPropagation();
     console.log('Insert Reply clicked');
-    // TODO: Insert reply into compose box (Task 7)
+    
+    // Get the generated reply text
+    const previewText = modal.querySelector('.ai-reply-preview-text');
+    if (!previewText) {
+      console.error('Could not find preview text element');
+      closeModal();
+      return;
+    }
+    
+    const replyText = previewText.textContent;
+    if (!replyText || replyText.includes('⚠️ Error')) {
+      console.error('No valid reply text to insert');
+      closeModal();
+      return;
+    }
+    
+    // Insert the reply into the compose box
+    await insertReplyIntoComposer(replyText);
+    
     closeModal();
   });
 }
