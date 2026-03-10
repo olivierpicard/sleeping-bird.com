@@ -6,15 +6,166 @@
   <title>X.com AI Reply Assistant</title>
   <style>
     body {
-      width: 300px;
-      padding: 16px;
+      width: 320px;
+      padding: 20px;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: #000;
+      color: #e7e9ea;
+      margin: 0;
+    }
+
+    h2 {
+      font-size: 20px;
+      font-weight: 700;
+      margin: 0 0 8px 0;
+      color: #e7e9ea;
+    }
+
+    .subtitle {
+      font-size: 13px;
+      color: #71767b;
+      margin: 0 0 20px 0;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    label {
+      display: block;
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: #e7e9ea;
+    }
+
+    input[type="text"],
+    input[type="password"] {
+      width: 100%;
+      padding: 10px 12px;
+      font-size: 14px;
+      border: 1px solid #2f3336;
+      border-radius: 8px;
+      background-color: #16181c;
+      color: #e7e9ea;
+      box-sizing: border-box;
+      transition: border-color 0.2s ease;
+    }
+
+    input[type="text"]:focus,
+    input[type="password"]:focus {
+      outline: none;
+      border-color: #1d9bf0;
+    }
+
+    input[type="text"]::placeholder,
+    input[type="password"]::placeholder {
+      color: #71767b;
+    }
+
+    .button-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    button {
+      background-color: #1d9bf0;
+      color: #fff;
+      border: none;
+      border-radius: 9999px;
+      padding: 10px 24px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+      flex: 1;
+    }
+
+    button:hover {
+      background-color: #1a8cd8;
+    }
+
+    button:active {
+      background-color: #1777b8;
+    }
+
+    button:disabled {
+      background-color: #2f3336;
+      color: #71767b;
+      cursor: not-allowed;
+    }
+
+    .status-message {
+      display: none;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      color: #00ba7c;
+      font-weight: 600;
+    }
+
+    .status-message.visible {
+      display: flex;
+    }
+
+    .checkmark {
+      width: 18px;
+      height: 18px;
+      background-color: #00ba7c;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 12px;
+    }
+
+    .help-text {
+      font-size: 12px;
+      color: #71767b;
+      margin-top: 8px;
+      line-height: 1.4;
+    }
+
+    .help-text a {
+      color: #1d9bf0;
+      text-decoration: none;
+    }
+
+    .help-text a:hover {
+      text-decoration: underline;
     }
   </style>
 </head>
 <body>
   <h2>X.com AI Reply Assistant</h2>
-  <p>Configure your settings here.</p>
+  <p class="subtitle">Configure your Grok API key</p>
+  
+  <form id="apiKeyForm">
+    <div class="form-group">
+      <label for="apiKey">Grok API Key</label>
+      <input 
+        type="password" 
+        id="apiKey" 
+        name="apiKey" 
+        placeholder="Enter your Grok API key"
+        autocomplete="off"
+      />
+      <p class="help-text">
+        Get your API key from <a href="https://console.x.ai/" target="_blank">console.x.ai</a>
+      </p>
+    </div>
+
+    <div class="button-group">
+      <button type="submit" id="saveBtn">Save Key</button>
+      <div class="status-message" id="statusMessage">
+        <span class="checkmark">✓</span>
+        <span>Key saved</span>
+      </div>
+    </div>
+  </form>
+
   <script src="popup.js"></script>
 </body>
 </html>

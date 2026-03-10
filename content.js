@@ -3,8 +3,23 @@
 
 console.log('X.com AI Reply Assistant loaded');
 
+// Storage key constant
+const STORAGE_KEY = 'grokApiKey';
+
 // Track which tweets already have our icon to avoid duplicates
 const processedTweets = new WeakSet();
+
+/**
+ * Get the Grok API key from chrome.storage.sync
+ * @returns {Promise<string|null>} The API key or null if not set
+ */
+async function getApiKey() {
+  return new Promise((resolve) => {
+    chrome.storage.sync.get([STORAGE_KEY], (result) => {
+      resolve(result[STORAGE_KEY] || null);
+    });
+  });
+}
 
 /**
  * Create the AI reply icon button
@@ -205,10 +220,18 @@ function positionModal(modal, anchorButton) {
 /**
  * Open the modal
  */
-function openModal(anchorButton) {
+async function openModal(anchorButton) {
   // Close existing modal if any
   if (currentModal) {
     closeModal();
+  }
+
+  // Check if API key is set
+  const apiKey = await getApiKey();
+  if (!apiKey) {
+    // Show error message if no API key is configured
+    alert('Please configure your Grok API key in the extension popup first.');
+    return;
   }
   
   // Create and add modal to DOM
@@ -226,6 +249,9 @@ function openModal(anchorButton) {
   requestAnimationFrame(() => {
     modal.classList.add('ai-reply-modal-visible');
   });
+
+  // TODO: In future tasks, use the apiKey to make API calls
+  console.log('API key is configured, ready for API calls');
 }
 
 /**

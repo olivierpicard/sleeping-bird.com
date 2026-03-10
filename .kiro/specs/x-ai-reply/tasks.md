@@ -19,7 +19,7 @@
   - Style it to feel native to X.com (dark theme, rounded corners, subtle shadow)
   - Visible result: clicking the icon opens/closes the modal
 
-- [ ] Task 4: Add Grok API key management via the extension popup
+- [x] Task 4: Add Grok API key management via the extension popup
   - In `popup.html` / `popup.js`, create a simple form: text input for the Grok API key + Save button
   - Store the key in `chrome.storage.sync`
   - Show a green checkmark or "Key saved" confirmation on save
