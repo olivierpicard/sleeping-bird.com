@@ -7,17 +7,17 @@
   - Show brief "✓ Copied to clipboard!" feedback before closing
   - Visible result: modal no longer has a footer with an Insert button; clicking a response copies it to clipboard
 
-- [ ] Task 2: Start generating the AI response on post click (URL change detection)
+- [x] Task 2: Start generating the AI response on post click (URL change detection)
   - Add a URL change listener (using `popstate`, `pushState`/`replaceState` interception, or polling) to detect when the user navigates to a tweet detail page (e.g. `/status/` URL pattern)
-  - When a tweet detail page is detected, immediately extract the main tweet text and start calling the Grok API in the background (before the user clicks the ✨ icon)
+  - When a tweet detail page is detected (including on page load/refresh), immediately extract the main tweet text and start calling the Grok API in the background (before the user clicks the ✨ icon)
   - Cache the generated responses keyed by tweet URL so they are ready instantly when the modal opens
   - Clear stale cache entries when navigating away from a tweet
-  - Visible result: opening the modal on a tweet detail page shows responses almost instantly instead of waiting for the API
+  - Visible result: opening the modal on a tweet detail page shows responses almost instantly instead of waiting for the API, even after refreshing the page
 
 - [ ] Task 3: Generate 5 different responses per tweet
   - Update the Grok API call to request 5 completions (use `n: 5` parameter or make 5 parallel requests with varied temperature)
   - Store all 5 responses in the cache alongside the tweet URL
-  - Visible result: API now returns 5 distinct reply options per tweet
+  - Visible result: API now returns 5 distinct reply options per tweet. Concole.log the responses
 
 - [ ] Task 4: Display the 5 responses as selectable cards in the modal
   - Replace the single preview text area with a scrollable list of 5 response cards

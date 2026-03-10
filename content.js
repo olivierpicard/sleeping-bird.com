@@ -9,6 +9,12 @@ const STORAGE_KEY = 'grokApiKey';
 // Track which tweets already have our icon to avoid duplicates
 const processedTweets = new WeakSet();
 
+// Cache for generated responses keyed by tweet URL
+const responseCache = new Map();
+
+// Track the current tweet URL to detect navigation
+let currentTweetUrl = null;
+
 /**
  * Get the Grok API key from chrome.storage.sync
  * @returns {Promise<string|null>} The API key or null if not set
@@ -19,6 +25,220 @@ async function getApiKey() {
       resolve(result[STORAGE_KEY] || null);
     });
   });
+}
+
+/**
+ * Check if the current URL is a tweet detail page
+ * @returns {boolean} True if on a tweet detail page
+ */
+function isTweetDetailPage() {
+  return window.location.pathname.includes('/status/');
+}
+
+/**
+ * Extract tweet URL from the current page
+ * @returns {string|null} The tweet URL or null if not on a tweet detail page
+ */
+function getCurrentTweetUrl() {
+  if (!isTweetDetailPage()) {
+    return null;
+  }
+  
+  // Extract the tweet URL from the current page URL
+  // Format: https://x.com/username/status/1234567890
+  const match = window.location.pathname.match(/\/status\/(\d+)/);
+  if (match) {
+    return window.location.pathname; // Use pathname as the cache key
+  }
+  
+  return null;
+}
+
+/**
+ * Extract tweet text from the main tweet on a detail page
+ * @returns {string|null} The tweet text or null if not found
+ */
+function extractMainTweetText() {
+  // Strategy 1: Try to find the main tweet article
+  let mainTweet = document.querySelector('article[data-testid="tweet"]');
+  
+  // Strategy 2: If not found, try finding by role="article"
+  if (!mainTweet) {
+    const articles = document.querySelectorAll('article');
+    if (articles.length > 0) {
+      mainTweet = articles[0]; // First article is usually the main tweet
+    }
+  }
+  
+  if (!mainTweet) {
+    console.warn('Could not find main tweet on detail page');
+    return null;
+  }
+  
+  // Find the tweet text element
+  const tweetTextElement = mainTweet.querySelector('[data-testid="tweetText"]');
+  
+  if (!tweetTextElement) {
+    console.warn('Could not find tweet text in main tweet');
+    return null;
+  }
+  
+  const tweetText = tweetTextElement.textContent.trim();
+  
+  if (!tweetText) {
+    console.warn('Tweet text is empty');
+    return null;
+  }
+  
+  return tweetText;
+}
+
+/**
+ * Start generating AI response in the background for the current tweet
+ */
+async function prefetchResponseForCurrentTweet() {
+  const tweetUrl = getCurrentTweetUrl();
+  
+  if (!tweetUrl) {
+    console.log('Not on a tweet detail page, skipping prefetch');
+    return;
+  }
+  
+  // Check if we already have a cached response
+  if (responseCache.has(tweetUrl)) {
+    console.log('Response already cached for:', tweetUrl);
+    return;
+  }
+  
+  // Get API key
+  const apiKey = await getApiKey();
+  if (!apiKey) {
+    console.log('No API key configured, skipping prefetch');
+    return;
+  }
+  
+  // Extract tweet text
+  const tweetText = extractMainTweetText();
+  if (!tweetText) {
+    console.log('Could not extract tweet text, skipping prefetch');
+    return;
+  }
+  
+  console.log('Starting background API call for tweet:', tweetUrl);
+  
+  // Call API in the background and cache the result
+  try {
+    const generatedReply = await callGrokAPI(tweetText, apiKey);
+    responseCache.set(tweetUrl, generatedReply);
+    console.log('Response cached for:', tweetUrl);
+  } catch (error) {
+    console.error('Error prefetching response:', error);
+    // Don't cache errors - let the modal handle them if user clicks
+  }
+}
+
+/**
+ * Clear stale cache entries when navigating away from a tweet
+ */
+function clearStaleCache() {
+  const tweetUrl = getCurrentTweetUrl();
+  
+  // If we're not on a tweet detail page, clear the entire cache
+  if (!tweetUrl) {
+    if (responseCache.size > 0) {
+      console.log('Clearing all cached responses (not on tweet detail page)');
+      responseCache.clear();
+    }
+    return;
+  }
+  
+  // If we're on a different tweet, clear old entries
+  // Keep only the current tweet's cache
+  const keysToDelete = [];
+  for (const key of responseCache.keys()) {
+    if (key !== tweetUrl) {
+      keysToDelete.push(key);
+    }
+  }
+  
+  if (keysToDelete.length > 0) {
+    console.log('Clearing stale cache entries:', keysToDelete);
+    keysToDelete.forEach(key => responseCache.delete(key));
+  }
+}
+
+/**
+ * Handle URL changes and trigger background API calls
+ */
+function handleUrlChange() {
+  const newTweetUrl = getCurrentTweetUrl();
+  
+  // Check if we've navigated to a different tweet or away from tweets
+  if (newTweetUrl !== currentTweetUrl) {
+    console.log('URL changed from', currentTweetUrl, 'to', newTweetUrl);
+    currentTweetUrl = newTweetUrl;
+    
+    // Clear stale cache entries
+    clearStaleCache();
+    
+    // If we're on a tweet detail page, start prefetching
+    if (newTweetUrl) {
+      // Wait a bit for the DOM to be ready
+      setTimeout(() => {
+        prefetchResponseForCurrentTweet();
+      }, 500);
+    }
+  }
+}
+
+/**
+ * Set up URL change detection
+ */
+function initUrlChangeDetection() {
+  // Initial check on page load/refresh
+  currentTweetUrl = getCurrentTweetUrl();
+  if (currentTweetUrl) {
+    console.log('Tweet detail page detected on load:', currentTweetUrl);
+    // Wait for DOM to be ready before prefetching
+    // Use a retry mechanism with increasing delays
+    const attemptPrefetch = (retries = 5, delay = 1000) => {
+      const tweetText = extractMainTweetText();
+      if (tweetText) {
+        console.log('Tweet text extracted successfully, starting prefetch');
+        prefetchResponseForCurrentTweet();
+      } else if (retries > 0) {
+        console.log(`Tweet text not ready, retrying in ${delay}ms... (${retries} attempts left)`);
+        setTimeout(() => attemptPrefetch(retries - 1, delay + 500), delay);
+      } else {
+        console.warn('Could not extract tweet text after multiple attempts');
+      }
+    };
+    
+    // Start attempting after a short initial delay
+    setTimeout(() => attemptPrefetch(), 1000);
+  }
+  
+  // Listen for popstate events (back/forward navigation)
+  window.addEventListener('popstate', handleUrlChange);
+  
+  // Intercept pushState and replaceState to detect SPA navigation
+  const originalPushState = history.pushState;
+  const originalReplaceState = history.replaceState;
+  
+  history.pushState = function(...args) {
+    originalPushState.apply(this, args);
+    handleUrlChange();
+  };
+  
+  history.replaceState = function(...args) {
+    originalReplaceState.apply(this, args);
+    handleUrlChange();
+  };
+  
+  // Also poll for URL changes as a fallback (X.com uses SPA navigation)
+  setInterval(handleUrlChange, 1000);
+  
+  console.log('URL change detection initialized');
 }
 
 /**
@@ -138,9 +358,13 @@ function initObserver() {
 
 // Initialize when DOM is ready
 if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', initObserver);
+  document.addEventListener('DOMContentLoaded', () => {
+    initObserver();
+    initUrlChangeDetection();
+  });
 } else {
   initObserver();
+  initUrlChangeDetection();
 }
 
 /**
@@ -314,12 +538,28 @@ async function openModal(anchorButton) {
     modal.classList.add('ai-reply-modal-visible');
   });
 
-  // Call Grok API to generate reply
-  try {
-    const generatedReply = await callGrokAPI(tweetText, apiKey);
-    showGeneratedReply(modal, generatedReply);
-  } catch (error) {
-    showError(modal, error.message);
+  // Check if we have a cached response for the current tweet
+  const tweetUrl = getCurrentTweetUrl();
+  const cachedResponse = tweetUrl ? responseCache.get(tweetUrl) : null;
+  
+  if (cachedResponse) {
+    console.log('Using cached response for:', tweetUrl);
+    showGeneratedReply(modal, cachedResponse);
+  } else {
+    // Call Grok API to generate reply
+    try {
+      const generatedReply = await callGrokAPI(tweetText, apiKey);
+      
+      // Cache the response if we're on a tweet detail page
+      if (tweetUrl) {
+        responseCache.set(tweetUrl, generatedReply);
+        console.log('Response cached for:', tweetUrl);
+      }
+      
+      showGeneratedReply(modal, generatedReply);
+    } catch (error) {
+      showError(modal, error.message);
+    }
   }
 }
 
@@ -538,7 +778,6 @@ function setupModalEventListeners(modal) {
     
     if (success) {
       // Show brief feedback that text was copied
-      const originalText = previewText.textContent;
       previewText.textContent = '✓ Copied to clipboard!';
       
       setTimeout(() => {
