@@ -6,11 +6,11 @@
   - Add a 48x48 and 128x128 placeholder icon
   - Load the extension in Chrome via `chrome://extensions` and confirm it appears
 
-- [ ] Task 2: Inject the AI reply icon next to existing action icons on each tweet
-  - In `content.js`, use a MutationObserver to detect tweet action bars on X.com
-  - Append a small ✨ (or custom SVG) icon button next to the existing icons (like, reply, retweet, Grok)
+- [x] Task 2: Inject the AI reply icon into the compose toolbar of reply/comment areas
+  - In `content.js`, use a MutationObserver to detect compose toolbars on X.com (the bar with image, GIF, Grok, emoji buttons)
+  - Append a small ✨ icon button next to the Grok button in the compose toolbar
   - Style it to blend with X.com's native icon row
-  - Visible result: each tweet shows the new icon in its action bar
+  - Visible result: when composing a reply or comment, the AI icon appears in the toolbar next to Grok
 
 - [ ] Task 3: Build the dismissable modal UI
   - On icon click, open a small floating modal anchored near the tweet
