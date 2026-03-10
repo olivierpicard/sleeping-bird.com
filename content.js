@@ -318,8 +318,128 @@ async function openModal(anchorButton) {
     modal.classList.add('ai-reply-modal-visible');
   });
 
-  // TODO: In Task 6, call Grok API with tweetText and apiKey
-  console.log('Ready to generate reply for tweet:', tweetText);
+  // Call Grok API to generate reply
+  try {
+    const generatedReply = await callGrokAPI(tweetText, apiKey);
+    showGeneratedReply(modal, generatedReply);
+  } catch (error) {
+    showError(modal, error.message);
+  }
+}
+
+/**
+ * Call the Grok API to generate a thoughtful reply
+ * @param {string} tweetText - The tweet text to reply to
+ * @param {string} apiKey - The Grok API key
+ * @returns {Promise<string>} The generated reply text
+ */
+async function callGrokAPI(tweetText, apiKey) {
+  const endpoint = 'https://api.x.ai/v1/chat/completions';
+  
+  const systemPrompt = `You are a thoughtful social media assistant. Your task is to craft insightful, valuable replies to tweets.
+
+Guidelines:
+- NO generic responses like "Great point!" or "Thanks for sharing"
+- Bring a NEW angle, insight, or perspective to the conversation
+- Be concise (1-3 sentences max)
+- Be authentic and conversational
+- Add value through: a relevant question, a complementary insight, a constructive challenge, or a useful resource
+- Avoid clichés and platitudes
+- Match the tone of the original tweet (professional, casual, humorous, etc.)`;
+
+  const userPrompt = `Generate a thoughtful reply to this tweet:\n\n"${tweetText}"`;
+
+  const requestBody = {
+    model: 'grok-4-1-fast',
+    messages: [
+      {
+        role: 'system',
+        content: systemPrompt
+      },
+      {
+        role: 'user',
+        content: userPrompt
+      }
+    ],
+    temperature: 0.7,
+    max_tokens: 150
+  };
+
+  const response = await fetch(endpoint, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${apiKey}`
+    },
+    body: JSON.stringify(requestBody)
+  });
+
+  if (!response.ok) {
+    // Handle different error types
+    if (response.status === 401) {
+      throw new Error('Invalid API key. Please check your Grok API key in the extension popup.');
+    } else if (response.status === 429) {
+      throw new Error('Rate limit exceeded. Please try again in a few moments.');
+    } else if (response.status >= 500) {
+      throw new Error('Grok API service error. Please try again later.');
+    } else {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.error?.message || `API error: ${response.status}`);
+    }
+  }
+
+  const data = await response.json();
+  
+  // Extract the generated reply from the response
+  if (!data.choices || !data.choices[0] || !data.choices[0].message) {
+    throw new Error('Unexpected API response format');
+  }
+
+  return data.choices[0].message.content.trim();
+}
+
+/**
+ * Show the generated reply in the modal
+ * @param {HTMLElement} modal - The modal element
+ * @param {string} replyText - The generated reply text
+ */
+function showGeneratedReply(modal, replyText) {
+  // Hide loading area
+  const loadingArea = modal.querySelector('.ai-reply-loading-area');
+  if (loadingArea) {
+    loadingArea.style.display = 'none';
+  }
+
+  // Show preview area with the generated text
+  const previewArea = modal.querySelector('.ai-reply-preview-area');
+  const previewText = modal.querySelector('.ai-reply-preview-text');
+  
+  if (previewArea && previewText) {
+    previewText.textContent = replyText;
+    previewArea.style.display = 'block';
+  }
+}
+
+/**
+ * Show an error message in the modal
+ * @param {HTMLElement} modal - The modal element
+ * @param {string} errorMessage - The error message to display
+ */
+function showError(modal, errorMessage) {
+  // Hide loading area
+  const loadingArea = modal.querySelector('.ai-reply-loading-area');
+  if (loadingArea) {
+    loadingArea.style.display = 'none';
+  }
+
+  // Show error in preview area
+  const previewArea = modal.querySelector('.ai-reply-preview-area');
+  const previewText = modal.querySelector('.ai-reply-preview-text');
+  
+  if (previewArea && previewText) {
+    previewText.innerHTML = `<div style="color: #f4212e; font-weight: 500;">⚠️ Error</div><div style="margin-top: 8px;">${errorMessage}</div>`;
+    previewArea.style.display = 'block';
+  }
 }
 
 /**

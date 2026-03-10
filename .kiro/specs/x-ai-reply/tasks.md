@@ -31,7 +31,7 @@
   - Pass it to the modal so it's ready for the API call
   - Visible result: the modal shows "Generating reply for: [tweet excerpt]..." while loading
 
-- [ ] Task 6: Call the Grok API to generate a high-value reply
+- [x] Task 6: Call the Grok API to generate a high-value reply
   - Use the stored API key to call the Grok API (xAI chat completions endpoint)
   - Send a prompt that instructs Grok to craft a thoughtful, reflective reply that adds value to the conversation
   - System prompt should emphasize: no generic responses, bring a new angle or insight, be concise
