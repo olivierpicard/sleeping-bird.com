@@ -195,32 +195,47 @@
   line-height: 1.4;
 }
 
-/* Preview Area */
-.ai-reply-preview-area {
+/* Cards Container */
+.ai-reply-cards-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
   padding: 0;
-  cursor: pointer;
-  transition: opacity 0.2s ease;
 }
 
-.ai-reply-preview-area:hover {
-  opacity: 0.9;
-}
-
-.ai-reply-preview-text {
+/* Individual Response Card */
+.ai-reply-card {
   color: rgb(231, 233, 234);
   font-size: 15px;
   line-height: 1.5;
   white-space: pre-wrap;
   word-wrap: break-word;
-  padding: 12px;
+  padding: 16px;
   background-color: rgb(22, 24, 28);
   border-radius: 12px;
   border: 1px solid rgb(47, 51, 54);
-  transition: border-color 0.2s ease;
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
-.ai-reply-preview-area:hover .ai-reply-preview-text {
+/* Card Hover State */
+.ai-reply-card:hover {
   border-color: rgb(29, 155, 240);
+  background-color: rgb(26, 28, 32);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(29, 155, 240, 0.15);
+}
+
+/* Card Active/Pressed State */
+.ai-reply-card:active {
+  transform: translateY(0);
+}
+
+/* Card Selected State */
+.ai-reply-card-selected {
+  border-color: rgb(29, 155, 240);
+  background-color: rgba(29, 155, 240, 0.1);
+  box-shadow: 0 0 0 2px rgba(29, 155, 240, 0.3);
 }
 
 /* Scrollbar styling for modal body */

@@ -397,8 +397,8 @@ function createModal() {
           <p class="ai-reply-loading-text">Generating reply...</p>
         </div>
         
-        <div class="ai-reply-preview-area" style="display: none;">
-          <div class="ai-reply-preview-text"></div>
+        <div class="ai-reply-cards-container" style="display: none;">
+          <!-- Response cards will be dynamically inserted here -->
         </div>
       </div>
     </div>
@@ -509,8 +509,8 @@ async function openModal(anchorButton) {
   
   if (cachedResponses && Array.isArray(cachedResponses) && cachedResponses.length > 0) {
     console.log('Using cached responses for:', tweetUrl);
-    // For now, display the first response (Task 4 will handle displaying all 5)
-    showGeneratedReply(modal, cachedResponses[0]);
+    // Display all 5 responses as cards
+    showResponseCards(modal, cachedResponses);
   } else {
     // No cached response - show loading state
     console.log('No cached response available, showing loading state');
@@ -612,25 +612,62 @@ Guidelines:
 }
 
 /**
- * Show the generated reply in the modal
+ * Show the response cards in the modal
  * @param {HTMLElement} modal - The modal element
- * @param {string} replyText - The generated reply text
+ * @param {string[]} responses - Array of generated reply texts
  */
-function showGeneratedReply(modal, replyText) {
+function showResponseCards(modal, responses) {
   // Hide loading area
   const loadingArea = modal.querySelector('.ai-reply-loading-area');
   if (loadingArea) {
     loadingArea.style.display = 'none';
   }
 
-  // Show preview area with the generated text
-  const previewArea = modal.querySelector('.ai-reply-preview-area');
-  const previewText = modal.querySelector('.ai-reply-preview-text');
-  
-  if (previewArea && previewText) {
-    previewText.textContent = replyText;
-    previewArea.style.display = 'block';
+  // Show cards container
+  const cardsContainer = modal.querySelector('.ai-reply-cards-container');
+  if (!cardsContainer) {
+    console.error('Cards container not found');
+    return;
   }
+
+  // Clear any existing cards
+  cardsContainer.innerHTML = '';
+
+  // Create a card for each response
+  responses.forEach((replyText, index) => {
+    const card = document.createElement('div');
+    card.className = 'ai-reply-card';
+    card.setAttribute('data-index', index);
+    card.textContent = replyText;
+
+    // Add click handler to select and insert the reply
+    card.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      
+      // Visual feedback - highlight the selected card
+      card.classList.add('ai-reply-card-selected');
+      
+      // Copy to clipboard
+      const success = await copyReplyToClipboard(replyText);
+      
+      if (success) {
+        // Show brief feedback
+        card.textContent = '✓ Copied to clipboard!';
+        
+        setTimeout(() => {
+          closeModal();
+        }, 500);
+      } else {
+        console.error('Failed to copy to clipboard');
+        closeModal();
+      }
+    });
+
+    cardsContainer.appendChild(card);
+  });
+
+  // Show the cards container
+  cardsContainer.style.display = 'block';
 }
 
 /**
@@ -720,41 +757,4 @@ function setupModalEventListeners(modal) {
     }
   };
   document.addEventListener('keydown', escapeHandler);
-  
-  // Click on preview area to insert reply
-  const previewArea = modal.querySelector('.ai-reply-preview-area');
-  previewArea.addEventListener('click', async (e) => {
-    e.stopPropagation();
-    console.log('Preview area clicked, copying reply to clipboard');
-    
-    // Get the generated reply text
-    const previewText = modal.querySelector('.ai-reply-preview-text');
-    if (!previewText) {
-      console.error('Could not find preview text element');
-      closeModal();
-      return;
-    }
-    
-    const replyText = previewText.textContent;
-    if (!replyText || replyText.includes('⚠️ Error')) {
-      console.error('No valid reply text to copy');
-      closeModal();
-      return;
-    }
-    
-    // Copy the reply to clipboard
-    const success = await copyReplyToClipboard(replyText);
-    
-    if (success) {
-      // Show brief feedback that text was copied
-      previewText.textContent = '✓ Copied to clipboard!';
-      
-      setTimeout(() => {
-        closeModal();
-      }, 500);
-    } else {
-      console.error('Failed to copy to clipboard');
-      closeModal();
-    }
-  });
 }

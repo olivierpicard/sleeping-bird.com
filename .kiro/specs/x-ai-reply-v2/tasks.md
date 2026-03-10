@@ -29,7 +29,7 @@
   - Store all 5 responses in the cache alongside the tweet URL
   - Visible result: API now returns 5 distinct reply options per tweet. Concole.log the responses
 
-- [ ] Task 4: Display the 5 responses as selectable cards in the modal
+- [x] Task 4: Display the 5 responses as selectable cards in the modal
   - Replace the single preview text area with a scrollable list of 5 response cards
   - Each card shows the reply text with a subtle border and hover highlight
   - Clicking a card selects it visually (highlight border in blue) and inserts the reply into the composer, then closes the modal
