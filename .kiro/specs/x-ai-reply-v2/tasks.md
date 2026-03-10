@@ -36,3 +36,10 @@
   - If responses are still loading, show a spinner; as each response arrives, append its card progressively
   - Update modal CSS for the card layout (card container, individual card styles, selected state, hover state)
   - Visible result: modal displays 5 clickable response cards; clicking one inserts it and dismisses the modal
+
+- [x] Task 5: Fix infinite loading screen when modal opens before cache is ready
+  - Add a cache update listener/observer mechanism that notifies the modal when responses become available
+  - When the modal is in loading state and cache gets populated for the current tweet URL, automatically update the modal to display the response cards
+  - Implement a simple event-based or polling approach to check cache updates while modal is open
+  - Keep the implementation simple and straightforward for MVP (e.g., use a callback or interval check)
+  - Visible result: modal shows loading state initially, then automatically displays the 5 response cards once the background generation completes, without requiring the user to close and reopen the modal

@@ -15,6 +15,38 @@ const responseCache = new Map();
 // Track the current tweet URL to detect navigation
 let currentTweetUrl = null;
 
+// Cache update listeners - callbacks to notify when cache is updated
+const cacheUpdateListeners = new Set();
+
+/**
+ * Add a cache update listener
+ * @param {Function} callback - Function to call when cache is updated
+ * @returns {Function} Function to remove the listener
+ */
+function addCacheUpdateListener(callback) {
+  cacheUpdateListeners.add(callback);
+  
+  // Return a function to remove the listener
+  return () => {
+    cacheUpdateListeners.delete(callback);
+  };
+}
+
+/**
+ * Notify all cache update listeners
+ * @param {string} tweetUrl - The tweet URL that was updated
+ * @param {string[]} responses - The cached responses
+ */
+function notifyCacheUpdate(tweetUrl, responses) {
+  cacheUpdateListeners.forEach(callback => {
+    try {
+      callback(tweetUrl, responses);
+    } catch (error) {
+      console.error('Error in cache update listener:', error);
+    }
+  });
+}
+
 /**
  * Get the Grok API key from chrome.storage.sync
  * @returns {Promise<string|null>} The API key or null if not set
@@ -131,6 +163,9 @@ async function prefetchResponseForCurrentTweet() {
     const generatedReplies = await callGrokAPI(tweetText, apiKey);
     responseCache.set(tweetUrl, generatedReplies);
     console.log('5 responses cached for:', tweetUrl);
+    
+    // Notify listeners that cache has been updated
+    notifyCacheUpdate(tweetUrl, generatedReplies);
   } catch (error) {
     console.error('Error prefetching response:', error);
     // Don't cache errors - let the modal handle them if user clicks
@@ -512,11 +547,25 @@ async function openModal(anchorButton) {
     // Display all 5 responses as cards
     showResponseCards(modal, cachedResponses);
   } else {
-    // No cached response - show loading state
+    // No cached response - show loading state and register listener
     console.log('No cached response available, showing loading state');
     const loadingTextElement = modal.querySelector('.ai-reply-loading-text');
     if (loadingTextElement) {
       loadingTextElement.textContent = 'Generating response...';
+    }
+    
+    // Register a cache update listener to update the modal when responses arrive
+    if (tweetUrl) {
+      const removeListener = addCacheUpdateListener((updatedTweetUrl, responses) => {
+        // Check if this update is for the current tweet
+        if (updatedTweetUrl === tweetUrl && currentModal === modal) {
+          console.log('Cache updated for current tweet, updating modal');
+          showResponseCards(modal, responses);
+        }
+      });
+      
+      // Store the remove function so we can clean it up when modal closes
+      modal._removeCacheListener = removeListener;
     }
   }
 }
@@ -712,6 +761,12 @@ async function copyReplyToClipboard(replyText) {
  */
 function closeModal() {
   if (!currentModal) return;
+  
+  // Clean up cache update listener if it exists
+  if (currentModal._removeCacheListener) {
+    currentModal._removeCacheListener();
+    currentModal._removeCacheListener = null;
+  }
   
   // Animate out
   currentModal.classList.remove('ai-reply-modal-visible');
