@@ -24,7 +24,7 @@
   - The modal becomes a pure "view" of the cache state - all generation happens in the background via URL change detection
   - Visible result: modal opens instantly showing either cached response or loading state; no API calls are triggered by opening the modal
 
-- [ ] Task 3: Generate 5 different responses per tweet
+- [x] Task 3: Generate 5 different responses per tweet
   - Update the Grok API call to request 5 completions (use `n: 5` parameter or make 5 parallel requests with varied temperature)
   - Store all 5 responses in the cache alongside the tweet URL
   - Visible result: API now returns 5 distinct reply options per tweet. Concole.log the responses

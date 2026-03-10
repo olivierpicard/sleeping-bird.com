@@ -126,11 +126,11 @@ async function prefetchResponseForCurrentTweet() {
   
   console.log('Starting background API call for tweet:', tweetUrl);
   
-  // Call API in the background and cache the result
+  // Call API in the background and cache the result (array of 5 responses)
   try {
-    const generatedReply = await callGrokAPI(tweetText, apiKey);
-    responseCache.set(tweetUrl, generatedReply);
-    console.log('Response cached for:', tweetUrl);
+    const generatedReplies = await callGrokAPI(tweetText, apiKey);
+    responseCache.set(tweetUrl, generatedReplies);
+    console.log('5 responses cached for:', tweetUrl);
   } catch (error) {
     console.error('Error prefetching response:', error);
     // Don't cache errors - let the modal handle them if user clicks
@@ -505,11 +505,12 @@ async function openModal(anchorButton) {
 
   // Check if we have a cached response for the current tweet
   const tweetUrl = getCurrentTweetUrl();
-  const cachedResponse = tweetUrl ? responseCache.get(tweetUrl) : null;
+  const cachedResponses = tweetUrl ? responseCache.get(tweetUrl) : null;
   
-  if (cachedResponse) {
-    console.log('Using cached response for:', tweetUrl);
-    showGeneratedReply(modal, cachedResponse);
+  if (cachedResponses && Array.isArray(cachedResponses) && cachedResponses.length > 0) {
+    console.log('Using cached responses for:', tweetUrl);
+    // For now, display the first response (Task 4 will handle displaying all 5)
+    showGeneratedReply(modal, cachedResponses[0]);
   } else {
     // No cached response - show loading state
     console.log('No cached response available, showing loading state');
@@ -521,10 +522,10 @@ async function openModal(anchorButton) {
 }
 
 /**
- * Call the Grok API to generate a thoughtful reply
+ * Call the Grok API to generate 5 thoughtful replies
  * @param {string} tweetText - The tweet text to reply to
  * @param {string} apiKey - The Grok API key
- * @returns {Promise<string>} The generated reply text
+ * @returns {Promise<string[]>} Array of 5 generated reply texts
  */
 async function callGrokAPI(tweetText, apiKey) {
   const endpoint = 'https://api.x.ai/v1/chat/completions';
@@ -562,8 +563,9 @@ Guidelines:
         content: userPrompt
       }
     ],
-    temperature: 0.7,
-    max_tokens: 150
+    temperature: 0.8,
+    max_tokens: 150,
+    n: 5  // Request 5 different completions
   };
 
   const response = await fetch(endpoint, {
@@ -591,12 +593,22 @@ Guidelines:
 
   const data = await response.json();
   
-  // Extract the generated reply from the response
-  if (!data.choices || !data.choices[0] || !data.choices[0].message) {
+  // Extract all 5 generated replies from the response
+  if (!data.choices || data.choices.length === 0) {
     throw new Error('Unexpected API response format');
   }
 
-  return data.choices[0].message.content.trim();
+  // Map all choices to their content and log them
+  const replies = data.choices.map(choice => {
+    if (!choice.message || !choice.message.content) {
+      throw new Error('Unexpected API response format');
+    }
+    return choice.message.content.trim();
+  });
+
+  console.log('Generated 5 responses:', replies);
+  
+  return replies;
 }
 
 /**
