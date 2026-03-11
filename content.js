@@ -612,10 +612,19 @@ Guidelines:
         content: userPrompt
       }
     ],
-    temperature: 0.8,
+    temperature: 1.8,  // High value (1.5-2.0) for increased randomness and diversity
+    top_p: 0.95,  // Sample from wider token distribution for more variety
     max_tokens: 150,
     n: 5  // Request 5 different completions
   };
+
+  // Log parameters for debugging
+  console.log('Grok API parameters:', {
+    temperature: requestBody.temperature,
+    top_p: requestBody.top_p,
+    n: requestBody.n,
+    note: 'Using temperature and top_p for diversity (frequency_penalty and presence_penalty not supported by this model)'
+  });
 
   const response = await fetch(endpoint, {
     method: 'POST',

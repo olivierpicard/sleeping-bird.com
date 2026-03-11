@@ -43,3 +43,20 @@
   - Implement a simple event-based or polling approach to check cache updates while modal is open
   - Keep the implementation simple and straightforward for MVP (e.g., use a callback or interval check)
   - Visible result: modal shows loading state initially, then automatically displays the 5 response cards once the background generation completes, without requiring the user to close and reopen the modal
+
+
+- [x] Task 6: Implement temperature and sampling parameters for response diversity
+  - Add temperature parameter to Grok API calls with a high value (1.5-2.0) to increase randomness
+  - Add top_p parameter set to 0.95 or higher to sample from a wider token distribution
+  - Add presence_penalty and frequency_penalty parameters (0.6-0.8 range) to discourage repetitive patterns across the 5 responses
+  - Test different parameter combinations to find the sweet spot for maximum diversity while maintaining quality
+  - Console.log the parameters being used for debugging
+  - Visible result: the 5 generated responses show significantly more variation in style, tone, and content approach
+
+- [ ] Task 7: Force diverse perspectives through prompt engineering
+  - Update the system prompt to explicitly request 5 completely different opinions and approaches, including contrarian views
+  - Add constraint that each response must use a different reasoning framework (e.g., analytical, emotional appeal, factual/data-driven, questioning/socratic, humorous/casual)
+  - Modify the prompt to instruct the AI: "Generate 5 distinct replies with different perspectives. Each must differ in reasoning approach, tone, and opinion. Include contrarian or alternative viewpoints."
+  - Add instruction to avoid similar sentence structures and vocabulary across responses
+  - Test that responses now show genuine disagreement or different angles on the same tweet
+  - Visible result: the 5 responses present noticeably different viewpoints, reasoning styles, and even conflicting opinions rather than variations of the same perspective
