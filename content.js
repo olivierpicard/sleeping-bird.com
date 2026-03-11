@@ -601,7 +601,7 @@ Guidelines:
   const userPrompt = `Generate a thoughtful reply to this tweet:\n\n"${tweetText}"`;
 
   const requestBody = {
-    model: 'grok-4-1-fast',
+    model: 'grok-4-1-fast-non-reasoning',
     messages: [
       {
         role: 'system',
