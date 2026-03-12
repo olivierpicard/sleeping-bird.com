@@ -54,7 +54,7 @@
   - Console.log the parameters being used for debugging
   - Visible result: the 5 generated responses show significantly more variation in style, tone, and content approach
 
-- [ ] Task 7: Force diverse perspectives through prompt engineering
+- [] Task 7: Force diverse perspectives through prompt engineering
   **Dev Traceability Note: Reverted because it is inefficient. The responses are confusing and not really useful. The task is kept here for traceability.**
   - Update the system prompt to explicitly request 5 completely different opinions and approaches, including contrarian views
   - Add constraint that each response must use a different reasoning framework (e.g., analytical, emotional appeal, factual/data-driven, questioning/socratic, humorous/casual)
