@@ -46,19 +46,19 @@
 
 
 - [x] Task 6: Implement temperature and sampling parameters for response diversity
+  **Dev traceability Note: The program give way more helpfull response.**
   - Add temperature parameter to Grok API calls with a high value (1.5-2.0) to increase randomness
   - Add top_p parameter set to 0.95 or higher to sample from a wider token distribution
   - Add presence_penalty and frequency_penalty parameters (0.6-0.8 range) to discourage repetitive patterns across the 5 responses
   - Test different parameter combinations to find the sweet spot for maximum diversity while maintaining quality
   - Console.log the parameters being used for debugging
   - Visible result: the 5 generated responses show significantly more variation in style, tone, and content approach
-  - Comment on this task: The program give way more helpfull response.
 
-- [x] Task 7: Force diverse perspectives through prompt engineering (Option 2: Separate API calls)
-  - Change from `n: 5` to making 5 separate API calls with `n: 1` each
-  - Define 5 distinct reasoning frameworks: analytical/logical, emotional appeal, questioning/socratic, humorous/casual, contrarian/alternative
-  - Create 5 different system prompts, each focused on ONE specific framework
-  - Each prompt should say: "You are generating ONE reply to a tweet. Use this specific approach: [framework]. Be authentic and concise. Generate ONLY the reply text itself"
-  - Make 5 sequential API calls, each with its dedicated single-framework prompt
-  - Collect all 5 responses and store them in the cache
-  - Visible result: the 5 responses are cleanly separated, each presenting one distinct viewpoint/reasoning style without numbered formatting or mixed perspectives within a single response
+- [ ] Task 7: Force diverse perspectives through prompt engineering
+  **Dev Traceability Note: Reverted because it is inefficient. The responses are confusing and not really useful. The task is kept here for traceability.**
+  - Update the system prompt to explicitly request 5 completely different opinions and approaches, including contrarian views
+  - Add constraint that each response must use a different reasoning framework (e.g., analytical, emotional appeal, factual/data-driven, questioning/socratic, humorous/casual)
+  - Modify the prompt to instruct the AI: "Generate 5 distinct replies with different perspectives. Each must differ in reasoning approach, tone, and opinion. Include contrarian or alternative viewpoints."
+  - Add instruction to avoid similar sentence structures and vocabulary across responses
+  - Test that responses now show genuine disagreement or different angles on the same tweet
+  - Visible result: the 5 responses present noticeably different viewpoints, reasoning styles, and even conflicting opinions rather than variations of the same perspective

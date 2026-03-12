@@ -579,98 +579,92 @@ async function openModal(anchorButton) {
 async function callGrokAPI(tweetText, apiKey) {
   const endpoint = 'https://api.x.ai/v1/chat/completions';
   
-  // Define 5 distinct reasoning frameworks with dedicated prompts
-  const frameworks = [
-    {
-      name: 'Analytical/Logical',
-      prompt: 'You are generating ONE reply to a tweet. Use this specific approach: Analytical/Logical - be data-driven, use systematic thinking, provide evidence-based insights. Be authentic and concise. Generate ONLY the reply text itself.'
-    },
-    {
-      name: 'Emotional Appeal',
-      prompt: 'You are generating ONE reply to a tweet. Use this specific approach: Emotional Appeal - be empathetic, create personal connection, focus on feelings and human experience. Be authentic and concise. Generate ONLY the reply text itself.'
-    },
-    {
-      name: 'Questioning/Socratic',
-      prompt: 'You are generating ONE reply to a tweet. Use this specific approach: Questioning/Socratic - ask thought-provoking questions, challenge assumptions, encourage deeper thinking. Be authentic and concise. Generate ONLY the reply text itself.'
-    },
-    {
-      name: 'Humorous/Casual',
-      prompt: 'You are generating ONE reply to a tweet. Use this specific approach: Humorous/Casual - be witty, lighthearted, use playful tone and humor. Be authentic and concise. Generate ONLY the reply text itself.'
-    },
-    {
-      name: 'Contrarian/Alternative',
-      prompt: 'You are generating ONE reply to a tweet. Use this specific approach: Contrarian/Alternative - present an opposing view, play devil\'s advocate, offer an unpopular or alternative opinion. Be authentic and concise. Generate ONLY the reply text itself.'
-    }
-  ];
+  const systemPrompt = `You are a thoughtful twitter assistant. Your task is to craft insightful, valuable replies to tweets.
 
-  console.log('Making 5 parallel API calls with distinct reasoning frameworks');
+Guidelines:
+- NO generic responses like "Great point!" or "Thanks for sharing"
+- Bring a NEW angle, insight, or perspective to the conversation
+- Be concise
+- Be authentic
+- Be positive
+- Make humble yet very human-like response
+- Use simple and basic vocabulary
+- Use every day oral vocabulary
+- Make the reply feel human, not AI-generated
+- Add value through: a complementary insight, a constructive challenge, a useful resource, or an unpopullar opnion
+- Let people knpw your conviction but respect others
+- Avoid clichés and platitudes
+- Make the sentence natural and human-like
+- Use short sentences and emojis when appropriate
+- Match the tone of the original tweet (professional, casual, humorous, etc.)`;
 
-  // Make 5 parallel API calls, each with its dedicated single-framework prompt
-  const apiCallPromises = frameworks.map((framework, index) => {
-    console.log(`Starting API call ${index + 1}/5: ${framework.name}`);
-    
-    const requestBody = {
-      model: 'grok-4-1-fast-non-reasoning',
-      messages: [
-        {
-          role: 'system',
-          content: framework.prompt
-        },
-        {
-          role: 'user',
-          content: `Reply to this tweet:\n\n"${tweetText}"`
-        }
-      ],
-      temperature: 1.8,
-      top_p: 0.95,
-      max_tokens: 150,
-      n: 1  // Request only 1 completion per call
-    };
+  const userPrompt = `Generate a thoughtful reply to this tweet:\n\n"${tweetText}"`;
 
-    return fetch(endpoint, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`
+  const requestBody = {
+    model: 'grok-4-1-fast-non-reasoning',
+    messages: [
+      {
+        role: 'system',
+        content: systemPrompt
       },
-      body: JSON.stringify(requestBody)
-    })
-    .then(async response => {
-      if (!response.ok) {
-        // Handle different error types
-        if (response.status === 401) {
-          throw new Error('Invalid API key. Please check your Grok API key in the extension popup.');
-        } else if (response.status === 429) {
-          throw new Error('Rate limit exceeded. Please try again in a few moments.');
-        } else if (response.status >= 500) {
-          throw new Error('Grok API service error. Please try again later.');
-        } else {
-          const errorData = await response.json().catch(() => ({}));
-          throw new Error(errorData.error?.message || `API error: ${response.status}`);
-        }
+      {
+        role: 'user',
+        content: userPrompt
       }
-      return response.json();
-    })
-    .then(data => {
-      // Extract the generated reply from the response
-      if (!data.choices || data.choices.length === 0) {
-        throw new Error('Unexpected API response format');
-      }
+    ],
+    temperature: 1.8,  // High value (1.5-2.0) for increased randomness and diversity
+    top_p: 0.95,  // Sample from wider token distribution for more variety
+    max_tokens: 150,
+    n: 5  // Request 5 different completions
+  };
 
-      if (!data.choices[0].message || !data.choices[0].message.content) {
-        throw new Error('Unexpected API response format');
-      }
-
-      const reply = data.choices[0].message.content.trim();
-      console.log(`Response ${index + 1} (${framework.name}):`, reply);
-      return reply;
-    });
+  // Log parameters for debugging
+  console.log('Grok API parameters:', {
+    temperature: requestBody.temperature,
+    top_p: requestBody.top_p,
+    n: requestBody.n,
+    note: 'Using temperature and top_p for diversity (frequency_penalty and presence_penalty not supported by this model)'
   });
 
-  // Wait for all 5 API calls to complete in parallel
-  const replies = await Promise.all(apiCallPromises);
+  const response = await fetch(endpoint, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${apiKey}`
+    },
+    body: JSON.stringify(requestBody)
+  });
+
+  if (!response.ok) {
+    // Handle different error types
+    if (response.status === 401) {
+      throw new Error('Invalid API key. Please check your Grok API key in the extension popup.');
+    } else if (response.status === 429) {
+      throw new Error('Rate limit exceeded. Please try again in a few moments.');
+    } else if (response.status >= 500) {
+      throw new Error('Grok API service error. Please try again later.');
+    } else {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.error?.message || `API error: ${response.status}`);
+    }
+  }
+
+  const data = await response.json();
   
-  console.log('All 5 responses generated with distinct frameworks');
+  // Extract all 5 generated replies from the response
+  if (!data.choices || data.choices.length === 0) {
+    throw new Error('Unexpected API response format');
+  }
+
+  // Map all choices to their content and log them
+  const replies = data.choices.map(choice => {
+    if (!choice.message || !choice.message.content) {
+      throw new Error('Unexpected API response format');
+    }
+    return choice.message.content.trim();
+  });
+
+  console.log('Generated 5 responses:', replies);
   
   return replies;
 }
