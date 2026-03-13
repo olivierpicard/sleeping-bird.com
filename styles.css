@@ -164,6 +164,69 @@
   overflow-y: auto;
 }
 
+/* Input Area */
+.ai-reply-input-area {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Textarea */
+.ai-reply-textarea {
+  width: 100%;
+  min-height: 100px;
+  padding: 12px;
+  background-color: rgb(22, 24, 28);
+  border: 1px solid rgb(47, 51, 54);
+  border-radius: 12px;
+  color: rgb(231, 233, 234);
+  font-size: 15px;
+  line-height: 1.5;
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial,
+    sans-serif;
+  resize: vertical;
+  transition: border-color 0.2s ease;
+}
+
+.ai-reply-textarea::placeholder {
+  color: rgb(113, 118, 123);
+}
+
+.ai-reply-textarea:focus {
+  outline: none;
+  border-color: rgb(29, 155, 240);
+}
+
+/* Generate Button */
+.ai-reply-generate-btn {
+  align-self: flex-end;
+  padding: 10px 24px;
+  background-color: rgb(29, 155, 240);
+  color: rgb(255, 255, 255);
+  font-size: 15px;
+  font-weight: 700;
+  border: none;
+  border-radius: 9999px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  min-width: 100px;
+}
+
+.ai-reply-generate-btn:hover {
+  background-color: rgb(26, 140, 216);
+}
+
+.ai-reply-generate-btn:active {
+  background-color: rgb(23, 125, 194);
+}
+
+.ai-reply-generate-btn:disabled {
+  background-color: rgb(47, 51, 54);
+  color: rgb(113, 118, 123);
+  cursor: not-allowed;
+}
+
 /* Loading Area */
 .ai-reply-loading-area {
   display: flex;
@@ -254,4 +317,49 @@
 
 .ai-reply-modal-body::-webkit-scrollbar-thumb:hover {
   background-color: rgb(62, 65, 68);
+}
+
+/* Error Display */
+.ai-reply-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 20px;
+  text-align: center;
+}
+
+.ai-reply-error-icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+}
+
+.ai-reply-error-message {
+  color: rgb(231, 233, 234);
+  font-size: 15px;
+  line-height: 1.5;
+  margin-bottom: 20px;
+  max-width: 300px;
+}
+
+/* Retry Button */
+.ai-reply-retry-btn {
+  padding: 10px 24px;
+  background-color: rgb(29, 155, 240);
+  color: rgb(255, 255, 255);
+  font-size: 15px;
+  font-weight: 700;
+  border: none;
+  border-radius: 9999px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  min-width: 100px;
+}
+
+.ai-reply-retry-btn:hover {
+  background-color: rgb(26, 140, 216);
+}
+
+.ai-reply-retry-btn:active {
+  background-color: rgb(23, 125, 194);
 }

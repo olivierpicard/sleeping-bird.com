@@ -9,43 +9,8 @@ const STORAGE_KEY = 'grokApiKey';
 // Track which tweets already have our icon to avoid duplicates
 const processedTweets = new WeakSet();
 
-// Cache for generated responses keyed by tweet URL
-const responseCache = new Map();
-
-// Track the current tweet URL to detect navigation
-let currentTweetUrl = null;
-
-// Cache update listeners - callbacks to notify when cache is updated
-const cacheUpdateListeners = new Set();
-
-/**
- * Add a cache update listener
- * @param {Function} callback - Function to call when cache is updated
- * @returns {Function} Function to remove the listener
- */
-function addCacheUpdateListener(callback) {
-  cacheUpdateListeners.add(callback);
-  
-  // Return a function to remove the listener
-  return () => {
-    cacheUpdateListeners.delete(callback);
-  };
-}
-
-/**
- * Notify all cache update listeners
- * @param {string} tweetUrl - The tweet URL that was updated
- * @param {string[]} responses - The cached responses
- */
-function notifyCacheUpdate(tweetUrl, responses) {
-  cacheUpdateListeners.forEach(callback => {
-    try {
-      callback(tweetUrl, responses);
-    } catch (error) {
-      console.error('Error in cache update listener:', error);
-    }
-  });
-}
+// Track the current modal
+let currentModal = null;
 
 /**
  * Get the Grok API key from chrome.storage.sync
@@ -60,423 +25,11 @@ async function getApiKey() {
 }
 
 /**
- * Check if the current URL is a tweet detail page
- * @returns {boolean} True if on a tweet detail page
- */
-function isTweetDetailPage() {
-  return window.location.pathname.includes('/status/');
-}
-
-/**
- * Extract tweet URL from the current page
- * @returns {string|null} The tweet URL or null if not on a tweet detail page
- */
-function getCurrentTweetUrl() {
-  if (!isTweetDetailPage()) {
-    return null;
-  }
-  
-  // Extract the tweet URL from the current page URL
-  // Format: https://x.com/username/status/1234567890
-  const match = window.location.pathname.match(/\/status\/(\d+)/);
-  if (match) {
-    return window.location.pathname; // Use pathname as the cache key
-  }
-  
-  return null;
-}
-
-/**
- * Extract tweet text from the main tweet on a detail page
+ * Extract tweet text from the DOM
+ * @param {HTMLElement} anchorButton - The button that was clicked
  * @returns {string|null} The tweet text or null if not found
  */
-function extractMainTweetText() {
-  // Strategy 1: Try to find the main tweet article
-  let mainTweet = document.querySelector('article[data-testid="tweet"]');
-  
-  // Strategy 2: If not found, try finding by role="article"
-  if (!mainTweet) {
-    const articles = document.querySelectorAll('article');
-    if (articles.length > 0) {
-      mainTweet = articles[0]; // First article is usually the main tweet
-    }
-  }
-  
-  if (!mainTweet) {
-    console.warn('Could not find main tweet on detail page');
-    return null;
-  }
-  
-  // Find the tweet text element
-  const tweetTextElement = mainTweet.querySelector('[data-testid="tweetText"]');
-  
-  if (!tweetTextElement) {
-    console.warn('Could not find tweet text in main tweet');
-    return null;
-  }
-  
-  const tweetText = tweetTextElement.textContent.trim();
-  
-  if (!tweetText) {
-    console.warn('Tweet text is empty');
-    return null;
-  }
-  
-  return tweetText;
-}
-
-/**
- * Start generating AI response in the background for the current tweet
- */
-async function prefetchResponseForCurrentTweet() {
-  const tweetUrl = getCurrentTweetUrl();
-  
-  if (!tweetUrl) {
-    console.log('Not on a tweet detail page, skipping prefetch');
-    return;
-  }
-  
-  // Check if we already have a cached response
-  if (responseCache.has(tweetUrl)) {
-    console.log('Response already cached for:', tweetUrl);
-    return;
-  }
-  
-  // Get API key
-  const apiKey = await getApiKey();
-  if (!apiKey) {
-    console.log('No API key configured, skipping prefetch');
-    return;
-  }
-  
-  // Extract tweet text
-  const tweetText = extractMainTweetText();
-  if (!tweetText) {
-    console.log('Could not extract tweet text, skipping prefetch');
-    return;
-  }
-  
-  console.log('Starting background API call for tweet:', tweetUrl);
-  
-  // Call API in the background and cache the result (array of 5 responses)
-  try {
-    const generatedReplies = await callGrokAPI(tweetText, apiKey);
-    responseCache.set(tweetUrl, generatedReplies);
-    console.log('5 responses cached for:', tweetUrl);
-    
-    // Notify listeners that cache has been updated
-    notifyCacheUpdate(tweetUrl, generatedReplies);
-  } catch (error) {
-    console.error('Error prefetching response:', error);
-    // Don't cache errors - let the modal handle them if user clicks
-  }
-}
-
-/**
- * Clear stale cache entries when navigating away from a tweet
- */
-function clearStaleCache() {
-  const tweetUrl = getCurrentTweetUrl();
-  
-  // If we're not on a tweet detail page, clear the entire cache
-  if (!tweetUrl) {
-    if (responseCache.size > 0) {
-      console.log('Clearing all cached responses (not on tweet detail page)');
-      responseCache.clear();
-    }
-    return;
-  }
-  
-  // If we're on a different tweet, clear old entries
-  // Keep only the current tweet's cache
-  const keysToDelete = [];
-  for (const key of responseCache.keys()) {
-    if (key !== tweetUrl) {
-      keysToDelete.push(key);
-    }
-  }
-  
-  if (keysToDelete.length > 0) {
-    console.log('Clearing stale cache entries:', keysToDelete);
-    keysToDelete.forEach(key => responseCache.delete(key));
-  }
-}
-
-/**
- * Handle URL changes and trigger background API calls
- */
-function handleUrlChange() {
-  const newTweetUrl = getCurrentTweetUrl();
-  
-  // Check if we've navigated to a different tweet or away from tweets
-  if (newTweetUrl !== currentTweetUrl) {
-    console.log('URL changed from', currentTweetUrl, 'to', newTweetUrl);
-    currentTweetUrl = newTweetUrl;
-    
-    // Clear stale cache entries
-    clearStaleCache();
-    
-    // If we're on a tweet detail page, start prefetching
-    if (newTweetUrl) {
-      // Wait a bit for the DOM to be ready
-      setTimeout(() => {
-        prefetchResponseForCurrentTweet();
-      }, 500);
-    }
-  }
-}
-
-/**
- * Set up URL change detection
- */
-function initUrlChangeDetection() {
-  // Initial check on page load/refresh
-  currentTweetUrl = getCurrentTweetUrl();
-  if (currentTweetUrl) {
-    console.log('Tweet detail page detected on load:', currentTweetUrl);
-    // Wait for DOM to be ready before prefetching
-    // Use a retry mechanism with increasing delays
-    const attemptPrefetch = (retries = 5, delay = 1000) => {
-      const tweetText = extractMainTweetText();
-      if (tweetText) {
-        console.log('Tweet text extracted successfully, starting prefetch');
-        prefetchResponseForCurrentTweet();
-      } else if (retries > 0) {
-        console.log(`Tweet text not ready, retrying in ${delay}ms... (${retries} attempts left)`);
-        setTimeout(() => attemptPrefetch(retries - 1, delay + 500), delay);
-      } else {
-        console.warn('Could not extract tweet text after multiple attempts');
-      }
-    };
-    
-    // Start attempting after a short initial delay
-    setTimeout(() => attemptPrefetch(), 1000);
-  }
-  
-  // Listen for popstate events (back/forward navigation)
-  window.addEventListener('popstate', handleUrlChange);
-  
-  // Intercept pushState and replaceState to detect SPA navigation
-  const originalPushState = history.pushState;
-  const originalReplaceState = history.replaceState;
-  
-  history.pushState = function(...args) {
-    originalPushState.apply(this, args);
-    handleUrlChange();
-  };
-  
-  history.replaceState = function(...args) {
-    originalReplaceState.apply(this, args);
-    handleUrlChange();
-  };
-  
-  // Also poll for URL changes as a fallback (X.com uses SPA navigation)
-  setInterval(handleUrlChange, 1000);
-  
-  console.log('URL change detection initialized');
-}
-
-/**
- * Create the AI reply icon button
- */
-function createAIReplyIcon() {
-  const button = document.createElement('button');
-  button.className = 'ai-reply-icon-btn';
-  button.setAttribute('aria-label', 'Generate AI reply');
-  button.setAttribute('type', 'button');
-  
-  // Use sparkle emoji as icon
-  button.innerHTML = `
-    <div class="ai-reply-icon-wrapper">
-      <span class="ai-reply-icon">✨</span>
-    </div>
-  `;
-  
-  // Add click handler to open modal
-  button.addEventListener('click', (e) => {
-    e.stopPropagation();
-    console.log('AI Reply icon clicked');
-    openModal(button);
-  });
-  
-  return button;
-}
-
-/**
- * Inject AI reply icon into a compose toolbar
- */
-function injectAIReplyIcon(toolbar) {
-  // Avoid processing the same toolbar twice
-  if (processedTweets.has(toolbar)) {
-    return;
-  }
-  
-  // Mark as processed
-  processedTweets.add(toolbar);
-  
-  // Create a wrapper div with role="presentation" to match X.com's structure
-  const wrapper = document.createElement('div');
-  wrapper.setAttribute('role', 'presentation');
-  wrapper.className = 'css-175oi2r r-14tvyh0 r-cpa5s6';
-  
-  // Create and append the icon
-  const aiIcon = createAIReplyIcon();
-  wrapper.appendChild(aiIcon);
-  
-  // Insert the wrapper into the toolbar
-  // Try to insert it after the Grok button if it exists, otherwise append to the end
-  const grokButton = toolbar.querySelector('[data-testid="grokImgGen"]');
-  if (grokButton && grokButton.parentElement) {
-    // Insert after the Grok button's wrapper
-    grokButton.parentElement.insertAdjacentElement('afterend', wrapper);
-  } else {
-    // Fallback: append to the end
-    toolbar.appendChild(wrapper);
-  }
-}
-
-/**
- * Find and process all comment compose toolbars on the page
- */
-function processActionBars() {
-  // Target the compose toolbar with role="tablist" that contains image, GIF, Grok, emoji buttons
-  // This is the toolbar in the reply/comment compose area
-  const toolbars = document.querySelectorAll('[role="tablist"][data-testid="ScrollSnap-List"]');
-  
-  toolbars.forEach((toolbar) => {
-    // Verify this is actually a compose toolbar by checking for typical buttons
-    const hasGifButton = toolbar.querySelector('[data-testid="gifSearchButton"]');
-    const hasGrokButton = toolbar.querySelector('[data-testid="grokImgGen"]');
-    const hasFileInput = toolbar.querySelector('[data-testid="fileInput"]');
-    
-    // If it has at least one of these buttons, it's likely a compose toolbar
-    const hasComposeButtons = hasGifButton || hasGrokButton || hasFileInput;
-    
-    if (hasComposeButtons && !processedTweets.has(toolbar)) {
-      injectAIReplyIcon(toolbar);
-    }
-  });
-}
-
-/**
- * Set up MutationObserver to watch for new compose toolbars
- */
-function initObserver() {
-  // Process existing toolbars on page load
-  processActionBars();
-  
-  // Watch for new compose areas being added (when opening reply, quote tweet, etc.)
-  const observer = new MutationObserver((mutations) => {
-    // Check if any new nodes were added
-    let shouldProcess = false;
-    
-    for (const mutation of mutations) {
-      if (mutation.addedNodes.length > 0) {
-        shouldProcess = true;
-        break;
-      }
-    }
-    
-    if (shouldProcess) {
-      processActionBars();
-    }
-  });
-  
-  // Observe the entire document body for changes
-  observer.observe(document.body, {
-    childList: true,
-    subtree: true
-  });
-  
-  console.log('AI Reply icon injection observer initialized for compose toolbars');
-}
-
-// Initialize when DOM is ready
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', () => {
-    initObserver();
-    initUrlChangeDetection();
-  });
-} else {
-  initObserver();
-  initUrlChangeDetection();
-}
-
-/**
- * Modal Management
- */
-
-let currentModal = null;
-
-/**
- * Create the modal HTML structure
- */
-function createModal() {
-  const modal = document.createElement('div');
-  modal.className = 'ai-reply-modal-overlay';
-  
-  modal.innerHTML = `
-    <div class="ai-reply-modal">
-      <div class="ai-reply-modal-header">
-        <h3 class="ai-reply-modal-title">AI Reply Generator</h3>
-        <button class="ai-reply-modal-close" aria-label="Close modal">
-          <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
-            <path d="M10.59 12L4.54 5.96l1.42-1.42L12 10.59l6.04-6.05 1.42 1.42L13.41 12l6.05 6.04-1.42 1.42L12 13.41l-6.04 6.05-1.42-1.42L10.59 12z"></path>
-          </svg>
-        </button>
-      </div>
-      
-      <div class="ai-reply-modal-body">
-        <div class="ai-reply-loading-area">
-          <div class="ai-reply-spinner"></div>
-          <p class="ai-reply-loading-text">Generating reply...</p>
-        </div>
-        
-        <div class="ai-reply-cards-container" style="display: none;">
-          <!-- Response cards will be dynamically inserted here -->
-        </div>
-      </div>
-    </div>
-  `;
-  
-  return modal;
-}
-
-/**
- * Position the modal near the clicked button
- */
-function positionModal(modal, anchorButton) {
-  const modalContent = modal.querySelector('.ai-reply-modal');
-  const rect = anchorButton.getBoundingClientRect();
-  
-  // Position below and slightly to the right of the button
-  const top = rect.bottom + 8;
-  const left = rect.left;
-  
-  modalContent.style.top = `${top}px`;
-  modalContent.style.left = `${left}px`;
-  
-  // Ensure modal stays within viewport
-  requestAnimationFrame(() => {
-    const modalRect = modalContent.getBoundingClientRect();
-    
-    // Adjust if modal goes off right edge
-    if (modalRect.right > window.innerWidth - 16) {
-      modalContent.style.left = `${window.innerWidth - modalRect.width - 16}px`;
-    }
-    
-    // Adjust if modal goes off bottom edge
-    if (modalRect.bottom > window.innerHeight - 16) {
-      modalContent.style.top = `${rect.top - modalRect.height - 8}px`;
-    }
-  });
-}
-
-/**
- * Extract tweet text from the DOM
- * Finds the original tweet that the user is replying to
- */
-function extractTweetText(anchorButton) {
+function extractMainTweetText(anchorButton) {
   // Strategy 1: Find the tweet article that contains the compose toolbar
   // The compose toolbar is inside the tweet article when replying inline
   let tweetArticle = anchorButton.closest('article[data-testid="tweet"]');
@@ -514,91 +67,33 @@ function extractTweetText(anchorButton) {
 }
 
 /**
- * Open the modal
- */
-async function openModal(anchorButton) {
-  // Close existing modal if any
-  if (currentModal) {
-    closeModal();
-  }
-  
-  // Create and add modal to DOM
-  const modal = createModal();
-  document.body.appendChild(modal);
-  currentModal = modal;
-  
-  // Position the modal
-  positionModal(modal, anchorButton);
-  
-  // Add event listeners
-  setupModalEventListeners(modal);
-  
-  // Animate in
-  requestAnimationFrame(() => {
-    modal.classList.add('ai-reply-modal-visible');
-  });
-
-  // Check if we have a cached response for the current tweet
-  const tweetUrl = getCurrentTweetUrl();
-  const cachedResponses = tweetUrl ? responseCache.get(tweetUrl) : null;
-  
-  if (cachedResponses && Array.isArray(cachedResponses) && cachedResponses.length > 0) {
-    console.log('Using cached responses for:', tweetUrl);
-    // Display all 5 responses as cards
-    showResponseCards(modal, cachedResponses);
-  } else {
-    // No cached response - show loading state and register listener
-    console.log('No cached response available, showing loading state');
-    const loadingTextElement = modal.querySelector('.ai-reply-loading-text');
-    if (loadingTextElement) {
-      loadingTextElement.textContent = 'Generating response...';
-    }
-    
-    // Register a cache update listener to update the modal when responses arrive
-    if (tweetUrl) {
-      const removeListener = addCacheUpdateListener((updatedTweetUrl, responses) => {
-        // Check if this update is for the current tweet
-        if (updatedTweetUrl === tweetUrl && currentModal === modal) {
-          console.log('Cache updated for current tweet, updating modal');
-          showResponseCards(modal, responses);
-        }
-      });
-      
-      // Store the remove function so we can clean it up when modal closes
-      modal._removeCacheListener = removeListener;
-    }
-  }
-}
-
-/**
- * Call the Grok API to generate 5 thoughtful replies
- * @param {string} tweetText - The tweet text to reply to
+ * Call the Grok API to generate reply variations
+ * @param {string} tweetText - The original tweet text for context
+ * @param {string} userDraft - The user's draft reply to expand on
  * @param {string} apiKey - The Grok API key
- * @returns {Promise<string[]>} Array of 5 generated reply texts
+ * @returns {Promise<string[]>} Array of 5 generated reply variations
  */
-async function callGrokAPI(tweetText, apiKey) {
+async function callGrokAPI(tweetText, userDraft, apiKey) {
   const endpoint = 'https://api.x.ai/v1/chat/completions';
   
-  const systemPrompt = `You are a thoughtful twitter assistant. Your task is to craft insightful, valuable replies to tweets.
+  const systemPrompt = `You are a thoughtful twitter assistant. Your task is to expand and riff on the user's draft reply, using the original tweet as context.
 
 Guidelines:
-- NO generic responses like "Great point!" or "Thanks for sharing"
-- Bring a NEW angle, insight, or perspective to the conversation
-- Be concise
-- Be authentic
-- Be positive
-- Make humble yet very human-like response
-- Use simple and basic vocabulary
-- Use every day oral vocabulary
-- Make the reply feel human, not AI-generated
-- Add value through: a complementary insight, a constructive challenge, a useful resource, or an unpopullar opnion
-- Let people knpw your conviction but respect others
-- Avoid clichés and platitudes
-- Make the sentence natural and human-like
-- Use short sentences and emojis when appropriate
-- Match the tone of the original tweet (professional, casual, humorous, etc.)`;
+- Take the user's draft as the main direction and creative seed
+- Expand it into a complete, polished reply
+- Use the original tweet as context to ensure relevance
+- Create variations that explore different angles or tones of the same core idea
+- Be concise but add depth and personality
+- Make each variation feel natural and human
+- Use simple, everyday vocabulary
+- Add emojis sparingly when appropriate
+- Match or slightly elevate the tone of the user's draft`;
 
-  const userPrompt = `Generate a thoughtful reply to this tweet:\n\n"${tweetText}"`;
+  const userPrompt = `Original tweet: "${tweetText}"
+
+User's draft reply: "${userDraft}"
+
+Generate 5 varied expansions of this draft reply. Each should capture the essence of the user's idea while adding polish, personality, and depth.`;
 
   const requestBody = {
     model: 'grok-4-1-fast-non-reasoning',
@@ -612,19 +107,13 @@ Guidelines:
         content: userPrompt
       }
     ],
-    temperature: 1.8,  // High value (1.5-2.0) for increased randomness and diversity
-    top_p: 0.95,  // Sample from wider token distribution for more variety
+    temperature: 1.8,  // High value for diversity across variations
+    top_p: 0.95,
     max_tokens: 150,
     n: 5  // Request 5 different completions
   };
 
-  // Log parameters for debugging
-  console.log('Grok API parameters:', {
-    temperature: requestBody.temperature,
-    top_p: requestBody.top_p,
-    n: requestBody.n,
-    note: 'Using temperature and top_p for diversity (frequency_penalty and presence_penalty not supported by this model)'
-  });
+  console.log('Calling Grok API with user draft:', userDraft);
 
   const response = await fetch(endpoint, {
     method: 'POST',
@@ -656,7 +145,7 @@ Guidelines:
     throw new Error('Unexpected API response format');
   }
 
-  // Map all choices to their content and log them
+  // Map all choices to their content
   const replies = data.choices.map(choice => {
     if (!choice.message || !choice.message.content) {
       throw new Error('Unexpected API response format');
@@ -664,7 +153,7 @@ Guidelines:
     return choice.message.content.trim();
   });
 
-  console.log('Generated 5 responses:', replies);
+  console.log('Generated 5 response variations:', replies);
   
   return replies;
 }
@@ -698,7 +187,7 @@ function showResponseCards(modal, responses) {
     card.setAttribute('data-index', index);
     card.textContent = replyText;
 
-    // Add click handler to select and insert the reply
+    // Add click handler to select and copy the reply
     card.addEventListener('click', async (e) => {
       e.stopPropagation();
       
@@ -729,28 +218,6 @@ function showResponseCards(modal, responses) {
 }
 
 /**
- * Show an error message in the modal
- * @param {HTMLElement} modal - The modal element
- * @param {string} errorMessage - The error message to display
- */
-function showError(modal, errorMessage) {
-  // Hide loading area
-  const loadingArea = modal.querySelector('.ai-reply-loading-area');
-  if (loadingArea) {
-    loadingArea.style.display = 'none';
-  }
-
-  // Show error in preview area
-  const previewArea = modal.querySelector('.ai-reply-preview-area');
-  const previewText = modal.querySelector('.ai-reply-preview-text');
-  
-  if (previewArea && previewText) {
-    previewText.innerHTML = `<div style="color: #f4212e; font-weight: 500;">⚠️ Error</div><div style="margin-top: 8px;">${errorMessage}</div>`;
-    previewArea.style.display = 'block';
-  }
-}
-
-/**
  * Insert the generated reply into X.com's reply composer
  * @param {string} replyText - The text to insert
  */
@@ -771,12 +238,6 @@ async function copyReplyToClipboard(replyText) {
 function closeModal() {
   if (!currentModal) return;
   
-  // Clean up cache update listener if it exists
-  if (currentModal._removeCacheListener) {
-    currentModal._removeCacheListener();
-    currentModal._removeCacheListener = null;
-  }
-  
   // Animate out
   currentModal.classList.remove('ai-reply-modal-visible');
   
@@ -792,7 +253,7 @@ function closeModal() {
 /**
  * Setup event listeners for modal interactions
  */
-function setupModalEventListeners(modal) {
+function setupModalEventListeners(modal, anchorButton) {
   // Close button
   const closeBtn = modal.querySelector('.ai-reply-modal-close');
   closeBtn.addEventListener('click', (e) => {
@@ -821,4 +282,289 @@ function setupModalEventListeners(modal) {
     }
   };
   document.addEventListener('keydown', escapeHandler);
+  
+  // Generate button click handler
+  const generateBtn = modal.querySelector('.ai-reply-generate-btn');
+  const textarea = modal.querySelector('.ai-reply-textarea');
+  const inputArea = modal.querySelector('.ai-reply-input-area');
+  const loadingArea = modal.querySelector('.ai-reply-loading-area');
+  
+  generateBtn.addEventListener('click', async (e) => {
+    e.stopPropagation();
+    
+    // Validate textarea is not empty
+    const userDraft = textarea.value.trim();
+    if (!userDraft) {
+      // Show validation feedback
+      textarea.style.borderColor = '#f4212e';
+      textarea.placeholder = 'Please type your draft reply first...';
+      textarea.focus();
+      
+      // Reset border color after a moment
+      setTimeout(() => {
+        textarea.style.borderColor = '';
+        textarea.placeholder = 'Type your draft reply...';
+      }, 2000);
+      
+      return;
+    }
+    
+    // Extract tweet text
+    const tweetText = extractMainTweetText(anchorButton);
+    if (!tweetText) {
+      showErrorWithRetry(modal, 'Could not find the tweet text. Please try again.');
+      return;
+    }
+    
+    // Get API key
+    const apiKey = await getApiKey();
+    if (!apiKey) {
+      showErrorWithRetry(modal, 'API key not found. Please set your Grok API key in the extension popup.');
+      return;
+    }
+    
+    // Hide input area and show loading
+    inputArea.style.display = 'none';
+    loadingArea.style.display = 'block';
+    
+    try {
+      // Call API with both tweet text and user draft
+      const responses = await callGrokAPI(tweetText, userDraft, apiKey);
+      
+      // Show response cards
+      showResponseCards(modal, responses);
+    } catch (error) {
+      console.error('Error generating replies:', error);
+      showErrorWithRetry(modal, error.message || 'Failed to generate replies. Please try again.');
+    }
+  });
+}
+
+/**
+ * Show an error message in the modal with a retry button
+ * @param {HTMLElement} modal - The modal element
+ * @param {string} errorMessage - The error message to display
+ */
+function showErrorWithRetry(modal, errorMessage) {
+  const loadingArea = modal.querySelector('.ai-reply-loading-area');
+  const inputArea = modal.querySelector('.ai-reply-input-area');
+  const cardsContainer = modal.querySelector('.ai-reply-cards-container');
+  
+  // Hide loading and cards
+  if (loadingArea) loadingArea.style.display = 'none';
+  if (cardsContainer) cardsContainer.style.display = 'none';
+  
+  // Clear cards container and show error
+  if (cardsContainer) {
+    cardsContainer.innerHTML = `
+      <div class="ai-reply-error">
+        <div class="ai-reply-error-icon">⚠️</div>
+        <div class="ai-reply-error-message">${errorMessage}</div>
+        <button class="ai-reply-retry-btn">Go Back</button>
+      </div>
+    `;
+    cardsContainer.style.display = 'block';
+    
+    // Add retry button handler
+    const retryBtn = cardsContainer.querySelector('.ai-reply-retry-btn');
+    retryBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      
+      // Hide error and show input area again
+      cardsContainer.style.display = 'none';
+      cardsContainer.innerHTML = '';
+      inputArea.style.display = 'block';
+      
+      // Focus textarea
+      const textarea = modal.querySelector('.ai-reply-textarea');
+      if (textarea) textarea.focus();
+    });
+  }
+}
+
+/**
+ * Create the AI reply icon button
+ */
+function createAIReplyIcon() {
+  const button = document.createElement('button');
+  button.className = 'ai-reply-icon-btn';
+  button.setAttribute('aria-label', 'Generate AI reply');
+  button.setAttribute('type', 'button');
+  
+  // Use sparkle emoji as icon
+  button.innerHTML = `
+    <div class="ai-reply-icon-wrapper">
+      <span class="ai-reply-icon">✨</span>
+    </div>
+  `;
+  
+  // Add click handler to open modal
+  button.addEventListener('click', (e) => {
+    e.stopPropagation();
+    console.log('AI Reply icon clicked');
+    openModal(button);
+  });
+  
+  return button;
+}
+
+/**
+ * Inject AI reply icon into a compose toolbar
+ */
+function injectAIReplyIcon(toolbar) {
+  // Avoid processing the same toolbar twice
+  if (processedTweets.has(toolbar)) {
+    return;
+  }
+  
+  processedTweets.add(toolbar);
+  
+  // Create and insert the icon
+  const icon = createAIReplyIcon();
+  
+  // Insert at the beginning of the toolbar
+  toolbar.insertBefore(icon, toolbar.firstChild);
+  
+  console.log('AI Reply icon injected into toolbar');
+}
+
+/**
+ * Find and process all compose action bars on the page
+ */
+function processActionBars() {
+  // Find all compose toolbars (reply, quote tweet, etc.)
+  const toolbars = document.querySelectorAll('[data-testid="toolBar"]');
+  
+  toolbars.forEach(toolbar => {
+    injectAIReplyIcon(toolbar);
+  });
+}
+
+/**
+ * Initialize the MutationObserver to watch for new compose areas
+ */
+function initObserver() {
+  // Process existing toolbars on page load
+  processActionBars();
+  
+  // Watch for new compose areas being added
+  const observer = new MutationObserver((mutations) => {
+    let shouldProcess = false;
+    
+    for (const mutation of mutations) {
+      if (mutation.addedNodes.length > 0) {
+        shouldProcess = true;
+        break;
+      }
+    }
+    
+    if (shouldProcess) {
+      processActionBars();
+    }
+  });
+  
+  // Observe the entire document body for changes
+  observer.observe(document.body, {
+    childList: true,
+    subtree: true
+  });
+  
+  console.log('AI Reply icon injection observer initialized');
+}
+
+/**
+ * Create the modal HTML structure with textarea input
+ */
+function createModal() {
+  const modal = document.createElement('div');
+  modal.className = 'ai-reply-modal-overlay';
+  
+  modal.innerHTML = `
+    <div class="ai-reply-modal">
+      <div class="ai-reply-modal-header">
+        <h3 class="ai-reply-modal-title">AI Reply Generator</h3>
+        <button class="ai-reply-modal-close" aria-label="Close modal">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+            <path d="M10.59 12L4.54 5.96l1.42-1.42L12 10.59l6.04-6.05 1.42 1.42L13.41 12l6.05 6.04-1.42 1.42L12 13.41l-6.04 6.05-1.42-1.42L10.59 12z"></path>
+          </svg>
+        </button>
+      </div>
+      
+      <div class="ai-reply-modal-body">
+        <div class="ai-reply-input-area">
+          <textarea 
+            class="ai-reply-textarea" 
+            placeholder="Type your draft reply..."
+            rows="4"
+          ></textarea>
+          <button class="ai-reply-generate-btn">Generate</button>
+        </div>
+        
+        <div class="ai-reply-loading-area" style="display: none;">
+          <div class="ai-reply-spinner"></div>
+          <p class="ai-reply-loading-text">Generating variations...</p>
+        </div>
+        
+        <div class="ai-reply-cards-container" style="display: none;">
+          <!-- Response cards will be dynamically inserted here -->
+        </div>
+      </div>
+    </div>
+  `;
+  
+  return modal;
+}
+
+/**
+ * Position the modal near the clicked button
+ */
+function positionModal(modal, anchorButton) {
+  const modalContent = modal.querySelector('.ai-reply-modal');
+  const rect = anchorButton.getBoundingClientRect();
+  
+  // Position below and slightly to the right of the button
+  const top = rect.bottom + 8;
+  const left = rect.left;
+  
+  modalContent.style.top = `${top}px`;
+  modalContent.style.left = `${left}px`;
+}
+
+/**
+ * Open the modal
+ */
+async function openModal(anchorButton) {
+  // Close existing modal if any
+  if (currentModal) {
+    closeModal();
+  }
+  
+  // Create and add modal to DOM
+  const modal = createModal();
+  document.body.appendChild(modal);
+  currentModal = modal;
+  
+  // Position the modal
+  positionModal(modal, anchorButton);
+  
+  // Add event listeners
+  setupModalEventListeners(modal, anchorButton);
+  
+  // Animate in
+  requestAnimationFrame(() => {
+    modal.classList.add('ai-reply-modal-visible');
+  });
+  
+  // Auto-focus the textarea
+  const textarea = modal.querySelector('.ai-reply-textarea');
+  if (textarea) {
+    setTimeout(() => textarea.focus(), 100);
+  }
+}
+
+// Initialize when DOM is ready
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initObserver);
+} else {
+  initObserver();
 }
