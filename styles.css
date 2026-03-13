@@ -100,7 +100,7 @@
 
 /* Modal Container */
 .ai-reply-modal {
-  position: absolute;
+  position: fixed;
   background-color: rgb(0, 0, 0);
   border: 1px solid rgb(47, 51, 54);
   border-radius: 16px;
@@ -109,12 +109,12 @@
   max-width: calc(100vw - 32px);
   max-height: calc(100vh - 32px);
   overflow: hidden;
-  transform: scale(0.95);
+  transform: scale(0.95) translateX(-50%);
   transition: transform 0.2s ease;
 }
 
 .ai-reply-modal-visible .ai-reply-modal {
-  transform: scale(1);
+  transform: scale(1) translateX(-50%);
 }
 
 /* Modal Header */

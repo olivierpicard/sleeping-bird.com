@@ -17,8 +17,18 @@ let currentModal = null;
  * @returns {Promise<string|null>} The API key or null if not set
  */
 async function getApiKey() {
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
+    // Check if chrome.storage is available
+    if (typeof chrome === 'undefined' || !chrome.storage || !chrome.storage.sync) {
+      reject(new Error('Extension not properly loaded. Please reload the extension.'));
+      return;
+    }
+    
     chrome.storage.sync.get([STORAGE_KEY], (result) => {
+      if (chrome.runtime.lastError) {
+        reject(new Error(chrome.runtime.lastError.message));
+        return;
+      }
       resolve(result[STORAGE_KEY] || null);
     });
   });
@@ -93,7 +103,15 @@ Guidelines:
 
 User's draft reply: "${userDraft}"
 
-Generate 5 varied expansions of this draft reply. Each should capture the essence of the user's idea while adding polish, personality, and depth.`;
+Generate exactly 5 varied expansions of this draft reply. Each should capture the essence of the user's idea while adding polish, personality, and depth.
+
+Format your response as 5 separate replies, each on its own line, numbered 1-5:
+
+1. [First variation]
+2. [Second variation]
+3. [Third variation]
+4. [Fourth variation]
+5. [Fifth variation]`;
 
   const requestBody = {
     model: 'grok-4-1-fast-non-reasoning',
@@ -109,8 +127,7 @@ Generate 5 varied expansions of this draft reply. Each should capture the essenc
     ],
     temperature: 1.8,  // High value for diversity across variations
     top_p: 0.95,
-    max_tokens: 150,
-    n: 5  // Request 5 different completions
+    max_tokens: 150*5  // Increased to accommodate 5 replies in one response
   };
 
   console.log('Calling Grok API with user draft:', userDraft);
@@ -140,22 +157,35 @@ Generate 5 varied expansions of this draft reply. Each should capture the essenc
 
   const data = await response.json();
   
-  // Extract all 5 generated replies from the response
+  // Extract the single response containing all 5 variations
   if (!data.choices || data.choices.length === 0) {
     throw new Error('Unexpected API response format');
   }
 
-  // Map all choices to their content
-  const replies = data.choices.map(choice => {
-    if (!choice.message || !choice.message.content) {
-      throw new Error('Unexpected API response format');
+  const content = data.choices[0]?.message?.content;
+  if (!content) {
+    throw new Error('Unexpected API response format');
+  }
+
+  // Parse the numbered list into separate replies
+  const replies = content
+    .split('\n')
+    .filter(line => line.trim().match(/^\d+\./))  // Find lines starting with numbers
+    .map(line => line.replace(/^\d+\.\s*/, '').trim())  // Remove the number prefix
+    .filter(reply => reply.length > 0);  // Remove empty entries
+
+  // Ensure we have exactly 5 replies
+  if (replies.length < 5) {
+    console.warn('Expected 5 replies but got', replies.length);
+    // Pad with empty strings if needed
+    while (replies.length < 5) {
+      replies.push('');
     }
-    return choice.message.content.trim();
-  });
+  }
 
   console.log('Generated 5 response variations:', replies);
   
-  return replies;
+  return replies.slice(0, 5);  // Return only the first 5
 }
 
 /**
@@ -516,18 +546,16 @@ function createModal() {
 }
 
 /**
- * Position the modal near the clicked button
+ * Position the modal at the top center of the screen
  */
 function positionModal(modal, anchorButton) {
   const modalContent = modal.querySelector('.ai-reply-modal');
-  const rect = anchorButton.getBoundingClientRect();
   
-  // Position below and slightly to the right of the button
-  const top = rect.bottom + 8;
-  const left = rect.left;
-  
-  modalContent.style.top = `${top}px`;
-  modalContent.style.left = `${left}px`;
+  // Center horizontally at the top of the viewport
+  modalContent.style.top = '80px';
+  modalContent.style.left = '50%';
+  modalContent.style.transform = 'translateX(-50%)';
+  modalContent.style.position = 'fixed';
 }
 
 /**
