@@ -1,4 +1,4 @@
-// Popup script for X.com AI Reply Assistant
+// Popup script for Sleeping Bird
 // This script handles the extension popup UI and API key management
 
 console.log('Popup loaded');

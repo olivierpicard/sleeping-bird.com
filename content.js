@@ -1,7 +1,7 @@
-// Content script for X.com AI Reply Assistant
+// Content script for Sleeping Bird
 // This script will inject AI reply functionality into X.com pages
 
-console.log('X.com AI Reply Assistant loaded');
+console.log('Sleeping Bird loaded');
 
 // Storage key constant
 const STORAGE_KEY = 'grokApiKey';

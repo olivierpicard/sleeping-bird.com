@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "X.com AI Reply Assistant",
+  "name": "Sleeping Bird",
   "version": "1.0.0",
-  "description": "Generate thoughtful AI-powered replies for X.com tweets using Grok",
+  "description": "Draft a quick reply idea on X.com and let Sleeping Bird expand it into 3 polished variations you can copy with one click",
   "permissions": ["storage"],
   "host_permissions": ["https://x.com/*", "https://twitter.com/*"],
   "action": {

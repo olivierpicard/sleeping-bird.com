@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Privacy Policy — Sleeping Bird</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      line-height: 1.7;
+      color: #1a1a1a;
+      background: #fafafa;
+      padding: 2rem 1rem;
+    }
+    main {
+      max-width: 720px;
+      margin: 0 auto;
+      background: #fff;
+      border-radius: 8px;
+      padding: 2.5rem 2rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    }
+    h1 { font-size: 1.8rem; margin-bottom: 0.25rem; }
+    h2 { font-size: 1.25rem; margin-top: 2rem; margin-bottom: 0.5rem; color: #333; }
+    h3 { font-size: 1.05rem; margin-top: 1.25rem; margin-bottom: 0.4rem; color: #444; }
+    p, li { margin-bottom: 0.6rem; }
+    ul { padding-left: 1.5rem; }
+    .updated { color: #666; font-size: 0.95rem; margin-bottom: 1.5rem; }
+    a { color: #1d9bf0; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Privacy Policy — Sleeping Bird</h1>
+    <p class="updated">Last updated: March 14, 2026</p>
+
+    <h2>Overview</h2>
+    <p>Sleeping Bird is a Chrome extension that helps users generate AI-powered reply suggestions on X.com (formerly Twitter). Your privacy is important to us.</p>
+
+    <h2>Data Collection</h2>
+    <p>This extension does <strong>not</strong> collect, store, or transmit any personal data to our servers. We do not have servers.</p>
+
+    <h3>What we store locally</h3>
+    <ul>
+      <li><strong>Grok API Key:</strong> Your API key is stored in Chrome's synced storage (<code>chrome.storage.sync</code>) so it persists across sessions. It never leaves your browser except when sent directly to the Grok API to generate replies.</li>
+    </ul>
+
+    <h3>What we send to third parties</h3>
+    <ul>
+      <li><strong>Grok API (api.x.ai):</strong> When you click "Generate," the text of the tweet you're replying to and your draft reply are sent to the Grok API to generate suggestions. This data is governed by <a href="https://x.ai/legal/privacy-policy">xAI's privacy policy</a>.</li>
+    </ul>
+
+    <h3>What we do NOT collect</h3>
+    <ul>
+      <li>We do not collect browsing history, personal information, analytics, or telemetry.</li>
+      <li>We do not track your usage of X.com.</li>
+      <li>We do not store tweet content or generated replies.</li>
+      <li>We do not use cookies or any tracking mechanisms.</li>
+    </ul>
+
+    <h2>Permissions</h2>
+    <ul>
+      <li><strong>storage:</strong> Used solely to save your API key locally.</li>
+      <li><strong>host_permissions (x.com, twitter.com):</strong> Required to inject the reply assistant UI into X.com pages.</li>
+    </ul>
+
+    <h2>Data Security</h2>
+    <p>Your API key is stored using Chrome's built-in encrypted storage. All API communication uses HTTPS.</p>
+
+    <h2>Changes to This Policy</h2>
+    <p>We may update this policy from time to time. Changes will be reflected in the "Last updated" date above.</p>
+
+    <h2>Contact</h2>
+    <p>If you have questions about this privacy policy, please open an issue on our <a href="https://github.com/olivierpicard/sleeping-bird.com">GitHub repository</a>.</p>
+  </main>
+</body>
+</html>

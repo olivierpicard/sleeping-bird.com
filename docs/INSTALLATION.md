@@ -1,4 +1,4 @@
-# X.com AI Reply Chrome Extension - Installation Guide
+# Sleeping Bird Chrome Extension - Installation Guide
 
 ## Loading the Extension in Chrome
 
@@ -10,7 +10,7 @@
 
 4. Navigate to this project directory and select it
 
-5. The extension should now appear in your extensions list with the name "X.com AI Reply Assistant"
+5. The extension should now appear in your extensions list with the name "Sleeping Bird"
 
 6. You should see the ✨ icon in your Chrome toolbar
 
@@ -18,7 +18,7 @@
 
 - The extension should appear in your extensions list at `chrome://extensions/`
 - You should see:
-  - Name: "X.com AI Reply Assistant"
+  - Name: "Sleeping Bird"
   - Version: 1.0.0
   - Status: Enabled
   - The extension icon (✨) in your toolbar
@@ -26,7 +26,7 @@
 ## Testing
 
 - Navigate to https://x.com (or https://twitter.com)
-- Open the browser console (F12) and check for the message: "X.com AI Reply Assistant loaded"
+- Open the browser console (F12) and check for the message: "Sleeping Bird loaded"
 - Click the extension icon in the toolbar to open the popup
 
 ## Troubleshooting
