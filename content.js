@@ -103,18 +103,16 @@ Guidelines:
 
 User's draft reply: "${userDraft}"
 
-Generate exactly 5 varied expansions of this draft reply. Each should capture the essence of the user's idea while adding polish, personality, and depth.
+Generate exactly 3 varied expansions of this draft reply. Each should capture the essence of the user's idea while adding polish, personality, and depth.
 
-Format your response as 5 separate replies, each on its own line, numbered 1-5:
+Format your response as 3 separate replies, each on its own line, numbered 1-3:
 
 1. [First variation]
 2. [Second variation]
-3. [Third variation]
-4. [Fourth variation]
-5. [Fifth variation]`;
+3. [Third variation]`;
 
   const requestBody = {
-    model: 'grok-4-1-fast-non-reasoning',
+    model: 'grok-4.20-beta-0309-non-reasoning',
     messages: [
       {
         role: 'system',
@@ -127,7 +125,7 @@ Format your response as 5 separate replies, each on its own line, numbered 1-5:
     ],
     temperature: 1.8,  // High value for diversity across variations
     top_p: 0.95,
-    max_tokens: 150*5  // Increased to accommodate 5 replies in one response
+    max_tokens: 150*3  // Increased to accommodate 3 replies in one response
   };
 
   console.log('Calling Grok API with user draft:', userDraft);
@@ -157,7 +155,7 @@ Format your response as 5 separate replies, each on its own line, numbered 1-5:
 
   const data = await response.json();
   
-  // Extract the single response containing all 5 variations
+  // Extract the single response containing all 3 variations
   if (!data.choices || data.choices.length === 0) {
     throw new Error('Unexpected API response format');
   }
@@ -172,20 +170,22 @@ Format your response as 5 separate replies, each on its own line, numbered 1-5:
     .split('\n')
     .filter(line => line.trim().match(/^\d+\./))  // Find lines starting with numbers
     .map(line => line.replace(/^\d+\.\s*/, '').trim())  // Remove the number prefix
-    .filter(reply => reply.length > 0);  // Remove empty entries
+    .filter(reply => reply.length > 0)  // Remove empty entries
+    .map(reply => reply.replace(/^["']+|["']+$/g, '')); // Remove surrounding quotes if any
+    
 
-  // Ensure we have exactly 5 replies
-  if (replies.length < 5) {
-    console.warn('Expected 5 replies but got', replies.length);
+  // Ensure we have exactly 3 replies
+  if (replies.length < 3) {
+    console.warn('Expected 3 replies but got', replies.length);
     // Pad with empty strings if needed
-    while (replies.length < 5) {
+    while (replies.length < 3) {
       replies.push('');
     }
   }
 
-  console.log('Generated 5 response variations:', replies);
+  console.log('Generated 3 response variations:', replies);
   
-  return replies.slice(0, 5);  // Return only the first 5
+  return replies.slice(0, 3);  // Return only the first 5
 }
 
 /**
