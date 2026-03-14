@@ -113,6 +113,7 @@ Format your response as 3 separate replies, each on its own line, numbered 1-3:
 
   const requestBody = {
     model: 'grok-4.20-beta-0309-non-reasoning',
+    // model: 'grok-4-1-fast-non-reasoning',
     messages: [
       {
         role: 'system',
