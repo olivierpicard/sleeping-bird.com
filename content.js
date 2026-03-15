@@ -1,7 +1,7 @@
 // Content script for Sleeping Bird
 // This script will inject AI reply functionality into X.com pages
 
-console.log('Sleeping Bird loaded');
+
 
 // Storage key constant
 const STORAGE_KEY = 'grokApiKey';
@@ -47,7 +47,7 @@ function extractMainTweetText(anchorButton) {
   // Strategy 2: If not found (e.g., in a modal or separate compose area),
   // look for the main tweet on the page
   if (!tweetArticle) {
-    console.log('Not in tweet article, searching for main tweet on page');
+
     const allTweets = document.querySelectorAll('article[data-testid="tweet"]');
     
     // Get the first tweet (usually the one being replied to)
@@ -71,7 +71,7 @@ function extractMainTweetText(anchorButton) {
   
   // Extract the text content
   const tweetText = tweetTextElement.textContent.trim();
-  console.log('Extracted tweet text:', tweetText);
+
   
   return tweetText;
 }
@@ -129,7 +129,7 @@ Format your response as 3 separate replies, each on its own line, numbered 1-3:
     max_tokens: 150*3  // Increased to accommodate 3 replies in one response
   };
 
-  console.log('Calling Grok API with user draft:', userDraft);
+
 
   const response = await fetch(endpoint, {
     method: 'POST',
@@ -184,7 +184,7 @@ Format your response as 3 separate replies, each on its own line, numbered 1-3:
     }
   }
 
-  console.log('Generated 3 response variations:', replies);
+
   
   return replies.slice(0, 3);  // Return only the first 5
 }
@@ -255,7 +255,7 @@ function showResponseCards(modal, responses) {
 async function copyReplyToClipboard(replyText) {
   try {
     await navigator.clipboard.writeText(replyText);
-    console.log('Reply text copied to clipboard');
+
     return true;
   } catch (err) {
     console.error('Failed to copy to clipboard:', err);
@@ -432,7 +432,7 @@ function createAIReplyIcon() {
   // Add click handler to open modal
   button.addEventListener('click', (e) => {
     e.stopPropagation();
-    console.log('AI Reply icon clicked');
+
     openModal(button);
   });
   
@@ -456,7 +456,7 @@ function injectAIReplyIcon(toolbar) {
   // Insert at the beginning of the toolbar
   toolbar.insertBefore(icon, toolbar.firstChild);
   
-  console.log('AI Reply icon injected into toolbar');
+
 }
 
 /**
@@ -500,7 +500,7 @@ function initObserver() {
     subtree: true
   });
   
-  console.log('AI Reply icon injection observer initialized');
+
 }
 
 /**
@@ -549,7 +549,7 @@ function createModal() {
 /**
  * Position the modal at the top center of the screen
  */
-function positionModal(modal, anchorButton) {
+function positionModal(modal) {
   const modalContent = modal.querySelector('.ai-reply-modal');
   
   // Center horizontally at the top of the viewport
@@ -574,7 +574,7 @@ async function openModal(anchorButton) {
   currentModal = modal;
   
   // Position the modal
-  positionModal(modal, anchorButton);
+  positionModal(modal);
   
   // Add event listeners
   setupModalEventListeners(modal, anchorButton);

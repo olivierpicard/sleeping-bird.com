@@ -3,16 +3,19 @@
   "name": "Sleeping Bird",
   "version": "1.0.0",
   "description": "Draft a quick reply idea on X.com and let Sleeping Bird expand it into 3 polished variations you can copy with one click",
+  "homepage_url": "https://www.sleeping-bird.com",
   "permissions": ["storage"],
   "host_permissions": ["https://x.com/*", "https://twitter.com/*"],
   "action": {
     "default_popup": "popup.html",
     "default_icon": {
+      "16": "icons/icon16.png",
       "48": "icons/icon48.png",
       "128": "icons/icon128.png"
     }
   },
   "icons": {
+    "16": "icons/icon16.png",
     "48": "icons/icon48.png",
     "128": "icons/icon128.png"
   },

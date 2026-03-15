@@ -1,7 +1,7 @@
 // Popup script for Sleeping Bird
 // This script handles the extension popup UI and API key management
 
-console.log('Popup loaded');
+
 
 // Storage key constant
 const STORAGE_KEY = 'grokApiKey';
@@ -34,7 +34,7 @@ function loadApiKey() {
   chrome.storage.sync.get([STORAGE_KEY], (result) => {
     if (result[STORAGE_KEY]) {
       apiKeyInput.value = result[STORAGE_KEY];
-      console.log('API key loaded from storage');
+
     }
   });
 }
@@ -58,7 +58,7 @@ function handleSave(e) {
 
   // Save to chrome.storage.sync
   chrome.storage.sync.set({ [STORAGE_KEY]: apiKey }, () => {
-    console.log('API key saved to storage');
+
 
     // Re-enable button
     saveBtn.disabled = false;
