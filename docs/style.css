@@ -8,19 +8,17 @@
 
 :root {
   --bg: #000;
-  --bg-subtle: #060606;
   --text: #f0f0f0;
   --text-secondary: #777;
   --text-dim: #555;
   --border: #1a1a1a;
   --border-light: #222;
   --card-bg: #0a0a0a;
-  --accent: #fff;
   --cyan: #7dd3d3;
 }
 
 html {
-  scroll-behavior: smooth;
+  scroll-behavior: auto;
 }
 
 body {
@@ -50,27 +48,25 @@ a {
   max-width: 720px;
 }
 
-/* ─── Hero ─── */
+/* ═══════════════════════════════════════
+   HERO — pinned, parallax fade-out
+   ═══════════════════════════════════════ */
+.hero-wrap {
+  height: 200vh; /* scroll runway */
+  position: relative;
+}
+
 .hero {
-  min-height: 100vh;
+  position: sticky;
+  top: 0;
+  height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   text-align: center;
   padding: 2rem;
-  position: relative;
-}
-
-.hero::after {
-  content: "";
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 200px;
-  background: linear-gradient(to bottom, transparent, var(--bg));
-  pointer-events: none;
+  will-change: transform, opacity;
 }
 
 .hero-label {
@@ -126,7 +122,6 @@ a {
   background: #fff;
   color: #000;
 }
-
 .btn-primary:hover {
   background: #e0e0e0;
   transform: translateY(-1px);
@@ -138,20 +133,61 @@ a {
   color: var(--text);
   border: 1px solid #333;
 }
-
 .btn-secondary:hover {
   border-color: #666;
   transform: translateY(-1px);
 }
 
-/* ─── Section Foundations ─── */
-.story-section {
-  padding: 8rem 0;
+/* Scroll hint */
+.scroll-hint {
+  position: absolute;
+  bottom: 3rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  color: var(--text-dim);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.scroll-arrow {
+  width: 1px;
+  height: 40px;
+  background: linear-gradient(to bottom, var(--text-dim), transparent);
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 0.5;
+    transform: translateY(0);
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(5px);
+  }
+}
+
+/* ═══════════════════════════════════════
+   SCROLL STORY SECTIONS
+   ═══════════════════════════════════════ */
+.scroll-story {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  padding: 6rem 0;
   position: relative;
 }
 
-.story-section + .story-section {
+.scroll-story + .scroll-story {
   border-top: 1px solid var(--border);
+}
+
+.scroll-story-inner {
+  width: 100%;
 }
 
 .section-label {
@@ -181,22 +217,75 @@ a {
   margin-bottom: 0;
 }
 
+.section-body strong {
+  color: var(--text);
+  font-weight: 600;
+}
+
 .inline-link {
   color: var(--text);
   text-decoration: underline;
   text-underline-offset: 3px;
   transition: opacity 0.2s;
 }
-
 .inline-link:hover {
   opacity: 0.7;
 }
 
-/* ─── Statement Sections ─── */
-.statement-section {
-  padding: 10rem 0;
-  text-align: center;
+/* ═══════════════════════════════════════
+   REVEAL ANIMATIONS (scroll-driven)
+   ═══════════════════════════════════════ */
+.reveal {
+  opacity: 0;
+  transform: translateY(60px);
+  filter: blur(8px);
+  transition:
+    opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.9s cubic-bezier(0.16, 1, 0.3, 1),
+    filter 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+  filter: blur(0);
+}
+
+/* Stagger delays via data-delay */
+.reveal[data-delay="1"] {
+  transition-delay: 0.12s;
+}
+.reveal[data-delay="2"] {
+  transition-delay: 0.24s;
+}
+.reveal[data-delay="3"] {
+  transition-delay: 0.36s;
+}
+.reveal[data-delay="4"] {
+  transition-delay: 0.48s;
+}
+.reveal[data-delay="5"] {
+  transition-delay: 0.6s;
+}
+
+/* ═══════════════════════════════════════
+   BIG STATEMENT — scale + blur entrance
+   ═══════════════════════════════════════ */
+.scroll-statement {
+  height: 200vh;
   position: relative;
+}
+
+.scroll-statement-inner {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 2rem;
+  will-change: transform, opacity, filter;
 }
 
 .big-statement {
@@ -222,7 +311,9 @@ a {
   margin-right: auto;
 }
 
-/* ─── Steps ─── */
+/* ═══════════════════════════════════════
+   STEPS
+   ═══════════════════════════════════════ */
 .steps {
   display: flex;
   flex-direction: column;
@@ -262,14 +353,15 @@ a {
   font-weight: 600;
   margin-bottom: 0.5rem;
 }
-
 .step-content p {
   color: var(--text-secondary);
   font-size: 1rem;
   line-height: 1.7;
 }
 
-/* ─── Use Cases ─── */
+/* ═══════════════════════════════════════
+   USE CASES
+   ═══════════════════════════════════════ */
 .use-cases {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -291,30 +383,24 @@ a {
   border-color: var(--border-light);
   transform: translateY(-2px);
 }
-
 .use-case-icon {
   font-size: 1.5rem;
   margin-bottom: 1rem;
 }
-
 .use-case h3 {
   font-size: 1.05rem;
   font-weight: 600;
   margin-bottom: 0.75rem;
 }
-
 .use-case p {
   color: var(--text-secondary);
   font-size: 0.95rem;
   line-height: 1.7;
 }
 
-/* ─── Dark Accent Section ─── */
-.dark-accent {
-  background: var(--bg-subtle);
-}
-
-/* ─── Not Grid ─── */
+/* ═══════════════════════════════════════
+   NOT GRID
+   ═══════════════════════════════════════ */
 .not-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -332,47 +418,31 @@ a {
 .not-card:hover {
   border-color: var(--border-light);
 }
-
 .not-icon {
   font-size: 1.25rem;
   margin-bottom: 1rem;
 }
-
 .not-card h3 {
   font-size: 1.05rem;
   font-weight: 600;
   margin-bottom: 0.75rem;
 }
-
 .not-card p {
   color: var(--text-secondary);
   font-size: 0.95rem;
   line-height: 1.7;
 }
 
-/* ─── Final CTA ─── */
-.final-cta {
-  padding: 10rem 0;
-  text-align: center;
-  position: relative;
-}
-
-.final-cta::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 1px;
-  height: 80px;
-  background: linear-gradient(to bottom, transparent, var(--border-light));
-}
-
+/* ═══════════════════════════════════════
+   FINAL CTA
+   ═══════════════════════════════════════ */
 .final-cta .cta-group {
   margin-top: 2.5rem;
 }
 
-/* ─── Footer ─── */
+/* ═══════════════════════════════════════
+   FOOTER
+   ═══════════════════════════════════════ */
 footer {
   border-top: 1px solid var(--border);
   padding: 3rem 0 2rem;
@@ -393,99 +463,65 @@ footer {
   color: var(--text);
   margin-bottom: 0.25rem;
 }
-
 .footer-desc {
   color: var(--text-dim);
   font-size: 0.85rem;
 }
-
 .footer-links {
   display: flex;
   gap: 2rem;
 }
-
 .footer-links a {
   color: var(--text-secondary);
   transition: color 0.2s;
   font-size: 0.9rem;
 }
-
 .footer-links a:hover {
   color: var(--text);
 }
-
 .footer-bottom {
   padding-top: 1.5rem;
   border-top: 1px solid var(--border);
   color: var(--text-dim);
 }
 
-/* ─── Fade-in Animation ─── */
-.fade-in {
-  opacity: 0;
-  transform: translateY(30px);
-  transition:
-    opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1),
-    transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.fade-in.visible {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-/* Stagger children */
-.fade-in:nth-child(2) {
-  transition-delay: 0.1s;
-}
-.fade-in:nth-child(3) {
-  transition-delay: 0.2s;
-}
-.fade-in:nth-child(4) {
-  transition-delay: 0.3s;
-}
-
-/* ─── Responsive ─── */
+/* ═══════════════════════════════════════
+   RESPONSIVE
+   ═══════════════════════════════════════ */
 @media (max-width: 768px) {
-  .hero {
-    min-height: 90vh;
-    padding: 2rem 1.5rem;
+  .hero-wrap {
+    height: 150vh;
   }
   .container {
     padding: 0 1.5rem;
   }
-  .story-section {
+  .scroll-story {
+    min-height: auto;
     padding: 5rem 0;
   }
-  .statement-section {
-    padding: 6rem 0;
-  }
-  .final-cta {
-    padding: 6rem 0;
-  }
-
-  .steps {
-    margin-top: 2rem;
+  .scroll-statement {
+    height: 150vh;
   }
   .step {
     flex-direction: column;
     gap: 1rem;
     padding: 2rem 0;
   }
-
   .use-cases {
     grid-template-columns: 1fr;
   }
   .not-grid {
     grid-template-columns: 1fr;
   }
-
   .footer-content {
     flex-direction: column;
     gap: 2rem;
   }
-
-  .final-cta::before {
-    height: 50px;
+  .scroll-hint {
+    bottom: 2rem;
+  }
+  .reveal {
+    filter: blur(4px);
+    transform: translateY(40px);
   }
 }
