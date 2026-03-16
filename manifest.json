@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Sleeping Bird",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Draft a quick reply idea on X.com and let Sleeping Bird expand it into 3 polished variations you can copy with one click",
   "homepage_url": "https://www.sleeping-bird.com",
   "permissions": ["storage"],

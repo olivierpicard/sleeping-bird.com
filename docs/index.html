@@ -3,166 +3,206 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sleeping Bird — AI-Powered Reply Assistant for X</title>
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      line-height: 1.7;
-      color: #1a1a1a;
-      background: #fafafa;
-    }
-    a { color: #1d9bf0; text-decoration: none; }
-    a:hover { text-decoration: underline; }
-
-    /* Hero */
-    .hero {
-      text-align: center;
-      padding: 5rem 1.5rem 3rem;
-      background: linear-gradient(135deg, #f0f7ff 0%, #fafafa 100%);
-    }
-    .hero-icon { font-size: 4rem; margin-bottom: 1rem; }
-    .hero h1 {
-      font-size: 2.5rem;
-      font-weight: 700;
-      margin-bottom: 0.5rem;
-    }
-    .hero .tagline {
-      font-size: 1.2rem;
-      color: #555;
-      max-width: 520px;
-      margin: 0 auto 2rem;
-    }
-    .cta-btn {
-      display: inline-block;
-      background: #1a1a1a;
-      color: #fff;
-      padding: 0.85rem 2rem;
-      border-radius: 8px;
-      font-size: 1.05rem;
-      font-weight: 500;
-      transition: background 0.2s;
-    }
-    .cta-btn:hover { background: #333; text-decoration: none; }
-
-    /* Features */
-    .features {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 2rem;
-      max-width: 900px;
-      margin: 0 auto;
-      padding: 3rem 1.5rem;
-    }
-    .feature {
-      background: #fff;
-      border-radius: 8px;
-      padding: 1.5rem;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-    }
-    .feature-icon { font-size: 1.8rem; margin-bottom: 0.5rem; }
-    .feature h3 { font-size: 1.1rem; margin-bottom: 0.4rem; }
-    .feature p { color: #555; font-size: 0.95rem; }
-
-    /* How it works */
-    .how-it-works {
-      max-width: 700px;
-      margin: 0 auto;
-      padding: 2rem 1.5rem 3rem;
-      text-align: center;
-    }
-    .how-it-works h2 {
-      font-size: 1.6rem;
-      margin-bottom: 1.5rem;
-    }
-    .steps {
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-      text-align: left;
-    }
-    .step {
-      display: flex;
-      align-items: flex-start;
-      gap: 1rem;
-    }
-    .step-num {
-      flex-shrink: 0;
-      width: 2rem;
-      height: 2rem;
-      background: #1a1a1a;
-      color: #fff;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 600;
-      font-size: 0.9rem;
-    }
-    .step p { color: #333; }
-
-    /* Footer */
-    footer {
-      text-align: center;
-      padding: 2rem 1.5rem;
-      border-top: 1px solid #eee;
-      color: #888;
-      font-size: 0.9rem;
-    }
-    footer a { color: #888; }
-    footer a:hover { color: #1d9bf0; }
-  </style>
+  <title>Sleeping Bird — Faster, Better Replies on X</title>
+  <meta name="description" content="Your ideas, sharpened. Type a rough reply idea on X and get 3 polished variations in one click.">
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
+
+  <!-- Hero -->
   <section class="hero">
-    <div class="hero-icon">✨</div>
-    <h1>Sleeping Bird</h1>
-    <p class="tagline">An AI-powered Chrome extension that helps you craft thoughtful replies on X, fast.</p>
-    <a href="https://github.com/olivierpicard/sleeping-bird.com" class="cta-btn">Get it on GitHub</a>
-  </section>
-
-  <section class="features">
-    <div class="feature">
-      <div class="feature-icon">🤖</div>
-      <h3>AI-Generated Replies</h3>
-      <p>Get smart reply suggestions powered by Grok, right inside your X timeline.</p>
-    </div>
-    <div class="feature">
-      <div class="feature-icon">🔒</div>
-      <h3>Privacy First</h3>
-      <p>No servers, no tracking, no data collection. Your API key stays in your browser.</p>
-    </div>
-    <div class="feature">
-      <div class="feature-icon">⚡</div>
-      <h3>Lightweight</h3>
-      <p>Minimal footprint. Injects only what's needed, when you need it.</p>
+    <p class="hero-label fade-in">Chrome Extension for X</p>
+    <h1 class="fade-in">Sleeping Bird</h1>
+    <p class="tagline fade-in">Your ideas, sharpened.<br>Reply faster on X without losing your voice.</p>
+    <div class="cta-group fade-in">
+      <a href="https://chrome.google.com/webstore/detail/jmafaeednncmehcojgbehpoklohbmikc" class="btn btn-primary">Add to Chrome — It's Free</a>
+      <a href="https://github.com/olivierpicard/sleeping-bird.com" class="btn btn-secondary">View on GitHub</a>
     </div>
   </section>
 
-  <section class="how-it-works">
-    <h2>How It Works</h2>
-    <div class="steps">
-      <div class="step">
-        <div class="step-num">1</div>
-        <p>Install the extension and add your Grok API key in the popup.</p>
-      </div>
-      <div class="step">
-        <div class="step-num">2</div>
-        <p>Browse X.com as usual. When you're replying to a tweet, click "Generate."</p>
-      </div>
-      <div class="step">
-        <div class="step-num">3</div>
-        <p>Pick from AI-suggested replies, edit if you like, and post.</p>
+  <!-- The Problem -->
+  <section class="story-section">
+    <div class="container narrow">
+      <p class="section-label fade-in">The problem</p>
+      <h2 class="section-headline fade-in">You know what you want to say.<br>You just don't always have the time to say it well.</h2>
+      <p class="section-body fade-in">
+        You see a tweet that sparks something. You want to reply — but <strong>finding the right words takes longer than the thought itself.</strong> So you scroll past. The moment's gone.
+      </p>
+    </div>
+  </section>
+
+  <!-- The Shift -->
+  <section class="story-section">
+    <div class="container narrow">
+      <p class="section-label fade-in">The shift</p>
+      <h2 class="section-headline fade-in">What if your rough ideas<br>could become sharp replies — instantly?</h2>
+      <p class="section-body fade-in">
+        Type a rough idea — even a few words — and get <strong>3 polished variations that sound like you.</strong> Your opinion, your voice. Just clearer and ready to post.
+      </p>
+    </div>
+  </section>
+
+  <!-- Big Statement -->
+  <section class="statement-section">
+    <div class="container">
+      <h2 class="big-statement fade-in">Your voice, your ideas.<br><span class="accent-text">On steroids.</span></h2>
+    </div>
+  </section>
+
+  <!-- How It Works -->
+  <section class="story-section">
+    <div class="container">
+      <p class="section-label fade-in">How it works</p>
+      <h2 class="section-headline fade-in">Three steps. Under a minute.</h2>
+      <div class="steps">
+        <div class="step fade-in">
+          <div class="step-num">01</div>
+          <div class="step-content">
+            <h3>Click ✨</h3>
+            <p>You're replying to a tweet. Hit the sparkle icon in the compose toolbar. That's it — you've started.</p>
+          </div>
+        </div>
+        <div class="step fade-in">
+          <div class="step-num">02</div>
+          <div class="step-content">
+            <h3>Dump your thought</h3>
+            <p>Type whatever comes to mind. A few words. A messy sentence. Don't overthink it — that's the whole point.</p>
+          </div>
+        </div>
+        <div class="step fade-in">
+          <div class="step-num">03</div>
+          <div class="step-content">
+            <h3>Pick, copy, post</h3>
+            <p>Three polished variations appear. Click the one that sounds like you. It's copied. Paste and post. Done.</p>
+          </div>
+        </div>
       </div>
     </div>
   </section>
 
+  <!-- Speed Section -->
+  <section class="statement-section">
+    <div class="container">
+      <h2 class="big-statement fade-in">Stop drafting.<br>Start posting.</h2>
+      <p class="statement-sub fade-in">A good reply can take minutes to craft. With Sleeping Bird, you're done in under one.</p>
+    </div>
+  </section>
+
+  <!-- Why People Use It -->
+  <section class="story-section">
+    <div class="container">
+      <p class="section-label fade-in">Why people use it</p>
+      <h2 class="section-headline fade-in">Different people. Same friction.</h2>
+      <div class="use-cases">
+        <div class="use-case fade-in">
+          <div class="use-case-icon">⚡</div>
+          <h3>The power replier</h3>
+          <p>You engage a lot. Dozens of replies a day. You need speed without sounding like you're rushing through conversations. Sleeping Bird lets you move fast and still sound thoughtful.</p>
+        </div>
+        <div class="use-case fade-in">
+          <div class="use-case-icon">🌍</div>
+          <h3>The non-native speaker</h3>
+          <p>English isn't your first language. You have sharp opinions and real insights — but sometimes the phrasing doesn't land the way you mean it. Now it does.</p>
+        </div>
+        <div class="use-case fade-in">
+          <div class="use-case-icon">💡</div>
+          <h3>The idea person</h3>
+          <p>Your head is full of great takes. But translating thoughts into words? That's the bottleneck. Sleeping Bird removes it. Think it, type it rough, post it polished.</p>
+        </div>
+        <div class="use-case fade-in">
+          <div class="use-case-icon">📈</div>
+          <h3>The growth-minded</h3>
+          <p>You're building an audience on X. Consistent, quality engagement is the game. Sleeping Bird lets you engage more without sacrificing what makes your replies yours.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Philosophy -->
+  <section class="story-section dark-accent">
+    <div class="container narrow">
+      <p class="section-label fade-in">Philosophy</p>
+      <h2 class="section-headline fade-in">We don't write for you.<br>We sharpen what's already there.</h2>
+      <p class="section-body fade-in">
+        Every reply starts with <strong>your idea, your angle, your opinion.</strong> We just help the words catch up to the thought.
+      </p>
+      <p class="section-body fade-in">
+        No ghostwriting. No generic output. <strong>It didn't write it — you did.</strong>
+      </p>
+    </div>
+  </section>
+
+  <!-- What It's Not -->
+  <section class="story-section">
+    <div class="container">
+      <p class="section-label fade-in">What it's not</p>
+      <h2 class="section-headline fade-in">Let's be clear.</h2>
+      <div class="not-grid">
+        <div class="not-card fade-in">
+          <div class="not-icon">🚫</div>
+          <h3>Not a bot</h3>
+          <p>It doesn't post for you. It doesn't auto-reply. It doesn't run in the background. You click, you choose, you post. Always.</p>
+        </div>
+        <div class="not-card fade-in">
+          <div class="not-icon">🚫</div>
+          <h3>Not generating opinions</h3>
+          <p>The ideas are 100% yours. Sleeping Bird doesn't have opinions. It takes yours and helps you phrase them with clarity and punch.</p>
+        </div>
+        <div class="not-card fade-in">
+          <div class="not-icon">🚫</div>
+          <h3>Not collecting your data</h3>
+          <p>Zero backend. Zero analytics. Zero accounts. Everything runs in your browser with your own API key. Nothing leaves your machine. Period.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Privacy -->
+  <section class="story-section">
+    <div class="container narrow">
+      <p class="section-label fade-in">Privacy</p>
+      <h2 class="section-headline fade-in">Your browser. Your key. That's it.</h2>
+      <p class="section-body fade-in">
+        Sleeping Bird has no servers. Your API key is stored locally in your browser's storage. Your drafts, your replies, your data — none of it ever touches our infrastructure, because we don't have any. This isn't a privacy policy checkbox. It's the architecture.
+      </p>
+      <p class="section-body fade-in">
+        Requires a Grok API key from <a href="https://console.x.ai/" class="inline-link">console.x.ai</a> — free tier available.
+      </p>
+    </div>
+  </section>
+
+  <!-- Final CTA -->
+  <section class="final-cta">
+    <div class="container">
+      <h2 class="big-statement fade-in">Ready to reply<br>like you mean it?</h2>
+      <p class="statement-sub fade-in">Install Sleeping Bird. Start replying faster, sharper, louder.</p>
+      <div class="cta-group fade-in">
+        <a href="https://chrome.google.com/webstore/detail/jmafaeednncmehcojgbehpoklohbmikc" class="btn btn-primary">Add to Chrome — It's Free</a>
+        <a href="https://github.com/olivierpicard/sleeping-bird.com" class="btn btn-secondary">View on GitHub</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
   <footer>
-    <p>
-      <a href="https://github.com/olivierpicard/sleeping-bird.com">GitHub</a> · 
-      <a href="/privacy">Privacy Policy</a>
-    </p>
-    <p style="margin-top: 0.5rem;">© 2026 Sleeping Bird</p>
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-brand">
+          <p class="footer-name">Sleeping Bird</p>
+          <p class="footer-desc">Your ideas, sharpened.</p>
+        </div>
+        <div class="footer-links">
+          <a href="https://github.com/olivierpicard/sleeping-bird.com">GitHub</a>
+          <a href="/privacy">Privacy Policy</a>
+          <a href="https://console.x.ai/">Get API Key</a>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2026 Sleeping Bird</p>
+      </div>
+    </div>
   </footer>
+
+  <script src="main.js"></script>
 </body>
 </html>
