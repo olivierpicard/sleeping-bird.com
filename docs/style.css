@@ -16,6 +16,7 @@
   --border-light: #222;
   --card-bg: #0a0a0a;
   --accent: #fff;
+  --cyan: #7dd3d3;
 }
 
 html {
@@ -206,7 +207,7 @@ a {
 }
 
 .accent-text {
-  background: linear-gradient(135deg, #fff 0%, #666 100%);
+  background: linear-gradient(135deg, var(--cyan) 0%, #fff 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
