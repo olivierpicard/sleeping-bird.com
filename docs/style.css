@@ -743,6 +743,75 @@ a {
   margin: 0;
 }
 
+/* ── Option 1 — animated glowing metallic cyan border ── */
+@property --border-angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+
+@keyframes rotateBorder {
+  to {
+    --border-angle: 360deg;
+  }
+}
+
+.reply-card[data-card="1"] {
+  position: relative;
+  border: none !important;
+  background: conic-gradient(
+    from var(--border-angle, 0deg),
+    #0e7490,
+    #67e8f9,
+    #e0f7fa,
+    #ffffff,
+    #67e8f9,
+    #0e7490,
+    #164e63,
+    #0e7490
+  ) !important;
+  animation: rotateBorder 6s linear infinite;
+  overflow: visible;
+  z-index: 0;
+}
+
+/* Inner solid fill to cover the gradient, leaving only the border visible */
+.reply-card[data-card="1"]::before {
+  content: "";
+  position: absolute;
+  inset: 2px;
+  border-radius: 8px;
+  background: #111;
+  z-index: 0;
+}
+
+/* Keep text above the fill */
+.reply-card[data-card="1"] .reply-card-label,
+.reply-card[data-card="1"] p {
+  position: relative;
+  z-index: 1;
+}
+
+/* Glow layer */
+.reply-card[data-card="1"]::after {
+  content: "";
+  position: absolute;
+  inset: -8px;
+  border-radius: 16px;
+  background: conic-gradient(
+    from var(--border-angle, 0deg),
+    transparent,
+    rgba(103, 232, 249, 0.25),
+    transparent,
+    rgba(103, 232, 249, 0.15),
+    transparent
+  );
+  filter: blur(12px);
+  animation: rotateBorder 6s linear infinite;
+  z-index: -1;
+  pointer-events: none;
+}
+
 /* ═══════════════════════════════════════
    BIG STATEMENT — kinetic word-by-word reveal
    ═══════════════════════════════════════ */
