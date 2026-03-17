@@ -1028,3 +1028,78 @@ footer {
     font-size: clamp(2rem, 8vw, 3.5rem);
   }
 }
+
+/* ═══════════════════════════════════════
+   TRUST SECTION — open source badges
+   ═══════════════════════════════════════ */
+.scroll-trust {
+  min-height: 50vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 2rem;
+  border-top: 1px solid var(--border);
+}
+
+.scroll-trust-inner {
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.trust-badges {
+  display: flex;
+  justify-content: center;
+  gap: 3rem;
+  flex-wrap: wrap;
+}
+
+.trust-badge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  text-align: center;
+}
+
+.trust-icon {
+  font-size: 2.4rem;
+  display: inline-block;
+  animation: iconFloat 3s ease-in-out infinite;
+}
+
+.trust-badge:nth-child(2) .trust-icon {
+  animation-delay: 0.4s;
+}
+.trust-badge:nth-child(3) .trust-icon {
+  animation-delay: 0.8s;
+}
+
+@keyframes iconFloat {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+.trust-badge h3 {
+  font-size: 1.05rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--text);
+}
+
+@media (max-width: 768px) {
+  .trust-badges {
+    flex-direction: column;
+    gap: 2rem;
+    align-items: center;
+  }
+  .scroll-trust {
+    min-height: auto;
+    padding: 3rem 1.5rem;
+  }
+}
