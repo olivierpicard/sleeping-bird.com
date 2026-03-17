@@ -9,176 +9,198 @@
 </head>
 <body>
 
-  <!-- Hero -->
-  <section class="hero">
-    <p class="hero-label fade-in">Chrome Extension for X</p>
-    <h1 class="fade-in">Sleeping Bird</h1>
-    <p class="tagline fade-in">Your ideas, sharpened.<br>Reply faster on X without losing your voice.</p>
-    <div class="cta-group fade-in">
-      <a href="https://chrome.google.com/webstore/detail/jmafaeednncmehcojgbehpoklohbmikc" class="btn btn-primary">Add to Chrome — It's Free</a>
-      <a href="https://github.com/olivierpicard/sleeping-bird.com" class="btn btn-secondary">View on GitHub</a>
-    </div>
-  </section>
+  <!-- Hero — pinned full-screen, fades out on scroll -->
+  <div class="hero-wrap" data-scroll-section>
+    <section class="hero">
+      <p class="hero-label">Chrome Extension for X</p>
+      <h1>Sleeping Bird</h1>
+      <p class="tagline">Your ideas, sharpened.<br>Reply faster on X without losing your voice.</p>
+      <div class="cta-group">
+        <a href="https://chrome.google.com/webstore/detail/jmafaeednncmehcojgbehpoklohbmikc" class="btn btn-primary">Add to Chrome — It's Free</a>
+        <a href="https://github.com/olivierpicard/sleeping-bird.com" class="btn btn-secondary">View on GitHub</a>
+      </div>
+      <div class="scroll-hint">
+        <span>Scroll to explore</span>
+        <div class="scroll-arrow"></div>
+      </div>
+    </section>
+  </div>
 
-  <!-- The Problem -->
-  <section class="story-section">
-    <div class="container narrow">
-      <p class="section-label fade-in">The problem</p>
-      <h2 class="section-headline fade-in">You know what you want to say.<br>You just don't always have the time to say it well.</h2>
-      <p class="section-body fade-in">
-        You see a tweet that sparks something. You want to reply — but <strong>finding the right words takes longer than the thought itself.</strong> So you scroll past. The moment's gone.
-      </p>
-    </div>
-  </section>
-
-  <!-- The Shift -->
-  <section class="story-section">
-    <div class="container narrow">
-      <p class="section-label fade-in">The shift</p>
-      <h2 class="section-headline fade-in">What if your rough ideas<br>could become sharp replies — instantly?</h2>
-      <p class="section-body fade-in">
-        Type a rough idea — even a few words — and get <strong>3 polished variations that sound like you.</strong> Your opinion, your voice. Just clearer and ready to post.
-      </p>
-    </div>
-  </section>
-
-  <!-- Big Statement -->
-  <section class="statement-section">
-    <div class="container">
-      <h2 class="big-statement fade-in">Your voice, your ideas.<br><span class="accent-text">On steroids.</span></h2>
-    </div>
-  </section>
-
-  <!-- How It Works -->
-  <section class="story-section">
-    <div class="container">
-      <p class="section-label fade-in">How it works</p>
-      <h2 class="section-headline fade-in">Three steps. Under a minute.</h2>
-      <div class="steps">
-        <div class="step fade-in">
-          <div class="step-num">01</div>
-          <div class="step-content">
-            <h3>Click ✨</h3>
-            <p>You're replying to a tweet. Hit the sparkle icon in the compose toolbar. That's it — you've started.</p>
-          </div>
-        </div>
-        <div class="step fade-in">
-          <div class="step-num">02</div>
-          <div class="step-content">
-            <h3>Dump your thought</h3>
-            <p>Type whatever comes to mind. A few words. A messy sentence. Don't overthink it — that's the whole point.</p>
-          </div>
-        </div>
-        <div class="step fade-in">
-          <div class="step-num">03</div>
-          <div class="step-content">
-            <h3>Pick, copy, post</h3>
-            <p>Three polished variations appear. Click the one that sounds like you. It's copied. Paste and post. Done.</p>
-          </div>
+  <!-- The Problem — pinned two-line swap -->
+  <section class="scroll-problem" data-scroll-section>
+    <div class="scroll-problem-inner">
+      <div class="container">
+        <p class="section-label">The problem</p>
+        <div class="problem-lines-wrap">
+          <h2 class="problem-line problem-line-1">You need to make 100 replies/day?</h2>
+          <h2 class="problem-line problem-line-2">But you can't make <br/>quality rhyme with quantity?</h2>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- Speed Section -->
-  <section class="statement-section">
-    <div class="container">
-      <h2 class="big-statement fade-in">Stop drafting.<br>Start posting.</h2>
-      <p class="statement-sub fade-in">A good reply can take minutes to craft. With Sleeping Bird, you're done in under one.</p>
+  <!-- The Pivot -->
+  <section class="scroll-pivot" data-scroll-section>
+    <div class="scroll-pivot-inner">
+      <p class="pivot-eyebrow reveal" data-reveal>The answer</p>
+      <h2 class="pivot-statement">
+        <span class="pivot-word reveal" data-reveal data-delay="1">That's</span>
+        <span class="pivot-word reveal" data-reveal data-delay="2">where</span>
+        <span class="pivot-word pivot-brand reveal" data-reveal data-delay="3">Sleeping Bird</span>
+        <span class="pivot-word pivot-shines reveal" data-reveal data-delay="4">shines.</span>
+      </h2>
     </div>
   </section>
 
-  <!-- Why People Use It -->
-  <section class="story-section">
-    <div class="container">
-      <p class="section-label fade-in">Why people use it</p>
-      <h2 class="section-headline fade-in">Different people. Same friction.</h2>
-      <div class="use-cases">
-        <div class="use-case fade-in">
-          <div class="use-case-icon">⚡</div>
-          <h3>The power replier</h3>
-          <p>You engage a lot. Dozens of replies a day. You need speed without sounding like you're rushing through conversations. Sleeping Bird lets you move fast and still sound thoughtful.</p>
+  <!-- How It Works — scroll storytelling with images -->
+  <section class="scroll-steps" data-scroll-section>
+    <div class="scroll-steps-track">
+
+      <!-- Step 1 -->
+      <div class="step-panel" data-step="1">
+        <div class="step-text">
+          <span class="step-number">01</span>
+          <h3>Draft your ideas, your opinions</h3>
+          <p>Just type what you think. Raw, unfiltered, yours. No need to polish — that's the whole point.</p>
         </div>
-        <div class="use-case fade-in">
-          <div class="use-case-icon">🌍</div>
-          <h3>The non-native speaker</h3>
-          <p>English isn't your first language. You have sharp opinions and real insights — but sometimes the phrasing doesn't land the way you mean it. Now it does.</p>
-        </div>
-        <div class="use-case fade-in">
-          <div class="use-case-icon">💡</div>
-          <h3>The idea person</h3>
-          <p>Your head is full of great takes. But translating thoughts into words? That's the bottleneck. Sleeping Bird removes it. Think it, type it rough, post it polished.</p>
-        </div>
-        <div class="use-case fade-in">
-          <div class="use-case-icon">📈</div>
-          <h3>The growth-minded</h3>
-          <p>You're building an audience on X. Consistent, quality engagement is the game. Sleeping Bird lets you engage more without sacrificing what makes your replies yours.</p>
+        <div class="step-image">
+          <div class="step1-anim" id="step1Anim">
+            <div class="sim-panel">
+              <div class="sim-header">
+                <span class="sim-dot sim-dot--red"></span>
+                <span class="sim-dot sim-dot--yellow"></span>
+                <span class="sim-dot sim-dot--green"></span>
+              </div>
+              <div class="sim-body sim-body--step1">
+                <div class="sim-input-wrap">
+                  <div class="sim-textarea" id="step1Textarea"></div>
+                  <div class="sim-cursor" id="step1Cursor"></div>
+                </div>
+                <button class="sim-generate-btn" id="step1Btn">Generate</button>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
-  </section>
 
-  <!-- Philosophy -->
-  <section class="story-section dark-accent">
-    <div class="container narrow">
-      <p class="section-label fade-in">Philosophy</p>
-      <h2 class="section-headline fade-in">We don't write for you.<br>We sharpen what's already there.</h2>
-      <p class="section-body fade-in">
-        Every reply starts with <strong>your idea, your angle, your opinion.</strong> We just help the words catch up to the thought.
-      </p>
-      <p class="section-body fade-in">
-        No ghostwriting. No generic output. <strong>It didn't write it — you did.</strong>
-      </p>
-    </div>
-  </section>
-
-  <!-- What It's Not -->
-  <section class="story-section">
-    <div class="container">
-      <p class="section-label fade-in">What it's not</p>
-      <h2 class="section-headline fade-in">Let's be clear.</h2>
-      <div class="not-grid">
-        <div class="not-card fade-in">
-          <div class="not-icon">🚫</div>
-          <h3>Not a bot</h3>
-          <p>It doesn't post for you. It doesn't auto-reply. It doesn't run in the background. You click, you choose, you post. Always.</p>
+      <!-- Step 2 -->
+      <div class="step-panel" data-step="2">
+        <div class="step-text">
+          <span class="step-number">02</span>
+          <h3>Get a lightning fast response</h3>
+          <p>One click. Three polished variations. Same voice, sharper delivery.</p>
         </div>
-        <div class="not-card fade-in">
-          <div class="not-icon">🚫</div>
-          <h3>Not generating opinions</h3>
-          <p>The ideas are 100% yours. Sleeping Bird doesn't have opinions. It takes yours and helps you phrase them with clarity and punch.</p>
-        </div>
-        <div class="not-card fade-in">
-          <div class="not-icon">🚫</div>
-          <h3>Not collecting your data</h3>
-          <p>Zero backend. Zero analytics. Zero accounts. Everything runs in your browser with your own API key. Nothing leaves your machine. Period.</p>
+        <div class="step-image">
+          <div class="step2-anim" id="step2Anim">
+            <!-- Simulated panel -->
+            <div class="sim-panel">
+              <div class="sim-header">
+                <span class="sim-dot sim-dot--red"></span>
+                <span class="sim-dot sim-dot--yellow"></span>
+                <span class="sim-dot sim-dot--green"></span>
+              </div>
+              <div class="sim-body">
+                <div class="sim-label">Generating replies…</div>
+                <div class="sim-status" id="step2Status">
+                  <!-- Loading spinner -->
+                  <div class="spinner" id="step2Spinner"></div>
+                </div>
+                <div class="sim-result" id="step2Result">
+                  <!-- Tick appears here after animation -->
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
+
+      <!-- Step 3 -->
+      <div class="step-panel" data-step="3">
+        <div class="step-text">
+          <span class="step-number">03</span>
+          <h3>Choose the one that vibes with you the most</h3>
+          <p>Pick, tweak if you want, and post. You stay in control, always.</p>
+        </div>
+        <div class="step-image">
+          <div class="step3-anim" id="step3Anim">
+            <div class="sim-panel">
+              <div class="sim-header">
+                <span class="sim-dot sim-dot--red"></span>
+                <span class="sim-dot sim-dot--yellow"></span>
+                <span class="sim-dot sim-dot--green"></span>
+              </div>
+              <div class="sim-body sim-body--step3">
+                <div class="reply-card" data-card="1">
+                  <div class="reply-card-label">Option 1</div>
+                  <p>Nothing beats Python for beginners - clean syntax, tons of resources, and you actually build stuff fast without the headache.</p>
+                </div>
+                <div class="reply-card" data-card="2">
+                  <div class="reply-card-label">Option 2</div>
+                  <p>Hands down, Python crushes it for beginners. Simple, readable, and forgiving when you're just starting out. Every other language feels overcomplicated by comparison.</p>
+                </div>
+                <div class="reply-card" data-card="3">
+                  <div class="reply-card-label">Option 3</div>
+                  <p>Python's the ultimate beginner's language - way ahead of everything else with its gentle learning curve and instant "I built something!" wins.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
     </div>
   </section>
 
-  <!-- Privacy -->
-  <section class="story-section">
-    <div class="container narrow">
-      <p class="section-label fade-in">Privacy</p>
-      <h2 class="section-headline fade-in">Your browser. Your key. That's it.</h2>
-      <p class="section-body fade-in">
-        Sleeping Bird has no servers. Your API key is stored locally in your browser's storage. Your drafts, your replies, your data — none of it ever touches our infrastructure, because we don't have any. This isn't a privacy policy checkbox. It's the architecture.
-      </p>
-      <p class="section-body fade-in">
-        Requires a Grok API key from <a href="https://console.x.ai/" class="inline-link">console.x.ai</a> — free tier available.
-      </p>
+  <!-- Big Statement — cinematic scroll reveal -->
+  <section class="scroll-statement" data-scroll-section>
+    <div class="scroll-statement-inner">
+      <h2 class="big-statement kinetic-text">
+        <span class="kinetic-word" data-kinetic="1">Your</span>
+        <span class="kinetic-word" data-kinetic="2">voice,</span>
+        <span class="kinetic-word" data-kinetic="3">your</span>
+        <span class="kinetic-word" data-kinetic="4">ideas.</span>
+        <br>
+        <span class="kinetic-word accent-text" data-kinetic="5">On</span>
+        <span class="kinetic-word accent-text" data-kinetic="6">steroids.</span>
+      </h2>
+    </div>
+  </section>
+
+  <!-- Open Source Trust -->
+  <section class="scroll-trust" data-scroll-section>
+    <div class="scroll-trust-inner">
+      <div class="trust-badges">
+        <div class="trust-badge" data-trust="0">
+          <span class="trust-icon">🔓</span>
+          <h3>100% Open Source</h3>
+        </div>
+        <div class="trust-badge" data-trust="1">
+          <span class="trust-icon">🚫</span>
+          <h3>No Sign-In</h3>
+        </div>
+        <div class="trust-badge" data-trust="2">
+          <span class="trust-icon">🔑</span>
+          <h3>Your Grok Key. That's It.</h3>
+        </div>
+        <div class="trust-badge trust-badge--free" data-trust="3">
+          <span class="trust-icon">💸</span>
+          <h3>Free. No Catch.</h3>
+          <p class="trust-sub">No in-app purchases. No premium tier. No "unlock for $4.99." Just free.</p>
+        </div>
+      </div>
     </div>
   </section>
 
   <!-- Final CTA -->
-  <section class="final-cta">
-    <div class="container">
-      <h2 class="big-statement fade-in">Ready to reply<br>like you mean it?</h2>
-      <p class="statement-sub fade-in">Install Sleeping Bird. Start replying faster, sharper, louder.</p>
-      <div class="cta-group fade-in">
-        <a href="https://chrome.google.com/webstore/detail/jmafaeednncmehcojgbehpoklohbmikc" class="btn btn-primary">Add to Chrome — It's Free</a>
-        <a href="https://github.com/olivierpicard/sleeping-bird.com" class="btn btn-secondary">View on GitHub</a>
+  <section class="scroll-story final-cta" data-scroll-section>
+    <div class="scroll-story-inner">
+      <div class="container" style="text-align:center">
+        <h2 class="big-statement reveal" data-reveal>Ready to reply<br>like you mean it?</h2>
+        <p class="statement-sub reveal" data-reveal data-delay="1">Install Sleeping Bird. Start replying faster, sharper, louder.</p>
+        <div class="cta-group reveal" data-reveal data-delay="2">
+          <a href="https://chrome.google.com/webstore/detail/jmafaeednncmehcojgbehpoklohbmikc" class="btn btn-primary">Add to Chrome — It's Free</a>
+          <a href="https://github.com/olivierpicard/sleeping-bird.com" class="btn btn-secondary">View on GitHub</a>
+        </div>
       </div>
     </div>
   </section>
