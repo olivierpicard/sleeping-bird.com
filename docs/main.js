@@ -19,6 +19,10 @@
   // ── Reveal elements ──
   const reveals = document.querySelectorAll('.reveal');
 
+  // ── Trust badges (scroll-driven) ──
+  const trustWrap = document.querySelector('.scroll-trust');
+  const trustBadges = document.querySelectorAll('.trust-badge[data-trust]');
+
   // ── Animation state ──
   let step2Played = false;
   let step3Played = false;
@@ -143,6 +147,30 @@
       } else {
         stmtInner.style.filter = 'none';
       }
+    }
+
+    // ─── Trust badges: scroll-driven staggered reveal ───
+    if (trustWrap && trustBadges.length) {
+      const rect = trustWrap.getBoundingClientRect();
+      const trustH = trustWrap.offsetHeight;
+      const progress = clamp(-rect.top / (trustH - vh), 0, 1);
+
+      const totalBadges = trustBadges.length;
+      const badgeWindow = 0.22; // each badge takes 22% of scroll to fully appear
+
+      trustBadges.forEach((badge, i) => {
+        const badgeStart = 0.1 + (i / totalBadges) * 0.6;
+        const badgeProgress = clamp((progress - badgeStart) / badgeWindow, 0, 1);
+        const eased = easeOutCubic(badgeProgress);
+
+        const y = lerp(60, 0, eased);
+        const scale = lerp(0.85, 1, eased);
+        const blur = lerp(8, 0, eased);
+
+        badge.style.opacity = eased;
+        badge.style.transform = `translateY(${y}px) scale(${scale})`;
+        badge.style.filter = `blur(${blur}px)`;
+      });
     }
 
     // ─── Reveal elements when they enter viewport ───

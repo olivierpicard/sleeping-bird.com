@@ -761,14 +761,14 @@ a {
   border: none !important;
   background: conic-gradient(
     from var(--border-angle, 0deg),
-    #0e7490,
-    #67e8f9,
-    #e0f7fa,
-    #ffffff,
-    #67e8f9,
-    #0e7490,
-    #164e63,
-    #0e7490
+    #0a5264,
+    #4db8b8,
+    #8ecfcf,
+    #c0dede,
+    #4db8b8,
+    #0a5264,
+    #0f3d4d,
+    #0a5264
   ) !important;
   animation: rotateBorder 6s linear infinite;
   overflow: visible;
@@ -783,6 +783,7 @@ a {
   border-radius: 8px;
   background: #111;
   z-index: 0;
+  box-shadow: 0 0 0 1px rgba(17, 17, 17, 0.5);
 }
 
 /* Keep text above the fill */
@@ -801,9 +802,9 @@ a {
   background: conic-gradient(
     from var(--border-angle, 0deg),
     transparent,
-    rgba(103, 232, 249, 0.25),
-    transparent,
     rgba(103, 232, 249, 0.15),
+    transparent,
+    rgba(103, 232, 249, 0.08),
     transparent
   );
   filter: blur(12px);
@@ -1102,15 +1103,19 @@ footer {
    TRUST SECTION — open source badges
    ═══════════════════════════════════════ */
 .scroll-trust {
-  min-height: 50vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 4rem 2rem;
+  height: 250vh; /* scroll runway so badges animate with scroll */
+  position: relative;
   border-top: 1px solid var(--border);
 }
 
 .scroll-trust-inner {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 2rem;
   width: 100%;
   max-width: 900px;
   margin: 0 auto;
@@ -1154,6 +1159,13 @@ footer {
   }
 }
 
+.trust-badge {
+  opacity: 0;
+  transform: translateY(60px) scale(0.85);
+  filter: blur(8px);
+  will-change: transform, opacity, filter;
+}
+
 .trust-badge h3 {
   font-size: 1.05rem;
   font-weight: 600;
@@ -1179,7 +1191,6 @@ footer {
     align-items: center;
   }
   .scroll-trust {
-    min-height: auto;
-    padding: 3rem 1.5rem;
+    height: 200vh;
   }
 }
