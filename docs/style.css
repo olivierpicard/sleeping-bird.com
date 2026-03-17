@@ -1092,6 +1092,17 @@ footer {
   color: var(--text);
 }
 
+.trust-sub {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  max-width: 200px;
+}
+
+.trust-badge--free .trust-icon {
+  animation-delay: 1.2s;
+}
+
 @media (max-width: 768px) {
   .trust-badges {
     flex-direction: column;
