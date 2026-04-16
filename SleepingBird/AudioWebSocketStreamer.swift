@@ -16,6 +16,9 @@ final class AudioWebSocketStreamer {
     private var webSocketTask: URLSessionWebSocketTask?
     private let session: URLSession
 
+    /// Called when a message is received from the server.
+    var onMessageReceived: ((URLSessionWebSocketTask.Message) -> Void)?
+
     init(session: URLSession = .shared) {
         self.session = session
     }
@@ -25,6 +28,15 @@ final class AudioWebSocketStreamer {
     func connect(to url: URL) {
         disconnect()
         let task = session.webSocketTask(with: url)
+        webSocketTask = task
+        task.resume()
+        isConnected = true
+        listenForMessages()
+    }
+
+    func connect(with request: URLRequest) {
+        disconnect()
+        let task = session.webSocketTask(with: request)
         webSocketTask = task
         task.resume()
         isConnected = true
@@ -59,8 +71,8 @@ final class AudioWebSocketStreamer {
         webSocketTask?.receive { [weak self] result in
             guard let self, self.isConnected else { return }
             switch result {
-            case .success:
-                // Continue listening for further messages.
+            case .success(let message):
+                self.onMessageReceived?(message)
                 self.listenForMessages()
             case .failure(let error):
                 print("WebSocket receive error: \(error.localizedDescription)")

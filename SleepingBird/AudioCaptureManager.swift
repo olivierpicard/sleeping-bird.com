@@ -21,22 +21,34 @@ final class AudioCaptureManager {
     private static let targetSampleRate: Double = 16_000
     private static let targetChannelCount: AVAudioChannelCount = 1
 
-    private let converterNode = AVAudioMixerNode()
-    private let sinkNode = AVAudioMixerNode()
-
     // MARK: - Public API
 
-    func startCapturing() throws {
+    func startCapturing() async throws {
         guard !isCapturing else { return }
 
-        #if os(iOS)
-            let session = AVAudioSession.sharedInstance()
-            try session.setCategory(.record, options: [.allowBluetoothHFP])
-            try session.setActive(true)
-        #endif
+        // Request microphone permission first
+        let permitted = await AVAudioApplication.requestRecordPermission()
+        guard permitted else {
+            throw AudioCaptureError.permissionDenied
+        }
+
+        let session = AVAudioSession.sharedInstance()
+        try session.setCategory(
+            .playAndRecord,
+            mode: .default,
+            options: [.defaultToSpeaker]
+        )
+        try session.setActive(true)
+
+        // Reset the engine to ensure a clean state after permission is granted
+        audioEngine.reset()
 
         let inputNode = audioEngine.inputNode
         let inputFormat = inputNode.outputFormat(forBus: 0)
+
+        guard inputFormat.sampleRate > 0 else {
+            throw AudioCaptureError.formatCreationFailed
+        }
 
         guard
             let targetFormat = AVAudioFormat(
@@ -49,48 +61,72 @@ final class AudioCaptureManager {
             throw AudioCaptureError.formatCreationFailed
         }
 
-        audioEngine.attach(converterNode)
-        audioEngine.attach(sinkNode)
+        guard
+            let converter = AVAudioConverter(
+                from: inputFormat,
+                to: targetFormat
+            )
+        else {
+            throw AudioCaptureError.formatCreationFailed
+        }
 
-        audioEngine.connect(inputNode, to: converterNode, format: inputFormat)
-        audioEngine.connect(converterNode, to: sinkNode, format: targetFormat)
-
-        converterNode.installTap(
+        inputNode.installTap(
             onBus: 0,
-            bufferSize: 1024,
-            format: targetFormat
+            bufferSize: 4096,
+            format: inputFormat
         ) { [weak self] buffer, _ in
-            let audioBuffer = buffer.audioBufferList.pointee.mBuffers
-            if let data = audioBuffer.mData {
-                self?.onAudioData?(
-                    Data(bytes: data, count: Int(audioBuffer.mDataByteSize))
+            let frameCapacity = AVAudioFrameCount(
+                Double(buffer.frameLength) * Self.targetSampleRate
+                    / inputFormat.sampleRate
+            )
+            guard
+                let convertedBuffer = AVAudioPCMBuffer(
+                    pcmFormat: targetFormat,
+                    frameCapacity: frameCapacity
                 )
+            else { return }
+
+            var error: NSError?
+            converter.convert(to: convertedBuffer, error: &error) {
+                _,
+                outStatus in
+                outStatus.pointee = .haveData
+                return buffer
+            }
+
+            if error != nil { return }
+
+            if let audioData = convertedBuffer.audioBufferList.pointee.mBuffers
+                .mData
+            {
+                let byteCount = Int(
+                    convertedBuffer.audioBufferList.pointee.mBuffers
+                        .mDataByteSize
+                )
+                self?.onAudioData?(Data(bytes: audioData, count: byteCount))
             }
         }
 
-        audioEngine.prepare()
         try audioEngine.start()
         isCapturing = true
     }
 
     func stopCapturing() {
         guard isCapturing else { return }
-        converterNode.removeTap(onBus: 0)
+        audioEngine.inputNode.removeTap(onBus: 0)
         audioEngine.stop()
-        audioEngine.detach(converterNode)
-        audioEngine.detach(sinkNode)
+        audioEngine.reset()
         isCapturing = false
 
-        #if os(iOS)
-            try? AVAudioSession.sharedInstance().setActive(
-                false,
-                options: .notifyOthersOnDeactivation
-            )
-        #endif
+        try? AVAudioSession.sharedInstance().setActive(
+            false,
+            options: .notifyOthersOnDeactivation
+        )
     }
 
 }
 
 enum AudioCaptureError: Error {
     case formatCreationFailed
+    case permissionDenied
 }
