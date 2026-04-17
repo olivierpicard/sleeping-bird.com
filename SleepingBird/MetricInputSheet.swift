@@ -3,7 +3,7 @@ import SwiftUI
 struct MetricInputSheet: View {
     @State private var instruction: String = ""
     @State private var isRecording: Bool = false
-    private let transcribe = Transcribe()
+    private let transcribe: Transcriber = DeepgramFluxTranscriber()
     private let BUTTON_SIZE: CGFloat = 65
 
     init(instruction: String = "") {
