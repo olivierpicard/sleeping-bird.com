@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import ArkanaKeys
 
 /// Streams microphone audio to Deepgram and forwards transcript text as it arrives.
 ///
@@ -24,8 +25,11 @@ final class Transcribe {
         var endpoint: URL
 
         static let `default` = Config(
-            apiKey: "c568a4c4507bb8abe1ecfd48b2761916ff85209b",
-            endpoint: URL(string: "wss://api.deepgram.com/v2/listen?eot_threshold=0.7&eot_timeout_ms=5000&model=flux-general-multi&encoding=linear16&sample_rate=16000")!
+            apiKey: ArkanaKeys.Global().deepgramApiKey,
+            endpoint: URL(
+                string:
+                    "wss://api.deepgram.com/v2/listen?eot_threshold=0.7&eot_timeout_ms=5000&model=flux-general-multi&encoding=linear16&sample_rate=16000"
+            )!
         )
     }
 
@@ -49,7 +53,12 @@ final class Transcribe {
 
         // Connect WebSocket with auth header
         var request = URLRequest(url: config.endpoint)
-        request.setValue("Token \(config.apiKey)", forHTTPHeaderField: "Authorization")
+        request.setValue(
+            "Token \(config.apiKey)",
+            forHTTPHeaderField: "Authorization"
+        )
+        
+        print(request.value(forHTTPHeaderField: "Authorization") ?? "no value")
         streamer.connect(with: request)
 
         // Forward audio chunks to WebSocket
@@ -89,7 +98,8 @@ final class Transcribe {
 
         guard
             let jsonData,
-            let json = try? JSONSerialization.jsonObject(with: jsonData) as? [String: Any],
+            let json = try? JSONSerialization.jsonObject(with: jsonData)
+                as? [String: Any],
             let transcript = json["transcript"] as? String,
             !transcript.isEmpty
         else { return }
