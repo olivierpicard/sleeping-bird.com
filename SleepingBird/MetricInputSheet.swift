@@ -3,11 +3,12 @@ import SwiftUI
 struct MetricInputSheet: View {
     @State private var instruction: String = ""
     @State private var isRecording: Bool = false
-    private let transcribe: Transcriber = DeepgramFluxTranscriber()
+    private let transcriber: Transcriber
     private let BUTTON_SIZE: CGFloat = 65
 
-    init(instruction: String = "") {
+    init(instruction: String = "", transcriber: Transcriber = DeepgramFluxTranscriber()) {
         _instruction = State(initialValue: instruction)
+        self.transcriber = transcriber
     }
 
     var body: some View {
@@ -45,10 +46,10 @@ struct MetricInputSheet: View {
 
     private func toggleRecording() {
         if isRecording {
-            transcribe.stop()
+            transcriber.stop()
             isRecording = false
         } else {
-            transcribe.start { text in
+            transcriber.start { text in
 //                instruction += (instruction.isEmpty ? "" : " ") + text
                 instruction = text
             }
