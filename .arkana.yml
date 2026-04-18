@@ -1,0 +1,12 @@
+import_name: ArkanaKeys
+namespace: ArkanaKeys
+package_manager: spm
+
+environments:
+  - Debug
+  - Release
+
+global_secrets: 
+  - DeepgramApiKey
+
+environment_secrets:
