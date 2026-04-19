@@ -22,8 +22,6 @@ async def generate_response(
     system_prompt: str,
     response_model: type[T],
 ) -> T:
-    print(json.dumps(response_model.model_json_schema(by_alias=True), indent=4))
-    print("-----------")
     response = await _client.aio.models.generate_content(
         model=settings.gemini_model,
         contents=user_prompt,
@@ -37,5 +35,4 @@ async def generate_response(
 
     if not response.text:
         raise EmptyResponseError("The generated response is empty. It is not allowed.")
-    print(json.dumps(json.loads(response.text), indent=4))
     return response_model.model_validate_json(response.text)

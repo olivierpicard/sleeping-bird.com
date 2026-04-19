@@ -37,11 +37,6 @@ async def root() -> str:
 
 @app.get(
     "/generate",
-    response_model=GenerateResponse,
-    responses={
-        400: {"model": ErrorResponse, "description": "Missing prompt parameter"},
-        500: {"model": ErrorResponse, "description": "Gemini API error"},
-    },
     summary="Generated metric suggestions",
 )
 async def generate(
