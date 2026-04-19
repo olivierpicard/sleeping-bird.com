@@ -1,28 +1,30 @@
-Prerequisites:
+# Sleeping Bird API (FastAPI)
 
-- [Vercel CLI](https://vercel.com/docs/cli) installed globally
+Python port of the Hono API. Exposes Gemini-powered metric-suggestion generation with
+a Pydantic-validated response schema and auto-generated OpenAPI docs.
 
-To develop locally:
+## Setup
 
-```
-npm install
-vc dev
-```
-
-```
-open http://localhost:3000
+```bash
+uv sync                 # or: pip install -e .
+cp .env.local.example .env.local   # set GEMINI_API_KEY
 ```
 
-To build locally:
+## Run
 
-```
-npm install
-vc build
+```bash
+uv run uvicorn app.main:app --reload --env-file .env.local
 ```
 
-To deploy:
+- `GET /` — health check
+- `GET /generate?prompt=...` — Gemini-generated suggestions
+- `GET /openapi.json` — OpenAPI document (served by FastAPI)
+- `GET /docs` — Swagger UI
 
+## Export the OpenAPI schema
+
+```bash
+uv run python -m scripts.generate_schema
 ```
-npm install
-vc deploy
-```
+
+Writes `openapi.json` to the project root.
