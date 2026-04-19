@@ -9,6 +9,8 @@
 /* Begin PBXBuildFile section */
 		8152B34D2F91B3E100D421C2 /* .gitignore in Resources */ = {isa = PBXBuildFile; fileRef = 8152B34C2F91B3E100D421C2 /* .gitignore */; };
 		8152B3672F91C55700D421C2 /* ArkanaKeys in Frameworks */ = {isa = PBXBuildFile; productRef = 8152B3662F91C55700D421C2 /* ArkanaKeys */; };
+		81BB91BE2F95603F00E4A4C5 /* FirebaseAILogic in Frameworks */ = {isa = PBXBuildFile; productRef = 81BB91BD2F95603F00E4A4C5 /* FirebaseAILogic */; };
+		81BB91C12F95609700E4A4C5 /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 81BB91C02F95609700E4A4C5 /* FirebaseAnalytics */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -30,6 +32,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				81BB91BE2F95603F00E4A4C5 /* FirebaseAILogic in Frameworks */,
+				81BB91C12F95609700E4A4C5 /* FirebaseAnalytics in Frameworks */,
 				8152B3672F91C55700D421C2 /* ArkanaKeys in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -37,6 +41,13 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		81BB91BF2F95609700E4A4C5 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		81F8D82F2F8DEA6600E96BF9 = {
 			isa = PBXGroup;
 			children = (
@@ -44,6 +55,7 @@
 				81F8D8392F8DEA6600E96BF9 /* Products */,
 				81F8D83A2F8DEA6600E96BF9 /* SleepingBird */,
 				8152B36A2F91CB9B00D421C2 /* .arkana.yml */,
+				81BB91BF2F95609700E4A4C5 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -76,6 +88,8 @@
 			name = SleepingBird;
 			packageProductDependencies = (
 				8152B3662F91C55700D421C2 /* ArkanaKeys */,
+				81BB91BD2F95603F00E4A4C5 /* FirebaseAILogic */,
+				81BB91C02F95609700E4A4C5 /* FirebaseAnalytics */,
 			);
 			productName = SleepingBird;
 			productReference = 81F8D8382F8DEA6600E96BF9 /* SleepingBird.app */;
@@ -107,6 +121,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				8152B3652F91C55700D421C2 /* XCLocalSwiftPackageReference "ArkanaKeys/ArkanaKeys" */,
+				81BB91BC2F95603F00E4A4C5 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 81F8D8392F8DEA6600E96BF9 /* Products */;
@@ -361,10 +376,31 @@
 		};
 /* End XCLocalSwiftPackageReference section */
 
+/* Begin XCRemoteSwiftPackageReference section */
+		81BB91BC2F95603F00E4A4C5 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
+			requirement = {
+				kind = upToNextMinorVersion;
+				minimumVersion = 12.12.1;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
 /* Begin XCSwiftPackageProductDependency section */
 		8152B3662F91C55700D421C2 /* ArkanaKeys */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = ArkanaKeys;
+		};
+		81BB91BD2F95603F00E4A4C5 /* FirebaseAILogic */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 81BB91BC2F95603F00E4A4C5 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAILogic;
+		};
+		81BB91C02F95609700E4A4C5 /* FirebaseAnalytics */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 81BB91BC2F95603F00E4A4C5 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAnalytics;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

@@ -20,7 +20,17 @@ struct MetricInputSheet: View {
             TextEditor(text: $instruction)
             Spacer()
             HStack {
-                Button(action: {}) {
+                Button(action: {
+                    Task {
+                        do {
+                            let response = try await AiAccess().suggestMetric(for: "Log my energy level with emoji")
+                            print(response)
+                           
+                        } catch {
+                            print("AiAccess error: \(error)")
+                        }
+                    }
+                }) {
                     Label("Send", systemImage: "paperplane")
                         .font(.system(size: BUTTON_SIZE))
                 }
