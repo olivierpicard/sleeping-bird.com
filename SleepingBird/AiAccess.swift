@@ -23,7 +23,9 @@ public struct AiAccess {
                     "A list of 1 to 3 tracking configurations based on the user's intent.",
                 minItems: 1,
                 maxItems: 3
-            )
+            ),
+            thinkingConfig: ThinkingConfig(thinkingLevel: .minimal),
+            
         )
         let systemPrompt = """
               You are a specialized Data Architect for health and productivity tracking. Your sole purpose is to parse user dictations and map them into the provided JSON schema.
