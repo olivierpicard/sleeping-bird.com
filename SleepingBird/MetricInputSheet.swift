@@ -6,7 +6,10 @@ struct MetricInputSheet: View {
     private let transcriber: Transcriber
     private let BUTTON_SIZE: CGFloat = 65
 
-    init(instruction: String = "", transcriber: Transcriber = DeepgramFluxTranscriber()) {
+    init(
+        instruction: String = "",
+        transcriber: Transcriber = DeepgramFluxTranscriber()
+    ) {
         _instruction = State(initialValue: instruction)
         self.transcriber = transcriber
     }
@@ -23,11 +26,12 @@ struct MetricInputSheet: View {
                 Button(action: {
                     Task {
                         do {
-                            let response = try await AiAccess().suggestMetric(for: "Log my energy level with emoji")
+                            let response = try await AiSuggestMetric().generate(
+                                userInstruction: instruction
+                            )
                             print(response)
-                           
                         } catch {
-                            print("AiAccess error: \(error)")
+                            print(error)
                         }
                     }
                 }) {
@@ -60,7 +64,7 @@ struct MetricInputSheet: View {
             isRecording = false
         } else {
             transcriber.start { text in
-//                instruction += (instruction.isEmpty ? "" : " ") + text
+                //                instruction += (instruction.isEmpty ? "" : " ") + text
                 instruction = text
             }
             isRecording = true
@@ -69,10 +73,10 @@ struct MetricInputSheet: View {
 }
 
 #Preview {
-        MetricInputSheet()
-//    MetricInputSheet(
-//        instruction: "I want to track how much coffee I drink per day"
-//    )
+    //        MetricInputSheet()
+    MetricInputSheet(
+        instruction: "I want to track how much coffee I drink per day"
+    )
     //        MetricInputSheet(
     //            instruction:
     //                "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum. Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum. "
