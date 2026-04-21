@@ -37,6 +37,7 @@ public class Metric {
 public struct Location: Codable {
     public var lat: Float
     public var lon: Float
+
 }
 
 public struct Record: Codable {
