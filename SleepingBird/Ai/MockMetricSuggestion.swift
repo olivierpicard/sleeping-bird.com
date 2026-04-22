@@ -14,7 +14,11 @@
                 min: Double = 0,
                 max: Double = 50_000,
                 granularity: Double = 100,
-                goal: Double? = 10_000
+                goal: Double? = 10_000,
+                behavior: MetricBehavior = .cumulative,
+                chart: ChartType = .bar,
+                bucket: TemporalBucket? = .daily,
+                method: AggregationMethod = .numerical(.sum)
             ) -> MetricSuggestion {
                 MetricSuggestion(
                     name: title,
@@ -25,8 +29,13 @@
                             max: max,
                             granularity: granularity,
                             unit: unit,
-                            goal: goal
+                            goal: goal,
+                            behavior: behavior
                         )
+                    ),
+                    Visual: MetricVisual(
+                        chart: chart,
+                        aggregation: AggregationConfig(bucket: bucket, method: method)
                     )
                 )
             }
@@ -35,13 +44,20 @@
                 title: String = "Mood",
                 labels: [String] = [
                     "Great", "Good", "Neutral", "Bad", "Terrible",
-                ]
+                ],
+                chart: ChartType = .pie,
+                bucket: TemporalBucket? = .daily,
+                method: AggregationMethod = .categorical(.mostFrequent)
             ) -> MetricSuggestion {
                 MetricSuggestion(
                     name: title,
                     fitPercentage: 0.88,
                     config: .categorySingleChoice(
                         CategoryConfig(labels: labels)
+                    ),
+                    Visual: MetricVisual(
+                        chart: chart,
+                        aggregation: AggregationConfig(bucket: bucket, method: method)
                     )
                 )
             }
@@ -50,13 +66,20 @@
                 title: String = "Symptoms",
                 labels: [String] = [
                     "Headache", "Fatigue", "Nausea", "Back pain", "Anxiety",
-                ]
+                ],
+                chart: ChartType = .bar,
+                bucket: TemporalBucket? = .daily,
+                method: AggregationMethod = .categorical(.count)
             ) -> MetricSuggestion {
                 MetricSuggestion(
                     name: title,
                     fitPercentage: 0.80,
                     config: .categoryMultipleChoice(
                         CategoryConfig(labels: labels)
+                    ),
+                    Visual: MetricVisual(
+                        chart: chart,
+                        aggregation: AggregationConfig(bucket: bucket, method: method)
                     )
                 )
             }
@@ -64,7 +87,10 @@
             static func binary(
                 title: String = "Workout Done",
                 trueLabel: String = "Yes",
-                falseLabel: String = "No"
+                falseLabel: String = "No",
+                chart: ChartType = .heatmap,
+                bucket: TemporalBucket? = .daily,
+                method: AggregationMethod = .categorical(.count)
             ) -> MetricSuggestion {
                 MetricSuggestion(
                     name: title,
@@ -74,24 +100,39 @@
                             trueLabel: trueLabel,
                             falseLabel: falseLabel
                         )
+                    ),
+                    Visual: MetricVisual(
+                        chart: chart,
+                        aggregation: AggregationConfig(bucket: bucket, method: method)
                     )
                 )
             }
 
-            static func datetime(title: String = "Wake-up Time")
-                -> MetricSuggestion
-            {
+            static func datetime(
+                title: String = "Wake-up Time",
+                chart: ChartType = .line,
+                bucket: TemporalBucket? = .daily,
+                method: AggregationMethod = .numerical(.average)
+            ) -> MetricSuggestion {
                 MetricSuggestion(
                     name: title,
                     fitPercentage: 0.85,
-                    config: .datetime(DatetimeConfig())
+                    config: .datetime,
+                    Visual: MetricVisual(
+                        chart: chart,
+                        aggregation: AggregationConfig(bucket: bucket, method: method)
+                    )
                 )
             }
 
             static func duration(
                 title: String = "Meditation Session",
                 granularity: String = "m",
-                maxInSeconds: Int = 3600
+                maxInSeconds: Int = 3600,
+                chart: ChartType = .bar,
+                bucket: TemporalBucket? = .daily,
+                method: AggregationMethod = .numerical(.sum),
+                behavior: MetricBehavior = .cumulative
             ) -> MetricSuggestion {
                 MetricSuggestion(
                     name: title,
@@ -99,8 +140,13 @@
                     config: .duration(
                         DurationConfig(
                             granularity: granularity,
-                            maxInSeconds: maxInSeconds
+                            maxInSeconds: maxInSeconds,
+                            behavior: behavior
                         )
+                    ),
+                    Visual: MetricVisual(
+                        chart: chart,
+                        aggregation: AggregationConfig(bucket: bucket, method: method)
                     )
                 )
             }
