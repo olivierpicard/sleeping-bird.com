@@ -23,21 +23,25 @@ private struct ShimmerModifier: ViewModifier {
                         endPoint: .trailing
                     )
                     .frame(width: geo.size.width * 0.5)
-                    .offset(x: isAnimating ? geo.size.width * 1.5 : -geo.size.width)
+                    .offset(
+                        x: isAnimating ? geo.size.width * 1.5 : -geo.size.width
+                    )
                     .allowsHitTesting(false)
                 }
                 .clipped()
             }
             .onAppear {
-                withAnimation(.linear(duration: 1.5).repeatForever(autoreverses: false)) {
+                withAnimation(
+                    .linear(duration: 1.5).repeatForever(autoreverses: false)
+                ) {
                     isAnimating = true
                 }
             }
     }
 }
 
-private extension View {
-    func shimmer() -> some View {
+extension View {
+    fileprivate func shimmer() -> some View {
         modifier(ShimmerModifier())
     }
 }
@@ -64,7 +68,11 @@ private struct MetricSuggestionSkeletonCard: View {
             Spacer()
         }
         .padding(24)
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+        .frame(
+            maxWidth: .infinity,
+            maxHeight: .infinity,
+            alignment: .topLeading
+        )
         .shimmer()
     }
 }
@@ -94,7 +102,11 @@ private struct MetricSuggestionCard: View {
             Spacer()
         }
         .padding(24)
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+        .frame(
+            maxWidth: .infinity,
+            maxHeight: .infinity,
+            alignment: .topLeading
+        )
     }
 
     @ViewBuilder
@@ -106,7 +118,8 @@ private struct MetricSuggestionCard: View {
                 if let unit = config.unit {
                     Text("Unit: \(unit)").foregroundStyle(.secondary)
                 }
-                Text("Range: \(Int(config.min)) – \(Int(config.max))").foregroundStyle(.secondary)
+                Text("Range: \(Int(config.min)) – \(Int(config.max))")
+                    .foregroundStyle(.secondary)
                 if let goal = config.goal {
                     Text("Goal: \(Int(goal))").foregroundStyle(.secondary)
                 }
@@ -114,21 +127,30 @@ private struct MetricSuggestionCard: View {
         case .categorySingleChoice(let config):
             VStack(alignment: .leading, spacing: 6) {
                 Label("Single Choice", systemImage: "list.bullet")
-                Text(config.labels.joined(separator: ", ")).foregroundStyle(.secondary)
+                Text(config.labels.joined(separator: ", ")).foregroundStyle(
+                    .secondary
+                )
             }
         case .categoryMultipleChoice(let config):
             VStack(alignment: .leading, spacing: 6) {
                 Label("Multiple Choice", systemImage: "checklist")
-                Text(config.labels.joined(separator: ", ")).foregroundStyle(.secondary)
+                Text(config.labels.joined(separator: ", ")).foregroundStyle(
+                    .secondary
+                )
             }
         case .binary(let config):
-            Label("\(config.trueLabel) / \(config.falseLabel)", systemImage: "toggle.on")
+            Label(
+                "\(config.trueLabel) / \(config.falseLabel)",
+                systemImage: "toggle.on"
+            )
         case .datetime:
             Label("Date & Time", systemImage: "clock")
         case .duration(let config):
             VStack(alignment: .leading, spacing: 6) {
                 Label("Duration", systemImage: "timer")
-                Text("Granularity: \(config.granularity)").foregroundStyle(.secondary)
+                Text("Granularity: \(config.granularity)").foregroundStyle(
+                    .secondary
+                )
             }
         }
     }
@@ -170,14 +192,16 @@ struct MetricChoice: View {
                 }
             }
             ToolbarItem(placement: .confirmationAction) {
-                Button(action: { }) {
+                Button(action: {}) {
                     Image(systemName: "checkmark")
                 }.buttonStyle(.glassProminent)
             }
         }
         .task {
             guard
-                ProcessInfo.processInfo.environment["XCODE_RUNNING_FOR_PREVIEWS"] != "1"
+                ProcessInfo.processInfo.environment[
+                    "XCODE_RUNNING_FOR_PREVIEWS"
+                ] != "1"
             else { return }
             do {
                 let response = try await AiSuggestMetric().generate(
@@ -214,4 +238,3 @@ struct MetricChoice: View {
         )
     }
 }
-
