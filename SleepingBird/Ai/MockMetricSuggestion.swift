@@ -10,6 +10,7 @@
         enum Mock {
             static func number(
                 title: String = "Daily Steps",
+                emoji: String = "👣",
                 unit: String? = "steps",
                 min: Double = 0,
                 max: Double = 50_000,
@@ -22,6 +23,7 @@
             ) -> MetricSuggestion {
                 MetricSuggestion(
                     name: title,
+                    emoji: emoji,
                     fitPercentage: 0.95,
                     config: .number(
                         NumberConfig(
@@ -42,6 +44,7 @@
 
             static func categorySingle(
                 title: String = "Mood",
+                emoji: String = "😊",
                 labels: [String] = [
                     "Great", "Good", "Neutral", "Bad", "Terrible",
                 ],
@@ -51,6 +54,7 @@
             ) -> MetricSuggestion {
                 MetricSuggestion(
                     name: title,
+                    emoji: emoji,
                     fitPercentage: 0.88,
                     config: .categorySingleChoice(
                         CategoryConfig(labels: labels)
@@ -64,6 +68,7 @@
 
             static func categoryMultiple(
                 title: String = "Symptoms",
+                emoji: String = "🤒",
                 labels: [String] = [
                     "Headache", "Fatigue", "Nausea", "Back pain", "Anxiety",
                 ],
@@ -73,6 +78,7 @@
             ) -> MetricSuggestion {
                 MetricSuggestion(
                     name: title,
+                    emoji: emoji,
                     fitPercentage: 0.80,
                     config: .categoryMultipleChoice(
                         CategoryConfig(labels: labels)
@@ -86,6 +92,7 @@
 
             static func binary(
                 title: String = "Workout Done",
+                emoji: String = "💪",
                 trueLabel: String = "Yes",
                 falseLabel: String = "No",
                 chart: ChartType = .heatmap,
@@ -94,6 +101,7 @@
             ) -> MetricSuggestion {
                 MetricSuggestion(
                     name: title,
+                    emoji: emoji,
                     fitPercentage: 0.92,
                     config: .binary(
                         BinaryConfig(
@@ -110,12 +118,14 @@
 
             static func datetime(
                 title: String = "Wake-up Time",
+                emoji: String = "⏰",
                 chart: ChartType = .line,
                 bucket: TemporalBucket? = .daily,
                 method: AggregationMethod = .numerical(.average)
             ) -> MetricSuggestion {
                 MetricSuggestion(
                     name: title,
+                    emoji: emoji,
                     fitPercentage: 0.85,
                     config: .datetime,
                     Visual: MetricVisual(
@@ -127,6 +137,7 @@
 
             static func duration(
                 title: String = "Meditation Session",
+                emoji: String = "🧘",
                 granularity: String = "m",
                 maxInSeconds: Int = 3600,
                 chart: ChartType = .bar,
@@ -136,6 +147,7 @@
             ) -> MetricSuggestion {
                 MetricSuggestion(
                     name: title,
+                    emoji: emoji,
                     fitPercentage: 0.78,
                     config: .duration(
                         DurationConfig(

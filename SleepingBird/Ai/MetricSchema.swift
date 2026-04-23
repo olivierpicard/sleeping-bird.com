@@ -14,7 +14,7 @@ public struct MetricSuggestionArray {
     @Guide(
         description: "A list of suggested metrics",
         .minimumCount(1),
-        .maximumCount(3)
+        .maximumCount(4)
     )
     let suggestions: [MetricSuggestion]
 }
@@ -26,6 +26,9 @@ public struct MetricSuggestion {
             "Concise title name. E.g., 'Deep Sleep Duration'"
     )
     let name: String
+    
+    @Guide(description: "A single emoji that fit the metric")
+    let emoji: String
 
     @Guide(
         description: "Confidence score. 1.0 means a clear match.",
