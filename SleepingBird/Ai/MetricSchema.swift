@@ -26,7 +26,7 @@ public struct MetricSuggestion {
             "Concise title name. E.g., 'Deep Sleep Duration'"
     )
     let name: String
-    
+
     @Guide(description: "A single emoji that fit the metric")
     let emoji: String
 
@@ -109,7 +109,7 @@ public struct DurationConfig {
         .range(0...Int.max)
     )
     let maxInSeconds: Int
-    
+
     @Guide(description: "Defines how the datetime behaves over time")
     let behavior: MetricBehavior
 }
@@ -136,11 +136,14 @@ public struct MetricVisual {
     let aggregation: AggregationConfig
 }
 
+// I kept heatmap rather than dotmap
+// because it is well known by the LLM. No need extra description
 @Generable()
 public enum ChartType: String, Codable {
     case line  // Best for continuous trends over time (Weight, duration)
     case bar  // Best for discrete, summed, or counted data (Calories, steps)
     case pie  // Best for proportions (Categories)
+    //    case dotmap  // Dot-grid chart: circles with gradient fill by value, good for habits or streaks
     case heatmap  // GitHub-style contribution graph (Best for Binary habits or frequency)
     case gauge  // Good if the metric has a specific daily `goal` limit
 }

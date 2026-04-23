@@ -77,13 +77,13 @@ struct MetricView: View {
                     emojiSize = $0
                 }
                 Spacer()
-                if(!hideAddButton) {
+                if !hideAddButton {
                     Button(action: {}) {
                         Image(systemName: "plus")
                             .font(.system(size: 22, weight: .bold))
                             .foregroundStyle(.white)
                     }
-                    .frame(width: emojiSize*0.8, height: emojiSize*0.8)
+                    .frame(width: emojiSize * 0.8, height: emojiSize * 0.8)
                     .background(mainColor)
                     .clipShape(Circle())
                     .shadow(
@@ -122,8 +122,10 @@ struct MetricView: View {
             barChart
         case .pie:
             linearCategoryChart
+//        case .dotmap:
+//            dotmapChart
         case .heatmap:
-            heatmapChart
+            dotmapChart
         case .gauge:
             linearGaugeChart
         }
@@ -195,10 +197,16 @@ struct MetricView: View {
                 let available = geo.size.width - count * spacing
 
                 HStack(spacing: spacing) {
-                    ForEach(Array(data.enumerated()), id: \.offset) { index, value in
+                    ForEach(Array(data.enumerated()), id: \.offset) {
+                        index,
+                        value in
                         let fraction = total > 0 ? value / total : 0
                         RoundedRectangle(cornerRadius: 3)
-                            .fill(Self.categoryPalette[index % Self.categoryPalette.count])
+                            .fill(
+                                Self.categoryPalette[
+                                    index % Self.categoryPalette.count
+                                ]
+                            )
                             .frame(width: available * fraction)
                     }
                 }
@@ -232,6 +240,39 @@ struct MetricView: View {
         .padding(.bottom, 12)
     }
 
+    // MARK: - Dot Map
+
+    private var dotmapChart: some View {
+        let totalSlots = 14
+        let slice = Array(data.suffix(totalSlots))
+        let padded =
+            Array(repeating: 0.0, count: max(0, totalSlots - slice.count))
+            + slice
+        let maxVal = slice.max() ?? 1
+        let dotSize: CGFloat = 16
+        let spacing: CGFloat = 6
+
+        return VStack(alignment: .leading, spacing: 4) {
+            HStack(spacing: spacing) {
+                ForEach(0..<totalSlots, id: \.self) { i in
+                    let intensity = maxVal > 0 ? padded[i] / maxVal : 0
+                    Circle()
+                        .fill(mainColor.opacity(intensity))
+                        .overlay(
+                            Circle().strokeBorder(
+                                mainColor.opacity(0.8),
+                                lineWidth: 1
+                            )
+                        )
+                        .frame(width: dotSize, height: dotSize)
+                }
+            }
+            .frame(maxWidth: .infinity)
+
+        }
+        .padding()
+    }
+
     // MARK: - Heatmap (GitHub-style)
 
     private var heatmapChart: some View {
@@ -240,7 +281,9 @@ struct MetricView: View {
 
         return LazyHGrid(
             rows: Array(
-                repeating: GridItem(.fixed(12), spacing: 2), count: rows),
+                repeating: GridItem(.fixed(12), spacing: 2),
+                count: rows
+            ),
             spacing: 2
         ) {
             ForEach(0..<data.count, id: \.self) { i in
@@ -279,8 +322,7 @@ struct MetricView: View {
                     .foregroundStyle(.secondary)
             }
         }
-        .padding(.horizontal)
-        .padding(.bottom, 12)
+        .padding()
     }
 }
 
@@ -290,7 +332,10 @@ struct MetricView: View {
         emoji: "👟",
         value: "8,432",
         mainColor: .green,
-        data: [3000, 5000, 4000, 6500, 5500, 7000, 4500, 8000, 6000, 9000, 7500, 8432],
+        data: [
+            3000, 5000, 4000, 6500, 5500, 7000, 4500, 8000, 6000, 9000, 7500,
+            8432,
+        ],
         chartType: .line
     )
     .padding()
@@ -301,7 +346,10 @@ struct MetricView: View {
         emoji: "🔥",
         value: "1,840 kcal",
         mainColor: .orange,
-        data: [1200, 1500, 1800, 1400, 2000, 1700, 1840, 1200, 1500, 1800, 1400, 2000, 1700, 1840],
+        data: [
+            1200, 1500, 1800, 1400, 2000, 1700, 1840, 1200, 1500, 1800, 1400,
+            2000, 1700, 1840,
+        ],
         chartType: .bar
     )
     .padding()
@@ -320,17 +368,31 @@ struct MetricView: View {
     .padding()
 }
 
-#Preview("Heatmap") {
+#Preview("Dot Map") {
     MetricView(
-        title: "Workout Days",
-        emoji: "💪",
-        value: "18 / 30",
-        mainColor: .purple,
-        data: Array((0..<158).map { _ in Double.random(in: 0...5) }),
+        title: "Did I take my medication",
+        emoji: "💊",
+        value: "Good",
+        mainColor: .pink,
+        data: [
+            0, 1, 0.8, 0.3, 1, 0.6, 0, 0, 1, 0.8, 0.3, 1, 0.6, 0,
+        ],
         chartType: .heatmap
     )
     .padding()
 }
+
+//#Preview("Heatmap") {
+//    MetricView(
+//        title: "Workout Days",
+//        emoji: "💪",
+//        value: "18 / 30",
+//        mainColor: .purple,
+//        data: Array((0..<158).map { _ in Double.random(in: 0...5) }),
+//        chartType: .heatmap
+//    )
+//    .padding()
+//}
 
 #Preview("Gauge") {
     MetricView(
@@ -344,4 +406,3 @@ struct MetricView: View {
     )
     .padding()
 }
-
