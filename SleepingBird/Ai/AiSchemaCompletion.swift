@@ -18,20 +18,23 @@ public struct AiSchemaCompletion {
         self.systemPrompt = systemPrompt
     }
 
-    public func generate<T: Generable>(as schema: T.Type = T.self) async throws -> T {
+    public func generate<T: Generable>(as schema: T.Type = T.self) async throws
+        -> T
+    {
         let ai = FirebaseAI.firebaseAI(backend: .googleAI())
-        let session = ai.generativeModelSession(model: "gemini-3-flash-preview", instructions: systemPrompt)
+        let session = ai.generativeModelSession(
+            model: "gemini-3-flash-preview",
+            instructions: systemPrompt
+        )
         let result = try await session.respond(
             to: userPrompt,
             generating: schema,
-            options: GenerationConfig(thinkingConfig: ThinkingConfig(thinkingLevel: .minimal))
+            options: GenerationConfig(
+                thinkingConfig: ThinkingConfig(thinkingLevel: .medium)
+            )
         )
-        
+
         return result.content
     }
 
 }
-
-
-
-
