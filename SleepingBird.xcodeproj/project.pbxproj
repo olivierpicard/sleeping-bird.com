@@ -41,20 +41,12 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		81BB91BF2F95609700E4A4C5 /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			name = Frameworks;
-			sourceTree = "<group>";
-		};
 		81F8D82F2F8DEA6600E96BF9 = {
 			isa = PBXGroup;
 			children = (
 				8152B34C2F91B3E100D421C2 /* .gitignore */,
 				81F8D8392F8DEA6600E96BF9 /* Products */,
 				8152B36A2F91CB9B00D421C2 /* .arkana.yml */,
-				81BB91BF2F95609700E4A4C5 /* Frameworks */,
 				81F8D83A2F8DEA6600E96BF9 /* SleepingBird */,
 			);
 			sourceTree = "<group>";

@@ -13,7 +13,6 @@ struct MetricView: View {
     let emoji: String
     let value: String
     let mainColor: Color
-    let hideAddButton: Bool
     let chartType: ChartType
     let labels: [String]
     let goal: Double?
@@ -40,7 +39,6 @@ struct MetricView: View {
         self.value = value
         self.mainColor = mainColor
         self.data = data
-        self.hideAddButton = hideAddButton
         self.chartType = chartType
         self.labels = labels
         self.goal = goal
@@ -77,23 +75,21 @@ struct MetricView: View {
                     emojiSize = $0
                 }
                 Spacer()
-                if !hideAddButton {
-                    Button(action: {}) {
-                        Image(systemName: "plus")
-                            .font(.system(size: 22, weight: .bold))
-                            .foregroundStyle(.white)
-                    }
-                    .frame(width: emojiSize * 0.8, height: emojiSize * 0.8)
-                    .background(mainColor)
-                    .clipShape(Circle())
-                    .shadow(
-                        color: mainColor.opacity(0.6),
-                        radius: 10,
-                        x: 0,
-                        y: 3
-                    )
-                    .buttonStyle(.plain)
+                Button(action: {}) {
+                    Image(systemName: "plus")
+                        .font(.system(size: 22, weight: .bold))
+                        .foregroundStyle(.white)
                 }
+                .frame(width: emojiSize * 0.8, height: emojiSize * 0.8)
+                .background(mainColor)
+                .clipShape(Circle())
+                .shadow(
+                    color: mainColor.opacity(0.6),
+                    radius: 10,
+                    x: 0,
+                    y: 3
+                )
+                .buttonStyle(.plain)
 
             }
             .padding(.horizontal)
@@ -122,8 +118,8 @@ struct MetricView: View {
             barChart
         case .pie:
             linearCategoryChart
-//        case .dotmap:
-//            dotmapChart
+        //        case .dotmap:
+        //            dotmapChart
         case .heatmap:
             dotmapChart
         case .gauge:
