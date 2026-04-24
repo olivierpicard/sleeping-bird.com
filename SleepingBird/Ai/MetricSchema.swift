@@ -9,16 +9,6 @@ import FoundationModels
 
 // MARK: -Metric Suggesion
 
-@Generable()
-public struct MetricSuggestionArray {
-    @Guide(
-        description: "A list of suggested metrics",
-        .minimumCount(1),
-        .maximumCount(4)
-    )
-    let suggestions: [MetricSuggestion]
-}
-
 @Generable(description: "A metric description and configuration")
 public struct MetricSuggestion {
     @Guide(

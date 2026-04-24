@@ -27,14 +27,14 @@ public struct AiSuggestMetric {
     private let signposter = OSSignposter()
 
     public func generate(userInstruction: String) async throws
-        -> MetricSuggestionArray
+        -> MetricSuggestion
     {
         let start = ContinuousClock.now
         let result = try await AiSchemaCompletion(
             userPrompt: createUserPrompt(userInstruction: userInstruction),
             systemPrompt: systemPrompt
         )
-        .generate(as: MetricSuggestionArray.self)
+            .generate(as: MetricSuggestion.self)
         let elapsed = ContinuousClock.now - start
 
         print("[AiSuggestMetric] generate completed in \(elapsed)")
