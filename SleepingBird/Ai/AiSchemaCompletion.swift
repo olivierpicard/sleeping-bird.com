@@ -36,5 +36,7 @@ public struct AiSchemaCompletion {
 
         return result.content
     }
-
 }
+
+
+

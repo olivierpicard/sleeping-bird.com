@@ -7,10 +7,10 @@
 
 import FoundationModels
 
-// MARK: -Metric Suggesion
+// MARK: -Metric Schema
 
 @Generable(description: "A metric description and configuration")
-public struct MetricSuggestion {
+public struct MetricSchema {
     @Guide(
         description:
             "Concise title name. E.g., 'Deep Sleep Duration'"
@@ -29,7 +29,7 @@ public struct MetricSuggestion {
     @Guide(description: "The config that best suite the metric need")
     let config: MetricConfig
 
-    let Visual: MetricVisual
+    let visual: MetricVisual
 }
 
 // MARK: -Metric Type Config

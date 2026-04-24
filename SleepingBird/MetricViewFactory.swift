@@ -21,7 +21,7 @@ enum MetricViewFactory {
     // MARK: - Public
 
     static func makeView(
-        from suggestion: MetricSuggestion,
+        from suggestion: MetricSchema,
         colorIndex: Int = 0,
         data: [Double] = [],
         generateFakeData: Bool = false,
@@ -41,7 +41,7 @@ enum MetricViewFactory {
             mainColor: color,
             data: resolvedData,
             hideAddButton: hideAddButton,
-            chartType: suggestion.Visual.chart,
+            chartType: suggestion.visual.chart,
             labels: labels,
             goal: goal,
         )

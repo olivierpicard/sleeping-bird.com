@@ -48,17 +48,9 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		81F31EF02F9B422300A92551 /* New Group */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = "New Group";
-			sourceTree = "<group>";
-		};
 		81F8D82F2F8DEA6600E96BF9 = {
 			isa = PBXGroup;
 			children = (
-				81F31EF02F9B422300A92551 /* New Group */,
 				8152B34C2F91B3E100D421C2 /* .gitignore */,
 				81F8D8392F8DEA6600E96BF9 /* Products */,
 				8152B36A2F91CB9B00D421C2 /* .arkana.yml */,
