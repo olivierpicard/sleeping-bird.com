@@ -23,24 +23,76 @@ enum MetricViewFactory {
     static func makeView(
         from suggestion: MetricSuggestion,
         colorIndex: Int = 0,
-        data: [Double] = []
+        data: [Double] = [],
+        generateFakeData: Bool = false,
+        hideAddButton: Bool = false,
     ) -> MetricView {
         let color = color(for: colorIndex)
         let value = placeholderValue(for: suggestion.config)
-
         let labels = extractLabels(from: suggestion.config)
         let goal = extractGoal(from: suggestion.config)
+        let resolvedData =
+            generateFakeData ? fakeData(for: suggestion.config) : data
 
         return MetricView(
             title: suggestion.name,
             emoji: suggestion.emoji,
             value: value,
             mainColor: color,
-            data: data,
+            data: resolvedData,
+            hideAddButton: hideAddButton,
             chartType: suggestion.Visual.chart,
             labels: labels,
-            goal: goal
+            goal: goal,
         )
+    }
+
+    // MARK: - Fake data generation
+
+    static func fakeData(for config: MetricConfig, count: Int = 12) -> [Double]
+    {
+        switch config {
+        case .number(let cfg):
+            return randomSeries(
+                min: cfg.min,
+                max: cfg.max,
+                count: count,
+                granularity: cfg.granularity
+            )
+
+        case .categorySingleChoice(let cfg), .categoryMultipleChoice(let cfg):
+            // One count per label, randomised
+            return cfg.labels.map { _ in Double(Int.random(in: 1...20)) }
+
+        case .binary:
+            // 0 or 1 for each data point
+            return (0..<count).map { _ in Double(Int.random(in: 0...1)) }
+
+        case .datetime:
+            // Unix timestamps spread across the last `count` days
+            let now = Date().timeIntervalSince1970
+            let dayInSeconds: Double = 86_400
+            return (0..<count).map { i in now - Double(count - i) * dayInSeconds
+            }
+
+        case .duration(let cfg):
+            let max = Double(cfg.maxInSeconds)
+            return randomSeries(min: 0, max: max, count: count, granularity: 1)
+        }
+    }
+
+    private static func randomSeries(
+        min: Double,
+        max: Double,
+        count: Int,
+        granularity: Double
+    ) -> [Double] {
+        let step = granularity > 0 ? granularity : 1
+        return (0..<count).map { _ in
+            let steps = Int((max - min) / step)
+            guard steps > 0 else { return min }
+            return min + Double(Int.random(in: 0...steps)) * step
+        }
     }
 
     // MARK: - Config extraction

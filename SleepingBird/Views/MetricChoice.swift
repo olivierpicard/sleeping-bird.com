@@ -33,19 +33,15 @@ struct MetricChoice: View {
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else {
                 TabView {
-                    ForEach(suggestions, id: \.name) { suggestion in
-                        MetricView(
-                            title: suggestion.name,
-                            emoji: suggestion.emoji,
-                            value: "2 345",
-                            mainColor: .blue,
-                            data: [
-                                3000, 5000, 4000, 6500, 5500, 7000, 4500, 8000,
-                                6000, 9000, 7500,
-                                8432,
-                            ],
-                            hideAddButton: true
-                        ).padding()
+                    ForEach(Array(suggestions.enumerated()), id: \.element.name)
+                    { index, suggestion in
+                        MetricViewFactory.makeView(
+                            from: suggestion,
+                            colorIndex: index,
+                            generateFakeData: false,
+                            hideAddButton: true,
+                        )
+                        .padding()
                     }
                 }
                 .tabViewStyle(.page)
@@ -110,9 +106,42 @@ struct MetricChoice: View {
         MetricChoice(
             instruction: "I want a good coffee tracking app",
             suggestions: [
-                .Mock.number(title: "My Steps"),
-                .Mock.categorySingle(),
-                .Mock.binary(),
+                .Mock.number(
+                    title: "Coffee Count",
+                    emoji: "☕",
+                    unit: "cups",
+                    max: 20,
+                    granularity: 1,
+                    goal: nil,
+                    behavior: .cumulative,
+                    chart: .bar,
+                    bucket: .daily,
+                    method: .numerical(.sum)
+                ),
+                .Mock.number(
+                    title: "Coffee Volume",
+                    emoji: "🥤",
+                    unit: "ml",
+                    min: 0,
+                    max: 2000,
+                    granularity: 10,
+                    goal: nil,
+                    behavior: .cumulative,
+                    chart: .line,
+                    bucket: .daily,
+                    method: .numerical(.sum)
+                ),
+                .Mock.categorySingle(
+                    title: "Coffee Type",
+                    emoji: "🥛",
+                    labels: [
+                        "Espresso", "Latte", "Americano", "Cappuccino",
+                        "Cold Brew",
+                    ],
+                    chart: .pie,
+                    bucket: nil,
+                    method: .categorical(.distribution)
+                ),
             ]
         )
     }
