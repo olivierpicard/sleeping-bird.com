@@ -9,10 +9,10 @@ import Foundation
 
 @Observable
 class MetricStore {
-    private(set) var store: [MetricSchema] = []
+    private(set) var store: [Metric] = []
     private(set) var isGenerating: Bool = false
 
-    init(with fakeMetric: [MetricSchema] = []) {
+    init(with fakeMetric: [Metric] = []) {
         store.append(contentsOf: fakeMetric)
     }
 
@@ -25,7 +25,12 @@ class MetricStore {
                 try await Task.sleep(for: .seconds(2))
                 print("awaiting is over -- metric created")
                 store.append(
-                    MetricSchema.Mock.number(title: "Daily Steps", emoji: "👟"),
+                    Metric(
+                        from: MetricSchema.Mock.number(
+                            title: "Daily Steps",
+                            emoji: "👟"
+                        )
+                    ),
                 )
                 //                let response = try await AiSuggestMetric().generate(
                 //                    userInstruction: instruction
