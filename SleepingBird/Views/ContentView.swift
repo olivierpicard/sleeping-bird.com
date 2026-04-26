@@ -5,7 +5,7 @@ struct ContentView: View {
 
     var body: some View {
         NavigationStack {
-            if !metricStore.store.isEmpty || metricStore.isGenerating {
+            if !metricStore.metrics.isEmpty || metricStore.isGenerating {
                 DashboardView()
             } else {
                 EmptyDashboardView()

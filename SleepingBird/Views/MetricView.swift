@@ -29,7 +29,6 @@ struct MetricView: View {
         value: String,
         mainColor: Color,
         data: [Double] = [],
-        hideAddButton: Bool = false,
         chartType: ChartType = .line,
         labels: [String] = [],
         goal: Double? = nil

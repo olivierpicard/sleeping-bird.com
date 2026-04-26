@@ -7,10 +7,10 @@
 
 import FoundationModels
 
-// MARK: -Metric Schema
+// MARK: - Metric Schema
 
 @Generable(description: "A metric description and configuration")
-public struct MetricSchema {
+struct MetricSchema {
     @Guide(
         description:
             "Concise title name. E.g., 'Deep Sleep Duration'"
@@ -32,10 +32,10 @@ public struct MetricSchema {
     let visual: MetricVisual
 }
 
-// MARK: -Metric Type Config
+// MARK: - Metric Type Config
 
 @Generable(description: "Types of metrics that can be tracked")
-public enum MetricConfig: Codable {
+enum MetricConfig: Codable {
     case number(NumberConfig)
     case categorySingleChoice(CategoryConfig)
     case categoryMultipleChoice(CategoryConfig)
@@ -45,7 +45,7 @@ public enum MetricConfig: Codable {
 
 }
 @Generable(description: "Match with a number metric type")
-public struct NumberConfig: Codable {
+struct NumberConfig: Codable {
     let min, max: Double
 
     @Guide(
@@ -71,7 +71,7 @@ public struct NumberConfig: Codable {
 }
 
 @Generable(description: "Match with a category metric type")
-public struct CategoryConfig: Codable {
+struct CategoryConfig: Codable {
     @Guide(
         description: "All possible values for this metric",
         .minimumCount(2),
@@ -81,13 +81,13 @@ public struct CategoryConfig: Codable {
 }
 
 @Generable(description: "Match a binary metric type")
-public struct BinaryConfig: Codable {
+struct BinaryConfig: Codable {
     let trueLabel: String
     let falseLabel: String
 }
 
 @Generable(description: "Match a duration metric type")
-public struct DurationConfig: Codable {
+struct DurationConfig: Codable {
     @Guide(
         description: "Floor smallest granularity that best suite the metric",
         .anyOf(["ms", "s", "m", "h"])
@@ -104,7 +104,7 @@ public struct DurationConfig: Codable {
     let behavior: MetricBehavior
 }
 
-// MARK: -Metric Behaviour
+// MARK: - Metric Behaviour
 
 @Generable(
     description: """
@@ -113,15 +113,15 @@ public struct DurationConfig: Codable {
             Snapshot: measurements that loose sense when cumulated over time. E.g., temperature, how long it take... 
         """
 )
-public enum MetricBehavior: String, Codable {
+enum MetricBehavior: String, Codable {
     case cumulative
     case snapshot
 }
 
-// MARK: -Metric visual
+// MARK: - Metric Visual
 
 @Generable()
-public struct MetricVisual: Codable {
+struct MetricVisual: Codable {
     let chart: ChartType
     let aggregation: AggregationConfig
 }
@@ -129,7 +129,7 @@ public struct MetricVisual: Codable {
 // I kept heatmap rather than dotmap
 // because it is well known by the LLM. No need extra description
 @Generable()
-public enum ChartType: String, Codable {
+enum ChartType: String, Codable {
     case line  // Best for continuous trends over time (Weight, duration)
     case bar  // Best for discrete, summed, or counted data (Calories, steps)
     case pie  // Best for proportions (Categories)
@@ -138,10 +138,10 @@ public enum ChartType: String, Codable {
     case gauge  // Good if the metric has a specific daily `goal` limit
 }
 
-// MARK: - Metric Groupping
+// MARK: - Metric Grouping
 
 @Generable(description: "Rules for grouping multiple data points over time.")
-public struct AggregationConfig: Codable {
+struct AggregationConfig: Codable {
 
     @Guide(description: "How data should be groupped (or not) by time.")
     let bucket: TemporalBucket?
@@ -150,7 +150,7 @@ public struct AggregationConfig: Codable {
 }
 
 @Generable()
-public enum TemporalBucket: String, Codable {
+enum TemporalBucket: String, Codable {
     case hourly
     case daily
     case weekly
@@ -159,13 +159,13 @@ public enum TemporalBucket: String, Codable {
 }
 
 @Generable()
-public enum AggregationMethod: Codable {
+enum AggregationMethod: Codable {
     case numerical(NumericMethod)
     case categorical(CategoricalMethod)
 }
 
 @Generable()
-public enum NumericMethod: String, Codable {
+enum NumericMethod: String, Codable {
     case sum  // e.g., Water intake
     case average  // e.g., Heart rate, Weight
     case min  // e.g., Lowest temperature
@@ -179,7 +179,7 @@ public enum NumericMethod: String, Codable {
         mostFrequent: 
         """
 )
-public enum CategoricalMethod: String, Codable {
+enum CategoricalMethod: String, Codable {
     case count  // Total number of entries
     case mostFrequent  // The "Mode" (e.g., most frequent mood)
     case distribution  // Percentage breakdown (required for Pie charts)

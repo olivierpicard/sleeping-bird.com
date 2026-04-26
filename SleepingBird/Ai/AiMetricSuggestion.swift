@@ -6,9 +6,8 @@
 //
 
 import Foundation
-import os
 
-public struct AiMetricSuggestion {
+struct AiMetricSuggestion {
     private let systemPrompt = """
         You are a specialized Data Architect for user metric tracking.
         Your sole purpose is to map user instruction into the provided schema.
@@ -19,22 +18,18 @@ public struct AiMetricSuggestion {
         return """
             **Input Dictation**: "\(userInstruction)"
 
-            **Instructions**: Analyze the input above. Generate 1 to 3 distinct ways to track this metric.
+            **Instructions**: Analyze the input above. Generate 1 to 3 distinct ways to track this metric.
                 Ensure the config values re realistic for the activity described.
             """
     }
 
-    private let signposter = OSSignposter()
-
-    public func generate(userInstruction: String) async throws
-        -> MetricSchema
-    {
+    func generate(userInstruction: String) async throws -> MetricSchema {
         let start = ContinuousClock.now
         let result = try await AiSchemaCompletion(
             userPrompt: createUserPrompt(userInstruction: userInstruction),
             systemPrompt: systemPrompt
         )
-            .generate(as: MetricSchema.self)
+        .generate(as: MetricSchema.self)
         let elapsed = ContinuousClock.now - start
 
         print("[AiMetricSuggestion] generate completed in \(elapsed)")

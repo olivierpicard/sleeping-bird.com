@@ -9,7 +9,7 @@ import FirebaseAILogic
 import Foundation
 import FoundationModels
 
-public struct AiSchemaCompletion {
+struct AiSchemaCompletion {
     let userPrompt: String
     let systemPrompt: String?
 
@@ -18,7 +18,7 @@ public struct AiSchemaCompletion {
         self.systemPrompt = systemPrompt
     }
 
-    public func generate<T: Generable>(as schema: T.Type = T.self) async throws
+    func generate<T: Generable>(as schema: T.Type = T.self) async throws
         -> T
     {
         let ai = FirebaseAI.firebaseAI(backend: .googleAI())

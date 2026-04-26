@@ -7,7 +7,7 @@
 
 #if DEBUG
     extension MetricSchema {
-        enum Mock {
+        enum Fake {
             static func number(
                 title: String = "Daily Steps",
                 emoji: String = "👣",

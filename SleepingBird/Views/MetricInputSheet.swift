@@ -6,7 +6,7 @@ struct MetricInputSheet: View {
     @State private var instruction: String = ""
     @State private var isRecording: Bool = false
     private let transcriber: Transcriber
-    private let BUTTON_SIZE: CGFloat = 65
+    private let buttonSize: CGFloat = 65
 
     init(
         instruction: String = "",
@@ -31,7 +31,7 @@ struct MetricInputSheet: View {
                         systemImage: isRecording
                             ? "stop" : "microphone"
                     )
-                    .font(.system(size: BUTTON_SIZE))
+                    .font(.system(size: buttonSize))
                 }
                 .symbolVariant(.circle.fill)
                 .labelStyle(.iconOnly)
@@ -67,7 +67,6 @@ struct MetricInputSheet: View {
             isRecording = false
         } else {
             transcriber.start { text in
-                //                instruction += (instruction.isEmpty ? "" : " ") + text
                 instruction = text
             }
             isRecording = true
@@ -76,12 +75,7 @@ struct MetricInputSheet: View {
 }
 
 #Preview {
-    //        MetricInputSheet()
     MetricInputSheet(
         instruction: "I want to track how much coffee I drink per day"
     ).environment(MetricStore())
-    //        MetricInputSheet(
-    //            instruction:
-    //                "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum. Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum. "
-    //        )
 }

@@ -48,9 +48,6 @@ struct EmptyDashboardView: View {
                 )
                 .presentationDetents([.large])
             }
-            NavigationLink("Go to Detail View") {
-                DashboardView()
-            }
         }.padding()
     }
 }

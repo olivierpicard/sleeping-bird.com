@@ -25,6 +25,7 @@ enum MetricViewFactory {
 
     // MARK: - Display Value
 
+
     private static func value(for metric: Metric) -> String {
         guard let last = metric.data.last else {
             return placeholder(for: metric.config)
@@ -55,10 +56,9 @@ enum MetricViewFactory {
     private static func placeholder(for config: MetricConfig) -> String {
         switch config {
         case .number(let cfg): return format(number: cfg.min, cfg: cfg)
-        case .categorySingleChoice(let cfg),
-            .categoryMultipleChoice(let cfg):
-            return cfg.labels.first ?? "—"
-        case .binary(let cfg): return cfg.trueLabel
+        case .categorySingleChoice(_), .categoryMultipleChoice(_):
+            return "—"
+        case .binary: return "—"
         case .datetime: return "—"
         case .duration(let cfg):
             return format(duration: 0, granularity: cfg.granularity)
