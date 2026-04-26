@@ -14,7 +14,7 @@ struct DashboardView: View {
         ScrollView(.vertical) {
         VStack(spacing: 16) {
             if(metricStore.isGenerating) {
-                
+                MetricPlaceholderView()
             }
             ForEach(Array(metricStore.store.reversed().enumerated()), id: \.offset) {
                     index,

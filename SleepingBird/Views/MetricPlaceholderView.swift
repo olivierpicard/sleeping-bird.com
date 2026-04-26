@@ -114,6 +114,7 @@ struct MetricPlaceholderView: View {
             .frame(height: 100)
         }
         .shimmer()
+        .background(.white)
         .clipShape(RoundedRectangle(cornerRadius: 12))
         .overlay{
             RoundedRectangle(cornerRadius: 12)
