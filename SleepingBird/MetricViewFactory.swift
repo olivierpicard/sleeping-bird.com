@@ -1,5 +1,5 @@
 //
-//  FactoryMetricView.swift
+//  MetricViewFactory.swift
 //  SleepingBird
 //
 //  Created by Olivier Picard on 23/04/2026.
@@ -8,7 +8,7 @@
 import Foundation
 import SwiftUI
 
-enum FactoryMetricView {
+enum MetricViewFactory {
 
     static func build(from metric: Metric) -> MetricView {
         MetricView(

@@ -1,5 +1,5 @@
 //
-//  AiSuggestMetric.swift
+//  AiMetricSuggestion.swift
 //  SleepingBird
 //
 //  Created by Olivier Picard on 20/04/2026.
@@ -8,7 +8,7 @@
 import Foundation
 import os
 
-public struct AiSuggestMetric {
+public struct AiMetricSuggestion {
     private let systemPrompt = """
         You are a specialized Data Architect for user metric tracking.
         Your sole purpose is to map user instruction into the provided schema.
@@ -37,7 +37,7 @@ public struct AiSuggestMetric {
             .generate(as: MetricSchema.self)
         let elapsed = ContinuousClock.now - start
 
-        print("[AiSuggestMetric] generate completed in \(elapsed)")
+        print("[AiMetricSuggestion] generate completed in \(elapsed)")
 
         return result
     }

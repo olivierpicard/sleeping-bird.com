@@ -1,5 +1,5 @@
 //
-//  Dashboard.swift
+//  DashboardView.swift
 //  SleepingBird
 //
 //  Created by Olivier Picard on 22/04/2026.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct Dashboard: View {
+struct DashboardView: View {
     @Environment(MetricStore.self) private var metricStore
 
     var body: some View {
@@ -19,7 +19,7 @@ struct Dashboard: View {
             ForEach(Array(metricStore.store.reversed().enumerated()), id: \.offset) {
                     index,
                     metric in
-                    FactoryMetricView.build(from: metric)
+                    MetricViewFactory.build(from: metric)
                 }
             }
             .padding()
@@ -32,7 +32,7 @@ struct Dashboard: View {
 
 #Preview {
     NavigationStack {
-        Dashboard()
+        DashboardView()
             .environment(
                 MetricStore(with: [
                     Metric(
@@ -81,7 +81,7 @@ struct Dashboard: View {
 
 
 #Preview("Card loading"){
-    Dashboard()
+    DashboardView()
         .environment(MetricStore(with: [
             Metric(
                 from: MetricSchema.Mock.binary(

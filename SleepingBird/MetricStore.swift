@@ -36,7 +36,7 @@ class MetricStore {
                 store.append(
                     Metric(from: fakeSchema, data: fakeData),
                 )
-                //                let response = try await AiSuggestMetric().generate(
+                //                let response = try await AiMetricSuggestion().generate(
                 //                    userInstruction: instruction
                 //                )
                 //                store.append(response)
