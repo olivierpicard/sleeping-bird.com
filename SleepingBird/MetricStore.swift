@@ -12,8 +12,9 @@ class MetricStore {
     private(set) var store: [Metric] = []
     private(set) var isGenerating: Bool = false
 
-    init(with fakeMetric: [Metric] = []) {
+    init(with fakeMetric: [Metric] = [], isGenerating: Bool = false) {
         store.append(contentsOf: fakeMetric)
+        self.isGenerating = isGenerating
     }
 
     func create(instruction: String) {
@@ -24,13 +25,16 @@ class MetricStore {
             do {
                 try await Task.sleep(for: .seconds(2))
                 print("awaiting is over -- metric created")
+
+                let fakeSchema = MetricSchema.Mock.number(
+                    title: "Daily Steps",
+                    emoji: "👟"
+                )
+
+                let fakeData = Metric.fakeData(for: fakeSchema.config)
+
                 store.append(
-                    Metric(
-                        from: MetricSchema.Mock.number(
-                            title: "Daily Steps",
-                            emoji: "👟"
-                        )
-                    ),
+                    Metric(from: fakeSchema, data: fakeData),
                 )
                 //                let response = try await AiSuggestMetric().generate(
                 //                    userInstruction: instruction
