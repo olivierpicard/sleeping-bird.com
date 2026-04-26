@@ -12,7 +12,7 @@ import SwiftUI
 
 struct MetricView: View {
     let title: String
-    let emoji: Character
+    let emoji: String
     let value: String
     let mainColor: Color
     let chartType: ChartType
@@ -27,7 +27,7 @@ struct MetricView: View {
 
     init(
         title: String,
-        emoji: Character,
+        emoji: String,
         value: String,
         mainColor: Color,
         data: [Double] = [],
@@ -49,7 +49,7 @@ struct MetricView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
-                Text(String(emoji))
+                Text(emoji)
                     .font(.system(size: emojiSize * 0.5))
                     .frame(width: emojiSize, height: emojiSize)
                     .background {

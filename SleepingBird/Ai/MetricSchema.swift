@@ -35,7 +35,7 @@ public struct MetricSchema {
 // MARK: -Metric Type Config
 
 @Generable(description: "Types of metrics that can be tracked")
-public enum MetricConfig {
+public enum MetricConfig: Codable {
     case number(NumberConfig)
     case categorySingleChoice(CategoryConfig)
     case categoryMultipleChoice(CategoryConfig)
@@ -87,7 +87,7 @@ public struct BinaryConfig: Codable {
 }
 
 @Generable(description: "Match a duration metric type")
-public struct DurationConfig {
+public struct DurationConfig: Codable {
     @Guide(
         description: "Floor smallest granularity that best suite the metric",
         .anyOf(["ms", "s", "m", "h"])
@@ -121,7 +121,7 @@ public enum MetricBehavior: String, Codable {
 // MARK: -Metric visual
 
 @Generable()
-public struct MetricVisual {
+public struct MetricVisual: Codable {
     let chart: ChartType
     let aggregation: AggregationConfig
 }
