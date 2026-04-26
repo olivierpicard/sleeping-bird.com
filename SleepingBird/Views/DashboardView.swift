@@ -25,10 +25,12 @@ struct DashboardView: View {
             .padding()
         }
         .scrollContentBackground(.hidden)
-        .background(Color(.systemGroupedBackground))
-        .navigationTitle("Overview")
+//        .background(Color(.systemGroupedBackground))
+        .navigationTitle("Dashboard")
     }
 }
+
+// MARK: -Preview
 
 #Preview {
     NavigationStack {
@@ -39,39 +41,46 @@ struct DashboardView: View {
                         from: MetricSchema.Mock.number(
                             title: "Daily Steps",
                             emoji: "👟"
-                        )
+                        ),
+                        data: Metric.fakeData(for: MetricSchema.Mock.number().config)
                     ),
                     Metric(
                         from: MetricSchema.Mock.duration(
                             title: "Sleep",
                             emoji: "🌙"
                         )
+                        ,
+                        data: Metric.fakeData(for: MetricSchema.Mock.duration().config)
                     ),
                     Metric(
                         from: MetricSchema.Mock.number(
                             title: "Sleep",
                             emoji: "🌙",
                             chart: .line
-                        )
+                        ),
+                        data: Metric.fakeData(for: MetricSchema.Mock.number().config)
                     ),
                     Metric(
                         from: MetricSchema.Mock.number(
                             title: "Heart Rate",
                             emoji: "❤️",
                             unit: "bpm"
-                        )
+                        ),
+                        data: Metric.fakeData(for: MetricSchema.Mock.number().config)
                     ),
                     Metric(
                         from: MetricSchema.Mock.binary(
                             title: "Workout Done",
                             emoji: "💪"
-                        )
+                        ),
+                        data: Metric.fakeData(for: MetricSchema.Mock.binary().config)
                     ),
                     Metric(
                         from: MetricSchema.Mock.categorySingle(
                             title: "Mood",
                             emoji: "😊"
-                        )
+                        ),
+                        data: Metric.fakeData(for: MetricSchema.Mock.categorySingle().config)
                     ),
                 ], isGenerating: false
                 )
@@ -80,20 +89,31 @@ struct DashboardView: View {
 }
 
 
-#Preview("Card loading"){
-    DashboardView()
-        .environment(MetricStore(with: [
-            Metric(
-                from: MetricSchema.Mock.binary(
-                    title: "Workout Done",
-                    emoji: "💪"
-                )
-            ),
-            Metric(
-                from: MetricSchema.Mock.categorySingle(
-                    title: "Mood",
-                    emoji: "😊"
-                )
-            ),
-        ], isGenerating: true))
+#Preview("Card loading - With existing one"){
+    NavigationStack {
+        DashboardView()
+            .environment(MetricStore(with: [
+                Metric(
+                    from: MetricSchema.Mock.binary(
+                        title: "Workout Done",
+                        emoji: "💪"
+                    ),
+                    data: Metric.fakeData(for: MetricSchema.Mock.binary().config)
+                ),
+                Metric(
+                    from: MetricSchema.Mock.categorySingle(
+                        title: "Mood",
+                        emoji: "😊"
+                    ),
+                    data: Metric.fakeData(for: MetricSchema.Mock.categorySingle().config)
+                ),
+            ], isGenerating: true))
+    }
+}
+
+#Preview("Card loading - Solo"){
+    NavigationStack {
+        DashboardView()
+            .environment(MetricStore(isGenerating: true))
+    }
 }

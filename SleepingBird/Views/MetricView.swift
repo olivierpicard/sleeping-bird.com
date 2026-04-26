@@ -8,8 +8,6 @@
 import Charts
 import SwiftUI
 
-
-
 struct MetricView: View {
     let title: String
     let emoji: String
@@ -104,7 +102,11 @@ struct MetricView: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(Color(.secondarySystemGroupedBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 16))
+        .clipShape(RoundedRectangle(cornerRadius: 12))
+        .overlay {
+            RoundedRectangle(cornerRadius: 12)
+                .stroke(mainColor, style: StrokeStyle(lineWidth: 0.4))
+        }
         .shadow(color: .black.opacity(0.06), radius: 8, x: 0, y: 2)
 
     }
