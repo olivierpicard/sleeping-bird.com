@@ -18,8 +18,8 @@ private struct ShimmerModifier: ViewModifier {
                     let w = geo.size.width
                     LinearGradient(
                         stops: [
-                            .init(color: .clear, location: 0),
-                            .init(color: .white.opacity(0.5), location: 0.5),
+                            .init(color: .clear, location: 0.0),
+                            .init(color: .white.opacity(0.6), location: 0.5),
                             .init(color: .clear, location: 1),
                         ],
                         startPoint: .leading,
@@ -32,15 +32,17 @@ private struct ShimmerModifier: ViewModifier {
                 .allowsHitTesting(false)
             )
             .onAppear {
-                withAnimation(.linear(duration: 1.5).repeatForever(autoreverses: false)) {
+                withAnimation(
+                    .linear(duration: 1.7).repeatForever(autoreverses: false)
+                ) {
                     phase = 1
                 }
             }
     }
 }
 
-private extension View {
-    func shimmer() -> some View {
+extension View {
+    fileprivate func shimmer() -> some View {
         modifier(ShimmerModifier())
     }
 }
@@ -50,11 +52,11 @@ struct MetricPlaceholderView: View {
         3000, 5000, 4000, 6500, 5500, 7000, 4500, 8000, 6000, 9000, 7500,
         8432,
     ]
-    
-    let mainColor = Color.black.opacity(0.1)
-    let secondColor = Color.black.opacity(0.08)
-    let thirdColor = Color.black.opacity(0.03)
-    
+
+    let mainColor = Color.primary.opacity(0.25)
+    let secondColor = Color.primary.opacity(0.15)
+    let thirdColor = Color.primary.opacity(0.1)
+
     var body: some View {
         VStack {
             HStack(alignment: .top) {
@@ -74,49 +76,16 @@ struct MetricPlaceholderView: View {
                     .foregroundStyle(mainColor)
                     .frame(width: 52)
             }
-            .padding()
-            Chart {
-                ForEach(Array(data.enumerated()), id: \.offset) {
-                    index,
-                    value in
-                    LineMark(
-                        x: .value("Index", index),
-                        y: .value("Value", value)
-                    )
-                    .foregroundStyle(secondColor)
-                    .interpolationMethod(.catmullRom)
-                    AreaMark(
-                        x: .value("Index", index),
-                        y: .value("Value", value)
-                    )
-                    .foregroundStyle(
-                        LinearGradient(
-                            stops: [
-                                .init(
-                                    color: thirdColor,
-                                    location: 0
-                                ),
-                                .init(
-                                    color: mainColor.opacity(0),
-                                    location: 0.8
-                                ),
-                            ],
-                            startPoint: .top,
-                            endPoint: .bottom
-                        )
-                    )
-                    .interpolationMethod(.catmullRom)
-                }
-            }
-            .chartXAxis(.hidden)
-            .chartYAxis(.hidden)
-            .chartYScale(domain: (data.min() ?? 0)...(data.max() ?? 1))
-            .frame(height: 100)
+
+            RoundedRectangle(cornerRadius: 12)
+                .frame(height: 100)
+                .foregroundStyle(mainColor)
         }
+        .padding()
         .shimmer()
-        .background(.white)
+        .background(.background)
         .clipShape(RoundedRectangle(cornerRadius: 12))
-        .overlay{
+        .overlay {
             RoundedRectangle(cornerRadius: 12)
                 .strokeBorder(style: StrokeStyle(lineWidth: 1))
                 .opacity(0.1)
@@ -126,4 +95,5 @@ struct MetricPlaceholderView: View {
 
 #Preview {
     MetricPlaceholderView()
+        .padding()
 }
