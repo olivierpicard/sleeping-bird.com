@@ -16,10 +16,6 @@ enum MetricViewFactory {
             emoji: metric.emoji,
             value: value(for: metric),
             mainColor: metric.color,
-            data: chartData(for: metric),
-            chartType: metric.visual.chart,
-            labels: labels(for: metric.config),
-            goal: goal(for: metric.config)
         )
     }
 

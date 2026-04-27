@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct SegmentedBarMiniChart: View {
+struct SegmentedBarMiniChart: MiniChart {
     let data: [Double]
     let labels: [String]
 
@@ -18,17 +18,23 @@ struct SegmentedBarMiniChart: View {
     private var total: Double { data.reduce(0, +) }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading) {
             GeometryReader { geo in
                 let spacing: CGFloat = 1.5
                 let count = CGFloat(max(data.count - 1, 0))
                 let available = geo.size.width - count * spacing
 
                 HStack(spacing: spacing) {
-                    ForEach(Array(data.enumerated()), id: \.offset) { index, value in
+                    ForEach(Array(data.enumerated()), id: \.offset) {
+                        index,
+                        value in
                         let fraction = total > 0 ? value / total : 0
                         RoundedRectangle(cornerRadius: 3)
-                            .fill(Self.categoryPalette[index % Self.categoryPalette.count])
+                            .fill(
+                                Self.categoryPalette[
+                                    index % Self.categoryPalette.count
+                                ]
+                            )
                             .frame(width: available * fraction)
                     }
                 }
@@ -42,10 +48,17 @@ struct SegmentedBarMiniChart: View {
                     alignment: .leading,
                     spacing: 6
                 ) {
-                    ForEach(Array(labels.prefix(data.count).enumerated()), id: \.offset) { index, label in
+                    ForEach(
+                        Array(labels.prefix(data.count).enumerated()),
+                        id: \.offset
+                    ) { index, label in
                         HStack(spacing: 4) {
                             Circle()
-                                .fill(Self.categoryPalette[index % Self.categoryPalette.count])
+                                .fill(
+                                    Self.categoryPalette[
+                                        index % Self.categoryPalette.count
+                                    ]
+                                )
                                 .frame(width: 8, height: 8)
                             Text(label)
                                 .font(.caption2)
@@ -62,7 +75,10 @@ struct SegmentedBarMiniChart: View {
 #Preview {
     SegmentedBarMiniChart(
         data: [90, 150, 45, 165, 90, 150, 45, 165, 90, 150, 45, 165],
-        labels: ["Deep with a touch of fake", "Light", "REM", "Awake", "Deep2", "Light2", "REM2", "Awake2", "Deep3", "Light3", "REM3", "Awake3"]
+        labels: [
+            "Deep with a touch of fake", "Light", "REM", "Awake", "Deep2",
+            "Light2", "REM2", "Awake2", "Deep3", "Light3", "REM3", "Awake3",
+        ]
     )
     .padding()
 }

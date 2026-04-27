@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct LinearGaugeMiniChart: View {
+struct LinearGaugeMiniChart: MiniChart {
     let current: Double
     let goal: Double
     let color: Color
@@ -20,7 +20,7 @@ struct LinearGaugeMiniChart: View {
     private var overflowMixColor: Color { colorScheme == .dark ? .white : .black }
 
     var body: some View {
-        VStack(alignment: .trailing, spacing: 4) {
+        VStack(alignment: .trailing) {
             GeometryReader { geo in
                 let maxWidth = geo.size.width
 

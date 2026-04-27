@@ -8,7 +8,7 @@
 import Charts
 import SwiftUI
 
-struct LineMiniChart: View {
+struct LineMiniChart: MiniChart {
     let data: [Double]
     let color: Color
     

@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct DotMiniChart: View {
+struct DotMiniChart: MiniChart {
     let data: [Double]
     let color: Color
 
