@@ -148,10 +148,12 @@ struct MetricView: View {
         emoji: "🌙",
         value: "7h 30m",
         mainColor: .indigo,
-        chart: SegmentedBarMiniChart(
-            data: [90, 150, 45, 165],
-            labels: ["Deep", "Light", "REM", "Awake"]
-        )
+        chart: DividerBarMiniChart(entries: [
+            .init(category: "Deep", value: 90),
+            .init(category: "Light", value: 150),
+            .init(category: "REM", value: 45),
+            .init(category: "Awake", value: 165),
+        ])
     )
     .padding()
 }
