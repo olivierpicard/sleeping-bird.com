@@ -1,5 +1,5 @@
 //
-//  StepperView.swift
+//  _StepperEditor.swift
 //  SleepingBird
 //
 //  Created by Olivier Picard on 30/04/2026.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct StepperView: View {
+struct _StepperEditor: View {
     let min: Double
     let max: Double
     let step: Double
@@ -17,15 +17,7 @@ struct StepperView: View {
 
     @State private var value: Double
 
-    init(
-        min: Double,
-        max: Double,
-        defaultValue: Double,
-        step: Double,
-        unit: String? = nil,
-        mainColor: Color = .accentColor,
-        onAdd: @escaping (Double) -> Void = { _ in }
-    ) {
+    init(min: Double, max: Double, defaultValue: Double, step: Double, unit: String?, mainColor: Color, onAdd: @escaping (Double) -> Void) {
         self.min = min
         self.max = max
         self.step = step
@@ -38,10 +30,6 @@ struct StepperView: View {
     private var canDecrement: Bool { value - step >= min }
     private var canIncrement: Bool { value + step <= max }
 
-    private var formattedValue: String {
-        step >= 1 ? String(Int(value)) : String(format: "%.1f", value)
-    }
-
     var body: some View {
         VStack(spacing: 32) {
             HStack(spacing: 24) {
@@ -50,7 +38,7 @@ struct StepperView: View {
                 }
 
                 VStack(spacing: 4) {
-                    Text(formattedValue)
+                    Text(_meFormat(value, step: step))
                         .font(.system(size: 64, weight: .light))
                         .contentTransition(.numericText(value: value))
                         .lineLimit(1)
@@ -71,43 +59,20 @@ struct StepperView: View {
             }
             .padding(.horizontal)
 
-            Button {
-                onAdd(value)
-            } label: {
-                Text("Save")
-                    .font(.headline)
-                    .foregroundStyle(.white)
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 56)
-                    .background(mainColor)
-                    .clipShape(RoundedRectangle(cornerRadius: 16))
-                    .shadow(color: mainColor.opacity(0.4), radius: 10, x: 0, y: 4)
-            }
-            .buttonStyle(.plain)
-            .padding(.horizontal)
+            _SaveButton(mainColor: mainColor) { onAdd(value) }
         }
         .padding(.vertical, 32)
         .animation(.snappy, value: value)
     }
 
-    private func stepButton(
-        systemName: String,
-        enabled: Bool,
-        action: @escaping () -> Void
-    ) -> some View {
+    private func stepButton(systemName: String, enabled: Bool, action: @escaping () -> Void) -> some View {
         Button(action: action) {
             Image(systemName: systemName)
                 .font(.system(size: 28, weight: .bold))
                 .foregroundStyle(enabled ? mainColor : .secondary)
                 .frame(width: 64, height: 64)
-                .background {
-                    Circle()
-                        .fill(mainColor.opacity(0.12))
-                }
-                .overlay {
-                    Circle()
-                        .strokeBorder(mainColor.opacity(0.4), lineWidth: 1)
-                }
+                .background { Circle().fill(mainColor.opacity(0.12)) }
+                .overlay { Circle().strokeBorder(mainColor.opacity(0.4), lineWidth: 1) }
         }
         .buttonStyle(.plain)
         .disabled(!enabled)
@@ -117,19 +82,10 @@ struct StepperView: View {
 
 #Preview {
     @Previewable @State var isSheetPresented = true
-    NavigationStack {
-        Text("")
-    }
+    NavigationStack { Text("") }
     .sheet(isPresented: $isSheetPresented) {
-        StepperView(
-            min: 0,
-            max: 20,
-            defaultValue: 8,
-            step: 1,
-            unit: "glasses",
-            mainColor: .blue,
-            onAdd: { _ in }
-        )
-        .presentationDetents([.height(250)]) 
+        MetricEditor.Number(min: 0, max: 20, defaultValue: 8, step: 1, unit: "glasses", mainColor: .blue)
+            .style(.stepper)
+            .presentationDetents([.height(250)])
     }
 }

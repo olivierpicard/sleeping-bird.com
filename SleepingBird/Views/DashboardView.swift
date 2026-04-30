@@ -23,17 +23,23 @@ struct DashboardView: View {
                 ) {
                     index,
                     metric in
-                    MetricViewFactory.make(from: metric, onAddTapped: {
-                       editingMetric = metric
-                    })
+                    MetricViewFactory.make(
+                        from: metric,
+                        onAddTapped: {
+                            editingMetric = metric
+                        }
+                    )
                 }
             }
             .padding()
         }
-//        .sheet(item: $editingMetric) { metric in
-//            AddEntrySheetFactory.make(from: metric)
-//                
-//        }
+        .sheet(item: $editingMetric) { metric in
+            //            AddEntrySheetFactory.make(from: metric)
+            MetricEditor.Number(min: 1, max: 10, defaultValue: 1, step: 1)
+                .style(.stepper)
+                .presentationDetents([.height(250)])
+
+        }
         .scrollContentBackground(.hidden)
         .navigationTitle("Dashboard")
     }

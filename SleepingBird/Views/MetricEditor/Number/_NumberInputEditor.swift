@@ -1,0 +1,88 @@
+//
+//  _NumberInputEditor.swift
+//  SleepingBird
+//
+//  Created by Olivier Picard on 30/04/2026.
+//
+
+import SwiftUI
+
+struct _NumberInputEditor: View {
+    let min: Double
+    let max: Double
+    let step: Double
+    let unit: String?
+    let mainColor: Color
+    let onAdd: (Double) -> Void
+
+    @State private var text: String
+    @FocusState private var isFocused: Bool
+
+    init(min: Double, max: Double, defaultValue: Double, step: Double, unit: String?, mainColor: Color, onAdd: @escaping (Double) -> Void) {
+        self.min = min
+        self.max = max
+        self.step = step
+        self.unit = unit
+        self.mainColor = mainColor
+        self.onAdd = onAdd
+        _text = State(initialValue: _meFormat(defaultValue, step: step))
+    }
+
+    private var parsedValue: Double? {
+        Double(text.replacingOccurrences(of: ",", with: "."))
+    }
+
+    private var isValid: Bool {
+        guard let v = parsedValue else { return false }
+        return v >= min && v <= max
+    }
+
+    var body: some View {
+        VStack(spacing: 32) {
+            VStack(spacing: 8) {
+                HStack(alignment: .firstTextBaseline, spacing: 8) {
+                    TextField("0", text: $text)
+                        .font(.system(size: 64, weight: .light))
+                        #if os(iOS)
+                        .keyboardType(step < 1 || min < 0 ? .numbersAndPunctuation : .numberPad)
+                        #endif
+                        .multilineTextAlignment(.center)
+                        .focused($isFocused)
+                        .fixedSize()
+                        .foregroundStyle(isValid ? Color.primary : Color.red)
+
+                    if let unit {
+                        Text(unit)
+                            .font(.title3)
+                            .foregroundStyle(.secondary)
+                    }
+                }
+
+                Text("Range: \(_meFormat(min, step: step)) – \(_meFormat(max, step: step))")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.horizontal)
+
+            _SaveButton(mainColor: mainColor, isEnabled: isValid) {
+                guard let v = parsedValue, isValid else { return }
+                isFocused = false
+                onAdd(v)
+            }
+        }
+        .padding(.vertical, 32)
+        .animation(.snappy, value: isValid)
+        .onAppear { isFocused = true }
+    }
+}
+
+#Preview {
+    @Previewable @State var isSheetPresented = true
+    NavigationStack { Text("") }
+    .sheet(isPresented: $isSheetPresented) {
+        MetricEditor.Number(min: 0, max: 200, defaultValue: 8, step: 1, unit: "glasses", mainColor: .blue)
+            .style(.numberInput)
+            .presentationDetents([.height(280)])
+    }
+}

@@ -1,5 +1,5 @@
 //
-//  PickerView.swift
+//  _PickerEditor.swift
 //  SleepingBird
 //
 //  Created by Olivier Picard on 30/04/2026.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct PickerView: View {
+struct _PickerEditor: View {
     let min: Double
     let max: Double
     let step: Double
@@ -17,15 +17,7 @@ struct PickerView: View {
 
     @State private var value: Double
 
-    init(
-        min: Double,
-        max: Double,
-        defaultValue: Double,
-        step: Double,
-        unit: String? = nil,
-        mainColor: Color = .accentColor,
-        onAdd: @escaping (Double) -> Void = { _ in }
-    ) {
+    init(min: Double, max: Double, defaultValue: Double, step: Double, unit: String?, mainColor: Color, onAdd: @escaping (Double) -> Void) {
         self.min = min
         self.max = max
         self.step = step
@@ -39,19 +31,12 @@ struct PickerView: View {
         stride(from: min, through: max, by: step).map { $0 }
     }
 
-    private func format(_ v: Double) -> String {
-        step >= 1 ? String(Int(v)) : String(format: "%.1f", v)
-    }
-
     var body: some View {
         VStack(spacing: 24) {
             HStack(alignment: .center, spacing: 12) {
                 Picker("", selection: $value) {
                     ForEach(values, id: \.self) { v in
-                        Text(format(v))
-//                            .font(.system(size: 48, weight: .light))
-                            .tag(v)
-                        
+                        Text(_meFormat(v, step: step)).tag(v)
                     }
                 }
                 .pickerStyle(.wheel)
@@ -68,20 +53,7 @@ struct PickerView: View {
             }
             .padding(.horizontal)
 
-            Button {
-                onAdd(value)
-            } label: {
-                Text("Save")
-                    .font(.headline)
-                    .foregroundStyle(.white)
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 56)
-                    .background(mainColor)
-                    .clipShape(RoundedRectangle(cornerRadius: 16))
-                    .shadow(color: mainColor.opacity(0.4), radius: 10, x: 0, y: 4)
-            }
-            .buttonStyle(.plain)
-            .padding(.horizontal)
+            _SaveButton(mainColor: mainColor) { onAdd(value) }
         }
         .padding(.vertical, 24)
         .animation(.snappy, value: value)
@@ -90,19 +62,10 @@ struct PickerView: View {
 
 #Preview {
     @Previewable @State var isSheetPresented = true
-    NavigationStack {
-        Text("")
-    }
+    NavigationStack { Text("") }
     .sheet(isPresented: $isSheetPresented) {
-        PickerView(
-            min: 0,
-            max: 200,
-            defaultValue: 8,
-            step: 1,
-            unit: "glasses",
-            mainColor: .blue,
-            onAdd: { _ in }
-        )
-        .presentationDetents([.height(320)])
+        MetricEditor.Number(min: 0, max: 200, defaultValue: 8, step: 1, unit: "glasses", mainColor: .blue)
+            .style(.picker)
+            .presentationDetents([.height(320)])
     }
 }
