@@ -12,6 +12,7 @@ struct MetricView: View {
     let emoji: String
     let value: String
     let mainColor: Color
+    let onAddTapped: () -> Void
     let chart: (any MiniChart)?
 
     @State private var emojiSize: CGFloat = 52
@@ -25,12 +26,14 @@ struct MetricView: View {
         emoji: String,
         value: String,
         mainColor: Color,
+        onAddTapped: @escaping () -> Void,
         chart: (any MiniChart)? = nil
     ) {
         self.title = title
         self.emoji = emoji
         self.value = value
         self.mainColor = mainColor
+        self.onAddTapped = onAddTapped
         self.chart = chart
     }
 
@@ -65,7 +68,7 @@ struct MetricView: View {
                     emojiSize = $0
                 }
                 Spacer()
-                Button(action: {}) {
+                Button(action: onAddTapped) {
                     Image(systemName: "plus")
                         .font(.system(size: 22, weight: .bold))
                         .foregroundStyle(.white)
@@ -114,6 +117,7 @@ struct MetricView: View {
         emoji: "👟",
         value: "8,432",
         mainColor: .green,
+        onAddTapped: {},
         chart: LineMiniChart(
             data: [
                 3000, 5000, 4000, 6500, 5500, 7000, 4500, 8000, 6000, 9000,
@@ -131,6 +135,7 @@ struct MetricView: View {
         emoji: "🔥",
         value: "1,840 kcal",
         mainColor: .orange,
+        onAddTapped: {},
         chart: BarMiniChart(
             data: [
                 1200, 1500, 1800, 1400, 2000, 1700, 1840, 1200, 1500, 1800,
@@ -148,6 +153,7 @@ struct MetricView: View {
         emoji: "🌙",
         value: "7h 30m",
         mainColor: .indigo,
+        onAddTapped: {},
         chart: DividerBarMiniChart(entries: [
             .init(category: "Deep", value: 90),
             .init(category: "Light", value: 150),
@@ -164,6 +170,7 @@ struct MetricView: View {
         emoji: "💊",
         value: "Good",
         mainColor: .pink,
+        onAddTapped: {},
         chart: DotMiniChart(
             data: [0, 1, 0.8, 0.3, 1, 0.6, 0, 0, 1, 0.8, 0.3, 1, 0.6, 0],
             color: .pink
@@ -178,6 +185,7 @@ struct MetricView: View {
         emoji: "💧",
         value: "1.8 L",
         mainColor: .blue,
+        onAddTapped: {},
         chart: LinearGaugeMiniChart(current: 1.8, goal: 2.5, color: .blue)
     )
     .padding()
@@ -189,6 +197,7 @@ struct MetricView: View {
         emoji: "😊",
         value: "Good",
         mainColor: .purple,
+        onAddTapped: {},
         chart: nil
     )
     .padding()

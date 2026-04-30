@@ -39,6 +39,7 @@ struct DividerBarMiniChart: MiniChart {
     VStack {
         DividerBarMiniChart(entries: [
             .init(category: "Deep with a touch of fake", value: 90),
+            .init(category: "Deep with a touch of fake", value: 690),
             .init(category: "Light", value: 150),
             .init(category: "REM", value: 45),
             .init(category: "Awake", value: 165),

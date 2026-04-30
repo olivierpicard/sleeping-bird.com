@@ -10,12 +10,14 @@ import SwiftUI
 
 enum MetricViewFactory {
 
-    static func build(from metric: Metric) -> MetricView {
+    static func make(from metric: Metric, onAddTapped: @escaping () -> Void) -> MetricView {
         MetricView(
             title: metric.name,
             emoji: metric.emoji,
             value: value(for: metric),
             mainColor: metric.color,
+            onAddTapped: onAddTapped,
+            chart: MiniChartFactory.make(from: metric),
         )
     }
 
@@ -61,45 +63,6 @@ enum MetricViewFactory {
         }
     }
 
-    // MARK: - Chart Data
-
-    private static func chartData(for metric: Metric) -> [Double] {
-        switch metric.config {
-        case .number:
-            return metric.data.compactMap {
-                guard case .number(_, let v) = $0 else { return nil }
-                return v
-            }
-        case .binary:
-            return metric.data.compactMap {
-                guard case .binary(_, let b) = $0 else { return nil }
-                return b ? 1.0 : 0.0
-            }
-        case .duration:
-            return metric.data.compactMap {
-                guard case .duration(_, let t) = $0 else { return nil }
-                return Double(t)
-            }
-        case .categorySingleChoice(let cfg), .categoryMultipleChoice(let cfg):
-            return categoryFrequencies(in: metric.data, for: cfg.labels)
-        case .datetime:
-            return []
-        }
-    }
-
-    private static func categoryFrequencies(
-        in data: [DataPoint],
-        for labels: [String]
-    ) -> [Double] {
-        labels.map { label in
-            data.reduce(0.0) { count, point in
-                guard case .category(_, let v) = point, v.contains(label) else {
-                    return count
-                }
-                return count + 1
-            }
-        }
-    }
 
     // MARK: - Metadata
 
