@@ -63,6 +63,7 @@ struct _StepperEditor: View {
         }
         .padding(.vertical, 32)
         .animation(.snappy, value: value)
+        .sensoryFeedback(.impact(weight: .light), trigger: value)
     }
 
     private func stepButton(systemName: String, enabled: Bool, action: @escaping () -> Void) -> some View {
@@ -71,10 +72,10 @@ struct _StepperEditor: View {
                 .font(.system(size: 28, weight: .bold))
                 .foregroundStyle(enabled ? mainColor : .secondary)
                 .frame(width: 64, height: 64)
-                .background { Circle().fill(mainColor.opacity(0.12)) }
-                .overlay { Circle().strokeBorder(mainColor.opacity(0.4), lineWidth: 1) }
         }
-        .buttonStyle(.plain)
+        .buttonStyle(.glass)
+        .buttonBorderShape(.circle)
+        .contentShape(.circle)
         .disabled(!enabled)
         .opacity(enabled ? 1 : 0.4)
     }
@@ -89,3 +90,4 @@ struct _StepperEditor: View {
             .presentationDetents([.height(250)])
     }
 }
+

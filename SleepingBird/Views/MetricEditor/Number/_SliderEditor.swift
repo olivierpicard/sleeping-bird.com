@@ -53,6 +53,7 @@ struct _SliderEditor: View {
         }
         .padding(.vertical, 32)
         .animation(.snappy, value: value)
+        .sensoryFeedback(.impact(weight: .light), trigger: value)
     }
 }
 

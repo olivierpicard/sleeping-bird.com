@@ -73,6 +73,7 @@ struct _NumberInputEditor: View {
         }
         .padding(.vertical, 32)
         .animation(.snappy, value: isValid)
+        .sensoryFeedback(.warning, trigger: isValid) { old, new in old && !new }
         .onAppear { isFocused = true }
     }
 }
