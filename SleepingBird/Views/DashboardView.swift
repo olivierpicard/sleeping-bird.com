@@ -39,13 +39,14 @@ struct DashboardView: View {
             //                .style(.stepper)
             //                .presentationDetents([.height(250)])
 
-//            MetricEditor.Category(labels: [
-//                "Happy", "Neutral", "Sad", "Angry", "Excited", "Happy2",
-//                "Neutral2", "Sad2", "Angry2", "Excited2",
-//            ], )
+            //            MetricEditor.Category(labels: [
+            //                "Happy", "Neutral", "Sad", "Angry", "Excited", "Happy2",
+            //                "Neutral2", "Sad2", "Angry2", "Excited2",
+            //            ], )
             MetricEditor.Category(labels: [
-                "Happy", "Neutral", "Sad", "Angry", "Excited"
+                "Happy", "Neutral", "Sad", "Angry", "Excited",
             ], )
+            .style(.multiple)
 
         }
         .scrollContentBackground(.hidden)

@@ -92,10 +92,13 @@ extension MetricEditor {
         }
     }
 
+    enum CategoryStyle { case single, multiple }
+
     struct Category: View {
         let labels: [String]
         let mainColor: Color
         let onAdd: ([String]) -> Void
+        private var style: CategoryStyle = .single
 
         init(
             labels: [String],
@@ -107,12 +110,27 @@ extension MetricEditor {
             self.onAdd = onAdd
         }
 
+        func style(_ style: CategoryStyle) -> Self {
+            var copy = self
+            copy.style = style
+            return copy
+        }
+
         var body: some View {
-            _CategorySingleEditor(
-                labels: labels,
-                mainColor: mainColor,
-                onAdd: { label in onAdd([label]) }
-            )
+            switch style {
+            case .single:
+                _CategorySingleEditor(
+                    labels: labels,
+                    mainColor: mainColor,
+                    onAdd: { label in onAdd([label]) }
+                )
+            case .multiple:
+                _CategoryMultipleEditor(
+                    labels: labels,
+                    mainColor: mainColor,
+                    onAdd: onAdd
+                )
+            }
         }
     }
 }
