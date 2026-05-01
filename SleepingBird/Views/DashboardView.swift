@@ -46,12 +46,13 @@ struct DashboardView: View {
             //                "Happy", "Neutral", "Sad", "Angry", "Excited",
             //            ], )
             //            .style(.multiple)
-            MetricEditor.Binary(
-                trueLabel: "Worked out at the gym",
-                falseLabel: "Skipped today the gym day",
-                mainColor: .green,
-                onAdd: { _ in }
-            )
+//            MetricEditor.Binary(
+//                trueLabel: "Worked out at the gym",
+//                falseLabel: "Skipped today the gym day",
+//                mainColor: .green,
+//                onAdd: { _ in }
+//            )
+            MetricEditor.Duration(granularity: "m", maxInSeconds: 90*60, defaultValue: 30*60)
 
         }
         .scrollContentBackground(.hidden)
