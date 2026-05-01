@@ -75,6 +75,7 @@ struct _NumberInputEditor: View {
         .animation(.snappy, value: isValid)
         .sensoryFeedback(.warning, trigger: isValid) { old, new in old && !new }
         .onAppear { isFocused = true }
+        .presentationDetents([.height(280)])
     }
 }
 
@@ -83,6 +84,6 @@ struct _NumberInputEditor: View {
     NavigationStack { Text("") }
     .sheet(isPresented: $isSheetPresented) {
         _NumberInputEditor(min: 0, max: 200, defaultValue: 8, step: 1, unit: "glasses", mainColor: .blue) { _ in }
-            .presentationDetents([.height(280)])
+            
     }
 }

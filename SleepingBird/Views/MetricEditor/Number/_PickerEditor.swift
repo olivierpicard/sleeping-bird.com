@@ -57,6 +57,7 @@ struct _PickerEditor: View {
         }
         .padding(.vertical, 24)
         .animation(.snappy, value: value)
+        .presentationDetents([.height(300)])
     }
 }
 
@@ -65,6 +66,6 @@ struct _PickerEditor: View {
     NavigationStack { Text("") }
     .sheet(isPresented: $isSheetPresented) {
         _PickerEditor(min: 0, max: 200, defaultValue: 8, step: 1, unit: "glasses", mainColor: .blue) { _ in }
-            .presentationDetents([.height(320)])
+             
     }
 }

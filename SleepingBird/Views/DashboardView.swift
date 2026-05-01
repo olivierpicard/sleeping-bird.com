@@ -37,7 +37,6 @@ struct DashboardView: View {
             //            AddEntrySheetFactory.make(from: metric)
             //            MetricEditor.Number(min: 1, max: 10, defaultValue: 1, step: 1)
             //                .style(.stepper)
-            //                .presentationDetents([.height(250)])
 
             //            MetricEditor.Category(labels: [
             //                "Happy", "Neutral", "Sad", "Angry", "Excited", "Happy2",
