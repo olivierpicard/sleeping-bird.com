@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		810156502FA5283200E02CC5 /* Inject in Frameworks */ = {isa = PBXBuildFile; productRef = 8101564F2FA5283200E02CC5 /* Inject */; };
 		8152B34D2F91B3E100D421C2 /* .gitignore in Resources */ = {isa = PBXBuildFile; fileRef = 8152B34C2F91B3E100D421C2 /* .gitignore */; };
 		8152B3672F91C55700D421C2 /* ArkanaKeys in Frameworks */ = {isa = PBXBuildFile; productRef = 8152B3662F91C55700D421C2 /* ArkanaKeys */; };
 		81BB91BE2F95603F00E4A4C5 /* FirebaseAILogic in Frameworks */ = {isa = PBXBuildFile; productRef = 81BB91BD2F95603F00E4A4C5 /* FirebaseAILogic */; };
@@ -40,6 +41,7 @@
 				81BB91BE2F95603F00E4A4C5 /* FirebaseAILogic in Frameworks */,
 				81BB91C12F95609700E4A4C5 /* FirebaseAnalytics in Frameworks */,
 				8152B3672F91C55700D421C2 /* ArkanaKeys in Frameworks */,
+				810156502FA5283200E02CC5 /* Inject in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -88,6 +90,7 @@
 				8152B3662F91C55700D421C2 /* ArkanaKeys */,
 				81BB91BD2F95603F00E4A4C5 /* FirebaseAILogic */,
 				81BB91C02F95609700E4A4C5 /* FirebaseAnalytics */,
+				8101564F2FA5283200E02CC5 /* Inject */,
 			);
 			productName = SleepingBird;
 			productReference = 81F8D8382F8DEA6600E96BF9 /* SleepingBird.app */;
@@ -120,6 +123,7 @@
 			packageReferences = (
 				8152B3652F91C55700D421C2 /* XCLocalSwiftPackageReference "ArkanaKeys/ArkanaKeys" */,
 				81BB91BC2F95603F00E4A4C5 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+				8101564E2FA5283200E02CC5 /* XCRemoteSwiftPackageReference "Inject" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 81F8D8392F8DEA6600E96BF9 /* Products */;
@@ -282,6 +286,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 5MSAR5N3G6;
+				EMIT_FRONTEND_COMMAND_LINES = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_DEEPGRAM_API_KEY = "$(DEEPGRAM_API_KEY)";
@@ -297,6 +302,10 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = (
+					"-Xlinker",
+					"-interposable",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.alizetech.SleepingBird;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
@@ -317,6 +326,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 5MSAR5N3G6;
+				EMIT_FRONTEND_COMMAND_LINES = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_DEEPGRAM_API_KEY = "$(DEEPGRAM_API_KEY)";
@@ -375,6 +385,14 @@
 /* End XCLocalSwiftPackageReference section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		8101564E2FA5283200E02CC5 /* XCRemoteSwiftPackageReference "Inject" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/krzysztofzablocki/Inject.git";
+			requirement = {
+				kind = upToNextMinorVersion;
+				minimumVersion = 1.6.0;
+			};
+		};
 		81BB91BC2F95603F00E4A4C5 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
@@ -386,6 +404,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		8101564F2FA5283200E02CC5 /* Inject */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8101564E2FA5283200E02CC5 /* XCRemoteSwiftPackageReference "Inject" */;
+			productName = Inject;
+		};
 		8152B3662F91C55700D421C2 /* ArkanaKeys */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = ArkanaKeys;
