@@ -61,8 +61,7 @@ struct _SliderEditor: View {
     @Previewable @State var isSheetPresented = true
     NavigationStack { Text("") }
     .sheet(isPresented: $isSheetPresented) {
-        MetricEditor.Number(min: 0, max: 20, defaultValue: 8, step: 1, unit: "glasses", mainColor: .blue)
-            .style(.slider)
+        _SliderEditor(min: 0, max: 20, defaultValue: 8, step: 1, unit: "glasses", mainColor: .blue) { _ in }
             .presentationDetents([.height(280)])
     }
 }

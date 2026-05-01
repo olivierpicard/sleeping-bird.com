@@ -85,8 +85,7 @@ struct _StepperEditor: View {
     @Previewable @State var isSheetPresented = true
     NavigationStack { Text("") }
     .sheet(isPresented: $isSheetPresented) {
-        MetricEditor.Number(min: 0, max: 20, defaultValue: 8, step: 1, unit: "glasses", mainColor: .blue)
-            .style(.stepper)
+        _StepperEditor(min: 0, max: 20, defaultValue: 8, step: 1, unit: "glasses", mainColor: .blue) { _ in }
             .presentationDetents([.height(250)])
     }
 }
