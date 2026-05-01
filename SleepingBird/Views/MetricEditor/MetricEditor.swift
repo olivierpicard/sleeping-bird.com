@@ -133,4 +133,32 @@ extension MetricEditor {
             }
         }
     }
+
+    struct Binary: View {
+        let trueLabel: String
+        let falseLabel: String
+        let mainColor: Color
+        let onAdd: (Bool) -> Void
+
+        init(
+            trueLabel: String = "Yes",
+            falseLabel: String = "No",
+            mainColor: Color = .accentColor,
+            onAdd: @escaping (Bool) -> Void = { _ in }
+        ) {
+            self.trueLabel = trueLabel
+            self.falseLabel = falseLabel
+            self.mainColor = mainColor
+            self.onAdd = onAdd
+        }
+
+        var body: some View {
+            _BinaryEditor(
+                trueLabel: trueLabel,
+                falseLabel: falseLabel,
+                mainColor: mainColor,
+                onAdd: onAdd
+            )
+        }
+    }
 }

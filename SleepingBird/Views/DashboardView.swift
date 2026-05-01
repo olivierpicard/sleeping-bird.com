@@ -42,10 +42,16 @@ struct DashboardView: View {
             //                "Happy", "Neutral", "Sad", "Angry", "Excited", "Happy2",
             //                "Neutral2", "Sad2", "Angry2", "Excited2",
             //            ], )
-            MetricEditor.Category(labels: [
-                "Happy", "Neutral", "Sad", "Angry", "Excited",
-            ], )
-            .style(.multiple)
+            //            MetricEditor.Category(labels: [
+            //                "Happy", "Neutral", "Sad", "Angry", "Excited",
+            //            ], )
+            //            .style(.multiple)
+            MetricEditor.Binary(
+                trueLabel: "Worked out at the gym",
+                falseLabel: "Skipped today the gym day",
+                mainColor: .green,
+                onAdd: { _ in }
+            )
 
         }
         .scrollContentBackground(.hidden)
