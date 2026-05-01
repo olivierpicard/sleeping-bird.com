@@ -34,26 +34,10 @@ struct DashboardView: View {
             .padding()
         }
         .sheet(item: $editingMetric) { metric in
-            //            AddEntrySheetFactory.make(from: metric)
-            //            MetricEditor.Number(min: 1, max: 10, defaultValue: 1, step: 1)
-            //                .style(.stepper)
-
-            //            MetricEditor.Category(labels: [
-            //                "Happy", "Neutral", "Sad", "Angry", "Excited", "Happy2",
-            //                "Neutral2", "Sad2", "Angry2", "Excited2",
-            //            ], )
-            //            MetricEditor.Category(labels: [
-            //                "Happy", "Neutral", "Sad", "Angry", "Excited",
-            //            ], )
-            //            .style(.multiple)
-//            MetricEditor.Binary(
-//                trueLabel: "Worked out at the gym",
-//                falseLabel: "Skipped today the gym day",
-//                mainColor: .green,
-//                onAdd: { _ in }
-//            )
-            MetricEditor.Duration(granularity: "m", maxInSeconds: 90*60, defaultValue: 30*60)
-
+            MetricInputFactory.make(from: metric) { point in
+                try? metric.append(point)
+                editingMetric = nil
+            }
         }
         .scrollContentBackground(.hidden)
         .navigationTitle("Dashboard")
@@ -86,16 +70,15 @@ struct DashboardView: View {
                                 for: MetricSchema.Fake.duration().config
                             )
                         ),
-                        Metric(
-                            from: MetricSchema.Fake.number(
-                                title: "Sleep",
-                                emoji: "🌙",
-                                chart: .line
-                            ),
-                            data: Metric.fakeData(
-                                for: MetricSchema.Fake.number().config
-                            )
-                        ),
+//                        Metric(
+//                            from: MetricSchema.Fake.datetime(
+//                                title: "Wake-up Time",
+//                                emoji: "⏰"
+//                            ),
+//                            data: Metric.fakeData(
+//                                for: MetricSchema.Fake.datetime().config
+//                            )
+//                        ),
                         Metric(
                             from: MetricSchema.Fake.number(
                                 title: "Heart Rate",
