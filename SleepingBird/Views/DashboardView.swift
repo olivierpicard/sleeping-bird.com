@@ -35,9 +35,17 @@ struct DashboardView: View {
         }
         .sheet(item: $editingMetric) { metric in
             //            AddEntrySheetFactory.make(from: metric)
-            MetricEditor.Number(min: 1, max: 10, defaultValue: 1, step: 1)
-                .style(.stepper)
-                .presentationDetents([.height(250)])
+            //            MetricEditor.Number(min: 1, max: 10, defaultValue: 1, step: 1)
+            //                .style(.stepper)
+            //                .presentationDetents([.height(250)])
+
+//            MetricEditor.Category(labels: [
+//                "Happy", "Neutral", "Sad", "Angry", "Excited", "Happy2",
+//                "Neutral2", "Sad2", "Angry2", "Excited2",
+//            ], )
+            MetricEditor.Category(labels: [
+                "Happy", "Neutral", "Sad", "Angry", "Excited"
+            ], )
 
         }
         .scrollContentBackground(.hidden)

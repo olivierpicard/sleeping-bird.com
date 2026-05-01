@@ -91,4 +91,28 @@ extension MetricEditor {
             }
         }
     }
+
+    struct Category: View {
+        let labels: [String]
+        let mainColor: Color
+        let onAdd: ([String]) -> Void
+
+        init(
+            labels: [String],
+            mainColor: Color = .accentColor,
+            onAdd: @escaping ([String]) -> Void = { _ in }
+        ) {
+            self.labels = labels
+            self.mainColor = mainColor
+            self.onAdd = onAdd
+        }
+
+        var body: some View {
+            _CategorySingleEditor(
+                labels: labels,
+                mainColor: mainColor,
+                onAdd: { label in onAdd([label]) }
+            )
+        }
+    }
 }
