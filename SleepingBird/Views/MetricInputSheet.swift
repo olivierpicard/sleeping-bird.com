@@ -1,8 +1,10 @@
+import SwiftData
 import SwiftUI
 
 struct MetricInputSheet: View {
     @Environment(\.dismiss) private var dismiss
-    @Environment(MetricStore.self) private var metricStore
+    @Environment(\.modelContext) private var context
+    @Environment(MetricGenerator.self) private var generator
     @State private var instruction: String = ""
     @State private var isRecording: Bool = false
     private let transcriber: Transcriber
@@ -49,7 +51,7 @@ struct MetricInputSheet: View {
 
                 ToolbarItem(placement: .confirmationAction) {
                     Button(action: {
-                        metricStore.create(instruction: instruction)
+                        generator.generate(instruction: instruction, into: context)
                         dismiss()
                     }) {
                         Image(systemName: "checkmark")
@@ -58,7 +60,6 @@ struct MetricInputSheet: View {
                 }
             }
         }
-
     }
 
     private func toggleRecording() {
@@ -77,5 +78,7 @@ struct MetricInputSheet: View {
 #Preview {
     MetricInputSheet(
         instruction: "I want to track how much coffee I drink per day"
-    ).environment(MetricStore())
+    )
+    .environment(MetricGenerator())
+    .modelContainer(for: Metric.self, inMemory: true)
 }

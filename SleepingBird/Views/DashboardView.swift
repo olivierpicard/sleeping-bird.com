@@ -1,33 +1,21 @@
-//
-//  DashboardView.swift
-//  SleepingBird
-//
-//  Created by Olivier Picard on 22/04/2026.
-//
-
+import SwiftData
 import SwiftUI
 
 struct DashboardView: View {
-    @Environment(MetricStore.self) private var metricStore
+    @Query(sort: \Metric.createdAt, order: .reverse) private var metrics: [Metric]
+    @Environment(MetricGenerator.self) private var generator
     @State private var editingMetric: Metric? = nil
 
     var body: some View {
         ScrollView(.vertical) {
             VStack(spacing: 16) {
-                if metricStore.isGenerating {
+                ForEach(generator.pending) { _ in
                     MetricPlaceholderView()
                 }
-                ForEach(
-                    Array(metricStore.metrics.reversed().enumerated()),
-                    id: \.offset
-                ) {
-                    index,
-                    metric in
+                ForEach(metrics) { metric in
                     MetricViewFactory.make(
                         from: metric,
-                        onAddTapped: {
-                            editingMetric = metric
-                        }
+                        onAddTapped: { editingMetric = metric }
                     )
                 }
             }
@@ -44,110 +32,37 @@ struct DashboardView: View {
     }
 }
 
-// MARK: -Preview
+// MARK: - Previews
+
+private func seedContainer(_ container: ModelContainer) -> ModelContainer {
+    let schemas: [(MetricSchema, [DataPoint])] = [
+        (MetricSchema.Fake.number(title: "Daily Steps", emoji: "👟"), Metric.fakeData(for: MetricSchema.Fake.number().config)),
+        (MetricSchema.Fake.duration(title: "Sleep", emoji: "🌙"), Metric.fakeData(for: MetricSchema.Fake.duration().config)),
+        (MetricSchema.Fake.number(title: "Heart Rate", emoji: "❤️", unit: "bpm"), Metric.fakeData(for: MetricSchema.Fake.number().config)),
+        (MetricSchema.Fake.binary(title: "Workout Done", emoji: "💪"), Metric.fakeData(for: MetricSchema.Fake.binary().config)),
+        (MetricSchema.Fake.categorySingle(title: "Mood", emoji: "😊"), Metric.fakeData(for: MetricSchema.Fake.categorySingle().config)),
+    ]
+    for (schema, data) in schemas {
+        container.mainContext.insert(Metric(from: schema, data: data))
+    }
+    return container
+}
 
 #Preview {
+    let container = seedContainer(try! ModelContainer(for: Metric.self, configurations: .init(isStoredInMemoryOnly: true)))
     NavigationStack {
         DashboardView()
-            .environment(
-                MetricStore(
-                    with: [
-                        Metric(
-                            from: MetricSchema.Fake.number(
-                                title: "Daily Steps",
-                                emoji: "👟"
-                            ),
-                            data: Metric.fakeData(
-                                for: MetricSchema.Fake.number().config
-                            )
-                        ),
-                        Metric(
-                            from: MetricSchema.Fake.duration(
-                                title: "Sleep",
-                                emoji: "🌙"
-                            ),
-                            data: Metric.fakeData(
-                                for: MetricSchema.Fake.duration().config
-                            )
-                        ),
-//                        Metric(
-//                            from: MetricSchema.Fake.datetime(
-//                                title: "Wake-up Time",
-//                                emoji: "⏰"
-//                            ),
-//                            data: Metric.fakeData(
-//                                for: MetricSchema.Fake.datetime().config
-//                            )
-//                        ),
-                        Metric(
-                            from: MetricSchema.Fake.number(
-                                title: "Heart Rate",
-                                emoji: "❤️",
-                                unit: "bpm"
-                            ),
-                            data: Metric.fakeData(
-                                for: MetricSchema.Fake.number().config
-                            )
-                        ),
-                        Metric(
-                            from: MetricSchema.Fake.binary(
-                                title: "Workout Done",
-                                emoji: "💪"
-                            ),
-                            data: Metric.fakeData(
-                                for: MetricSchema.Fake.binary().config
-                            )
-                        ),
-                        Metric(
-                            from: MetricSchema.Fake.categorySingle(
-                                title: "Mood",
-                                emoji: "😊"
-                            ),
-                            data: Metric.fakeData(
-                                for: MetricSchema.Fake.categorySingle().config
-                            )
-                        ),
-                    ],
-                    isGenerating: false
-                )
-            )
+            .environment(MetricGenerator())
     }
+    .modelContainer(container)
 }
 
-#Preview("Card loading - With existing one") {
+#Preview("Loading state") {
+    let generator = MetricGenerator(pending: [.init(instruction: "track my coffee")])
+    let container = seedContainer(try! ModelContainer(for: Metric.self, configurations: .init(isStoredInMemoryOnly: true)))
     NavigationStack {
         DashboardView()
-            .environment(
-                MetricStore(
-                    with: [
-                        Metric(
-                            from: MetricSchema.Fake.binary(
-                                title: "Workout Done",
-                                emoji: "💪"
-                            ),
-                            data: Metric.fakeData(
-                                for: MetricSchema.Fake.binary().config
-                            )
-                        ),
-                        Metric(
-                            from: MetricSchema.Fake.categorySingle(
-                                title: "Mood",
-                                emoji: "😊"
-                            ),
-                            data: Metric.fakeData(
-                                for: MetricSchema.Fake.categorySingle().config
-                            )
-                        ),
-                    ],
-                    isGenerating: true
-                )
-            )
+            .environment(generator)
     }
-}
-
-#Preview("Card loading - Solo") {
-    NavigationStack {
-        DashboardView()
-            .environment(MetricStore(isGenerating: true))
-    }
+    .modelContainer(container)
 }

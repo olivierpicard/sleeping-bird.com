@@ -5,6 +5,7 @@
 //  Created by Olivier Picard on 24/04/2026.
 //
 
+import SwiftData
 import SwiftUI
 
 struct EmptyDashboardView: View {
@@ -54,5 +55,6 @@ struct EmptyDashboardView: View {
 
 #Preview {
     EmptyDashboardView()
-        .environment(MetricStore())
+        .environment(MetricGenerator())
+        .modelContainer(for: Metric.self, inMemory: true)
 }

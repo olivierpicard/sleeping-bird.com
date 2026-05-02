@@ -6,6 +6,7 @@
 //
 
 import FirebaseCore
+import SwiftData
 import SwiftUI
 
 class AppDelegate: NSObject, UIApplicationDelegate {
@@ -21,14 +22,14 @@ class AppDelegate: NSObject, UIApplicationDelegate {
 
 @main
 struct SleepingBirdApp: App {
-    // register app delegate for Firebase setup
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
-    @State var metricStore = MetricStore()
+    @State private var generator = MetricGenerator()
 
     var body: some Scene {
         WindowGroup {
             ContentView()
-                .environment(metricStore)
+                .environment(generator)
         }
+        .modelContainer(for: Metric.self)
     }
 }

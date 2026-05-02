@@ -18,6 +18,7 @@ class Metric: Identifiable {
     var config: MetricConfig
     var visual: MetricVisual
     var data: [DataPoint]
+    var createdAt: Date
 
     enum AppendError: Error {
         case typeMismatch(expected: String, got: String)
@@ -51,7 +52,8 @@ class Metric: Identifiable {
         from schema: MetricSchema,
         id: UUID = UUID(),
         color: Color = .randomMetricColor(),
-        data: [DataPoint] = []
+        data: [DataPoint] = [],
+        createdAt: Date = Date()
     ) {
         self.id = id
         self.name = schema.name
@@ -60,6 +62,7 @@ class Metric: Identifiable {
         self.config = schema.config
         self.visual = schema.visual
         self.data = data
+        self.createdAt = createdAt
     }
 }
 

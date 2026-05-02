@@ -1,14 +1,16 @@
+import SwiftData
 import SwiftUI
 
 struct ContentView: View {
-    @Environment(MetricStore.self) private var metricStore
+    @Query private var metrics: [Metric]
+    @Environment(MetricGenerator.self) private var generator
 
     var body: some View {
         NavigationStack {
-            if !metricStore.metrics.isEmpty || metricStore.isGenerating {
-                DashboardView()
-            } else {
+            if metrics.isEmpty && generator.pending.isEmpty {
                 EmptyDashboardView()
+            } else {
+                DashboardView()
             }
         }
     }
@@ -16,5 +18,6 @@ struct ContentView: View {
 
 #Preview {
     ContentView()
-        .environment(MetricStore())
+        .environment(MetricGenerator())
+        .modelContainer(for: Metric.self, inMemory: true)
 }
