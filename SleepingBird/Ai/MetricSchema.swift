@@ -40,7 +40,6 @@ enum MetricConfig: Codable {
     case categorySingleChoice(CategoryConfig)
     case categoryMultipleChoice(CategoryConfig)
     case binary(BinaryConfig)
-    case datetime
     case duration(DurationConfig)
 
 }
@@ -100,7 +99,7 @@ struct DurationConfig: Codable {
     )
     let maxInSeconds: Int
 
-    @Guide(description: "Defines how the datetime behaves over time")
+    @Guide(description: "Defines how the duration behaves over time")
     let behavior: MetricBehavior
 }
 

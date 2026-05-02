@@ -116,25 +116,6 @@
                 )
             }
 
-            static func datetime(
-                title: String = "Wake-up Time",
-                emoji: String = "⏰",
-                chart: ChartType = .line,
-                bucket: TemporalBucket? = .daily,
-                method: AggregationMethod = .numerical(.average)
-            ) -> MetricSchema {
-                MetricSchema(
-                    name: title,
-                    emoji: emoji,
-                    fitPercentage: 0.85,
-                    config: .datetime,
-                    visual: MetricVisual(
-                        chart: chart,
-                        aggregation: AggregationConfig(bucket: bucket, method: method)
-                    )
-                )
-            }
-
             static func duration(
                 title: String = "Meditation Session",
                 emoji: String = "🧘",

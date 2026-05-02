@@ -57,7 +57,6 @@ enum MetricViewFactory {
         case .categorySingleChoice(_), .categoryMultipleChoice(_):
             return "—"
         case .binary: return "—"
-        case .datetime: return "—"
         case .duration(let cfg):
             return format(duration: 0, granularity: cfg.granularity)
         }

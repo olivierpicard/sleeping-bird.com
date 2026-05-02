@@ -67,11 +67,7 @@ enum MiniChartFactory {
             }
             return LineMiniChart(data: values, color: metric.color)
 
-        case .datetime:
-            let values = metric.data.compactMap {
-                $0.datetimeValue.map { _ in 1.0 }
-            }
-            return DotMiniChart(data: values, color: metric.color)
+
         }
     }
 }

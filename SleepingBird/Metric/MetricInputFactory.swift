@@ -50,12 +50,6 @@ enum MetricInputFactory {
                 mainColor: metric.color,
                 onAdd: { onAdd(.duration(Date(), $0)) }
             )
-
-        case .datetime:
-            _DatetimeEditor(
-                mainColor: metric.color,
-                onAdd: { onAdd(.datetime($0)) }
-            )
         }
     }
 
@@ -67,24 +61,5 @@ enum MetricInputFactory {
         if steps <= 100 { return .slider }
         if steps <= 200 { return .picker }
         return .numberInput
-    }
-}
-
-private struct _DatetimeEditor: View {
-    let mainColor: Color
-    let onAdd: (Date) -> Void
-    @State private var date = Date()
-
-    var body: some View {
-        VStack(spacing: 24) {
-            DatePicker("", selection: $date)
-                .datePickerStyle(.graphical)
-                .tint(mainColor)
-            Button("Add") { onAdd(date) }
-                .buttonStyle(.glassProminent)
-                .tint(mainColor)
-        }
-        .padding()
-        .presentationDetents([.medium])
     }
 }

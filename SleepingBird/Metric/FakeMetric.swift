@@ -34,17 +34,6 @@ import Foundation
                     return .category(date, picked)
                 case .binary:
                     return .binary(date, Double.random(in: 0...1) > 0.3)
-                case .datetime:
-                    let hour = Int.random(in: 5...9)
-                    let minute = Int.random(in: 0...59)
-                    let wake =
-                        calendar.date(
-                            bySettingHour: hour,
-                            minute: minute,
-                            second: 0,
-                            of: date
-                        ) ?? date
-                    return .datetime(wake)
                 case .duration(let cfg):
                     let max = TimeInterval(cfg.maxInSeconds)
                     return .duration(

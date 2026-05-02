@@ -29,7 +29,6 @@ class Metric: Identifiable {
         case (.number, .number): valid = true
         case (.categorySingleChoice, .category), (.categoryMultipleChoice, .category): valid = true
         case (.binary, .binary): valid = true
-        case (.datetime, .datetime): valid = true
         case (.duration, .duration): valid = true
         default: valid = false
         }
