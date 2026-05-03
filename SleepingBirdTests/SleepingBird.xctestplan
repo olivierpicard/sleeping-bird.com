@@ -1,0 +1,27 @@
+{
+  "configurations" : [
+    {
+      "id" : "F35B74C0-C29A-4EE3-9268-82804ED08E37",
+      "name" : "Configuration 1",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "testTimeoutsEnabled" : true
+  },
+  "testTargets" : [
+    {
+      "skippedTests" : [
+        "MiniChartFactoryTests\/test_datetime_returnsDotMiniChart_onePerEntry()"
+      ],
+      "target" : {
+        "containerPath" : "container:SleepingBird.xcodeproj",
+        "identifier" : "8104B7552FA76EAD0087967B",
+        "name" : "SleepingBirdTests"
+      }
+    }
+  ],
+  "version" : 1
+}

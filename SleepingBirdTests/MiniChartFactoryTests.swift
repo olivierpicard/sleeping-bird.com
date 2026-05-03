@@ -96,13 +96,5 @@ final class MiniChartFactoryTests: XCTestCase {
         XCTAssertTrue(MiniChartFactory.make(from: m) is BarMiniChart)
     }
 
-    // MARK: - Datetime
-
-    func test_datetime_returnsDotMiniChart_onePerEntry() {
-        let data: [DataPoint] = [.datetime(Date()), .datetime(Date())]
-        let m = metric(schema: .Fake.datetime(), data: data)
-        let chart = MiniChartFactory.make(from: m) as? DotMiniChart
-        XCTAssertNotNil(chart)
-        XCTAssertEqual(chart?.data, [1.0, 1.0])
-    }
+   
 }

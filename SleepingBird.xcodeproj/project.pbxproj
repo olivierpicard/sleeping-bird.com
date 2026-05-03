@@ -14,14 +14,25 @@
 		81BB91C12F95609700E4A4C5 /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 81BB91C02F95609700E4A4C5 /* FirebaseAnalytics */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		8104B75A2FA76EAD0087967B /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 81F8D8302F8DEA6600E96BF9 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 81F8D8372F8DEA6600E96BF9;
+			remoteInfo = SleepingBird;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
+		8104B7562FA76EAD0087967B /* SleepingBirdTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SleepingBirdTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		8152B34C2F91B3E100D421C2 /* .gitignore */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
 		8152B36A2F91CB9B00D421C2 /* .arkana.yml */ = {isa = PBXFileReference; lastKnownFileType = text.yaml; path = .arkana.yml; sourceTree = "<group>"; };
 		81F8D8382F8DEA6600E96BF9 /* SleepingBird.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SleepingBird.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		8157D0222FA205D70022CA84 /* SleepingBirdTests */ = {
+		8104B76B2FA770680087967B /* SleepingBirdTests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = SleepingBirdTests;
 			sourceTree = "<group>";
@@ -34,6 +45,13 @@
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		8104B7532FA76EAD0087967B /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		81F8D8352F8DEA6600E96BF9 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -52,10 +70,10 @@
 			isa = PBXGroup;
 			children = (
 				8152B34C2F91B3E100D421C2 /* .gitignore */,
-				8157D0222FA205D70022CA84 /* SleepingBirdTests */,
 				81F8D8392F8DEA6600E96BF9 /* Products */,
 				8152B36A2F91CB9B00D421C2 /* .arkana.yml */,
 				81F8D83A2F8DEA6600E96BF9 /* SleepingBird */,
+				8104B76B2FA770680087967B /* SleepingBirdTests */,
 			);
 			sourceTree = "<group>";
 		};
@@ -63,6 +81,7 @@
 			isa = PBXGroup;
 			children = (
 				81F8D8382F8DEA6600E96BF9 /* SleepingBird.app */,
+				8104B7562FA76EAD0087967B /* SleepingBirdTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -70,6 +89,29 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		8104B7552FA76EAD0087967B /* SleepingBirdTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 8104B75E2FA76EAD0087967B /* Build configuration list for PBXNativeTarget "SleepingBirdTests" */;
+			buildPhases = (
+				8104B7522FA76EAD0087967B /* Sources */,
+				8104B7532FA76EAD0087967B /* Frameworks */,
+				8104B7542FA76EAD0087967B /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				8104B75B2FA76EAD0087967B /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				8104B76B2FA770680087967B /* SleepingBirdTests */,
+			);
+			name = SleepingBirdTests;
+			packageProductDependencies = (
+			);
+			productName = SleepingBirdTests;
+			productReference = 8104B7562FA76EAD0087967B /* SleepingBirdTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 		81F8D8372F8DEA6600E96BF9 /* SleepingBird */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 81F8D8452F8DEA6800E96BF9 /* Build configuration list for PBXNativeTarget "SleepingBird" */;
@@ -106,6 +148,10 @@
 				LastSwiftUpdateCheck = 2640;
 				LastUpgradeCheck = 2640;
 				TargetAttributes = {
+					8104B7552FA76EAD0087967B = {
+						CreatedOnToolsVersion = 26.4.1;
+						TestTargetID = 81F8D8372F8DEA6600E96BF9;
+					};
 					81F8D8372F8DEA6600E96BF9 = {
 						CreatedOnToolsVersion = 26.4;
 					};
@@ -131,11 +177,19 @@
 			projectRoot = "";
 			targets = (
 				81F8D8372F8DEA6600E96BF9 /* SleepingBird */,
+				8104B7552FA76EAD0087967B /* SleepingBirdTests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		8104B7542FA76EAD0087967B /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		81F8D8362F8DEA6600E96BF9 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -147,6 +201,13 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		8104B7522FA76EAD0087967B /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		81F8D8342F8DEA6600E96BF9 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -156,7 +217,57 @@
 		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		8104B75B2FA76EAD0087967B /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 81F8D8372F8DEA6600E96BF9 /* SleepingBird */;
+			targetProxy = 8104B75A2FA76EAD0087967B /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
 /* Begin XCBuildConfiguration section */
+		8104B75C2FA76EAD0087967B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 5MSAR5N3G6;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.alizetech.SleepingBirdTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/SleepingBird.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/SleepingBird";
+			};
+			name = Debug;
+		};
+		8104B75D2FA76EAD0087967B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 5MSAR5N3G6;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.alizetech.SleepingBirdTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/SleepingBird.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/SleepingBird";
+			};
+			name = Release;
+		};
 		81F8D8432F8DEA6800E96BF9 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -357,6 +468,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		8104B75E2FA76EAD0087967B /* Build configuration list for PBXNativeTarget "SleepingBirdTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8104B75C2FA76EAD0087967B /* Debug */,
+				8104B75D2FA76EAD0087967B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		81F8D8332F8DEA6600E96BF9 /* Build configuration list for PBXProject "SleepingBird" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
