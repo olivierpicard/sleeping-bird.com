@@ -13,25 +13,21 @@ struct MetricDetailView: View {
 
     @State private var range: TimeRange = .month
     @State private var selectedDate: Date?
-    @State private var scrollPosition: Date = .now
+    @State private var bins: [ChartBin] = []
 
-    private var entries: [DataPoint] {
-        metric.data
-    }
-
-    private var sortedEntries: [DataPoint] {
-        entries.sorted { lhs, rhs in
-            date(of: lhs) > date(of: rhs)
-        }
-    }
-
-    private var bins: [ChartBin] {
-        MetricAggregator.bins(
+    private func recomputeBins() {
+        bins = MetricAggregator.bins(
             from: metric.data,
             range: range,
             method: metric.visual.aggregation.method.numeric,
             behavior: metric.config.behavior
         )
+    }
+
+    private var sortedEntries: [DataPoint] {
+        metric.data.sorted { lhs, rhs in
+            date(of: lhs) > date(of: rhs)
+        }
     }
 
     private var displayedBin: ChartBin? {
@@ -49,6 +45,7 @@ struct MetricDetailView: View {
     }
 
     var body: some View {
+        let _ = Self._printChanges()
         ScrollView {
             VStack(alignment: .leading, spacing: 24) {
                 header
@@ -68,16 +65,14 @@ struct MetricDetailView: View {
                     .tint(metric.color)
             }
         }
-        .onAppear { resetScrollPosition() }
+        .onAppear { recomputeBins() }
         .onChange(of: range) { _, _ in
             selectedDate = nil
-            resetScrollPosition()
+            recomputeBins()
         }
-    }
-
-    private func resetScrollPosition() {
-        guard let last = bins.last?.date else { return }
-        scrollPosition = last.addingTimeInterval(-range.visibleDomainSeconds)
+        .onChange(of: metric.data.count) { _, _ in
+            recomputeBins()
+        }
     }
 
     // MARK: - Header
@@ -138,9 +133,10 @@ struct MetricDetailView: View {
             .clipShape(RoundedRectangle(cornerRadius: 4))
             .foregroundStyle(barGradient(for: bin))
         }
+        .id(range)  // recreates chart when range changes → re-applies initialX
         .chartScrollableAxes(.horizontal)
         .chartXVisibleDomain(length: range.visibleDomainSeconds)
-        .chartScrollPosition(x: $scrollPosition)
+        .chartScrollPosition(initialX: bins.last?.date ?? Date.now)
         .chartXSelection(value: $selectedDate)
         .chartYAxis(.hidden)
         .chartXAxis {
@@ -366,3 +362,7 @@ extension AggregationMethod {
         MetricDetailView(metric: metric)
     }
 }
+
+
+//I want to bar selection to be draggable. When the use long tap (or hold) and then drag (without
+//  realeasing) I don't want the chart to
