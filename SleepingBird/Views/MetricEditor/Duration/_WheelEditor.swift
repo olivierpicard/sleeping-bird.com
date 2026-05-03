@@ -51,7 +51,7 @@ struct _WheelEditor: View {
             }
         }
         .padding(.vertical, 24)
-        .presentationBackground(.windowBackground)
+//        .presentationBackground(.windowBackground)
         .presentationDetents([.height(320)])
     }
 
