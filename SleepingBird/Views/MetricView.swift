@@ -15,6 +15,7 @@ struct MetricView: View {
     let value: String
     let mainColor: Color
     let onAddTapped: () -> Void
+    let onCardTapped: () -> Void
     let chart: (any MiniChart)?
 
     @State private var feedbackTrigger = false
@@ -31,6 +32,7 @@ struct MetricView: View {
         value: String,
         mainColor: Color,
         onAddTapped: @escaping () -> Void,
+        onCardTapped: @escaping () -> Void = {},
         chart: (any MiniChart)? = nil
     ) {
         self.title = title
@@ -38,6 +40,7 @@ struct MetricView: View {
         self.value = value
         self.mainColor = mainColor
         self.onAddTapped = onAddTapped
+        self.onCardTapped = onCardTapped
         self.chart = chart
     }
 
@@ -104,8 +107,8 @@ struct MetricView: View {
 
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        //                .frame(  maxWidth: 300, alignment: .leading)
-        //        .frame(width: 300, alignment: .leading)
+        .contentShape(RoundedRectangle(cornerRadius: 12))
+        .onTapGesture(perform: onCardTapped)
         .background(Color(.secondarySystemGroupedBackground))
         .clipShape(RoundedRectangle(cornerRadius: 12))
         .overlay {

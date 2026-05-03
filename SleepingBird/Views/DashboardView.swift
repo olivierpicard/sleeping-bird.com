@@ -6,6 +6,7 @@ struct DashboardView: View {
         [Metric]
     @Environment(MetricGenerator.self) private var generator
     @State private var editingMetric: Metric? = nil
+    @State private var selectedMetric: Metric? = nil
 
     var body: some View {
         ScrollView(.vertical) {
@@ -16,11 +17,15 @@ struct DashboardView: View {
                 ForEach(metrics) { metric in
                     MetricViewFactory.make(
                         from: metric,
-                        onAddTapped: { editingMetric = metric }
+                        onAddTapped: { editingMetric = metric },
+                        onCardTapped: { selectedMetric = metric }
                     )
                 }
             }
             .padding()
+        }
+        .navigationDestination(item: $selectedMetric) { metric in
+            MetricDetailView(metric: metric)
         }
         .sheet(item: $editingMetric) { metric in
             MetricInputFactory.make(from: metric) { point in

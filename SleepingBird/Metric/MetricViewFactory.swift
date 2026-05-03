@@ -10,13 +10,18 @@ import SwiftUI
 
 enum MetricViewFactory {
 
-    static func make(from metric: Metric, onAddTapped: @escaping () -> Void) -> MetricView {
+    static func make(
+        from metric: Metric,
+        onAddTapped: @escaping () -> Void,
+        onCardTapped: @escaping () -> Void = {}
+    ) -> MetricView {
         MetricView(
             title: metric.name,
             emoji: metric.emoji,
             value: value(for: metric),
             mainColor: metric.color,
             onAddTapped: onAddTapped,
+            onCardTapped: onCardTapped,
             chart: MiniChartFactory.make(from: metric),
         )
     }
