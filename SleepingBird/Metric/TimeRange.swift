@@ -8,7 +8,6 @@
 import Foundation
 
 enum TimeRange: String, CaseIterable, Identifiable {
-    case week = "1W"
     case month = "1M"
     case sixMonths = "6M"
     case year = "1Y"
@@ -17,18 +16,25 @@ enum TimeRange: String, CaseIterable, Identifiable {
 
     var bucketComponent: Calendar.Component {
         switch self {
-        case .week, .month: return .day
+        case .month: return .day
         case .sixMonths: return .weekOfYear
         case .year: return .month
         }
     }
 
-    var visibleBarCount: Int {
+    var visibleDomainSeconds: TimeInterval {
         switch self {
-        case .week: return 7
-        case .month: return 30
-        case .sixMonths: return 26
-        case .year: return 12
+        case .month: return 30 * 86_400
+        case .sixMonths: return 26 * 7 * 86_400
+        case .year: return 365 * 86_400
+        }
+    }
+
+    var desiredAxisLabels: Int {
+        switch self {
+        case .month: return 8
+        case .sixMonths: return 7
+        case .year: return 6
         }
     }
 }

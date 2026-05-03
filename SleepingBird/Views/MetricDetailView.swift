@@ -12,7 +12,8 @@ struct MetricDetailView: View {
     let metric: Metric
 
     @State private var range: TimeRange = .month
-    @State private var selectedIndex: Int?
+    @State private var selectedDate: Date?
+    @State private var scrollPosition: Date = .now
 
     private var entries: [DataPoint] {
         metric.data
@@ -34,9 +35,15 @@ struct MetricDetailView: View {
     }
 
     private var displayedBin: ChartBin? {
-        if let index = selectedIndex {
-            let current = bins
-            if current.indices.contains(index) { return current[index] }
+        if let selectedDate {
+            let calendar = Calendar.current
+            return bins.first {
+                calendar.isDate(
+                    $0.date,
+                    equalTo: selectedDate,
+                    toGranularity: range.bucketComponent
+                )
+            } ?? bins.last
         }
         return bins.last
     }
@@ -61,9 +68,16 @@ struct MetricDetailView: View {
                     .tint(metric.color)
             }
         }
+        .onAppear { resetScrollPosition() }
         .onChange(of: range) { _, _ in
-            selectedIndex = nil
+            selectedDate = nil
+            resetScrollPosition()
         }
+    }
+
+    private func resetScrollPosition() {
+        guard let last = bins.last?.date else { return }
+        scrollPosition = last.addingTimeInterval(-range.visibleDomainSeconds)
     }
 
     // MARK: - Header
@@ -96,7 +110,7 @@ struct MetricDetailView: View {
             }
 
             Text(displayedDateText)
-                .font(.subheadline)
+                .font(.headline)
                 .foregroundStyle(.secondary)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -116,77 +130,42 @@ struct MetricDetailView: View {
     // MARK: - Chart
 
     private var chartSection: some View {
-        let currentBins = bins
-        return GeometryReader { geo in
-            let viewportWidth = geo.size.width
-            let spacing: CGFloat = 4
-            let visibleCount = max(range.visibleBarCount, 1)
-            let barWidth = max(
-                (viewportWidth / CGFloat(visibleCount)) - spacing,
-                2
+        Chart(bins, id: \.date) { bin in
+            BarMark(
+                x: .value("Date", bin.date, unit: range.bucketComponent),
+                y: .value("Value", bin.value)
             )
-            let chartWidth = max(
-                CGFloat(currentBins.count) * (barWidth + spacing),
-                viewportWidth
-            )
-
-            ScrollView(.horizontal, showsIndicators: false) {
-                Chart {
-                    ForEach(currentBins.indices, id: \.self) { index in
-                        let bin = currentBins[index]
-                        BarMark(
-                            x: .value("Index", index),
-                            y: .value("Value", bin.value),
-                            width: .fixed(barWidth)
-                        )
-                        .clipShape(
-                            RoundedRectangle(cornerRadius: barWidth / 2.5)
-                        )
-                        .foregroundStyle(barGradient(forIndex: index))
-                    }
-                }
-                .chartXAxis {
-                    AxisMarks(values: xAxisIndices(for: currentBins)) { value in
-                        if let index = value.as(Int.self),
-                            currentBins.indices.contains(index)
-                        {
-                            AxisValueLabel {
-                                Text(axisLabel(for: currentBins[index].date))
-                                    .font(.caption2)
-                                    .foregroundStyle(.secondary)
-                            }
-                        }
-                    }
-                }
-                .chartYAxis(.hidden)
-                .chartOverlay { proxy in
-                    GeometryReader { plotGeo in
-                        Rectangle()
-                            .fill(.clear)
-                            .contentShape(Rectangle())
-                            .gesture(
-                                SpatialTapGesture()
-                                    .onEnded { value in
-                                        handleTap(
-                                            at: value.location,
-                                            proxy: proxy,
-                                            geo: plotGeo,
-                                            binsCount: currentBins.count
-                                        )
-                                    }
-                            )
-                    }
-                }
-                .frame(width: chartWidth, height: 200)
-            }
-            .scrollClipDisabled()
-            .defaultScrollAnchor(.trailing)
+            .clipShape(RoundedRectangle(cornerRadius: 4))
+            .foregroundStyle(barGradient(for: bin))
         }
-        .frame(height: 220)
+        .chartScrollableAxes(.horizontal)
+        .chartXVisibleDomain(length: range.visibleDomainSeconds)
+        .chartScrollPosition(x: $scrollPosition)
+        .chartXSelection(value: $selectedDate)
+        .chartYAxis(.hidden)
+        .chartXAxis {
+            AxisMarks(values: .automatic(desiredCount: range.desiredAxisLabels)) { value in
+                if let date = value.as(Date.self) {
+                    AxisValueLabel {
+                        Text(axisLabel(for: date))
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
+                    }
+                }
+            }
+        }
+        .frame(height: 200)
     }
 
-    private func barGradient(forIndex index: Int) -> LinearGradient {
-        let isSelected = selectedIndex == index
+    private func barGradient(for bin: ChartBin) -> LinearGradient {
+        let calendar = Calendar.current
+        let isSelected = selectedDate.map {
+            calendar.isDate(
+                bin.date,
+                equalTo: $0,
+                toGranularity: range.bucketComponent
+            )
+        } ?? false
         let top = metric.color.opacity(isSelected ? 1.0 : 0.45)
         let bottom = metric.color.opacity(isSelected ? 0.6 : 0.15)
         return LinearGradient(
@@ -194,34 +173,6 @@ struct MetricDetailView: View {
             startPoint: .top,
             endPoint: .bottom
         )
-    }
-
-    private func xAxisIndices(for bins: [ChartBin]) -> [Int] {
-        let count = bins.count
-        guard count > 0 else { return [] }
-        let desired = 5
-        let stride = max(count / desired, 1)
-        return Array(Swift.stride(from: 0, to: count, by: stride))
-    }
-
-    private func handleTap(
-        at location: CGPoint,
-        proxy: ChartProxy,
-        geo: GeometryProxy,
-        binsCount: Int
-    ) {
-        guard let plot = proxy.plotFrame else { return }
-        let frame = geo[plot]
-        let xInPlot = location.x - frame.origin.x
-        guard
-            let rawIndex: Double = proxy.value(
-                atX: xInPlot,
-                as: Double.self
-            )
-        else { return }
-        let index = Int(rawIndex.rounded())
-        guard (0..<binsCount).contains(index) else { return }
-        selectedIndex = (selectedIndex == index) ? nil : index
     }
 
     // MARK: - Recent Entries
@@ -294,13 +245,13 @@ struct MetricDetailView: View {
     private var displayedDateText: String {
         guard let bin = displayedBin else { return "No data" }
         let formatted = formattedBucketDate(bin.date)
-        let suffix = (selectedIndex == nil) ? " · Latest" : ""
+        let suffix = (selectedDate == nil) ? " · Latest" : ""
         return formatted + suffix
     }
 
     private func formattedBucketDate(_ date: Date) -> String {
         switch range {
-        case .week, .month:
+        case .month:
             return date.formatted(
                 .dateTime.month(.abbreviated).day().year()
             )
@@ -352,7 +303,7 @@ struct MetricDetailView: View {
 
     private func axisLabel(for date: Date) -> String {
         switch range {
-        case .week, .month:
+        case .month:
             return date.formatted(.dateTime.month(.abbreviated).day())
         case .sixMonths:
             return date.formatted(.dateTime.month(.abbreviated).day())
@@ -397,7 +348,7 @@ extension AggregationMethod {
     let metric = Metric(
         from: schema,
         color: .pink,
-        data: Metric.fakeData(for: schema.config, days: 365)
+        data: Metric.fakeData(for: schema.config, days: 365*5)
     )
     return NavigationStack {
         MetricDetailView(metric: metric)

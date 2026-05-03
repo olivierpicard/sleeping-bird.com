@@ -23,7 +23,7 @@ struct MetricAggregatorTests {
 
     private static func bins(
         _ points: [DataPoint],
-        range: TimeRange = .week,
+        range: TimeRange = .month,
         method: NumericMethod = .sum,
         behavior: MetricBehavior = .snapshot
     ) -> [ChartBin] {
