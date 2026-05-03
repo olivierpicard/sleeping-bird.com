@@ -2,7 +2,8 @@ import SwiftData
 import SwiftUI
 
 struct DashboardView: View {
-    @Query(sort: \Metric.createdAt, order: .reverse) private var metrics: [Metric]
+    @Query(sort: \Metric.createdAt, order: .reverse) private var metrics:
+        [Metric]
     @Environment(MetricGenerator.self) private var generator
     @State private var editingMetric: Metric? = nil
 
@@ -36,11 +37,29 @@ struct DashboardView: View {
 
 private func seedContainer(_ container: ModelContainer) -> ModelContainer {
     let schemas: [(MetricSchema, [DataPoint])] = [
-        (MetricSchema.Fake.number(title: "Daily Steps", emoji: "👟"), Metric.fakeData(for: MetricSchema.Fake.number().config)),
-        (MetricSchema.Fake.duration(title: "Sleep", emoji: "🌙"), Metric.fakeData(for: MetricSchema.Fake.duration().config)),
-        (MetricSchema.Fake.number(title: "Heart Rate", emoji: "❤️", unit: "bpm"), Metric.fakeData(for: MetricSchema.Fake.number().config)),
-        (MetricSchema.Fake.binary(title: "Workout Done", emoji: "💪"), Metric.fakeData(for: MetricSchema.Fake.binary().config)),
-        (MetricSchema.Fake.categorySingle(title: "Mood", emoji: "😊"), Metric.fakeData(for: MetricSchema.Fake.categorySingle().config)),
+        (
+            MetricSchema.Fake.number(title: "Daily Steps", emoji: "👟"),
+            Metric.fakeData(for: MetricSchema.Fake.number().config)
+        ),
+        (
+            MetricSchema.Fake.duration(title: "Sleep", emoji: "🌙"),
+            Metric.fakeData(for: MetricSchema.Fake.duration().config)
+        ),
+        (
+            MetricSchema.Fake.number(
+                title: "Heart Rate",
+                emoji: "❤️",
+                unit: "bpm"
+            ), Metric.fakeData(for: MetricSchema.Fake.number().config)
+        ),
+        (
+            MetricSchema.Fake.binary(title: "Workout Done", emoji: "💪"),
+            Metric.fakeData(for: MetricSchema.Fake.binary().config)
+        ),
+        (
+            MetricSchema.Fake.categorySingle(title: "Mood", emoji: "😊"),
+            Metric.fakeData(for: MetricSchema.Fake.categorySingle().config)
+        ),
     ]
     for (schema, data) in schemas {
         container.mainContext.insert(Metric(from: schema, data: data))
@@ -49,7 +68,12 @@ private func seedContainer(_ container: ModelContainer) -> ModelContainer {
 }
 
 #Preview {
-    let container = seedContainer(try! ModelContainer(for: Metric.self, configurations: .init(isStoredInMemoryOnly: true)))
+    let container = seedContainer(
+        try! ModelContainer(
+            for: Metric.self,
+            configurations: .init(isStoredInMemoryOnly: true)
+        )
+    )
     NavigationStack {
         DashboardView()
             .environment(MetricGenerator())
@@ -57,11 +81,19 @@ private func seedContainer(_ container: ModelContainer) -> ModelContainer {
     .modelContainer(container)
 }
 
-#Preview("Loading state") {
-    let generator = MetricGenerator(pending: [.init(instruction: "track my coffee")])
-    let container = seedContainer(try! ModelContainer(for: Metric.self, configurations: .init(isStoredInMemoryOnly: true)))
+#Preview("Loading state", ) {
+    let generator = MetricGenerator(pending: [
+        .init(instruction: "track my coffee")
+    ]) 
+    let container = seedContainer(
+        try! ModelContainer(
+            for: Metric.self,
+            configurations: .init(isStoredInMemoryOnly: true)
+        )
+    )
     NavigationStack {
         DashboardView()
+
             .environment(generator)
     }
     .modelContainer(container)

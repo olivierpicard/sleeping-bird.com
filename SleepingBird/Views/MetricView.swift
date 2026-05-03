@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct MetricView: View {
+    @Environment(\.colorScheme) private var colorScheme
+
     let title: String
     let emoji: String
     let value: String
@@ -15,7 +17,9 @@ struct MetricView: View {
     let onAddTapped: () -> Void
     let chart: (any MiniChart)?
 
-    @State private var emojiSize: CGFloat = 52
+    @State private var feedbackTrigger = false
+
+    private let emojiSize: CGFloat = 52
 
     private static let categoryPalette: [Color] = [
         .blue, .green, .orange, .red, .purple, .teal, .pink, .yellow,
@@ -41,7 +45,7 @@ struct MetricView: View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
                 Text(emoji)
-                    .font(.system(size: emojiSize * 0.5))
+                    .font(.system(size: emojiSize * 0.6))
                     .frame(width: emojiSize, height: emojiSize)
                     .background {
                         mainColor.opacity(0.03)
@@ -59,30 +63,31 @@ struct MetricView: View {
                         .fontWeight(.medium)
                         .foregroundStyle(.secondary)
                     Text(value)
-                        .font(.system(size: 38))
-                        .fontWeight(.light)
+                        .font(.title)
+                        .fontWeight(.medium)
                 }
-                .onGeometryChange(for: CGFloat.self) {
-                    $0.size.height
-                } action: {
-                    emojiSize = $0
-                }
+
                 Spacer()
-                Button(action: onAddTapped) {
+                Button(action: {
+                    feedbackTrigger.toggle()
+                    onAddTapped()
+                }) {
                     Image(systemName: "plus")
-                        .font(.system(size: 22, weight: .bold))
+                        .font(.title3.weight(.semibold))
                         .foregroundStyle(.white)
                 }
-                .frame(width: emojiSize * 0.8, height: emojiSize * 0.8)
-                .background(mainColor)
-                .clipShape(Circle())
+                .buttonStyle(.glassProminent)
+                .tint(mainColor)
                 .shadow(
-                    color: mainColor.opacity(0.6),
-                    radius: 10,
+                    color: mainColor.opacity(0.8),
+                    radius: 6,
                     x: 0,
-                    y: 3
+                    y: 0
                 )
-                .buttonStyle(.plain)
+                .sensoryFeedback(
+                    .impact(flexibility: .soft),
+                    trigger: feedbackTrigger
+                )
 
             }
             .padding(.horizontal)
@@ -99,14 +104,37 @@ struct MetricView: View {
 
         }
         .frame(maxWidth: .infinity, alignment: .leading)
+        //                .frame(  maxWidth: 300, alignment: .leading)
+        //        .frame(width: 300, alignment: .leading)
         .background(Color(.secondarySystemGroupedBackground))
         .clipShape(RoundedRectangle(cornerRadius: 12))
         .overlay {
             RoundedRectangle(cornerRadius: 12)
-                .stroke(mainColor, style: StrokeStyle(lineWidth: 0.4))
+                .stroke(mainColor, style: cardStrokeStyle)
         }
-        .shadow(color: .black.opacity(0.06), radius: 8, x: 0, y: 2)
+        .shadow(
+            color: mainColor.opacity(cardShadowOpacity),
+            radius: cardShadowRadius,
+            x: 0,
+            y: 0
+        )
 
+    }
+
+    private var isDarkMode: Bool {
+        colorScheme == .dark
+    }
+
+    private var cardShadowOpacity: Double {
+        isDarkMode ? 0.5 : 0.5
+    }
+
+    private var cardShadowRadius: CGFloat {
+        isDarkMode ? 10 : 4
+    }
+
+    private var cardStrokeStyle: StrokeStyle {
+        StrokeStyle(lineWidth: isDarkMode ? 0 : 0)
     }
 
 }
