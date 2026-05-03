@@ -1,0 +1,107 @@
+//
+//  MetricAggregator.swift
+//  SleepingBird
+//
+//  Created by Olivier Picard on 03/05/2026.
+//
+
+import Foundation
+
+enum MetricAggregator {
+    static func bins(
+        from points: [DataPoint],
+        range: TimeRange,
+        method: NumericMethod,
+        behavior: MetricBehavior
+    ) -> [ChartBin] {
+        let calendar = Calendar.current
+        let component = range.bucketComponent
+
+        let raw: [(Date, Double)] = points.compactMap { point in
+            switch point {
+            case .number(let d, let v): return (d, v)
+            case .duration(let d, let t): return (d, t)
+            default: return nil
+            }
+        }
+        guard !raw.isEmpty else { return [] }
+
+        var groups: [Date: [(Date, Double)]] = [:]
+        for (date, value) in raw {
+            guard
+                let start = calendar.dateInterval(of: component, for: date)?
+                    .start
+            else { continue }
+            groups[start, default: []].append((date, value))
+        }
+
+        var bins: [ChartBin] = groups.map { bucketStart, items in
+            ChartBin(
+                date: bucketStart,
+                value: aggregate(items, method: method),
+                count: items.count
+            )
+        }
+        bins.sort { $0.date < $1.date }
+
+        if behavior == .cumulative,
+            let first = bins.first?.date,
+            let last = bins.last?.date
+        {
+            return fillGaps(
+                bins,
+                from: first,
+                to: last,
+                stepping: component,
+                calendar: calendar
+            )
+        }
+
+        return bins
+    }
+
+    private static func aggregate(
+        _ items: [(Date, Double)],
+        method: NumericMethod
+    ) -> Double {
+        guard !items.isEmpty else { return 0 }
+        let values = items.map { $0.1 }
+        switch method {
+        case .sum: return values.reduce(0, +)
+        case .average: return values.reduce(0, +) / Double(values.count)
+        case .min: return values.min() ?? 0
+        case .max: return values.max() ?? 0
+        case .latest:
+            return items.max(by: { $0.0 < $1.0 })?.1 ?? values.last ?? 0
+        }
+    }
+
+    private static func fillGaps(
+        _ bins: [ChartBin],
+        from start: Date,
+        to end: Date,
+        stepping component: Calendar.Component,
+        calendar: Calendar
+    ) -> [ChartBin] {
+        var byDate = Dictionary(uniqueKeysWithValues: bins.map { ($0.date, $0) })
+        var filled: [ChartBin] = []
+        var cursor = start
+        while cursor <= end {
+            if let existing = byDate[cursor] {
+                filled.append(existing)
+            } else {
+                filled.append(ChartBin(date: cursor, value: 0, count: 0))
+            }
+            byDate[cursor] = nil
+            guard
+                let next = calendar.date(
+                    byAdding: component,
+                    value: 1,
+                    to: cursor
+                )
+            else { break }
+            cursor = next
+        }
+        return filled
+    }
+}
