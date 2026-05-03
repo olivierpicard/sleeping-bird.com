@@ -14,6 +14,7 @@ struct MetricDetailView: View {
     @State private var range: TimeRange = .month
     @State private var selectedDate: Date?
     @State private var bins: [ChartBin] = []
+    @State private var isEditing: Bool = false
 
     private func recomputeBins() {
         bins = MetricAggregator.bins(
@@ -61,9 +62,12 @@ struct MetricDetailView: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
-                Button("Edit") {}
+                Button("Edit") { isEditing = true }
                     .tint(metric.color)
             }
+        }
+        .sheet(isPresented: $isEditing) {
+            MetricEditSheet(metric: metric)
         }
         .onAppear { recomputeBins() }
         .onChange(of: range) { _, _ in
