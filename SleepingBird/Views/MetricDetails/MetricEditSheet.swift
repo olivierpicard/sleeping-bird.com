@@ -13,7 +13,6 @@ struct MetricEditSheet: View {
     @State private var unit: String
     @State private var emoji: String
     @State private var color: Color
-    @State private var isPickingCustomColor: Bool = false
     @FocusState private var focused: Field?
 
     private let supportsUnit: Bool
@@ -22,17 +21,20 @@ struct MetricEditSheet: View {
 
     private static let palette: [Color] = [
         Color(hex: "FF453A"), // red
+        Color(hex: "FF2D96"), // magenta
+        Color(hex: "E05A6E"), // coral
         Color(hex: "FF9F0A"), // orange
-        Color(hex: "FFD60A"), // yellow
+        Color(hex: "C27D00"), // amber
+        Color(hex: "B8A000"), // gold
+        Color(hex: "9DBF3C"), // lime
         Color(hex: "30D158"), // green
+        Color(hex: "00B870"), // emerald
+        Color(hex: "7B9E6C"), // sage
         Color(hex: "00C7BE"), // teal
-        Color(hex: "64D2FF"), // sky
-        Color(hex: "0A84FF"), // blue
-        Color(hex: "5E5CE6"), // indigo
+        Color(hex: "0096A8"), // ocean
+        Color(hex: "3197FF"), // blue
         Color(hex: "BF5AF2"), // purple
-        Color(hex: "FF375F"), // pink
         Color(hex: "AC8E68"), // brown
-        Color(hex: "8E8E93"), // gray
     ]
 
     init(metric: Metric) {
@@ -206,7 +208,6 @@ struct MetricEditSheet: View {
                     ForEach(Self.palette, id: \.hexString) { swatch in
                         colorSwatch(swatch)
                     }
-                    customSwatch
                 }
                 .padding(.horizontal, 16)
                 .padding(.bottom, 14)
@@ -215,42 +216,6 @@ struct MetricEditSheet: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(Color(.secondarySystemGroupedBackground))
         .clipShape(RoundedRectangle(cornerRadius: 20))
-    }
-
-    private var customSwatch: some View {
-        let isCustom = !Self.palette.contains { $0.hexString == color.hexString }
-        return Button {
-            isPickingCustomColor = true
-        } label: {
-            ZStack {
-                Circle()
-                    .fill(
-                        AngularGradient(
-                            colors: [.red, .orange, .yellow, .green, .blue, .purple, .red],
-                            center: .center
-                        )
-                    )
-                    .frame(width: 36, height: 36)
-                if isCustom {
-                    Circle()
-                        .strokeBorder(color, lineWidth: 2.5)
-                        .frame(width: 46, height: 46)
-                }
-                Image(systemName: "eyedropper")
-                    .font(.system(size: 14, weight: .bold))
-                    .foregroundStyle(.white)
-                    .shadow(color: .black.opacity(0.25), radius: 1, y: 0.5)
-            }
-            .frame(width: 46, height: 46)
-            .contentShape(Circle())
-        }
-        .buttonStyle(.plain)
-        .accessibilityLabel("Custom color")
-        .sheet(isPresented: $isPickingCustomColor) {
-            CustomColorPickerSheet(color: $color)
-                .ignoresSafeArea()
-                .presentationDetents([.medium, .large])
-        }
     }
 
     private func colorSwatch(_ swatch: Color) -> some View {
@@ -331,33 +296,6 @@ struct MetricEditSheet: View {
             )
         }
         dismiss()
-    }
-}
-
-// MARK: - Custom color picker
-
-private struct CustomColorPickerSheet: UIViewControllerRepresentable {
-    @Binding var color: Color
-
-    func makeCoordinator() -> Coordinator { Coordinator(color: $color) }
-
-    func makeUIViewController(context: Context) -> UIColorPickerViewController {
-        let vc = UIColorPickerViewController()
-        vc.supportsAlpha = false
-        vc.selectedColor = UIColor(color)
-        vc.delegate = context.coordinator
-        return vc
-    }
-
-    func updateUIViewController(_ uiViewController: UIColorPickerViewController, context: Context) {}
-
-    final class Coordinator: NSObject, UIColorPickerViewControllerDelegate {
-        @Binding var color: Color
-        init(color: Binding<Color>) { _color = color }
-
-        func colorPickerViewControllerDidSelectColor(_ vc: UIColorPickerViewController) {
-            color = Color(vc.selectedColor)
-        }
     }
 }
 
