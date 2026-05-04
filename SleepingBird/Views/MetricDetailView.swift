@@ -14,6 +14,7 @@ struct MetricDetailView: View {
     @State private var range: TimeRange = .month
     @State private var selectedDate: Date?
     @State private var bins: [ChartBin] = []
+    @State private var filledDays: Set<Date> = []
     @State private var isEditing: Bool = false
 
     private func recomputeBins() {
@@ -23,6 +24,35 @@ struct MetricDetailView: View {
             method: metric.visual.aggregation.method.numeric,
             behavior: metric.config.behavior
         )
+    }
+
+    private func recomputeFilledDays() {
+        let cal = Calendar.current
+        var set: Set<Date> = []
+        for point in metric.data {
+            if case .binary(let date, true) = point {
+                set.insert(cal.startOfDay(for: date))
+            }
+        }
+        filledDays = set
+    }
+
+    private var isBinary: Bool {
+        if case .binary = metric.config { return true }
+        return false
+    }
+
+    private var binaryConfig: BinaryConfig? {
+        if case .binary(let cfg) = metric.config { return cfg }
+        return nil
+    }
+
+    private var displayedBinaryValue: Bool? {
+        let cal = Calendar.current
+        let target = cal.startOfDay(for: selectedDate ?? Date())
+        let entries = metric.data.compactMap { $0.binaryValue }
+            .filter { cal.isDate($0.date, inSameDayAs: target) }
+        return entries.max(by: { $0.date < $1.date })?.value
     }
 
     private var sortedEntries: [DataPoint] {
@@ -50,11 +80,17 @@ struct MetricDetailView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 24) {
                 header
-                rangePicker
-                chartSection
+                    .padding(.horizontal, 20)
+                if !isBinary {
+                    rangePicker
+                    chartSection
+                } else {
+                    binaryCalendarSection
+                }
                 recentEntries
+                    .padding(.horizontal, 20)
             }
-            .padding(.horizontal, 20)
+
             .padding(.top, 8)
             .padding(.bottom, 40)
         }
@@ -69,13 +105,17 @@ struct MetricDetailView: View {
         .sheet(isPresented: $isEditing) {
             MetricEditSheet(metric: metric)
         }
-        .onAppear { recomputeBins() }
+        .onAppear {
+            recomputeBins()
+            recomputeFilledDays()
+        }
         .onChange(of: range) { _, _ in
             selectedDate = nil
             recomputeBins()
         }
         .onChange(of: metric.data.count) { _, _ in
             recomputeBins()
+            recomputeFilledDays()
         }
     }
 
@@ -95,7 +135,9 @@ struct MetricDetailView: View {
 
             HStack(alignment: .lastTextBaseline, spacing: 6) {
                 Text(displayedValueText)
-                    .font(.system(size: 56, weight: .semibold, design: .rounded))
+                    .font(
+                        .system(size: 56, weight: .semibold, design: .rounded)
+                    )
                     .foregroundStyle(.primary)
                     .contentTransition(.numericText())
                     .animation(.snappy, value: displayedValueText)
@@ -144,7 +186,8 @@ struct MetricDetailView: View {
         .chartXSelection(value: $selectedDate)
         .chartYAxis(.hidden)
         .chartXAxis {
-            AxisMarks(values: .automatic(desiredCount: range.desiredAxisLabels)) { value in
+            AxisMarks(values: .automatic(desiredCount: range.desiredAxisLabels))
+            { value in
                 if let date = value.as(Date.self) {
                     AxisValueLabel {
                         Text(axisLabel(for: date))
@@ -157,15 +200,36 @@ struct MetricDetailView: View {
         .frame(height: 200)
     }
 
+    // MARK: - Binary Calendar
+
+    private var binaryCalendarSection: some View {
+        let cal = Calendar.current
+        let now = Date()
+        let endMonth = cal.dateInterval(of: .month, for: now)?.start ?? now
+        let startMonth =
+            cal.date(byAdding: .month, value: -11, to: endMonth) ?? endMonth
+        let cfg = binaryConfig
+        return BinaryCalendarView(
+            filledDays: filledDays,
+            startMonth: startMonth,
+            endMonth: endMonth,
+            tint: metric.color,
+            trueLabel: cfg?.trueLabel ?? "Yes",
+            falseLabel: cfg?.falseLabel ?? "No",
+            selectedDate: $selectedDate
+        )
+    }
+
     private func barGradient(for bin: ChartBin) -> LinearGradient {
         let calendar = Calendar.current
-        let isSelected = selectedDate.map {
-            calendar.isDate(
-                bin.date,
-                equalTo: $0,
-                toGranularity: range.bucketComponent
-            )
-        } ?? false
+        let isSelected =
+            selectedDate.map {
+                calendar.isDate(
+                    bin.date,
+                    equalTo: $0,
+                    toGranularity: range.bucketComponent
+                )
+            } ?? false
         let top = metric.color.opacity(isSelected ? 1.0 : 0.45)
         let bottom = metric.color.opacity(isSelected ? 0.6 : 0.15)
         return LinearGradient(
@@ -215,11 +279,11 @@ struct MetricDetailView: View {
             }
             Spacer()
             HStack(alignment: .lastTextBaseline, spacing: 4) {
-                Text(valueText(value: numericValue(of: point)))
+                Text(entryDisplayText(for: point))
                     .font(.body)
                     .fontWeight(.semibold)
                     .foregroundStyle(metric.color)
-                if !unitText.isEmpty {
+                if !isBinary, !unitText.isEmpty {
                     Text(unitText)
                         .font(.caption)
                         .foregroundStyle(metric.color.opacity(0.7))
@@ -233,16 +297,30 @@ struct MetricDetailView: View {
     // MARK: - Display helpers
 
     private var displayedValueText: String {
+        if isBinary {
+            guard let value = displayedBinaryValue, let cfg = binaryConfig
+            else { return "—" }
+            return value ? cfg.trueLabel : cfg.falseLabel
+        }
         guard let bin = displayedBin else { return "—" }
         return valueText(value: bin.value)
     }
 
     private var displayedUnitText: String {
+        if isBinary { return "" }
         guard displayedBin != nil else { return "" }
         return unitText
     }
 
     private var displayedDateText: String {
+        if isBinary {
+            let target = selectedDate ?? Date()
+            let formatted = target.formatted(
+                .dateTime.month(.abbreviated).day()
+            )
+            let suffix = (selectedDate == nil) ? " · Today" : ""
+            return formatted + suffix
+        }
         guard let bin = displayedBin else { return "No data" }
         let formatted = formattedBucketDate(bin.date)
         let suffix = (selectedDate == nil) ? " · Latest" : ""
@@ -268,6 +346,13 @@ struct MetricDetailView: View {
         case .number(let cfg): return cfg.unit ?? ""
         default: return ""
         }
+    }
+
+    private func entryDisplayText(for point: DataPoint) -> String {
+        if case .binary(_, let flag) = point, let cfg = binaryConfig {
+            return flag ? cfg.trueLabel : cfg.falseLabel
+        }
+        return valueText(value: numericValue(of: point))
     }
 
     private func valueText(value: Double) -> String {
@@ -348,7 +433,7 @@ extension AggregationMethod {
     let metric = Metric(
         from: schema,
         color: .pink,
-        data: Metric.fakeData(for: schema.config, days: 365*5)
+        data: Metric.fakeData(for: schema.config, days: 365 * 5)
     )
     return NavigationStack {
         MetricDetailView(metric: metric)
@@ -367,6 +452,14 @@ extension AggregationMethod {
     }
 }
 
-
-//I want to bar selection to be draggable. When the use long tap (or hold) and then drag (without
-//  realeasing) I don't want the chart to
+#Preview("Binary") {
+    let schema = MetricSchema.Fake.binary(title: "Workout Day", emoji: "💪")
+    let metric = Metric(
+        from: schema,
+        color: .teal,
+        data: Metric.fakeData(for: schema.config, days: 365)
+    )
+    return NavigationStack {
+        MetricDetailView(metric: metric)
+    }
+}
