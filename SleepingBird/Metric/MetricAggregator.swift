@@ -6,8 +6,42 @@
 //
 
 import Foundation
+import SwiftUI
 
 enum MetricAggregator {
+    static func categoryEntries(
+        from points: [DataPoint],
+        range: TimeRange
+    ) -> [StackedBarChartView.Entry] {
+        let calendar = Calendar.current
+        let component = range.bucketComponent
+
+        var counts: [Date: [String: Int]] = [:]
+        for point in points {
+            guard case .category(let date, let labels) = point,
+                let start = calendar.dateInterval(of: component, for: date)?.start
+            else { continue }
+            for label in labels {
+                counts[start, default: [:]][label, default: 0] += 1
+            }
+        }
+
+        var entries: [StackedBarChartView.Entry] = []
+        for (bucketStart, byLabel) in counts {
+            for (label, count) in byLabel {
+                entries.append(
+                    StackedBarChartView.Entry(
+                        date: bucketStart,
+                        label: label,
+                        value: Double(count)
+                    )
+                )
+            }
+        }
+        entries.sort { $0.date < $1.date }
+        return entries
+    }
+
     static func bins(
         from points: [DataPoint],
         range: TimeRange,

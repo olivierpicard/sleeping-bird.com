@@ -15,6 +15,7 @@ struct MetricDetailView: View {
     @State private var selectedDate: Date?
     @State private var bins: [ChartBin] = []
     @State private var filledDays: Set<Date> = []
+    @State private var categoryEntries: [StackedBarChartView.Entry] = []
     @State private var isEditing: Bool = false
 
     private func recomputeBins() {
@@ -23,6 +24,13 @@ struct MetricDetailView: View {
             range: range,
             method: metric.visual.aggregation.method.numeric,
             behavior: metric.config.behavior
+        )
+    }
+
+    private func recomputeCategoryEntries() {
+        categoryEntries = MetricAggregator.categoryEntries(
+            from: metric.data,
+            range: range
         )
     }
 
@@ -40,6 +48,45 @@ struct MetricDetailView: View {
     private var isBinary: Bool {
         if case .binary = metric.config { return true }
         return false
+    }
+
+    private var isCategory: Bool {
+        switch metric.config {
+        case .categorySingleChoice, .categoryMultipleChoice: return true
+        default: return false
+        }
+    }
+
+    private var displayedCategoryBucket: Date? {
+        let calendar = Calendar.current
+        let dates = Array(Set(categoryEntries.map(\.date))).sorted()
+        guard !dates.isEmpty else { return nil }
+        if let selectedDate {
+            return dates.first {
+                calendar.isDate(
+                    $0,
+                    equalTo: selectedDate,
+                    toGranularity: range.bucketComponent
+                )
+            } ?? dates.last
+        }
+        return dates.last
+    }
+
+    private var displayedCategorySummary: (label: String, count: Int)? {
+        guard let bucket = displayedCategoryBucket else { return nil }
+        let calendar = Calendar.current
+        let inBucket = categoryEntries.filter {
+            calendar.isDate(
+                $0.date,
+                equalTo: bucket,
+                toGranularity: range.bucketComponent
+            )
+        }
+        guard let top = inBucket.max(by: { $0.value < $1.value }) else {
+            return nil
+        }
+        return (top.label, Int(top.value))
     }
 
     private var binaryConfig: BinaryConfig? {
@@ -83,15 +130,18 @@ struct MetricDetailView: View {
                     .padding(.horizontal)
              
                 Group {
-                    if !isBinary {
-                            rangePicker
-                                .frame(maxWidth: 280)
-                        chartSection
-                    } else {
+                    if isBinary {
                         binaryCalendarSection
                             .padding(.top)
+                    } else if isCategory {
+                        rangePicker
+                            .frame(maxWidth: 280)
+                        categoryChartSection
+                    } else {
+                        rangePicker
+                            .frame(maxWidth: 280)
+                        chartSection
                     }
-                    
                 }
 //                .padding(.horizontal)
                 recentEntries
@@ -115,14 +165,17 @@ struct MetricDetailView: View {
         .onAppear {
             recomputeBins()
             recomputeFilledDays()
+            recomputeCategoryEntries()
         }
         .onChange(of: range) { _, _ in
             selectedDate = nil
             recomputeBins()
+            recomputeCategoryEntries()
         }
         .onChange(of: metric.data.count) { _, _ in
             recomputeBins()
             recomputeFilledDays()
+            recomputeCategoryEntries()
         }
     }
 
@@ -206,6 +259,16 @@ struct MetricDetailView: View {
             }
         }
         .frame(height: 200)
+    }
+
+    // MARK: - Category Chart
+
+    private var categoryChartSection: some View {
+        StackedBarChartView(
+            entries: categoryEntries,
+            range: range,
+            selectedDate: $selectedDate
+        )
     }
 
     // MARK: - Binary Calendar
@@ -310,12 +373,20 @@ struct MetricDetailView: View {
             else { return "—" }
             return value ? cfg.trueLabel : cfg.falseLabel
         }
+        if isCategory {
+            guard let summary = displayedCategorySummary else { return "—" }
+            return summary.label
+        }
         guard let bin = displayedBin else { return "—" }
         return valueText(value: bin.value)
     }
 
     private var displayedUnitText: String {
         if isBinary { return "" }
+        if isCategory {
+            guard let summary = displayedCategorySummary else { return "" }
+            return "×\(summary.count)"
+        }
         guard displayedBin != nil else { return "" }
         return unitText
     }
@@ -327,6 +398,12 @@ struct MetricDetailView: View {
                 .dateTime.month(.abbreviated).day()
             )
             let suffix = (selectedDate == nil) ? " · Today" : ""
+            return formatted + suffix
+        }
+        if isCategory {
+            guard let bucket = displayedCategoryBucket else { return "No data" }
+            let formatted = formattedBucketDate(bucket)
+            let suffix = (selectedDate == nil) ? " · Latest" : ""
             return formatted + suffix
         }
         guard let bin = displayedBin else { return "No data" }
@@ -360,6 +437,9 @@ struct MetricDetailView: View {
         if case .binary(_, let flag) = point, let cfg = binaryConfig {
             return flag ? cfg.trueLabel : cfg.falseLabel
         }
+        if case .category(_, let labels) = point {
+            return labels.joined(separator: ", ")
+        }
         return valueText(value: numericValue(of: point))
     }
 
@@ -389,8 +469,10 @@ struct MetricDetailView: View {
         switch point {
         case .number(let d, _), .duration(let d, _):
             return d
-        default:
-            return .distantPast
+        case .category(let d, _), .binary(let d, _):
+            return d
+        case .datetime(let d):
+            return d
         }
     }
 
@@ -460,6 +542,33 @@ extension AggregationMethod {
     }
 }
 
+#Preview("Category Single") {
+    let schema = MetricSchema.Fake.categorySingle(title: "Mood", emoji: "😊")
+    let metric = Metric(
+        from: schema,
+        color: .orange,
+        data: Metric.fakeData(for: schema.config, days: 365)
+    )
+    return NavigationStack {
+        MetricDetailView(metric: metric)
+    }
+}
+
+#Preview("Category Multiple") {
+    let schema = MetricSchema.Fake.categoryMultiple(
+        title: "Symptoms",
+        emoji: "🤒"
+    )
+    let metric = Metric(
+        from: schema,
+        color: .purple,
+        data: Metric.fakeData(for: schema.config, days: 365)
+    )
+    return NavigationStack {
+        MetricDetailView(metric: metric)
+    }
+}
+
 #Preview("Binary") {
     let schema = MetricSchema.Fake.binary(title: "Workout Day", emoji: "💪")
     let metric = Metric(
@@ -471,22 +580,3 @@ extension AggregationMethod {
         MetricDetailView(metric: metric)
     }
 }
-
-
-//Here is 3 of the design that I love.
-//Focus on the header
-//There is :
-//- the emoji + metric name
-//- A value label
-//- A date label
-//
-//In the body there is:
-//- A segment
-//- A chart
-//
-//- I want the segment to be on the right and small size like it is on 2 pictures
-//- I want the header to be only emoji + metric name only
-//- Move the big value label & the date label under the segment, closer to the chart like it is on the third image
-//- Except these keep everything, focus only on the "header" part
-//
-//Use the described layout for the image 2 (with the fine bar chart). Rework the segment to be smaller but keep all values
