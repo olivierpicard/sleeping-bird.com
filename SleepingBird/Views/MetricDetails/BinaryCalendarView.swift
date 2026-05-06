@@ -14,7 +14,8 @@ struct BinaryCalendarView: View {
     let tint: Color
     let trueLabel: String
     let falseLabel: String
-    let cellSize: Double = 300
+    let cellSize: Double = 270
+    let monthPadding: Double = 40
     let displayLegend: Bool = false
     @Binding var selectedDate: Date?
 
@@ -38,7 +39,7 @@ struct BinaryCalendarView: View {
         VStack(alignment: .leading, spacing: 16) {
             if displayLegend {legend}
             ScrollView(.horizontal, showsIndicators: false) {
-                LazyHStack(alignment: .top, spacing: 28) {
+                LazyHStack(alignment: .top, spacing: monthPadding) {
                     ForEach(months, id: \.self) { month in
                         MonthGridView(
                             month: month,
@@ -54,6 +55,7 @@ struct BinaryCalendarView: View {
             }
             .scrollTargetBehavior(.viewAligned)
             .defaultScrollAnchor(.trailing)
+            .contentMargins(.trailing, 32, for: .scrollContent)
         }
         .sensoryFeedback(.selection, trigger: selectedDate)
     }
@@ -116,7 +118,7 @@ private struct MonthGridView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
             Text(month.formatted(.dateTime.month(.abbreviated)).uppercased())
-                .font(.caption2)
+                .font(.caption)
                 .fontWeight(.semibold)
                 .tracking(1.2)
                 .foregroundStyle(.secondary)
@@ -188,7 +190,7 @@ private struct DayCell: View {
                 .fontWeight(isFilled || isToday ? .semibold : .regular)
                 .foregroundStyle(isFilled ? Color.white : .primary)
         }
-        .opacity(isFuture ? 0.2 : 1)
+        .opacity(isFuture ? 0.15 : 1)
         .aspectRatio(1, contentMode: .fit)
         .contentShape(Circle())
         .animation(.snappy(duration: 0.2), value: isSelected)

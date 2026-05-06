@@ -78,15 +78,22 @@ struct MetricDetailView: View {
     var body: some View {
         let _ = Self._printChanges()
         ScrollView {
-            VStack(alignment: .leading, spacing: 24) {
+            VStack(spacing: 24) {
                 header
-                    .padding(.horizontal, 20)
-                if !isBinary {
-                    rangePicker
-                    chartSection
-                } else {
-                    binaryCalendarSection
+                    .padding(.horizontal)
+             
+                Group {
+                    if !isBinary {
+                            rangePicker
+                                .frame(maxWidth: 280)
+                        chartSection
+                    } else {
+                        binaryCalendarSection
+                            .padding(.top)
+                    }
+                    
                 }
+//                .padding(.horizontal)
                 recentEntries
                     .padding(.horizontal, 20)
             }
@@ -122,7 +129,7 @@ struct MetricDetailView: View {
     // MARK: - Header
 
     private var header: some View {
-        VStack(alignment: .leading, spacing: 10) {
+        VStack(alignment: .leading) {
             HStack(spacing: 8) {
                 Text(metric.emoji)
                     .font(.title3)
@@ -149,6 +156,7 @@ struct MetricDetailView: View {
                         .foregroundStyle(metric.color)
                 }
             }
+            .padding(.bottom, -10)
 
             Text(displayedDateText)
                 .font(.headline)
@@ -463,3 +471,22 @@ extension AggregationMethod {
         MetricDetailView(metric: metric)
     }
 }
+
+
+//Here is 3 of the design that I love.
+//Focus on the header
+//There is :
+//- the emoji + metric name
+//- A value label
+//- A date label
+//
+//In the body there is:
+//- A segment
+//- A chart
+//
+//- I want the segment to be on the right and small size like it is on 2 pictures
+//- I want the header to be only emoji + metric name only
+//- Move the big value label & the date label under the segment, closer to the chart like it is on the third image
+//- Except these keep everything, focus only on the "header" part
+//
+//Use the described layout for the image 2 (with the fine bar chart). Rework the segment to be smaller but keep all values
