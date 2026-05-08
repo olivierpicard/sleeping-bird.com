@@ -27,36 +27,36 @@ struct EmptyDashboardBackground: View {
     }
 
     private var colorfulColors: [Color] {
-        if colorScheme == .dark {
-            return [
-                blend(Color(red: 0.18, green: 0.14, blue: 0.32)),  // top-left: deep indigo
-                blend(Color(red: 0.10, green: 0.10, blue: 0.18)),  // top-center: near black
-                blend(Color(red: 0.10, green: 0.28, blue: 0.30)),  // top-right: deep teal
-                blend(Color(red: 0.20, green: 0.16, blue: 0.34)),  // mid-left: dark lavender
-                blend(Color(red: 0.07, green: 0.07, blue: 0.12)),  // center: near-black dominant
-                blend(Color(red: 0.32, green: 0.18, blue: 0.14)),  // mid-right: dark amber
-                blend(Color(red: 0.10, green: 0.30, blue: 0.32)),  // bottom-left: dark turquoise
-                blend(Color(red: 0.30, green: 0.16, blue: 0.12)),  // bottom-center: dark peach
-                blend(Color(red: 0.40, green: 0.18, blue: 0.14)),  // bottom-right: deep salmon
-            ]
-        }
-        return [
-            blend(Color(red: 0.91, green: 0.88, blue: 0.98)),  // top-left: lavender
-            blend(Color(red: 0.97, green: 0.97, blue: 1.00)),  // top-center: near white
-            blend(Color(red: 0.85, green: 0.97, blue: 0.96)),  // top-right: cyan-green
-            blend(Color(red: 0.93, green: 0.91, blue: 0.99)),  // mid-left: soft lavender
-            blend(Color(red: 0.99, green: 0.98, blue: 1.00)),  // center: near white dominant
-            blend(Color(red: 1.00, green: 0.94, blue: 0.91)),  // mid-right: light peach
-            blend(Color(red: 0.87, green: 0.97, blue: 0.97)),  // bottom-left: cyan/turquoise
-            blend(Color(red: 1.00, green: 0.93, blue: 0.90)),  // bottom-center: light peach
-            blend(Color(red: 1.00, green: 0.86, blue: 0.80)),  // bottom-right: peach/salmon
+        // Base hues (0...1) and a "weight" indicating how dominant the stop is.
+        // Lower weight = closer to neutral (near-white in light, near-black in dark).
+        let stops: [(hue: Double, weight: Double)] = [
+            (0.72, 0.6),  // top-left: indigo/lavender
+            (0.70, 0.1),  // top-center: near neutral
+            (0.48, 0.6),  // top-right: teal/cyan
+            (0.74, 0.5),  // mid-left: soft lavender
+            (0.70, 0.0),  // center: neutral dominant
+            (0.06, 0.6),  // mid-right: amber/peach
+            (0.50, 0.7),  // bottom-left: turquoise
+            (0.05, 0.7),  // bottom-center: peach
+            (0.03, 0.9),  // bottom-right: salmon
         ]
+        return stops.map { tone(hue: $0.hue, weight: $0.weight) }
     }
 
-    private func blend(_ color: Color) -> Color {
-        let t = max(0, min(1, colorIntensity))
-        let neutral: Color = colorScheme == .dark ? .black : .white
-        return color.mix(with: neutral, by: 1 - t)
+    private func tone(hue: Double, weight: Double) -> Color {
+        let t = max(0, min(1, colorIntensity)) * weight
+        let saturation: Double
+        let brightness: Double
+        if colorScheme == .dark {
+            // Dark mode: low brightness, moderate saturation, fading to near-black.
+            saturation = 0.85 * t + 0.15
+            brightness = 0.12 + 0.3 * t
+        } else {
+            // Light mode: high brightness, low saturation, fading to near-white.
+            saturation = 0.18 * t + 0.02
+            brightness = 1.00 - 0.05 * t
+        }
+        return Color(hue: hue, saturation: saturation, brightness: brightness)
     }
 }
 

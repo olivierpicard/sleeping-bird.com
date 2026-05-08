@@ -9,7 +9,6 @@ import SwiftData
 import SwiftUI
 
 struct EmptyDashboardView: View {
-    var background: EmptyDashboardBackground = EmptyDashboardBackground()
     @State private var showModal = false
     @Environment(\.colorScheme) private var colorScheme
 
@@ -21,17 +20,32 @@ struct EmptyDashboardView: View {
             VStack(alignment: .leading) {
                 Text("SLEEPING BIRD")
                     .font(.caption)
-                    .tracking(4)
+                    .fontWeight(.bold)
+                    .tracking(3)
                     .padding(.bottom, 15)
                     .foregroundStyle(.secondary)
+                
                 Text("What do you")
                     .font(.largeTitle)
                     .fontWeight(.semibold)
                 Text("Want to measure ?")
                     .font(.largeTitle)
                     .fontWeight(.heavy)
-                    .padding(.bottom, 10)
-                Text("Just say it out loud. we'll figure out the rest.")
+                    .foregroundStyle(
+                        LinearGradient(
+                            colors: colorScheme == .dark ? [
+                                Color(red: 0xe8/255, green: 0xee/255, blue: 0xf4/255),
+                                Color(red: 0xa1/255, green: 0xb7/255, blue: 0xf6/255),
+                            ] : [
+                                Color(red: 0x64/255, green: 0x6c/255, blue: 0xf6/255),
+                                Color(red: 0xc2/255, green: 0x5d/255, blue: 0xdd/255),
+                            ],
+                            startPoint: .leading,
+                            endPoint: .trailing
+                        )
+                    )
+                    .padding(.bottom, 5)
+                Text("Track anything you want. Just say it out loud.")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
             }
@@ -39,13 +53,15 @@ struct EmptyDashboardView: View {
             BadgesStackView(
                 badges: [
                     "Water 💧",
+                    "Maintenance 💰🚗",
                     "Sleeps 💤",
                     "Pain 😖",
                     "Mood 😁",
-                    "Relax Time 🧘",
+                    "Proteins 🥩🌱",
+                    "Meditation ⏱️🧘",
                     "Coffee ☕️",
-                    "Protein 🥩🌱",
-                    "Car cost 🚗",
+                    "Fuel Spend ⛽️",
+                    "Ask anything..."
                 ],
                 borderThickness: 0.5
             )
@@ -59,7 +75,7 @@ struct EmptyDashboardView: View {
                     .offset(x: 28)
                 HandDrawnArrow()
                     .stroke(
-                        Color.primary.opacity(0.2),
+                        Color.primary.opacity(colorScheme == .dark ? 0.4 : 0.3),
                         style: StrokeStyle(
                             lineWidth: 1.5,
                             lineCap: .round,
@@ -68,22 +84,25 @@ struct EmptyDashboardView: View {
                         )
                     )
                     .frame(width: 80, height: 90)
-                    .padding(.bottom, 8)
             }
             .foregroundStyle(.secondary)
-            Button(action: {}) {
+            .padding(.bottom, -20)
+            .padding(.leading, 30)
+            Button(action: { showModal = true }) {
                 Label("Add a metric using voice", systemImage: "mic")
                     .font(.largeTitle)
                     .padding(.all, 8)
             }
             .labelStyle(.iconOnly)
-            .buttonStyle(.glassProminent)
             .controlSize(.extraLarge)
+            .tint(Color(red: 0x64/255, green: 0x6c/255, blue: 0xf6/255))
+            .buttonStyle(.glassProminent)
+            .buttonStyle(.glass)
 
         }
         .padding()
         .background {
-            background
+            EmptyDashboardBackground()
         }
         .sheet(
             isPresented: $showModal,
@@ -96,8 +115,6 @@ struct EmptyDashboardView: View {
         }
     }
 }
-
-
 
 private struct HandDrawnArrow: Shape {
     func path(in rect: CGRect) -> Path {
@@ -123,6 +140,9 @@ private struct HandDrawnArrow: Shape {
         return path
     }
 }
+
+
+
 
 #Preview {
     EmptyDashboardView()
