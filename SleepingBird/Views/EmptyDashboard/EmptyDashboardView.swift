@@ -13,10 +13,13 @@ struct EmptyDashboardView: View {
 
     var body: some View {
         VStack(spacing: 28) {
+            Spacer()
             VStack(alignment: .leading) {
                 Text("SLEEPING BIRD")
-                    .font(.subheadline)
+                    .font(.caption)
+                    .tracking(4)
                     .padding(.bottom, 15)
+                    .foregroundStyle(.secondary)
                 Text("What do you")
                     .font(.largeTitle)
                     .fontWeight(.semibold)
@@ -29,18 +32,41 @@ struct EmptyDashboardView: View {
                     .foregroundStyle(.secondary)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
-            BadgesStackView(badges: [
-                "Water",
-                "Sleeps",
-                "Pain",
-                "Mood",
-                "Relax Time",
-                "Coffee",
-                "Meat ate",
-                "Car cost",
-            ])
+            BadgesStackView(
+                badges: [
+                    "Water 💧",
+                    "Sleeps 💤",
+                    "Pain 😖",
+                    "Mood 😁",
+                    "Relax Time 🧘",
+                    "Coffee ☕️",
+                    "Protein 🥩🌱",
+                    "Car cost 🚗",
+                ],
+                borderThickness: 0.5
+            )
             .padding(.top, 10)
+            .padding(.trailing, 10)
             Spacer()
+            VStack(spacing: -4) {
+                Text("tap to start")
+                    .font(.custom("Bradley Hand", size: 22))
+                    .rotationEffect(.degrees(-3))
+                    .offset(x: 28)
+                HandDrawnArrow()
+                    .stroke(
+                        Color.primary.opacity(0.2),
+                        style: StrokeStyle(
+                            lineWidth: 1.5,
+                            lineCap: .round,
+                            lineJoin: .round,
+                            dash: [4, 6]
+                        )
+                    )
+                    .frame(width: 80, height: 90)
+                    .padding(.bottom, 8)
+            }
+            .foregroundStyle(.secondary)
             Button(action: {}) {
                 Label("Add a metric using voice", systemImage: "mic")
                     .font(.largeTitle)
@@ -61,6 +87,32 @@ struct EmptyDashboardView: View {
             )
             .presentationDetents([.large])
         }
+    }
+}
+
+private struct HandDrawnArrow: Shape {
+    func path(in rect: CGRect) -> Path {
+        var path = Path()
+        let w = rect.width
+        let h = rect.height
+
+        let start = CGPoint(x: w * 0.85, y: h * 0.05)
+        let tip = CGPoint(x: w * 0.20, y: h * 1)
+
+        path.move(to: start)
+        path.addCurve(
+            to: tip,
+            control1: CGPoint(x: w * 0.95, y: h * 0.55),
+            control2: CGPoint(x: w * 0.10, y: h * 0.65)
+        )
+
+        path.move(to: tip)
+        path.addLine(to: CGPoint(x: tip.x - 15, y: tip.y - 10))
+        path.move(to: tip)
+        path.addLine(to: CGPoint(x: tip.x + 15, y: tip.y - 10))
+        //        path.addLine(to: CGPoint(x: w * 0.72, y: h * 0.80))
+
+        return path
     }
 }
 
