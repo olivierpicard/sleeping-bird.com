@@ -9,7 +9,11 @@ import SwiftData
 import SwiftUI
 
 struct EmptyDashboardView: View {
+    var background: EmptyDashboardBackground = EmptyDashboardBackground()
     @State private var showModal = false
+    @Environment(\.colorScheme) private var colorScheme
+
+
 
     var body: some View {
         VStack(spacing: 28) {
@@ -78,6 +82,9 @@ struct EmptyDashboardView: View {
 
         }
         .padding()
+        .background {
+            background
+        }
         .sheet(
             isPresented: $showModal,
             onDismiss: { showModal = false }
@@ -89,6 +96,8 @@ struct EmptyDashboardView: View {
         }
     }
 }
+
+
 
 private struct HandDrawnArrow: Shape {
     func path(in rect: CGRect) -> Path {
@@ -110,7 +119,6 @@ private struct HandDrawnArrow: Shape {
         path.addLine(to: CGPoint(x: tip.x - 15, y: tip.y - 10))
         path.move(to: tip)
         path.addLine(to: CGPoint(x: tip.x + 15, y: tip.y - 10))
-        //        path.addLine(to: CGPoint(x: w * 0.72, y: h * 0.80))
 
         return path
     }

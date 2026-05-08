@@ -8,11 +8,12 @@
 import SwiftUI
 
 struct BadgesStackView: View {
+    @Environment(\.colorScheme) private var colorScheme
+    
     let badges: [String]
     let innerPadding: Double
     let borderThickness: Double
     let borderColor: Color
-    let fillColor: Color
     let cornerRadius: Double
 
     init(
@@ -20,14 +21,12 @@ struct BadgesStackView: View {
         innerPadding: Double = 8,
         borderThickness: Double = 1,
         borderColor: Color = Color.gray,
-        fillColor: Color = Color.white.opacity(0.6),
         cornerRadius: Double = 16
     ) {
         self.badges = badges
         self.innerPadding = innerPadding
         self.borderThickness = borderThickness
         self.borderColor = borderColor
-        self.fillColor = fillColor
         self.cornerRadius = cornerRadius
     }
 
@@ -46,6 +45,12 @@ struct BadgesStackView: View {
             }
         }
 
+    }
+    
+    private var fillColor: Color {
+        colorScheme == .dark
+            ? Color.white.opacity(0.2)
+            : Color.white.opacity(0.6)
     }
 }
 
