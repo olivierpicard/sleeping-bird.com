@@ -109,7 +109,8 @@ struct EmptyDashboardView: View {
             onDismiss: { showModal = false }
         ) {
             MetricInputSheet(
-                transcriber: DeepgramNova3Transcriber()
+                transcriber: DeepgramNova3Transcriber(),
+                autoStartTranscription: true
             )
             .presentationDetents([.large])
         }
