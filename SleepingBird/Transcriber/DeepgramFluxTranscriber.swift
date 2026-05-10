@@ -40,9 +40,10 @@ final class DeepgramFluxTranscriber: Transcriber {
     // MARK: - Private state
 
     private let config: Config
-    private let capture = AudioCaptureManager()
+    private let broker: MicBroker
     private let streamer = AudioWebSocketStreamer()
     private var onText: ((String) -> Void)?
+    private var subscriptionToken: UUID?
 
     /// All fully committed turns (EndOfTurn) accumulated since `start()`.
     private var committedText = ""
@@ -51,7 +52,8 @@ final class DeepgramFluxTranscriber: Transcriber {
 
     // MARK: - Init
 
-    init(config: Config = .default) {
+    init(broker: MicBroker = .shared, config: Config = .default) {
+        self.broker = broker
         self.config = config
     }
 
@@ -71,24 +73,22 @@ final class DeepgramFluxTranscriber: Transcriber {
         
         streamer.connect(with: request)
 
-        // Forward audio chunks to WebSocket
-        capture.onAudioData = { [weak self] data in
-            self?.streamer.send(data)
-        }
-
         // Parse transcripts from server messages
         streamer.onMessageReceived = { [weak self] message in
             self?.handleMessage(message)
         }
 
-        // Start microphone
-        Task {
-            try? await capture.startCapturing()
+        // Subscribe to mic buffers and forward to WebSocket
+        subscriptionToken = broker.subscribe { [weak self] data in
+            self?.streamer.send(data)
         }
     }
 
     func stop() {
-        capture.stopCapturing()
+        if let token = subscriptionToken {
+            broker.unsubscribe(token)
+            subscriptionToken = nil
+        }
         streamer.disconnect()
         onText = nil
     }

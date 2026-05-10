@@ -9,7 +9,10 @@ private struct PlaceholderExample {
 private let placeholderExamples: [PlaceholderExample] = [
     .init(text: "Track my daily goal of 2L water", duration: 2),
     .init(text: "How many cups of coffee do I drink?", duration: 3.0),
-    .init(text: "I want to know how long my meditation sessions are", duration: 4.0),
+    .init(
+        text: "I want to know how long my meditation sessions are",
+        duration: 4.0
+    ),
     .init(text: "Measure my belly pain", duration: 2.5),
     .init(text: "I want to note each time I put gas in my car", duration: 3.5),
     .init(text: "Track my mood using emoji", duration: 3.0),
@@ -24,17 +27,21 @@ struct MetricInputSheet: View {
     @State private var fontSize: CGFloat = 40
     @State private var placeholderIndex: Int = 0
     private let transcriber: Transcriber
+    private let spectrumLogic: SpectrumViewModel
     private let autoStartTranscription: Bool
 
     init(
         instruction: String = "",
-        transcriber: Transcriber = DeepgramFluxTranscriber(),
+        transcriber: Transcriber = DeepgramNova3Transcriber(),
+        spectrumLogic: SpectrumViewModel = LiveSpectrumViewModel(),
         autoStartTranscription: Bool = false
     ) {
         _instruction = State(initialValue: instruction)
-        let initialSize: CGFloat = 40 - (40 - 16) * min(1, CGFloat(instruction.count) / 250)
+        let initialSize: CGFloat =
+            40 - (40 - 16) * min(1, CGFloat(instruction.count) / 250)
         _fontSize = State(initialValue: initialSize)
         self.transcriber = transcriber
+        self.spectrumLogic = spectrumLogic
         self.autoStartTranscription = autoStartTranscription
     }
 
@@ -78,15 +85,22 @@ struct MetricInputSheet: View {
                 .task(id: instruction.isEmpty) {
                     guard instruction.isEmpty else { return }
                     while !Task.isCancelled {
-                        let nanos = UInt64(placeholderExamples[placeholderIndex].duration * 1_000_000_000)
+                        let nanos = UInt64(
+                            placeholderExamples[placeholderIndex].duration
+                                * 1_000_000_000
+                        )
                         try? await Task.sleep(nanoseconds: nanos)
                         if Task.isCancelled { return }
                         withAnimation {
-                            placeholderIndex = (placeholderIndex + 1) % placeholderExamples.count
+                            placeholderIndex =
+                                (placeholderIndex + 1)
+                                % placeholderExamples.count
                         }
                     }
                 }
                 Spacer(minLength: 0)
+                SpectrumBarView(viewModel: spectrumLogic)
+                    .padding(.bottom, 25)
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .padding()
@@ -106,7 +120,10 @@ struct MetricInputSheet: View {
 
                 ToolbarItem(placement: .confirmationAction) {
                     Button(action: {
-                        generator.generate(instruction: instruction, into: context)
+                        generator.generate(
+                            instruction: instruction,
+                            into: context
+                        )
                         dismiss()
                     }) {
                         Image(systemName: "checkmark")
@@ -125,7 +142,9 @@ struct MetricInputSheet: View {
     }
     .sheet(isPresented: $showSheet) {
         MetricInputSheet(
-            instruction: "I want to track how much coffee I drink per day"
+            instruction: "I want to track how much coffee I drink per day",
+            transcriber: FakeTranscriber(),
+            spectrumLogic: FakeSpectrumViewModel(),
         )
     }
     .presentationDetents([.large])
@@ -139,14 +158,16 @@ struct MetricInputSheet: View {
     NavigationStack {
     }
     .sheet(isPresented: $showSheet) {
-        MetricInputSheet()
+        MetricInputSheet(
+            transcriber: FakeTranscriber(),
+            spectrumLogic: FakeSpectrumViewModel(),
+        )
     }
     .presentationDetents([.large])
     .environment(MetricGenerator())
     .modelContainer(for: Metric.self, inMemory: true)
 }
 
-#if DEBUG
 #Preview("Fake transcribing") {
     @Previewable @State var showSheet = true
 
@@ -156,6 +177,7 @@ struct MetricInputSheet: View {
         MetricInputSheet(
             instruction: "",
             transcriber: FakeTranscriber(),
+            spectrumLogic: FakeSpectrumViewModel(),
             autoStartTranscription: true
         )
     }
@@ -163,4 +185,16 @@ struct MetricInputSheet: View {
     .environment(MetricGenerator())
     .modelContainer(for: Metric.self, inMemory: true)
 }
-#endif
+
+#Preview("Real Deepgram") {
+    @Previewable @State var showSheet = true
+
+    NavigationStack {
+    }
+    .sheet(isPresented: $showSheet) {
+        MetricInputSheet(autoStartTranscription: true)
+    }
+    .presentationDetents([.large])
+    .environment(MetricGenerator())
+    .modelContainer(for: Metric.self, inMemory: true)
+}

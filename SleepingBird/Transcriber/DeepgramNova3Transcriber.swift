@@ -41,9 +41,10 @@ final class DeepgramNova3Transcriber: Transcriber {
     // MARK: - Private state
 
     private let config: Config
-    private let capture = AudioCaptureManager()
+    private let broker: MicBroker
     private let streamer = AudioWebSocketStreamer()
     private var onText: ((String) -> Void)?
+    private var subscriptionToken: UUID?
 
     /// All finalized (`is_final`) transcript segments accumulated since `start()`.
     private var committedText = ""
@@ -52,7 +53,8 @@ final class DeepgramNova3Transcriber: Transcriber {
 
     // MARK: - Init
 
-    init(config: Config = .default) {
+    init(broker: MicBroker = .shared, config: Config = .default) {
+        self.broker = broker
         self.config = config
     }
 
@@ -71,21 +73,20 @@ final class DeepgramNova3Transcriber: Transcriber {
 
         streamer.connect(with: request)
 
-        capture.onAudioData = { [weak self] data in
-            self?.streamer.send(data)
-        }
-
         streamer.onMessageReceived = { [weak self] message in
             self?.handleMessage(message)
         }
 
-        Task {
-            try? await capture.startCapturing()
+        subscriptionToken = broker.subscribe { [weak self] data in
+            self?.streamer.send(data)
         }
     }
 
     func stop() {
-        capture.stopCapturing()
+        if let token = subscriptionToken {
+            broker.unsubscribe(token)
+            subscriptionToken = nil
+        }
         streamer.disconnect()
         onText = nil
     }
