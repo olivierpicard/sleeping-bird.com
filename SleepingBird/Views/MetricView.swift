@@ -202,8 +202,8 @@ struct MetricView: View {
         value: "Good",
         mainColor: .pink,
         onAddTapped: {},
-        chart: DotMiniChart(
-            data: [0, 1, 0.8, 0.3, 1, 0.6, 0, 0, 1, 0.8, 0.3, 1, 0.6, 0],
+        chart: TrailingCalendarMiniChart(
+            data: (0..<14).compactMap { Calendar.current.date(byAdding: .day, value: -$0, to: .now) }.filter { _ in Bool.random() },
             color: .pink
         )
     )

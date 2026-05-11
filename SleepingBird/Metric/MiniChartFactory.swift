@@ -32,7 +32,8 @@ enum MiniChartFactory {
             case .bar:
                 return BarMiniChart(data: values, color: metric.color)
             case .heatmap:
-                return DotMiniChart(data: values, color: metric.color)
+                let dates = metric.data.compactMap(\.numberValue?.date)
+                return TrailingCalendarMiniChart(data: dates, color: metric.color)
             default:
                 return LineMiniChart(data: values, color: metric.color)
             }
@@ -54,11 +55,11 @@ enum MiniChartFactory {
             return DividerBarMiniChart(entries: entries)
 
         case .binary:
-            let values = metric.data.compactMap { dp -> Double? in
-                guard let b = dp.binaryValue else { return nil }
-                return b.value ? 1.0 : 0.0
+            let dates = metric.data.compactMap { dp -> Date? in
+                guard let b = dp.binaryValue, b.value else { return nil }
+                return b.date
             }
-            return DotMiniChart(data: values, color: metric.color)
+            return TrailingCalendarMiniChart(data: dates, color: metric.color)
 
         case .duration:
             let values = metric.data.compactMap(\.durationValue?.interval)
