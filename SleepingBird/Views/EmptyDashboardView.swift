@@ -82,8 +82,7 @@ struct EmptyDashboardView: View {
                 borderThickness: 0.5
             )
             .padding(.top, 10)
-            .padding(.trailing, 10)
-            Spacer()
+//            Spacer()
             VStack(spacing: -4) {
                 Text("tap to start")
                     .font(.custom("Bradley Hand", size: 22))
@@ -105,15 +104,16 @@ struct EmptyDashboardView: View {
             .padding(.bottom, -20)
             .padding(.leading, 30)
             Button(action: { showModal = true }) {
-                Label("Add a metric using voice", systemImage: "mic")
+                Label("Add a metric", systemImage: "plus")
                     .font(.largeTitle)
-                    .padding(.all, 8)
+                    .labelStyle(.iconOnly)
+                    .frame(width: 40, height: 40)
             }
-            .labelStyle(.iconOnly)
             .controlSize(.extraLarge)
-            .tint(Color(red: 0x64 / 255, green: 0x6c / 255, blue: 0xf6 / 255))
             .buttonStyle(.glassProminent)
-            .buttonStyle(.glass)
+//            .tint(.indigo)
+            .padding(.bottom, 30)
+            .tint(Color(red: 0x64 / 255, green: 0x6c / 255, blue: 0xf6 / 255))
 
         }
         .padding()

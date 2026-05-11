@@ -27,6 +27,8 @@ struct MetricInputSheet: View {
     @State private var fontSize: CGFloat = 40
     @State private var placeholderIndex: Int = 0
     @State private var isListening: Bool = false
+    @State private var isEditing: Bool = false
+    @FocusState private var isFocused: Bool
     @Namespace private var glassNamespace
     private let transcriber: Transcriber
     private let spectrumLogic: SpectrumViewModel
@@ -42,6 +44,21 @@ struct MetricInputSheet: View {
         _fontSize = State(initialValue: initialSize)
         self.transcriber = transcriber
         self.spectrumLogic = spectrumLogic
+    }
+
+    private func enterEditMode() {
+        if isListening { toggleMic() }
+        withAnimation(.spring(response: 0.45, dampingFraction: 0.85)) {
+            isEditing = true
+        }
+        isFocused = true
+    }
+
+    private func exitEditMode() {
+        withAnimation(.spring(response: 0.45, dampingFraction: 0.85)) {
+            isEditing = false
+        }
+        isFocused = false
     }
 
     private func toggleMic() {
@@ -69,7 +86,19 @@ struct MetricInputSheet: View {
             VStack {
                 Spacer(minLength: 0)
                 Group {
-                    if instruction.isEmpty {
+                    if isEditing {
+                        TextField("", text: $instruction, axis: .vertical)
+                            .focused($isFocused)
+                            .multilineTextAlignment(.center)
+                            .onChange(of: instruction) { _, new in
+                                if new.contains("\n") {
+                                    instruction = new.replacingOccurrences(of: "\n", with: "")
+                                    exitEditMode()
+                                } else {
+                                    fontSize = computeFontSize(for: new)
+                                }
+                            }
+                    } else if instruction.isEmpty {
                         Text(placeholderExamples[placeholderIndex].text)
                             .foregroundStyle(.tertiary)
                             .id(placeholderIndex)
@@ -83,16 +112,15 @@ struct MetricInputSheet: View {
                                         .animation(.easeOut(duration: 0.3))
                                 )
                             )
+                            .onTapGesture { enterEditMode() }
                     } else {
                         Text(instruction)
+                            .onTapGesture { enterEditMode() }
                     }
                 }
                 .font(.system(size: fontSize, weight: .semibold))
                 .multilineTextAlignment(.center)
                 .animation(.easeInOut(duration: 0.2), value: fontSize)
-                .onChange(of: instruction) { _, newValue in
-                    fontSize = computeFontSize(for: newValue)
-                }
                 .task(id: instruction.isEmpty) {
                     guard instruction.isEmpty else { return }
                     while !Task.isCancelled {
@@ -111,7 +139,7 @@ struct MetricInputSheet: View {
                 }
                 Spacer(minLength: 0)
                 bottomBar
-                    .padding(.bottom, 50)
+                    .padding(.bottom, isEditing ? 8 : 50)
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .padding()
@@ -155,18 +183,22 @@ struct MetricInputSheet: View {
     private var bottomBar: some View {
         GlassEffectContainer(spacing: 40) {
             HStack(spacing: isListening ? 12 : 0) {
-                if !isListening { Spacer(minLength: 0) }
+                if !isEditing && !isListening { Spacer(minLength: 0) }
                 keyboardButton
-                    .padding(.trailing, -5)
-                if isListening {
-                    SpectrumBarView(viewModel: spectrumLogic)
-                        .frame(maxWidth: .infinity)
-                        .transition(
-                            .opacity.combined(with: .scale(scale: 0.92))
-                        )
+                    .padding(.trailing, isEditing ? 0 : -5)
+                if isEditing {
+                    Spacer(minLength: 0)
+                } else {
+                    if isListening {
+                        SpectrumBarView(viewModel: spectrumLogic)
+                            .frame(maxWidth: .infinity)
+                            .transition(
+                                .opacity.combined(with: .scale(scale: 0.92))
+                            )
+                    }
+                    micButton
+                    if !isListening { Spacer(minLength: 0) }
                 }
-                micButton
-                if !isListening { Spacer(minLength: 0) }
             }
         }
     }
@@ -182,8 +214,8 @@ struct MetricInputSheet: View {
     }
 
     private var keyboardButton: some View {
-        Button(action: {}) {
-            Image(systemName: "keyboard")
+        Button(action: { isEditing ? exitEditMode() : enterEditMode() }) {
+            Image(systemName: isEditing ? "keyboard.chevron.compact.down" : "keyboard")
                 .font(.title2)
         }
         .buttonStyle(.glass)
