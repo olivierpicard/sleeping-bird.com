@@ -12,8 +12,6 @@ struct EmptyDashboardView: View {
     @State private var showModal = false
     @Environment(\.colorScheme) private var colorScheme
 
-
-
     var body: some View {
         VStack(spacing: 28) {
             Spacer()
@@ -24,7 +22,7 @@ struct EmptyDashboardView: View {
                     .tracking(3)
                     .padding(.bottom, 15)
                     .foregroundStyle(.secondary)
-                
+
                 Text("What do you")
                     .font(.largeTitle)
                     .fontWeight(.semibold)
@@ -33,13 +31,31 @@ struct EmptyDashboardView: View {
                     .fontWeight(.heavy)
                     .foregroundStyle(
                         LinearGradient(
-                            colors: colorScheme == .dark ? [
-                                Color(red: 0xe8/255, green: 0xee/255, blue: 0xf4/255),
-                                Color(red: 0xa1/255, green: 0xb7/255, blue: 0xf6/255),
-                            ] : [
-                                Color(red: 0x64/255, green: 0x6c/255, blue: 0xf6/255),
-                                Color(red: 0xc2/255, green: 0x5d/255, blue: 0xdd/255),
-                            ],
+                            colors: colorScheme == .dark
+                                ? [
+                                    Color(
+                                        red: 0xe8 / 255,
+                                        green: 0xee / 255,
+                                        blue: 0xf4 / 255
+                                    ),
+                                    Color(
+                                        red: 0xa1 / 255,
+                                        green: 0xb7 / 255,
+                                        blue: 0xf6 / 255
+                                    ),
+                                ]
+                                : [
+                                    Color(
+                                        red: 0x64 / 255,
+                                        green: 0x6c / 255,
+                                        blue: 0xf6 / 255
+                                    ),
+                                    Color(
+                                        red: 0xc2 / 255,
+                                        green: 0x5d / 255,
+                                        blue: 0xdd / 255
+                                    ),
+                                ],
                             startPoint: .leading,
                             endPoint: .trailing
                         )
@@ -61,7 +77,7 @@ struct EmptyDashboardView: View {
                     "Meditation ⏱️🧘",
                     "Coffee ☕️",
                     "Fuel Spend ⛽️",
-                    "Ask anything..."
+                    "Ask anything...",
                 ],
                 borderThickness: 0.5
             )
@@ -95,7 +111,7 @@ struct EmptyDashboardView: View {
             }
             .labelStyle(.iconOnly)
             .controlSize(.extraLarge)
-            .tint(Color(red: 0x64/255, green: 0x6c/255, blue: 0xf6/255))
+            .tint(Color(red: 0x64 / 255, green: 0x6c / 255, blue: 0xf6 / 255))
             .buttonStyle(.glassProminent)
             .buttonStyle(.glass)
 
@@ -108,8 +124,8 @@ struct EmptyDashboardView: View {
             isPresented: $showModal,
             onDismiss: { showModal = false }
         ) {
-            MetricInputSheet(autoStartTranscription: true)
-            .presentationDetents([.large])
+            MetricInputSheet()
+                .presentationDetents([.large])
         }
     }
 }
@@ -139,11 +155,8 @@ private struct HandDrawnArrow: Shape {
     }
 }
 
-
-
-
 #Preview {
     EmptyDashboardView()
         .environment(MetricGenerator())
         .modelContainer(for: Metric.self, inMemory: true)
-} 
+}

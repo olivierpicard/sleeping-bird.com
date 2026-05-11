@@ -26,15 +26,15 @@ struct MetricInputSheet: View {
     @State private var instruction: String = ""
     @State private var fontSize: CGFloat = 40
     @State private var placeholderIndex: Int = 0
+    @State private var isListening: Bool = false
+    @Namespace private var micNamespace
     private let transcriber: Transcriber
     private let spectrumLogic: SpectrumViewModel
-    private let autoStartTranscription: Bool
 
     init(
         instruction: String = "",
         transcriber: Transcriber = DeepgramNova3Transcriber(),
-        spectrumLogic: SpectrumViewModel = LiveSpectrumViewModel(),
-        autoStartTranscription: Bool = false
+        spectrumLogic: SpectrumViewModel = LiveSpectrumViewModel()
     ) {
         _instruction = State(initialValue: instruction)
         let initialSize: CGFloat =
@@ -42,7 +42,18 @@ struct MetricInputSheet: View {
         _fontSize = State(initialValue: initialSize)
         self.transcriber = transcriber
         self.spectrumLogic = spectrumLogic
-        self.autoStartTranscription = autoStartTranscription
+    }
+
+    private func toggleMic() {
+        let willListen = !isListening
+        withAnimation(.spring(response: 0.45, dampingFraction: 0.85)) {
+            isListening = willListen
+        }
+        if willListen {
+            transcriber.start { instruction = $0 }
+        } else {
+            transcriber.stop()
+        }
     }
 
     private func computeFontSize(for text: String) -> CGFloat {
@@ -99,21 +110,19 @@ struct MetricInputSheet: View {
                     }
                 }
                 Spacer(minLength: 0)
-                SpectrumBarView(viewModel: spectrumLogic)
-                    .padding(.bottom, 25)
+                bottomBar
+                    .padding(.bottom, 50)
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .padding()
             .background {
-                ReactiveMeshBorder(magnitudes: spectrumLogic.magnitudes)
-                    .ignoresSafeArea()
-            }
-            .presentationDragIndicator(.visible)
-            .task {
-                if autoStartTranscription {
-                    transcriber.start { instruction = $0 }
+                if isListening {
+                    ReactiveMeshBorder(magnitudes: spectrumLogic.magnitudes)
+                        .ignoresSafeArea()
+                        .transition(.opacity)
                 }
             }
+            .presentationDragIndicator(.visible)
             .onDisappear { transcriber.stop() }
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
@@ -133,9 +142,37 @@ struct MetricInputSheet: View {
                         Image(systemName: "checkmark")
                     }
                     .buttonStyle(.glassProminent)
+                    .disabled(instruction.isEmpty)
                 }
             }
         }
+    }
+
+    @ViewBuilder
+    private var bottomBar: some View {
+        HStack(spacing: 12) {
+            if isListening {
+                SpectrumBarView(viewModel: spectrumLogic)
+                    .transition(
+                        .opacity.combined(with: .scale(scale: 0.92))
+                    )
+                micButton
+            } else {
+                Spacer(minLength: 0)
+                micButton
+                Spacer(minLength: 0)
+            }
+        }
+    }
+
+    private var micButton: some View {
+        Button(action: toggleMic) {
+            Image(systemName: "mic")
+                .font(.largeTitle)
+        }
+        .buttonStyle(.glass)
+        .controlSize(.extraLarge)
+        .matchedGeometryEffect(id: "mic", in: micNamespace)
     }
 }
 
@@ -182,7 +219,6 @@ struct MetricInputSheet: View {
             instruction: "",
             transcriber: FakeTranscriber(),
             spectrumLogic: FakeSpectrumViewModel(),
-            autoStartTranscription: true
         )
     }
     .presentationDetents([.large])
@@ -196,7 +232,7 @@ struct MetricInputSheet: View {
     NavigationStack {
     }
     .sheet(isPresented: $showSheet) {
-        MetricInputSheet(autoStartTranscription: true)
+        MetricInputSheet()
     }
     .presentationDetents([.large])
     .environment(MetricGenerator())
