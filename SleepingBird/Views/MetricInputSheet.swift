@@ -104,6 +104,10 @@ struct MetricInputSheet: View {
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .padding()
+            .background {
+                ReactiveMeshBorder(magnitudes: spectrumLogic.magnitudes)
+                    .ignoresSafeArea()
+            }
             .presentationDragIndicator(.visible)
             .task {
                 if autoStartTranscription {

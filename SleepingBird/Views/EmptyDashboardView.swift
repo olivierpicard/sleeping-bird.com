@@ -146,4 +146,4 @@ private struct HandDrawnArrow: Shape {
     EmptyDashboardView()
         .environment(MetricGenerator())
         .modelContainer(for: Metric.self, inMemory: true)
-}
+} 
