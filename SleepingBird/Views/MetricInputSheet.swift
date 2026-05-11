@@ -27,7 +27,7 @@ struct MetricInputSheet: View {
     @State private var fontSize: CGFloat = 40
     @State private var placeholderIndex: Int = 0
     @State private var isListening: Bool = false
-    @Namespace private var micNamespace
+    @Namespace private var glassNamespace
     private let transcriber: Transcriber
     private let spectrumLogic: SpectrumViewModel
 
@@ -124,6 +124,9 @@ struct MetricInputSheet: View {
             }
             .presentationDragIndicator(.visible)
             .onDisappear { transcriber.stop() }
+            .navigationTitle("Add a metric").navigationBarTitleDisplayMode(
+                .inline
+            )
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button(action: { dismiss() }) {
@@ -150,17 +153,20 @@ struct MetricInputSheet: View {
 
     @ViewBuilder
     private var bottomBar: some View {
-        HStack(spacing: 12) {
-            if isListening {
-                SpectrumBarView(viewModel: spectrumLogic)
-                    .transition(
-                        .opacity.combined(with: .scale(scale: 0.92))
-                    )
+        GlassEffectContainer(spacing: 40) {
+            HStack(spacing: isListening ? 12 : 0) {
+                if !isListening { Spacer(minLength: 0) }
+                keyboardButton
+                    .padding(.trailing, -5)
+                if isListening {
+                    SpectrumBarView(viewModel: spectrumLogic)
+                        .frame(maxWidth: .infinity)
+                        .transition(
+                            .opacity.combined(with: .scale(scale: 0.92))
+                        )
+                }
                 micButton
-            } else {
-                Spacer(minLength: 0)
-                micButton
-                Spacer(minLength: 0)
+                if !isListening { Spacer(minLength: 0) }
             }
         }
     }
@@ -172,7 +178,17 @@ struct MetricInputSheet: View {
         }
         .buttonStyle(.glass)
         .controlSize(.extraLarge)
-        .matchedGeometryEffect(id: "mic", in: micNamespace)
+        .glassEffectID("mic", in: glassNamespace)
+    }
+
+    private var keyboardButton: some View {
+        Button(action: {}) {
+            Image(systemName: "keyboard")
+                .font(.title2)
+        }
+        .buttonStyle(.glass)
+        .controlSize(.extraLarge)
+        .glassEffectID("keyboard", in: glassNamespace)
     }
 }
 
