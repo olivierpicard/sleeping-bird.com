@@ -42,30 +42,45 @@ struct DashboardView: View {
 
 private func seedContainer(_ container: ModelContainer) -> ModelContainer {
     let schemas: [(MetricSchema, [DataPoint])] = [
-        (
-            MetricSchema.Fake.number(title: "Daily Steps", emoji: "👟"),
-            Metric.fakeData(for: MetricSchema.Fake.number().config)
-        ),
-        (
-            MetricSchema.Fake.duration(title: "Sleep", emoji: "🌙"),
-            Metric.fakeData(for: MetricSchema.Fake.duration().config)
-        ),
+        // number + gauge → LinearGaugeMiniChart
         (
             MetricSchema.Fake.number(
-                title: "Heart Rate",
-                emoji: "❤️",
-                unit: "bpm",
-                chart: .line
-            ), Metric.fakeData(for: MetricSchema.Fake.number().config)
+                title: "Daily Steps", emoji: "👟",
+                unit: "steps", min: 0, max: 50_000, granularity: 100,
+                goal: 10_000, chart: .gauge
+            ),
+            Metric.fakeData(for: MetricSchema.Fake.number(chart: .gauge).config)
         ),
+        // number + line → LineMiniChart
         (
-            MetricSchema.Fake.binary(title: "Workout Done", emoji: "💪"),
-            Metric.fakeData(for: MetricSchema.Fake.binary().config)
+            MetricSchema.Fake.number(
+                title: "Heart Rate", emoji: "❤️",
+                unit: "bpm", min: 40, max: 200, granularity: 1,
+                goal: nil, chart: .line
+            ),
+            Metric.fakeData(for: MetricSchema.Fake.number(chart: .line).config)
         ),
+        // duration + bar → BarMiniChart
+        (
+            MetricSchema.Fake.duration(title: "Sleep", emoji: "🌙", chart: .bar),
+            Metric.fakeData(for: MetricSchema.Fake.duration().config)
+        ),
+        // categorySingleChoice → DividerBarMiniChart
         (
             MetricSchema.Fake.categorySingle(title: "Mood", emoji: "😊"),
             Metric.fakeData(for: MetricSchema.Fake.categorySingle().config)
         ),
+        // categoryMultipleChoice → DividerBarMiniChart
+        (
+            MetricSchema.Fake.categoryMultiple(title: "Symptoms", emoji: "🤒"),
+            Metric.fakeData(for: MetricSchema.Fake.categoryMultiple().config)
+        ),
+        // binary → TrailingCalendarMiniChart
+        (
+            MetricSchema.Fake.binary(title: "Workout Done", emoji: "💪"),
+            Metric.fakeData(for: MetricSchema.Fake.binary().config)
+        ),
+        // datetime → EventCalendarMiniChart
         (
             MetricSchema.Fake.datetime(title: "Doctor Appointments", emoji: "🏥"),
             Metric.fakeData(for: MetricSchema.Fake.datetime().config)
