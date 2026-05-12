@@ -51,11 +51,13 @@ struct TrailingCalendarMiniChart: MiniChart {
 
                     VStack(spacing: labelSpacing) {
                         Text(weekdayLabel(for: day))
-                            .font(.system(size: dotSize * 0.28, weight: .semibold))
+                            .font(
+                                .system(size: dotSize * 0.28, weight: .semibold)
+                            )
                             .foregroundStyle(color.opacity(0.8))
 
                         Circle()
-                            .fill(active ? color : Color.clear)
+                            .fill(active ? color.opacity(0.18) : Color.clear)
                             .overlay(
                                 Circle().strokeBorder(
                                     color.opacity(isToday ? 1.0 : 0.4),
@@ -64,8 +66,15 @@ struct TrailingCalendarMiniChart: MiniChart {
                             )
                             .overlay(
                                 Text("\(dayNumber)")
-                                    .font(.system(size: dotSize * 0.32, weight: .semibold))
-                                    .foregroundStyle(active ? .white : color.opacity(0.7))
+                                    .font(
+                                        .system(
+                                            size: dotSize * 0.32,
+                                            weight: .bold
+                                        )
+                                    )
+                                    .foregroundStyle(
+                                        color
+                                    )
                             )
                             .frame(width: dotSize, height: dotSize)
                     }
