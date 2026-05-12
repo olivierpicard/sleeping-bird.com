@@ -18,6 +18,7 @@ struct MetricDetailView: View {
     @State private var categoryEntries: [StackedBarChartView.Entry] = []
     @State private var datetimeFilledDays: Set<Date> = []
     @State private var isEditing: Bool = false
+    @State private var isAddingEntry: Bool = false
 
     private func recomputeBins() {
         bins = MetricAggregator.bins(
@@ -175,12 +176,26 @@ struct MetricDetailView: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
+                Button {
+                    isAddingEntry = true
+                } label: {
+                    Image(systemName: "plus")
+                }
+                .tint(metric.color)
+            }
+            ToolbarItem(placement: .topBarTrailing) {
                 Button("Edit") { isEditing = true }
                     .tint(metric.color)
             }
         }
         .sheet(isPresented: $isEditing) {
             MetricEditSheet(metric: metric)
+        }
+        .sheet(isPresented: $isAddingEntry) {
+            MetricInputFactory.make(from: metric) { point in
+                try? metric.append(point)
+                isAddingEntry = false
+            }
         }
         .onAppear {
             recomputeBins()

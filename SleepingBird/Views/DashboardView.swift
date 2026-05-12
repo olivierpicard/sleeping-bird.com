@@ -54,7 +54,8 @@ private func seedContainer(_ container: ModelContainer) -> ModelContainer {
             MetricSchema.Fake.number(
                 title: "Heart Rate",
                 emoji: "❤️",
-                unit: "bpm"
+                unit: "bpm",
+                chart: .line
             ), Metric.fakeData(for: MetricSchema.Fake.number().config)
         ),
         (
