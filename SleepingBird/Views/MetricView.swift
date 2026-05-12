@@ -76,17 +76,19 @@ struct MetricView: View {
                     onAddTapped()
                 }) {
                     Image(systemName: "plus")
-                        .font(.title3.weight(.semibold))
+                        .font(.title3.weight(.bold))
                         .foregroundStyle(.white)
+                        .padding(.vertical, 3)
+
                 }
                 .buttonStyle(.glassProminent)
                 .tint(mainColor)
-                .shadow(
-                    color: mainColor.opacity(0.8),
-                    radius: 6,
-                    x: 0,
-                    y: 0
-                )
+//                .shadow(
+//                    color: mainColor.opacity(0.8),
+//                    radius: 6,
+//                    x: 0,
+//                    y: 0
+//                )
                 .sensoryFeedback(
                     .impact(flexibility: .soft),
                     trigger: feedbackTrigger
