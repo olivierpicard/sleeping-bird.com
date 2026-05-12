@@ -40,6 +40,11 @@ import Foundation
                         date,
                         TimeInterval.random(in: max * 0.3...max)
                     )
+                case .datetime:
+                    let randomOffset = TimeInterval.random(
+                        in: 0...(60 * 60 * 24 * 90)
+                    )
+                    return .datetime(date.addingTimeInterval(-randomOffset))
                 }
             }
         }

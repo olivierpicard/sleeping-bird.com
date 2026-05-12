@@ -41,8 +41,9 @@ enum MetricConfig: Codable {
     case categoryMultipleChoice(CategoryConfig)
     case binary(BinaryConfig)
     case duration(DurationConfig)
-
+    case datetime(DatetimeConfig)
 }
+
 @Generable(description: "Match with a number metric type")
 struct NumberConfig: Codable {
     let min, max: Double
@@ -103,6 +104,11 @@ struct DurationConfig: Codable {
     let behavior: MetricBehavior
 }
 
+@Generable(description: "Match a pure datetime or date event")
+struct DatetimeConfig: Codable {
+    var format = "date and/or time " // This is a random value. Without it Dashboad preview using fake crash. This line is not related to generation behaviour
+}
+
 // MARK: - Metric Behaviour
 
 @Generable(
@@ -132,8 +138,7 @@ enum ChartType: String, Codable {
     case line  // Best for continuous trends over time (Weight, duration)
     case bar  // Best for discrete, summed, or counted data (Calories, steps)
     case pie  // Best for proportions (Categories)
-    //    case dotmap  // Dot-grid chart: circles with gradient fill by value, good for habits or streaks
-    case heatmap  // GitHub-style contribution graph (Best for Binary habits or frequency)
+    case calendar  // Best for binary and datetime
     case gauge  // Good if the metric has a specific daily `goal` limit
 }
 

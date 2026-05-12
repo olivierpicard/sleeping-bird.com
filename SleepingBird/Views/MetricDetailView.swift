@@ -16,6 +16,7 @@ struct MetricDetailView: View {
     @State private var bins: [ChartBin] = []
     @State private var filledDays: Set<Date> = []
     @State private var categoryEntries: [StackedBarChartView.Entry] = []
+    @State private var datetimeFilledDays: Set<Date> = []
     @State private var isEditing: Bool = false
 
     private func recomputeBins() {
@@ -45,8 +46,24 @@ struct MetricDetailView: View {
         filledDays = set
     }
 
+    private func recomputeDatetimeFilledDays() {
+        let cal = Calendar.current
+        var set: Set<Date> = []
+        for point in metric.data {
+            if case .datetime(let date) = point {
+                set.insert(cal.startOfDay(for: date))
+            }
+        }
+        datetimeFilledDays = set
+    }
+
     private var isBinary: Bool {
         if case .binary = metric.config { return true }
+        return false
+    }
+
+    private var isDatetime: Bool {
+        if case .datetime = metric.config { return true }
         return false
     }
 
@@ -128,10 +145,13 @@ struct MetricDetailView: View {
             VStack(spacing: 24) {
                 header
                     .padding(.horizontal)
-             
+
                 Group {
                     if isBinary {
                         binaryCalendarSection
+                            .padding(.top)
+                    } else if isDatetime {
+                        datetimeCalendarSection
                             .padding(.top)
                     } else if isCategory {
                         rangePicker
@@ -143,7 +163,7 @@ struct MetricDetailView: View {
                         chartSection
                     }
                 }
-//                .padding(.horizontal)
+                //                .padding(.horizontal)
                 recentEntries
                     .padding(.horizontal, 20)
             }
@@ -165,6 +185,7 @@ struct MetricDetailView: View {
         .onAppear {
             recomputeBins()
             recomputeFilledDays()
+            recomputeDatetimeFilledDays()
             recomputeCategoryEntries()
         }
         .onChange(of: range) { _, _ in
@@ -175,6 +196,7 @@ struct MetricDetailView: View {
         .onChange(of: metric.data.count) { _, _ in
             recomputeBins()
             recomputeFilledDays()
+            recomputeDatetimeFilledDays()
             recomputeCategoryEntries()
         }
     }
@@ -291,6 +313,37 @@ struct MetricDetailView: View {
         )
     }
 
+    // MARK: - Datetime Calendar
+
+    private var datetimeCalendarSection: some View {
+        let cal = Calendar.current
+        let now = Date()
+        let endMonth = cal.dateInterval(of: .month, for: now)?.start ?? now
+        let startMonth =
+            cal.date(byAdding: .month, value: -11, to: endMonth) ?? endMonth
+        return BinaryCalendarView(
+            filledDays: datetimeFilledDays,
+            startMonth: startMonth,
+            endMonth: endMonth,
+            tint: metric.color,
+            trueLabel: "Event",
+            falseLabel: "No event",
+            selectedDate: $selectedDate
+        )
+    }
+
+    private var displayedDatetimeCount: Int? {
+        let cal = Calendar.current
+        let target = cal.startOfDay(for: selectedDate ?? Date())
+        let count = metric.data.filter {
+            if case .datetime(let d) = $0 {
+                return cal.isDate(d, inSameDayAs: target)
+            }
+            return false
+        }.count
+        return count > 0 ? count : nil
+    }
+
     private func barGradient(for bin: ChartBin) -> LinearGradient {
         let calendar = Calendar.current
         let isSelected =
@@ -344,7 +397,7 @@ struct MetricDetailView: View {
                     .font(.body)
                     .fontWeight(.medium)
                     .foregroundStyle(.primary)
-                Text(entryDate.formatted(date: .omitted, time: .shortened))
+                Text(entryDate.formatted(.dateTime.year()))
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
@@ -373,6 +426,10 @@ struct MetricDetailView: View {
             else { return "—" }
             return value ? cfg.trueLabel : cfg.falseLabel
         }
+        if isDatetime {
+            guard let count = displayedDatetimeCount else { return "—" }
+            return "\(count)"
+        }
         if isCategory {
             guard let summary = displayedCategorySummary else { return "—" }
             return summary.label
@@ -383,6 +440,10 @@ struct MetricDetailView: View {
 
     private var displayedUnitText: String {
         if isBinary { return "" }
+        if isDatetime {
+            guard let count = displayedDatetimeCount else { return "" }
+            return count == 1 ? "event" : "events"
+        }
         if isCategory {
             guard let summary = displayedCategorySummary else { return "" }
             return "×\(summary.count)"
@@ -393,6 +454,14 @@ struct MetricDetailView: View {
 
     private var displayedDateText: String {
         if isBinary {
+            let target = selectedDate ?? Date()
+            let formatted = target.formatted(
+                .dateTime.month(.abbreviated).day()
+            )
+            let suffix = (selectedDate == nil) ? " · Today" : ""
+            return formatted + suffix
+        }
+        if isDatetime {
             let target = selectedDate ?? Date()
             let formatted = target.formatted(
                 .dateTime.month(.abbreviated).day()
@@ -439,6 +508,9 @@ struct MetricDetailView: View {
         }
         if case .category(_, let labels) = point {
             return labels.joined(separator: ", ")
+        }
+        if case .datetime(let d) = point {
+            return d.formatted(date: .omitted, time: .shortened)
         }
         return valueText(value: numericValue(of: point))
     }
@@ -491,7 +563,7 @@ struct MetricDetailView: View {
         let calendar = Calendar.current
         if calendar.isDateInToday(date) { return "Today" }
         if calendar.isDateInYesterday(date) { return "Yesterday" }
-        return date.formatted(.dateTime.month(.abbreviated).day())
+        return date.formatted(.dateTime.month(.wide).day())
     }
 }
 
@@ -575,6 +647,24 @@ extension AggregationMethod {
         from: schema,
         color: .teal,
         data: Metric.fakeData(for: schema.config, days: 365)
+    )
+    return NavigationStack {
+        MetricDetailView(metric: metric)
+    }
+}
+
+#Preview("Datetime") {
+    let schema = MetricSchema.Fake.datetime(
+        title: "Doctor Appointments",
+        emoji: "🏥"
+    )
+    let metric = Metric(
+        from: schema,
+        color: .pink,
+        data: Metric.fakeData(
+            for: schema.config,
+            days: 5
+        )
     )
     return NavigationStack {
         MetricDetailView(metric: metric)

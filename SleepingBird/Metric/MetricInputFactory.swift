@@ -50,7 +50,16 @@ enum MetricInputFactory {
                 mainColor: metric.color,
                 onAdd: { onAdd(.duration(Date(), $0)) }
             )
+        
+        case .datetime(_):
+            MetricEditor.Datetime(
+                defaultValue: Date.now,
+                mainColor: metric.color,
+                onAdd: { onAdd(.datetime( $0 )) }
+            )
+            
         }
+        
     }
 
     private static func numberStyle(for cfg: NumberConfig)

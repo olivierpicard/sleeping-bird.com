@@ -65,6 +65,10 @@ private func seedContainer(_ container: ModelContainer) -> ModelContainer {
             MetricSchema.Fake.categorySingle(title: "Mood", emoji: "😊"),
             Metric.fakeData(for: MetricSchema.Fake.categorySingle().config)
         ),
+        (
+            MetricSchema.Fake.datetime(title: "Doctor Appointments", emoji: "🏥"),
+            Metric.fakeData(for: MetricSchema.Fake.datetime().config)
+        ),
     ]
     for (schema, data) in schemas {
         container.mainContext.insert(Metric(from: schema, data: data))

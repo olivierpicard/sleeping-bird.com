@@ -95,7 +95,7 @@
                 emoji: String = "💪",
                 trueLabel: String = "Yes",
                 falseLabel: String = "No",
-                chart: ChartType = .heatmap,
+                chart: ChartType = .calendar,
                 bucket: TemporalBucket? = .daily,
                 method: AggregationMethod = .categorical(.count)
             ) -> MetricSchema {
@@ -108,6 +108,27 @@
                             trueLabel: trueLabel,
                             falseLabel: falseLabel
                         )
+                    ),
+                    visual: MetricVisual(
+                        chart: chart,
+                        aggregation: AggregationConfig(bucket: bucket, method: method)
+                    )
+                )
+            }
+
+            static func datetime(
+                title: String = "Wake Up Time",
+                emoji: String = "⏰",
+                chart: ChartType = .line,
+                bucket: TemporalBucket? = .daily,
+                method: AggregationMethod = .numerical(.average)
+            ) -> MetricSchema {
+                MetricSchema(
+                    name: title,
+                    emoji: emoji,
+                    fitPercentage: 0.85,
+                    config: .datetime(
+                        DatetimeConfig()
                     ),
                     visual: MetricVisual(
                         chart: chart,

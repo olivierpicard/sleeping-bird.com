@@ -31,7 +31,7 @@ enum MiniChartFactory {
             switch metric.visual.chart {
             case .bar:
                 return BarMiniChart(data: values, color: metric.color)
-            case .heatmap:
+            case .calendar:
                 let dates = metric.data.compactMap(\.numberValue?.date)
                 return TrailingCalendarMiniChart(data: dates, color: metric.color)
             default:
@@ -68,7 +68,9 @@ enum MiniChartFactory {
             }
             return LineMiniChart(data: values, color: metric.color)
 
-
+        case .datetime:
+            let dates = metric.data.compactMap(\.datetimeValue)
+            return EventCalendarMiniChart(data: dates, color: metric.color)
         }
     }
 }

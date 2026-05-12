@@ -166,6 +166,30 @@ extension MetricEditor {
         }
     }
 
+    struct Datetime: View {
+        let defaultValue: Date
+        let mainColor: Color
+        let onAdd: (Date) -> Void
+
+        init(
+            defaultValue: Date = Date(),
+            mainColor: Color = .accentColor,
+            onAdd: @escaping (Date) -> Void = { _ in }
+        ) {
+            self.defaultValue = defaultValue
+            self.mainColor = mainColor
+            self.onAdd = onAdd
+        }
+
+        var body: some View {
+            _DatePickerEditor(
+                defaultValue: defaultValue,
+                mainColor: mainColor,
+                onAdd: onAdd
+            )
+        }
+    }
+
     struct Binary: View {
         let trueLabel: String
         let falseLabel: String

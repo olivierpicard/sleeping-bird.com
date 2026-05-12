@@ -64,6 +64,8 @@ enum MetricViewFactory {
         case .binary: return "—"
         case .duration(let cfg):
             return format(duration: 0, granularity: cfg.granularity)
+        case .datetime:
+            return "—"
         }
     }
 
