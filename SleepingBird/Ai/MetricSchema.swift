@@ -139,7 +139,7 @@ enum ChartType: String, Codable {
     case bar  // Best for discrete, summed, or counted data (Calories, steps)
     case pie  // Best for proportions (Categories)
     case calendar  // Best for binary and datetime
-    case gauge  // Good if the metric has a specific daily `goal` limit
+    case dailyGauge  // Good if the metric has a specific daily `goal` limit
 }
 
 // MARK: - Metric Grouping

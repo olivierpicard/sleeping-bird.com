@@ -28,31 +28,100 @@ enum MetricViewFactory {
 
     // MARK: - Display Value
 
-
     private static func value(for metric: Metric) -> String {
-        guard let last = metric.data.last else {
+        guard !metric.data.isEmpty else {
             return placeholder(for: metric.config)
         }
-        switch last {
-        case .number(_, let v):
-            guard case .number(let cfg) = metric.config else {
+        let agg = metric.visual.aggregation
+        let start = windowStart(for: agg.bucket)
+
+        switch metric.config {
+        case .number(let cfg):
+            let points = metric.data.compactMap { $0.numberValue }.filter {
+                $0.date >= start
+            }
+            guard !points.isEmpty else {
                 return placeholder(for: metric.config)
             }
-            return format(number: v, cfg: cfg)
-        case .category(_, let v):
+            guard case .numerical(let method) = agg.method else {
+                return format(number: points.last!.value, cfg: cfg)
+            }
+            return format(
+                number: aggregate(points.map { $0.value }, method),
+                cfg: cfg
+            )
+
+        case .duration(let cfg):
+            let points = metric.data.compactMap { $0.durationValue }.filter {
+                $0.date >= start
+            }
+            guard !points.isEmpty else {
+                return placeholder(for: metric.config)
+            }
+            guard case .numerical(let method) = agg.method else {
+                return format(
+                    duration: Int(points.last!.interval),
+                    granularity: cfg.granularity
+                )
+            }
+            return format(
+                duration: Int(aggregate(points.map { $0.interval }, method)),
+                granularity: cfg.granularity
+            )
+
+        case .categorySingleChoice, .categoryMultipleChoice:
+            guard case .category(_, let v) = metric.data.last else {
+                return placeholder(for: metric.config)
+            }
             return v.first ?? "—"
-        case .binary(_, let flag):
-            guard case .binary(let cfg) = metric.config else {
-                return placeholder(for: metric.config)
-            }
+
+        case .binary:
+            guard case .binary(_, let flag) = metric.data.last,
+                case .binary(let cfg) = metric.config
+            else { return placeholder(for: metric.config) }
             return flag ? cfg.trueLabel : cfg.falseLabel
-        case .datetime(let d):
-            return d.formatted(date: .abbreviated, time: .shortened)
-        case .duration(_, let t):
-            guard case .duration(let cfg) = metric.config else {
+
+        case .datetime:
+            guard case .datetime(let d) = metric.data.last else {
                 return placeholder(for: metric.config)
             }
-            return format(duration: Int(t), granularity: cfg.granularity)
+            return d.formatted(date: .abbreviated, time: .shortened)
+        }
+    }
+
+    private static func windowStart(for bucket: TemporalBucket?) -> Date {
+        guard let bucket else { return .distantPast }
+        let now = Date()
+        let cal = Calendar.current
+        switch bucket {
+        case .hourly:
+            return cal.date(byAdding: .hour, value: -1, to: now) ?? now
+        case .daily: return cal.startOfDay(for: now)
+        case .weekly:
+            return cal.date(
+                from: cal.dateComponents(
+                    [.yearForWeekOfYear, .weekOfYear],
+                    from: now
+                )
+            ) ?? now
+        case .monthly:
+            return cal.date(
+                from: cal.dateComponents([.year, .month], from: now)
+            ) ?? now
+        case .yearly:
+            return cal.date(from: cal.dateComponents([.year], from: now)) ?? now
+        }
+    }
+
+    private static func aggregate(_ values: [Double], _ method: NumericMethod)
+        -> Double
+    {
+        switch method {
+        case .sum: return values.reduce(0, +)
+        case .average: return values.reduce(0, +) / Double(values.count)
+        case .min: return values.min() ?? 0
+        case .max: return values.max() ?? 0
+        case .latest: return values.last ?? 0
         }
     }
 
@@ -68,7 +137,6 @@ enum MetricViewFactory {
             return "—"
         }
     }
-
 
     // MARK: - Metadata
 
@@ -95,7 +163,8 @@ enum MetricViewFactory {
             cfg.granularity >= 1
             ? String(Int(value))
             : String(format: "%.1f", value)
-        return cfg.unit.map { "\(text) \($0)" } ?? text
+        let unit = cfg.unit ?? ""
+        return "\(text) \(unit)".trimmingCharacters(in: .whitespaces)
     }
 
     private static func format(duration seconds: Int, granularity: String)

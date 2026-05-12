@@ -17,23 +17,23 @@ enum MiniChartFactory {
 
         switch metric.config {
         case .number(let cfg):
-            if metric.visual.chart == .gauge,
-                let goal = cfg.goal,
-                let current = metric.data.last?.numberValue?.value
-            {
-                return LinearGaugeMiniChart(
-                    current: current,
-                    goal: goal,
-                    color: metric.color
-                )
+            if metric.visual.chart == .dailyGauge, let goal = cfg.goal {
+                let today = Calendar.current.startOfDay(for: Date())
+                let current = metric.data.compactMap(\.numberValue).filter {
+                    $0.date >= today
+                }.map(\.value).reduce(0, +)
+                if current > 0 {
+                    return LinearGaugeMiniChart(
+                        current: current,
+                        goal: goal,
+                        color: metric.color
+                    )
+                }
             }
             let values = metric.data.compactMap(\.numberValue?.value)
             switch metric.visual.chart {
             case .bar:
                 return BarMiniChart(data: values, color: metric.color)
-            case .calendar:
-                let dates = metric.data.compactMap(\.numberValue?.date)
-                return TrailingCalendarMiniChart(data: dates, color: metric.color)
             default:
                 return LineMiniChart(data: values, color: metric.color)
             }

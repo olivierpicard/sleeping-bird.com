@@ -45,18 +45,30 @@ private func seedContainer(_ container: ModelContainer) -> ModelContainer {
         // number + gauge → LinearGaugeMiniChart
         (
             MetricSchema.Fake.number(
-                title: "Daily Steps", emoji: "👟",
-                unit: "steps", min: 0, max: 50_000, granularity: 100,
-                goal: 10_000, chart: .gauge
+                title: "Daily Steps",
+                emoji: "👟",
+                unit: "steps",
+                min: 0,
+                max: 50_000,
+                granularity: 100,
+                goal: 10_000,
+                chart: .dailyGauge
             ),
-            Metric.fakeData(for: MetricSchema.Fake.number(chart: .gauge).config)
+            Metric.fakeData(
+                for: MetricSchema.Fake.number(chart: .dailyGauge).config
+            )
         ),
         // number + line → LineMiniChart
         (
             MetricSchema.Fake.number(
-                title: "Heart Rate", emoji: "❤️",
-                unit: "bpm", min: 40, max: 200, granularity: 1,
-                goal: nil, chart: .line
+                title: "Heart Rate",
+                emoji: "❤️",
+                unit: "bpm",
+                min: 40,
+                max: 200,
+                granularity: 1,
+                goal: nil,
+                chart: .line
             ),
             Metric.fakeData(for: MetricSchema.Fake.number(chart: .line).config)
         ),
@@ -82,7 +94,10 @@ private func seedContainer(_ container: ModelContainer) -> ModelContainer {
         ),
         // datetime → EventCalendarMiniChart
         (
-            MetricSchema.Fake.datetime(title: "Doctor Appointments", emoji: "🏥"),
+            MetricSchema.Fake.datetime(
+                title: "Doctor Appointments",
+                emoji: "🏥"
+            ),
             Metric.fakeData(for: MetricSchema.Fake.datetime().config)
         ),
     ]
@@ -109,7 +124,7 @@ private func seedContainer(_ container: ModelContainer) -> ModelContainer {
 #Preview("Loading state", ) {
     let generator = MetricGenerator(pending: [
         .init(instruction: "track my coffee")
-    ]) 
+    ])
     let container = seedContainer(
         try! ModelContainer(
             for: Metric.self,
