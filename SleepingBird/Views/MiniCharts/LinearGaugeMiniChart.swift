@@ -34,7 +34,7 @@ struct LinearGaugeMiniChart: MiniChart {
                         Capsule()
                             .fill(color.mix(with: overflowMixColor, by: 0.4))
                             .frame(
-                                width: (geo.size.width * min(progress - 1, 2))
+                                width: (geo.size.width * min(progress - 1, 1))
                             )
                     }
                 }
@@ -67,7 +67,7 @@ struct LinearGaugeMiniChart: MiniChart {
 }
 
 #Preview("Over goal") {
-    LinearGaugeMiniChart(current: 3, goal: 2.5, color: .blue)
+    LinearGaugeMiniChart(current: 12, goal: 2.5, color: .blue)
         .padding()
 }
 
