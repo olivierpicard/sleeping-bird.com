@@ -66,8 +66,8 @@ struct MetricView: View {
                         .fontWeight(.medium)
                         .foregroundStyle(.secondary)
                     Text(value)
-                        .font(.title)
-                        .fontWeight(.medium)
+                        .font(.title2)
+                        .fontWeight(.semibold)
                 }
 
                 Spacer()
