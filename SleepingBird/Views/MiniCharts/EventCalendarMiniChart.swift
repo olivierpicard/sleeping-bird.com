@@ -10,7 +10,7 @@ import SwiftUI
 struct EventCalendarMiniChart: MiniChart {
     let data: [Date]
     let color: Color
-    var cellCount: Int = 7
+    var cellCount: Int = 6
 
     private let cellHeight: Double = 56
     private let cellSpacing: Double = 6
@@ -60,9 +60,11 @@ private struct FilledCell: View {
     let monthLabel: String
     let dayLabel: String
 
+    @Environment(\.colorScheme) private var colorScheme
+
     var body: some View {
         RoundedRectangle(cornerRadius: cornerRadius)
-            .fill(color.opacity(0.15))
+            .fill(color.opacity(colorScheme == .dark ? 0.2 : 0.08))
             .overlay(
                 RoundedRectangle(cornerRadius: cornerRadius)
                     .strokeBorder(color.opacity(0.6), lineWidth: 1)
@@ -71,11 +73,12 @@ private struct FilledCell: View {
                 VStack(spacing: 1) {
                     Text(monthLabel)
                         .font(.caption2)
-                        .foregroundStyle(color)
+//                        .fontWeight(.medium)
+                        .foregroundStyle(color.mix(with: .primary, by: 0.2))
                     Text(dayLabel)
                         .font(.title3)
-                        .fontWeight(.semibold)
-                        .foregroundStyle(color)
+                        .fontWeight(.medium)
+                        .foregroundStyle(color.mix(with: .primary, by: 0.1))
                 }
             )
     }
@@ -88,7 +91,7 @@ private struct EmptyCell: View {
     var body: some View {
         RoundedRectangle(cornerRadius: cornerRadius)
             .strokeBorder(style: StrokeStyle(lineWidth: 1, dash: [3, 3]))
-            .foregroundStyle(color.opacity(0.5))
+            .foregroundStyle(color.opacity(0.8))
     }
 }
 

@@ -14,7 +14,10 @@ struct TrailingCalendarMiniChart: MiniChart {
 
     private let maxDotSize: Double = 36
     private let dotSpacing: Double = 6
-    private let labelSpacing: Double = 4
+    private let labelSpacing: Double = 6
+
+    @Environment(\.colorScheme) private var colorScheme
+    private var isDark: Bool {colorScheme == .dark}
 
     private var calendar: Calendar { .current }
 
@@ -46,7 +49,6 @@ struct TrailingCalendarMiniChart: MiniChart {
             HStack(spacing: dotSpacing) {
                 ForEach(days, id: \.self) { day in
                     let active = hasEntry(on: day)
-                    let isToday = calendar.startOfDay(for: day) == today
                     let dayNumber = calendar.component(.day, from: day)
 
                     VStack(spacing: labelSpacing) {
@@ -54,14 +56,23 @@ struct TrailingCalendarMiniChart: MiniChart {
                             .font(
                                 .system(size: dotSize * 0.28, weight: .semibold)
                             )
-                            .foregroundStyle(color.opacity(0.8))
+                            .foregroundStyle(
+                                color.mix(with: .primary, by: 0.15).opacity(
+                                    0.9
+                                )
+                            )
 
                         Circle()
-                            .fill(active ? color.opacity(0.18) : Color.clear)
+                            .fill(
+                                active
+                                    ? color.opacity(
+                                        isDark ? 0.4 : 0.2
+                                    ) : Color.clear
+                            )
                             .overlay(
                                 Circle().strokeBorder(
-                                    color.opacity(isToday ? 1.0 : 0.4),
-                                    lineWidth: isToday ? 2 : 1
+                                    color.opacity(isDark ? 0.8 : 0.5),
+                                    lineWidth: 1
                                 )
                             )
                             .overlay(
@@ -73,7 +84,7 @@ struct TrailingCalendarMiniChart: MiniChart {
                                         )
                                     )
                                     .foregroundStyle(
-                                        color
+                                        color.mix(with: .primary, by: 0.25)
                                     )
                             )
                             .frame(width: dotSize, height: dotSize)

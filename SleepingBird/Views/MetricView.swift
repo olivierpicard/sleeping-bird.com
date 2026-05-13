@@ -131,7 +131,7 @@ struct MetricView: View {
     }
 
     private var cardShadowOpacity: Double {
-        isDarkMode ? 0.5 : 0.5
+        isDarkMode ? 0.6 : 0.5
     }
 
     private var cardShadowRadius: CGFloat {
