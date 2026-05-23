@@ -20,19 +20,18 @@ final class MetricGenerator {
         Task { @MainActor in
             defer { pending.removeAll { $0.id == p.id } }
             do {
-                //                let schema = try await AiMetricSuggestion().generate(
-                //                    userInstruction: instruction
-                //                )
+                let schema = try await AiMetricSuggestion().generate(
+                    userInstruction: instruction
+                )
+                let metric = Metric(
+                    from: schema
+                )
+                //                try await Task.sleep(for: .seconds(3))
+                //                let schema = MetricSchema.Fake.number()
                 //                let metric = Metric(
                 //                    from: schema,
-                //                    data:is  Metric.fakeData(for: schema.config)
+                //                    data: Metric.fakeData(for: schema.config)
                 //                )
-                try await Task.sleep(for: .seconds(3))
-                let schema = MetricSchema.Fake.number()
-                let metric = Metric(
-                    from: schema,
-                    data: Metric.fakeData(for: schema.config)
-                )
                 context.insert(metric)
             } catch {
                 print("generation failed: \(error)")
