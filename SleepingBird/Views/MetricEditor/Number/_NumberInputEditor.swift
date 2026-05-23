@@ -50,7 +50,7 @@ struct _NumberInputEditor: View {
         VStack(spacing: 32) {
             VStack(spacing: 8) {
                 HStack(alignment: .firstTextBaseline, spacing: 8) {
-                    TextField("0", text: $text)
+                    TextField(String(localized: "number_input_editor.placeholder"), text: $text)
                         .font(.system(size: 64, weight: .light))
                             .keyboardType(
                                 step < 1 || min < 0
@@ -71,9 +71,7 @@ struct _NumberInputEditor: View {
                     }
                 }
 
-                Text(
-                    "Range: \(_meFormat(min, step: step)) – \(_meFormat(max, step: step))"
-                )
+                Text("number_input_editor.range \(_meFormat(min, step: step)) \(_meFormat(max, step: step))")
                 .font(.caption)
                 .foregroundStyle(.secondary)
             }

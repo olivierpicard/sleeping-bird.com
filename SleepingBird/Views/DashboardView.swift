@@ -34,7 +34,7 @@ struct DashboardView: View {
             }
         }
         .scrollContentBackground(.hidden)
-        .navigationTitle("Dashboard")
+        .navigationTitle("Today")
     }
 }
 

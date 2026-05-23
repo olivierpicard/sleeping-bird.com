@@ -16,78 +16,80 @@ struct EmptyDashboardView: View {
         VStack(spacing: 28) {
             Spacer()
             VStack(alignment: .leading) {
-                Text("SLEEPING BIRD")
-                    .font(.caption)
-                    .fontWeight(.bold)
-                    .tracking(3)
-                    .padding(.bottom, 15)
-                    .foregroundStyle(.secondary)
+                Text(String(localized: "empty_dashboard.app_name"))
+                .font(.caption)
+                .fontWeight(.bold)
+                .tracking(3)
+                .padding(.bottom, 15)
+                .foregroundStyle(.secondary)
 
-                Text("What do you")
-                    .font(.largeTitle)
-                    .fontWeight(.semibold)
-                Text("Want to measure ?")
-                    .font(.largeTitle)
-                    .fontWeight(.heavy)
-                    .foregroundStyle(
-                        LinearGradient(
-                            colors: colorScheme == .dark
-                                ? [
-                                    Color(
-                                        red: 0xe8 / 255,
-                                        green: 0xee / 255,
-                                        blue: 0xf4 / 255
-                                    ),
-                                    Color(
-                                        red: 0xa1 / 255,
-                                        green: 0xb7 / 255,
-                                        blue: 0xf6 / 255
-                                    ),
-                                ]
-                                : [
-                                    Color(
-                                        red: 0x64 / 255,
-                                        green: 0x6c / 255,
-                                        blue: 0xf6 / 255
-                                    ),
-                                    Color(
-                                        red: 0xc2 / 255,
-                                        green: 0x5d / 255,
-                                        blue: 0xdd / 255
-                                    ),
-                                ],
-                            startPoint: .leading,
-                            endPoint: .trailing
-                        )
+                Text(String(localized: "empty_dashboard.headline_1"))
+                .font(.largeTitle)
+                .fontWeight(.semibold)
+                Text(String(localized: "empty_dashboard.headline_2"))
+                .font(.largeTitle)
+                .fontWeight(.heavy)
+                .foregroundStyle(
+                    LinearGradient(
+                        colors: colorScheme == .dark
+                            ? [
+                                Color(
+                                    red: 0xe8 / 255,
+                                    green: 0xee / 255,
+                                    blue: 0xf4 / 255
+                                ),
+                                Color(
+                                    red: 0xa1 / 255,
+                                    green: 0xb7 / 255,
+                                    blue: 0xf6 / 255
+                                ),
+                            ]
+                            : [
+                                Color(
+                                    red: 0x64 / 255,
+                                    green: 0x6c / 255,
+                                    blue: 0xf6 / 255
+                                ),
+                                Color(
+                                    red: 0xc2 / 255,
+                                    green: 0x5d / 255,
+                                    blue: 0xdd / 255
+                                ),
+                            ],
+                        startPoint: .leading,
+                        endPoint: .trailing
                     )
-                    .padding(.bottom, 5)
-                Text("Track anything you want. Just say it out loud.")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
+                )
+                .padding(.bottom, 5)
+                Text(String(localized: "empty_dashboard.subtitle"))
+                .font(.subheadline)
+                .multilineTextAlignment(.leading)
+                .fixedSize(horizontal: false, vertical: true)
+                .foregroundStyle(.secondary)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             BadgesStackView(
                 badges: [
-                    "Water 💧",
-                    "Maintenance 💰🚗",
-                    "Sleeps 💤",
-                    "Pain 😖",
-                    "Mood 😁",
-                    "Proteins 🥩🌱",
-                    "Meditation ⏱️🧘",
-                    "Coffee ☕️",
-                    "Fuel Spend ⛽️",
-                    "Ask anything...",
+                    String(localized: "empty_dashboard.badge.water"),
+                    String(localized: "empty_dashboard.badge.maintenance"),
+                    String(localized: "empty_dashboard.badge.sleeps"),
+                    String(localized: "empty_dashboard.badge.pain"),
+                    String(localized: "empty_dashboard.badge.mood"),
+                    String(localized: "empty_dashboard.badge.proteins"),
+                    String(localized: "empty_dashboard.badge.meditation"),
+                    String(localized: "empty_dashboard.badge.coffee"),
+                    String(localized: "empty_dashboard.badge.fuel_spend"),
+                    String(localized: "empty_dashboard.badge.ask_anything"),
                 ],
                 borderThickness: 0.5
             )
             .padding(.top, 10)
-//            Spacer()
+            //            Spacer()
             VStack(spacing: -4) {
-                Text("tap to start")
-                    .font(.custom("Bradley Hand", size: 22))
-                    .rotationEffect(.degrees(-3))
-                    .offset(x: 28)
+                Text(String(localized: "empty_dashboard.tap_to_start"))
+                .font(.custom("Bradley Hand", size: 22))
+                .rotationEffect(.degrees(-3))
+                .offset(x: 28)
                 HandDrawnArrow()
                     .stroke(
                         Color.primary.opacity(colorScheme == .dark ? 0.4 : 0.3),
@@ -104,14 +106,14 @@ struct EmptyDashboardView: View {
             .padding(.bottom, -20)
             .padding(.leading, 30)
             Button(action: { showModal = true }) {
-                Label("Add a metric", systemImage: "plus")
-                    .font(.largeTitle)
-                    .labelStyle(.iconOnly)
-                    .frame(width: 40, height: 40)
+                Label(String(localized: "empty_dashboard.add_metric"), systemImage: "plus")
+                .font(.largeTitle)
+                .labelStyle(.iconOnly)
+                .frame(width: 40, height: 40)
             }
             .controlSize(.extraLarge)
             .buttonStyle(.glassProminent)
-//            .tint(.indigo)
+            //            .tint(.indigo)
             .padding(.bottom, 30)
             .tint(Color(red: 0x64 / 255, green: 0x6c / 255, blue: 0xf6 / 255))
 
@@ -157,6 +159,7 @@ private struct HandDrawnArrow: Shape {
 
 #Preview {
     EmptyDashboardView()
+        .environment(\.locale, Locale(identifier: "fr"))
         .environment(MetricGenerator())
         .modelContainer(for: Metric.self, inMemory: true)
 }

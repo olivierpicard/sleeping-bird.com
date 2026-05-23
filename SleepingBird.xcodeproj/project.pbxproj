@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		810156502FA5283200E02CC5 /* Inject in Frameworks */ = {isa = PBXBuildFile; productRef = 8101564F2FA5283200E02CC5 /* Inject */; };
+		8116F4162FB494C200E703A6 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 8116F4152FB494C100E703A6 /* Localizable.xcstrings */; };
 		8152B34D2F91B3E100D421C2 /* .gitignore in Resources */ = {isa = PBXBuildFile; fileRef = 8152B34C2F91B3E100D421C2 /* .gitignore */; };
 		8152B3672F91C55700D421C2 /* ArkanaKeys in Frameworks */ = {isa = PBXBuildFile; productRef = 8152B3662F91C55700D421C2 /* ArkanaKeys */; };
 		81BB91BE2F95603F00E4A4C5 /* FirebaseAILogic in Frameworks */ = {isa = PBXBuildFile; productRef = 81BB91BD2F95603F00E4A4C5 /* FirebaseAILogic */; };
@@ -26,6 +27,7 @@
 
 /* Begin PBXFileReference section */
 		8104B7562FA76EAD0087967B /* SleepingBirdTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SleepingBirdTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		8116F4152FB494C100E703A6 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 		8152B34C2F91B3E100D421C2 /* .gitignore */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
 		8152B36A2F91CB9B00D421C2 /* .arkana.yml */ = {isa = PBXFileReference; lastKnownFileType = text.yaml; path = .arkana.yml; sourceTree = "<group>"; };
 		81F8D8382F8DEA6600E96BF9 /* SleepingBird.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SleepingBird.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -69,6 +71,7 @@
 		81F8D82F2F8DEA6600E96BF9 = {
 			isa = PBXGroup;
 			children = (
+				8116F4152FB494C100E703A6 /* Localizable.xcstrings */,
 				8152B34C2F91B3E100D421C2 /* .gitignore */,
 				81F8D8392F8DEA6600E96BF9 /* Products */,
 				8152B36A2F91CB9B00D421C2 /* .arkana.yml */,
@@ -163,6 +166,7 @@
 			knownRegions = (
 				en,
 				Base,
+				fr,
 			);
 			mainGroup = 81F8D82F2F8DEA6600E96BF9;
 			minimizedProjectReferenceProxies = 1;
@@ -195,6 +199,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				8152B34D2F91B3E100D421C2 /* .gitignore in Resources */,
+				8116F4162FB494C200E703A6 /* Localizable.xcstrings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -328,6 +333,7 @@
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Debug;
@@ -385,6 +391,7 @@
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
 				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_EMIT_LOC_STRINGS = YES;
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;

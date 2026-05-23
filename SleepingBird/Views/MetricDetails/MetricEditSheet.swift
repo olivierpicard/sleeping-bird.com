@@ -115,9 +115,15 @@ struct MetricEditSheet: View {
                     .foregroundStyle(.primary)
                     .lineLimit(1)
                 if supportsUnit {
-                    Text(unit.isEmpty ? "No unit" : unit)
-                        .font(.subheadline)
-                        .foregroundStyle(unit.isEmpty ? .secondary : color)
+                    Group {
+                        if unit.isEmpty {
+                            Text("metric_edit_sheet.no_unit")
+                        } else {
+                            Text(verbatim: unit)
+                        }
+                    }
+                    .font(.subheadline)
+                    .foregroundStyle(unit.isEmpty ? .secondary : color)
                 }
             }
             Spacer(minLength: 0)
@@ -133,8 +139,8 @@ struct MetricEditSheet: View {
     private var fieldsCard: some View {
         VStack(spacing: 0) {
             fieldRow(
-                label: "NAME",
-                placeholder: "Metric name",
+                label: "metric_edit_sheet.field.name",
+                placeholder: "metric_edit_sheet.placeholder.name",
                 text: $name,
                 field: .name,
                 submitLabel: supportsUnit ? .next : .done,
@@ -147,8 +153,8 @@ struct MetricEditSheet: View {
             if supportsUnit {
                 Divider().padding(.leading, 16)
                 fieldRow(
-                    label: "UNIT",
-                    placeholder: "e.g. kg, steps, kcal",
+                    label: "metric_edit_sheet.field.unit",
+                    placeholder: "metric_edit_sheet.placeholder.unit",
                     text: $unit,
                     field: .unit,
                     submitLabel: .done,
@@ -162,8 +168,8 @@ struct MetricEditSheet: View {
     }
 
     private func fieldRow(
-        label: String,
-        placeholder: String,
+        label: LocalizedStringKey,
+        placeholder: LocalizedStringKey,
         text: Binding<String>,
         field: Field,
         submitLabel: SubmitLabel,

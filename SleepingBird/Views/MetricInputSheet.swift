@@ -7,16 +7,13 @@ private struct PlaceholderExample {
 }
 
 private let placeholderExamples: [PlaceholderExample] = [
-    .init(text: "Track my daily goal of 2L water", duration: 2),
-    .init(text: "How many cups of coffee do I drink?", duration: 3.0),
-    .init(
-        text: "I want to know how long my meditation sessions are",
-        duration: 4.0
-    ),
-    .init(text: "Measure my belly pain", duration: 2.5),
-    .init(text: "I want to note each time I put gas in my car", duration: 3.5),
-    .init(text: "Track my mood using emoji", duration: 3.0),
-    .init(text: "Make a counter for each time I go to pee", duration: 3.0),
+    .init(text: String(localized: "metric_input_sheet.placeholder.water"), duration: 2),
+    .init(text: String(localized: "metric_input_sheet.placeholder.coffee"), duration: 3.0),
+    .init(text: String(localized: "metric_input_sheet.placeholder.meditation"), duration: 4.0),
+    .init(text: String(localized: "metric_input_sheet.placeholder.pain"), duration: 2.5),
+    .init(text: String(localized: "metric_input_sheet.placeholder.fuel"), duration: 3.5),
+    .init(text: String(localized: "metric_input_sheet.placeholder.mood"), duration: 3.0),
+    .init(text: String(localized: "metric_input_sheet.placeholder.pee"), duration: 3.0),
 ]
 
 struct MetricInputSheet: View {
@@ -92,7 +89,10 @@ struct MetricInputSheet: View {
                             .multilineTextAlignment(.center)
                             .onChange(of: instruction) { _, new in
                                 if new.contains("\n") {
-                                    instruction = new.replacingOccurrences(of: "\n", with: "")
+                                    instruction = new.replacingOccurrences(
+                                        of: "\n",
+                                        with: ""
+                                    )
                                     exitEditMode()
                                 } else {
                                     fontSize = computeFontSize(for: new)
@@ -215,8 +215,11 @@ struct MetricInputSheet: View {
 
     private var keyboardButton: some View {
         Button(action: { isEditing ? exitEditMode() : enterEditMode() }) {
-            Image(systemName: isEditing ? "keyboard.chevron.compact.down" : "keyboard")
-                .font(.title2)
+            Image(
+                systemName: isEditing
+                    ? "keyboard.chevron.compact.down" : "keyboard"
+            )
+            .font(.title2)
         }
         .buttonStyle(.glass)
         .controlSize(.extraLarge)

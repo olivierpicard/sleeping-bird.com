@@ -18,7 +18,7 @@ struct _SaveButton: View {
 
     var body: some View {
         Button(action: action) {
-            Text("Save")
+            Text("metric_editor.save")
                 .font(.headline)
                 .foregroundStyle(.white)
                 .frame(maxWidth: .infinity)

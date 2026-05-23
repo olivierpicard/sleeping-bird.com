@@ -25,10 +25,10 @@ enum _DurationGranularity: String {
 
     var shortLabel: String {
         switch self {
-        case .ms: "ms"
-        case .s: "sec"
-        case .m: "min"
-        case .h: "hr"
+        case .ms: String(localized: "duration.unit.ms")
+        case .s: String(localized: "duration.unit.s")
+        case .m: String(localized: "duration.unit.min")
+        case .h: String(localized: "duration.unit.h")
         }
     }
 }
