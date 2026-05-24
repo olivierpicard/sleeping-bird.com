@@ -23,6 +23,22 @@
         }
       }
     },
+    "Add your first value" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añade tu primer valor"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajoutez votre première valeur"
+          }
+        }
+      }
+    },
     "Category" : {
       "localizations" : {
         "es" : {
@@ -896,18 +912,18 @@
         }
       }
     },
-    "Not enough data" : {
+    "No data yet" : {
       "localizations" : {
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Datos insuficientes"
+            "value" : "Aún no hay datos"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Pas assez de données"
+            "value" : "Aucune donnée pour l'instant"
           }
         }
       }

@@ -12,7 +12,7 @@ enum MiniChartFactory {
 
     static func make(from metric: Metric) -> any MiniChart {
         guard !metric.data.isEmpty else {
-            return NoDataMiniChart(color: metric.color)
+            return NoDataMiniChart()
         }
 
         switch metric.config {
@@ -50,7 +50,7 @@ enum MiniChartFactory {
                 return DividerBarMiniChart.Entry(category: label, value: count)
             }
             guard !entries.isEmpty else {
-                return NoDataMiniChart(color: metric.color)
+                return NoDataMiniChart()
             }
             return DividerBarMiniChart(entries: entries)
 

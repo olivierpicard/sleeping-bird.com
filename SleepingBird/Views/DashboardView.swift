@@ -119,6 +119,10 @@ private func seedContainer(_ container: ModelContainer) -> ModelContainer {
             ),
             Metric.fakeData(for: MetricSchema.Fake.datetime().config)
         ),
+        (
+            MetricSchema.Fake.binary(title: "Medication taken", emoji: "💊"),
+            []
+        )
     ]
     for (schema, data) in schemas {
         container.mainContext.insert(Metric(from: schema, data: data))

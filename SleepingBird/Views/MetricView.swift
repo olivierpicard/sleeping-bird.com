@@ -103,7 +103,7 @@ struct MetricView: View {
                     .frame(height: 100)
                     .padding(.horizontal)
             } else {
-                NoDataMiniChart(color: mainColor)
+                NoDataMiniChart()
                     .frame(height: 100)
             }
 
