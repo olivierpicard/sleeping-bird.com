@@ -67,7 +67,7 @@ class Metric: Identifiable {
     }
 }
 
-enum DataPoint: Codable {
+enum DataPoint: Codable, Equatable {
     case number(Date, Double)
     case category(Date, [String])
     case binary(Date, Bool)

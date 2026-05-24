@@ -141,37 +141,39 @@ struct MetricDetailView: View {
     }
 
     var body: some View {
-        ScrollView {
-            VStack(spacing: 24) {
-                header
-                    .padding(.horizontal)
+        List {
+            Section {
+                VStack(spacing: 24) {
+                    header
 
-                Group {
-                    if isBinary {
-                        binaryCalendarSection
-                            .padding(.top)
-                    } else if isDatetime {
-                        datetimeCalendarSection
-                            .padding(.top)
-                    } else if isCategory {
-                        rangePicker
-                            .frame(maxWidth: 280)
-                        categoryChartSection
-                    } else {
-                        rangePicker
-                            .frame(maxWidth: 280)
-                        chartSection
+                    Group {
+                        if isBinary {
+                            binaryCalendarSection
+                                .padding(.top)
+                        } else if isDatetime {
+                            datetimeCalendarSection
+                                .padding(.top)
+                        } else if isCategory {
+                            rangePicker
+                                .frame(maxWidth: 280)
+                            categoryChartSection
+                        } else {
+                            rangePicker
+                                .frame(maxWidth: 280)
+                            chartSection
+                        }
                     }
                 }
-                //                .padding(.horizontal)
-                recentEntries
-                    .padding(.horizontal, 20)
+                .listRowInsets(
+                    EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16)
+                )
+                .listRowSeparator(.hidden)
+                .listRowBackground(Color.clear)
             }
 
-            .padding(.top, 8)
-            .padding(.bottom, 40)
+            recentEntries
         }
-        .background(Color(uiColor: .systemGroupedBackground))
+        .listStyle(.insetGrouped)
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
@@ -380,26 +382,31 @@ struct MetricDetailView: View {
     // MARK: - Recent Entries
 
     private var recentEntries: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        let visible = Array(sortedEntries.prefix(8))
+        return Section {
+            ForEach(visible.indices, id: \.self) { index in
+                entryRow(for: visible[index])
+                    .listRowInsets(EdgeInsets())
+                    .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                        Button(role: .destructive) {
+                            delete(visible[index])
+                        } label: {
+                            Label("Delete", systemImage: "trash")
+                        }
+                    }
+            }
+        } header: {
             Text("RECENT ENTRIES")
                 .font(.caption)
                 .fontWeight(.semibold)
                 .tracking(1.2)
                 .foregroundStyle(.secondary)
-                .padding(.leading, 4)
+        }
+    }
 
-            let visible = Array(sortedEntries.prefix(8))
-            VStack(spacing: 0) {
-                ForEach(visible.indices, id: \.self) { index in
-                    entryRow(for: visible[index])
-                    if index < visible.count - 1 {
-                        Divider()
-                            .padding(.leading, 16)
-                    }
-                }
-            }
-            .background(Color(.secondarySystemGroupedBackground))
-            .clipShape(RoundedRectangle(cornerRadius: 16))
+    private func delete(_ point: DataPoint) {
+        if let index = metric.data.firstIndex(of: point) {
+            metric.data.remove(at: index)
         }
     }
 
