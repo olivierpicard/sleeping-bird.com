@@ -36,9 +36,9 @@ struct MetricInputSheet: View {
         spectrumLogic: SpectrumViewModel = LiveSpectrumViewModel()
     ) {
         _instruction = State(initialValue: instruction)
-        let initialSize: CGFloat =
-            40 - (40 - 16) * min(1, CGFloat(instruction.count) / 250)
-        _fontSize = State(initialValue: initialSize)
+        _fontSize = State(
+            initialValue: Self.computeFontSize(for: instruction)
+        )
         self.transcriber = transcriber
         self.spectrumLogic = spectrumLogic
     }
@@ -70,7 +70,7 @@ struct MetricInputSheet: View {
         }
     }
 
-    private func computeFontSize(for text: String) -> CGFloat {
+    private static func computeFontSize(for text: String) -> CGFloat {
         let maxSize: CGFloat = 37
         let minSize: CGFloat = 16
         let length = CGFloat(text.count)
@@ -94,8 +94,6 @@ struct MetricInputSheet: View {
                                         with: ""
                                     )
                                     exitEditMode()
-                                } else {
-                                    fontSize = computeFontSize(for: new)
                                 }
                             }
                     } else if instruction.isEmpty {
@@ -121,6 +119,9 @@ struct MetricInputSheet: View {
                 .font(.system(size: fontSize, weight: .semibold))
                 .multilineTextAlignment(.center)
                 .animation(.easeInOut(duration: 0.2), value: fontSize)
+                .onChange(of: instruction) { _, new in
+                    fontSize = Self.computeFontSize(for: new)
+                }
                 .task(id: instruction.isEmpty) {
                     guard instruction.isEmpty else { return }
                     while !Task.isCancelled {
