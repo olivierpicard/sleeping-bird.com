@@ -5,25 +5,44 @@ struct DashboardView: View {
     @Query(sort: \Metric.createdAt, order: .reverse) private var metrics:
         [Metric]
     @Environment(MetricGenerator.self) private var generator
+    @Environment(\.modelContext) private var modelContext
     @State private var editingMetric: Metric? = nil
     @State private var selectedMetric: Metric? = nil
 
+    private let rowInsets = EdgeInsets(
+        top: 8,
+        leading: 16,
+        bottom: 8,
+        trailing: 16
+    )
+
     var body: some View {
-        ScrollView(.vertical) {
-            VStack(spacing: 16) {
-                ForEach(generator.pending) { _ in
-                    MetricPlaceholderView()
-                }
-                ForEach(metrics) { metric in
-                    MetricViewFactory.make(
-                        from: metric,
-                        onAddTapped: { editingMetric = metric },
-                        onCardTapped: { selectedMetric = metric }
-                    )
+        List {
+            ForEach(generator.pending) { _ in
+                MetricPlaceholderView()
+                    .listRowInsets(rowInsets)
+                    .listRowSeparator(.hidden)
+                    .listRowBackground(Color.clear)
+            }
+            ForEach(metrics) { metric in
+                MetricViewFactory.make(
+                    from: metric,
+                    onAddTapped: { editingMetric = metric },
+                    onCardTapped: { selectedMetric = metric }
+                )
+                .listRowInsets(rowInsets)
+                .listRowSeparator(.hidden)
+                .listRowBackground(Color.clear)
+                .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                    Button(role: .destructive) {
+                        modelContext.delete(metric)
+                    } label: {
+                        Label("Delete", systemImage: "trash")
+                    }
                 }
             }
-            .padding()
         }
+        .listStyle(.plain)
         .navigationDestination(item: $selectedMetric) { metric in
             MetricDetailView(metric: metric)
         }
