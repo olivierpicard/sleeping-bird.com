@@ -6,6 +6,7 @@ struct DashboardView: View {
         [Metric]
     @Environment(MetricGenerator.self) private var generator
     @Environment(\.modelContext) private var modelContext
+    let onAddMetric: () -> Void
     @State private var editingMetric: Metric? = nil
     @State private var selectedMetric: Metric? = nil
 
@@ -53,7 +54,14 @@ struct DashboardView: View {
             }
         }
         .scrollContentBackground(.hidden)
-        .navigationTitle("Today")
+        .navigationTitle("My Metrics")
+        .toolbar {
+            ToolbarItem(placement: .primaryAction) {
+                Button(action: onAddMetric) {
+                    Label("Add a metric", systemImage: "plus")
+                }
+            }
+        }
     }
 }
 
@@ -138,7 +146,7 @@ private func seedContainer(_ container: ModelContainer) -> ModelContainer {
         )
     )
     NavigationStack {
-        DashboardView()
+        DashboardView(onAddMetric: {})
             .environment(MetricGenerator())
     }
     .modelContainer(container)
@@ -155,7 +163,7 @@ private func seedContainer(_ container: ModelContainer) -> ModelContainer {
         )
     )
     NavigationStack {
-        DashboardView()
+        DashboardView(onAddMetric: {})
 
             .environment(generator)
     }

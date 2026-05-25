@@ -135,7 +135,8 @@ struct MetricView: View {
     }
 
     private var cardShadowRadius: CGFloat {
-        isDarkMode ? 10 : 4
+//        isDarkMode ? 10 : 4
+        isDarkMode ? 4 : 4
     }
 
     private var cardStrokeStyle: StrokeStyle {

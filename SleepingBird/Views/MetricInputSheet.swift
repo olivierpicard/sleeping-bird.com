@@ -174,6 +174,7 @@ struct MetricInputSheet: View {
                         Image(systemName: "checkmark")
                     }
                     .buttonStyle(.glassProminent)
+                    .tint(.indigo)
                     .disabled(instruction.isEmpty)
                 }
             }

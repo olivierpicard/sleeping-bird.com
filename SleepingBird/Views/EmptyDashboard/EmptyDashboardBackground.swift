@@ -9,7 +9,11 @@ import SwiftUI
 
 struct EmptyDashboardBackground: View {
     @Environment(\.colorScheme) private var colorScheme
-    var colorIntensity: Double = 1.0
+    var colorIntensity: Double
+    
+    init(intensity: Double = 1.0) {
+        self.colorIntensity = intensity
+    }
 
     var body: some View {
 

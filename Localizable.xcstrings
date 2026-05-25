@@ -912,6 +912,22 @@
         }
       }
     },
+    "My Metrics" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mis registros"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mes suivis"
+          }
+        }
+      }
+    },
     "No data yet" : {
       "localizations" : {
         "es" : {
