@@ -75,14 +75,14 @@ struct MetricView: View {
                     feedbackTrigger.toggle()
                     onAddTapped()
                 }) {
-                    Image(systemName: "plus")
+                    Image(systemName: "square.and.pencil")
                         .font(.title3.weight(.bold))
-                        .foregroundStyle(.white)
+                        .foregroundStyle(mainColor)
                         .padding(.vertical, 3)
 
                 }
-                .buttonStyle(.glassProminent)
-                .tint(mainColor)
+                .buttonStyle(.bordered)
+                .tint(mainColor.mix(with: .gray, by: 0.5))
 //                .shadow(
 //                    color: mainColor.opacity(0.8),
 //                    radius: 6,
