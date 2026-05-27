@@ -1,13 +1,35 @@
+import StoreKit
 import SwiftUI
 
 struct PaywallView: View {
-    @State private var selectedPlan: Plan = .yearly
+    @State private var store = Store()
+    @State private var selectedPlan: Store.Plan = .yearly
     @State private var selectedSharing: Sharing = .single
+    @Environment(\.dismiss) private var dismiss
 
     private let anonymousID = "$RCAnonymousID:0110333ef6a440c89beafb82647556f2"
 
-    enum Plan { case yearly, monthly }
     enum Sharing { case single, family }
+
+    private var selectedProduct: Product? { store.product(for: selectedPlan) }
+
+    private var yearlyDiscount: String? {
+        guard let yearly = store.product(for: .yearly),
+            let monthly = store.product(for: .monthly)
+        else { return nil }
+        let monthlyYear = monthly.price * Decimal(12)
+        guard monthlyYear > 0 else { return nil }
+        let percent = ((monthlyYear - yearly.price) / monthlyYear) * 100
+        let rounded = NSDecimalNumber(decimal: percent).intValue
+        guard rounded > 0 else { return nil }
+        return "-\(rounded) %"
+    }
+
+    private var footerText: String {
+        guard let product = selectedProduct else { return "cancel anytime" }
+        let unit = selectedPlan == .yearly ? "year" : "month"
+        return "\(product.displayPrice)/\(unit) • cancel anytime"
+    }
 
     var body: some View {
         VStack(spacing: 0) {
@@ -25,15 +47,15 @@ struct PaywallView: View {
                         PlanCard(
                             emoji: "🤓",
                             title: "Yearly",
-                            price: "29,99 €",
-                            discount: "-16 %",
+                            price: store.product(for: .yearly)?.displayPrice,
+                            discount: yearlyDiscount,
                             isSelected: selectedPlan == .yearly
                         ) { selectedPlan = .yearly }
 
                         PlanCard(
                             emoji: "🤏",
                             title: "Monthly",
-                            price: "2,99 €",
+                            price: store.product(for: .monthly)?.displayPrice,
                             discount: nil,
                             isSelected: selectedPlan == .monthly
                         ) { selectedPlan = .monthly }
@@ -59,9 +81,10 @@ struct PaywallView: View {
                                 blue: 0.80
                             ),
                             title: "Unlimited Voice Interaction",
-                            description: "Create metrics and log entries just by speaking"
+                            description:
+                                "Create metrics and log entries just by speaking"
                         )
-                       
+
                         FeatureRow(
                             icon: "arrow.2.circlepath",
                             iconColor: Color(
@@ -145,7 +168,7 @@ struct PaywallView: View {
 
                     // Utility buttons
                     VStack(spacing: 12) {
-                        Button(action: {}) {
+                        Button(action: { Task { await store.restore() } }) {
                             Label(
                                 "Restore Purchases",
                                 systemImage: "arrow.counterclockwise"
@@ -199,23 +222,36 @@ struct PaywallView: View {
             Divider()
 
             VStack(spacing: 12) {
-                Button(action: {}) {
-                    Label("Start tracking", systemImage: "play")
-                        .font(.headline)
-                        .foregroundStyle(.white)
-                        .frame(maxWidth: .infinity)
-                        .frame(height: 54)
-                        .background(Color(red: 0.90, green: 0.38, blue: 0.32))
-                        .clipShape(RoundedRectangle(cornerRadius: 16))
+                Button(action: {
+                    guard let product = selectedProduct else { return }
+                    Task {
+                        if await store.purchase(product) { dismiss() }
+                    }
+                }) {
+                    Group {
+                        if store.purchaseInProgress {
+                            ProgressView()
+                                .tint(.white)
+                        } else {
+                            Label("Start tracking", systemImage: "play")
+                                .font(.headline)
+                                .foregroundStyle(.white)
+                        }
+                    }
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 54)
+                    .background(Color(red: 0.90, green: 0.38, blue: 0.32))
+                    .clipShape(RoundedRectangle(cornerRadius: 16))
                 }
-                
-                Text("2.99€/month • cancel anytime")
+                .disabled(selectedProduct == nil || store.purchaseInProgress)
+
+                Text(footerText)
                     .font(.callout)
             }
             .padding(.horizontal, 16)
             .padding(.top, 16)
             .background(Color(.systemBackground))
-            
+
         }
         .background(Color(.systemGroupedBackground))
         .interactiveDismissDisabled()
@@ -225,7 +261,7 @@ struct PaywallView: View {
 private struct PlanCard: View {
     let emoji: String
     let title: String
-    let price: String
+    let price: String?
     let discount: String?
     let isSelected: Bool
     let action: () -> Void
@@ -271,10 +307,11 @@ private struct PlanCard: View {
                         .foregroundStyle(.primary)
                 }
 
-                Text(price)
+                Text(price ?? "—")
                     .font(.title2)
                     .fontWeight(.bold)
                     .foregroundStyle(.primary)
+                    .redacted(reason: price == nil ? .placeholder : [])
                     .padding(.top, 4)
             }
             .padding(14)
