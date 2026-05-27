@@ -7,6 +7,9 @@
     "%lld" : {
 
     },
+    "2.99€/month • cancel anytime" : {
+
+    },
     "Add a metric" : {
       "localizations" : {
         "es" : {
@@ -86,6 +89,12 @@
           }
         }
       }
+    },
+    "Contact Support" : {
+
+    },
+    "Copy" : {
+
     },
     "Current: %@" : {
       "localizations" : {
@@ -979,6 +988,9 @@
     "Placeholder" : {
 
     },
+    "Premium" : {
+
+    },
     "Range" : {
       "localizations" : {
         "es" : {
@@ -1011,7 +1023,14 @@
         }
       }
     },
+    "Restore Purchases" : {
+
+    },
+    "Start tracking" : {
+
+    },
     "Today" : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {

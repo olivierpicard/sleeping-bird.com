@@ -13,6 +13,7 @@
 		8152B3672F91C55700D421C2 /* ArkanaKeys in Frameworks */ = {isa = PBXBuildFile; productRef = 8152B3662F91C55700D421C2 /* ArkanaKeys */; };
 		81BB91BE2F95603F00E4A4C5 /* FirebaseAILogic in Frameworks */ = {isa = PBXBuildFile; productRef = 81BB91BD2F95603F00E4A4C5 /* FirebaseAILogic */; };
 		81BB91C12F95609700E4A4C5 /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 81BB91C02F95609700E4A4C5 /* FirebaseAnalytics */; };
+		81E2ADCA2FC766DB0024AC56 /* InAppPurchases.storekit in Resources */ = {isa = PBXBuildFile; fileRef = 81E2ADC92FC766DB0024AC56 /* InAppPurchases.storekit */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -30,6 +31,7 @@
 		8116F4152FB494C100E703A6 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 		8152B34C2F91B3E100D421C2 /* .gitignore */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
 		8152B36A2F91CB9B00D421C2 /* .arkana.yml */ = {isa = PBXFileReference; lastKnownFileType = text.yaml; path = .arkana.yml; sourceTree = "<group>"; };
+		81E2ADC92FC766DB0024AC56 /* InAppPurchases.storekit */ = {isa = PBXFileReference; lastKnownFileType = text; path = InAppPurchases.storekit; sourceTree = "<group>"; };
 		81F8D8382F8DEA6600E96BF9 /* SleepingBird.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SleepingBird.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -71,6 +73,7 @@
 		81F8D82F2F8DEA6600E96BF9 = {
 			isa = PBXGroup;
 			children = (
+				81E2ADC92FC766DB0024AC56 /* InAppPurchases.storekit */,
 				8116F4152FB494C100E703A6 /* Localizable.xcstrings */,
 				8152B34C2F91B3E100D421C2 /* .gitignore */,
 				81F8D8392F8DEA6600E96BF9 /* Products */,
@@ -198,6 +201,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				81E2ADCA2FC766DB0024AC56 /* InAppPurchases.storekit in Resources */,
 				8152B34D2F91B3E100D421C2 /* .gitignore in Resources */,
 				8116F4162FB494C200E703A6 /* Localizable.xcstrings in Resources */,
 			);
@@ -412,8 +416,8 @@
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -427,12 +431,15 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.alizetech.SleepingBird;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
 		};
@@ -452,8 +459,8 @@
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -463,12 +470,15 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.alizetech.SleepingBird;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;
 		};
