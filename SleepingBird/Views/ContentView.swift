@@ -37,6 +37,7 @@ struct ContentView: View {
 #Preview("Empty") {
     ContentView()
         .environment(MetricGenerator())
+        .environment(\.locale, Locale(identifier: "en_US"))
         .modelContainer(for: Metric.self, inMemory: true)
 }
 

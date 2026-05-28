@@ -8,22 +8,34 @@
 import Foundation
 
 struct AiMetricSuggestion {
+    private let locale: Locale
+
+    init(locale: Locale = .current) {
+        self.locale = locale
+    }
+
     private let systemPrompt = """
         You are a specialized Data Architect for user metric tracking.
         Your sole purpose is to map user instruction into the provided schema.
         Use the most typical configuration for the metric requested.
+        Make the configuration reflect the user local region
         """
 
     private func createUserPrompt(userInstruction: String) -> String {
         return """
             **Input Dictation**: "\(userInstruction)"
-
-            **Instructions**: Analyze the input above. Generate 1 to 3 distinct ways to track this metric.
-                Ensure the config values re realistic for the activity described.
+            **User Locale**: "\(locale.identifier)"
+            **Instructions**: Analyze the input above. 
+                Generate the most probable and pragmatic way to track this metric.
+                The metric should match the user intent.
+                Use the most natural and common way of tracking this.
+                Ensure the config values are realistic for the activity described.
+                Use the user language and the region to improve the metric description & definition
             """
     }
 
     func generate(userInstruction: String) async throws -> MetricSchema {
+        print(createUserPrompt(userInstruction: userInstruction))
         let start = ContinuousClock.now
         let result = try await AiSchemaCompletion(
             userPrompt: createUserPrompt(userInstruction: userInstruction),
@@ -33,6 +45,7 @@ struct AiMetricSuggestion {
         let elapsed = ContinuousClock.now - start
 
         print("[AiMetricSuggestion] generate completed in \(elapsed)")
+        print(result)
 
         return result
     }

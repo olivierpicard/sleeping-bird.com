@@ -14,13 +14,13 @@ final class MetricGenerator {
         self.pending = pending
     }
 
-    func generate(instruction: String, into context: ModelContext) {
+    func generate(instruction: String, into context: ModelContext, locale: Locale = .current) {
         let p = Pending(instruction: instruction)
         pending.append(p)
         Task { @MainActor in
             defer { pending.removeAll { $0.id == p.id } }
             do {
-                let schema = try await AiMetricSuggestion().generate(
+                let schema = try await AiMetricSuggestion(locale: locale).generate(
                     userInstruction: instruction
                 )
                 let metric = Metric(

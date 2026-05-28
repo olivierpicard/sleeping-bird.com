@@ -20,6 +20,7 @@ struct MetricInputSheet: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var context
     @Environment(MetricGenerator.self) private var generator
+    @Environment(\.locale) private var locale
     @State private var instruction: String = ""
     @State private var fontSize: CGFloat = 40
     @State private var placeholderIndex: Int = 0
@@ -167,7 +168,8 @@ struct MetricInputSheet: View {
                     Button(action: {
                         generator.generate(
                             instruction: instruction,
-                            into: context
+                            into: context,
+                            locale: locale
                         )
                         dismiss()
                     }) {
