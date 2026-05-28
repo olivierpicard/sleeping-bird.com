@@ -26,9 +26,16 @@ struct PaywallView: View {
     }
 
     private var footerText: String {
-        guard let product = selectedProduct else { return "cancel anytime" }
-        let unit = selectedPlan == .yearly ? "year" : "month"
-        return "\(product.displayPrice)/\(unit) • cancel anytime"
+        guard let product = selectedProduct else {
+            return String(localized: "paywall.footer.cancel_anytime")
+        }
+        let unit =
+            selectedPlan == .yearly
+            ? String(localized: "paywall.unit.year")
+            : String(localized: "paywall.unit.month")
+        return String(
+            localized: "paywall.footer.price_unit \(product.displayPrice) \(unit)"
+        )
     }
 
     var body: some View {
@@ -143,7 +150,7 @@ struct PaywallView: View {
                                 green: 0.87,
                                 blue: 0.97
                             ),
-                            title: "Aggregate",
+                            title: "Aggregation",
                             description:
                                 "Aggregate your data to have a better overview"
                         )
@@ -233,7 +240,7 @@ struct PaywallView: View {
                             ProgressView()
                                 .tint(.white)
                         } else {
-                            Label("Start tracking", systemImage: "play")
+                            Label("Continue", systemImage: "arrow.right")
                                 .font(.headline)
                                 .foregroundStyle(.white)
                         }
@@ -260,7 +267,7 @@ struct PaywallView: View {
 
 private struct PlanCard: View {
     let emoji: String
-    let title: String
+    let title: LocalizedStringKey
     let price: String?
     let discount: String?
     let isSelected: Bool
@@ -359,9 +366,9 @@ private struct FeatureRow: View {
     let icon: String
     let iconColor: Color
     let iconBackground: Color
-    let title: String
+    let title: LocalizedStringKey
     var badge: String? = nil
-    let description: String
+    let description: LocalizedStringKey
 
     var body: some View {
         HStack(alignment: .top, spacing: 14) {
@@ -407,4 +414,5 @@ private struct FeatureRow: View {
             PaywallView()
         }
         .presentationDetents([.large])
+        .environment(\.locale, Locale(identifier: "es"))
 }
