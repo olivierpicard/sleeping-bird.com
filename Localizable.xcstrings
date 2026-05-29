@@ -39,6 +39,57 @@
         }
       }
     },
+    "Advanced Charts" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gráficos avanzados"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Graphiques avancés"
+          }
+        }
+      }
+    },
+    "Aggregate your data to have a better overview" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Agrega tus datos para tener una mejor vista general"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Agrégez vos données pour une meilleure vue d'ensemble"
+          }
+        }
+      }
+    },
+    "Aggregation" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Agregación"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Agrégation"
+          }
+        }
+      }
+    },
+    "By continuing, you agree to our Terms and Privacy Policy." : {
+
+    },
     "Category" : {
       "localizations" : {
         "es" : {
@@ -103,6 +154,22 @@
         }
       }
     },
+    "Continue" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Suscribirse"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "S'abonner"
+          }
+        }
+      }
+    },
     "Copy" : {
       "localizations" : {
         "es" : {
@@ -115,6 +182,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Copier"
+          }
+        }
+      }
+    },
+    "Create metrics and log entries just by speaking" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Crea tus métricas por voz"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Créez vos métriques oralement"
           }
         }
       }
@@ -166,6 +249,9 @@
           }
         }
       }
+    },
+    "Done" : {
+
     },
     "duration.unit.h" : {
       "localizations" : {
@@ -639,6 +725,25 @@
         }
       }
     },
+    "Get fast help whenever you need it" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Asistencia rápida cuando la necesites"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Une assistance rapide dès que vous en avez besoin"
+          }
+        }
+      }
+    },
+    "Get Started" : {
+
+    },
     "Goal: %@" : {
       "localizations" : {
         "es" : {
@@ -656,6 +761,9 @@
       }
     },
     "Label" : {
+
+    },
+    "Last updated %@" : {
 
     },
     "metric_edit_sheet.field.name" : {
@@ -944,6 +1052,22 @@
         }
       }
     },
+    "Monthly" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mensual"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mensuel"
+          }
+        }
+      }
+    },
     "My Metrics" : {
       "localizations" : {
         "es" : {
@@ -956,6 +1080,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Mes suivis"
+          }
+        }
+      }
+    },
+    "No Ads, Full Privacy" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sin anuncios, privacidad garantizada"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sans publicité, vie privée garantie"
           }
         }
       }
@@ -1008,6 +1148,94 @@
         }
       }
     },
+    "paywall.footer.cancel_anytime" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "cancel anytime"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "cancela cuando quieras"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "annulable à tout moment"
+          }
+        }
+      }
+    },
+    "paywall.footer.price_unit %@ %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@/%2$@ • cancel anytime"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@/%2$@ • cancela cuando quieras"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@/%2$@ • annulable à tout moment"
+          }
+        }
+      }
+    },
+    "paywall.unit.month" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "month"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "mes"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "mois"
+          }
+        }
+      }
+    },
+    "paywall.unit.year" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "year"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "año"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "an"
+          }
+        }
+      }
+    },
     "Placeholder" : {
 
     },
@@ -1023,6 +1251,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Premium"
+          }
+        }
+      }
+    },
+    "Priority Support" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Soporte prioritario"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Support prioritaire"
           }
         }
       }
@@ -1075,82 +1319,47 @@
         }
       }
     },
-    "Continue" : {
+    "Sleeping Bird" : {
+
+    },
+    "Terms & Privacy" : {
+
+    },
+    "Thanks for trusting us with your data." : {
+
+    },
+    "Today" : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Suscribirse"
+            "value" : "Hoy"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "S'abonner"
+            "value" : "Aujourd'hui"
           }
         }
       }
     },
-    "Yearly" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Anual"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Annuel"
-          }
-        }
-      }
+    "Track anything. Just say it out loud." : {
+
     },
-    "Monthly" : {
+    "Track as many metrics as you want" : {
       "localizations" : {
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Mensual"
+            "value" : "Registra todas las métricas que quieras"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Mensuel"
-          }
-        }
-      }
-    },
-    "Unlimited Voice Interaction" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Comandos de voz ilimitados"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Interaction vocale illimitée"
-          }
-        }
-      }
-    },
-    "Create metrics and log entries just by speaking" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Crea tus métricas por voz"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Créez vos métriques oralement"
+            "value" : "Suivez autant de métriques que vous le souhaitez"
           }
         }
       }
@@ -1171,34 +1380,18 @@
         }
       }
     },
-    "Track as many metrics as you want" : {
+    "Unlimited Voice Interaction" : {
       "localizations" : {
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Registra todas las métricas que quieras"
+            "value" : "Comandos de voz ilimitados"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Suivez autant de métriques que vous le souhaitez"
-          }
-        }
-      }
-    },
-    "Advanced Charts" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Gráficos avanzados"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Graphiques avancés"
+            "value" : "Interaction vocale illimitée"
           }
         }
       }
@@ -1219,18 +1412,27 @@
         }
       }
     },
-    "No Ads, Full Privacy" : {
+    "Value" : {
+
+    },
+    "Welcome to %@" : {
+
+    },
+    "y" : {
+
+    },
+    "Yearly" : {
       "localizations" : {
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Sin anuncios, privacidad garantizada"
+            "value" : "Anual"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Sans publicité, vie privée garantie"
+            "value" : "Annuel"
           }
         }
       }
@@ -1250,181 +1452,6 @@
           }
         }
       }
-    },
-    "Aggregation" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Agregación"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Agrégation"
-          }
-        }
-      }
-    },
-    "Aggregate your data to have a better overview" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Agrega tus datos para tener una mejor vista general"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Agrégez vos données pour une meilleure vue d'ensemble"
-          }
-        }
-      }
-    },
-    "Priority Support" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Soporte prioritario"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Support prioritaire"
-          }
-        }
-      }
-    },
-    "Get fast help whenever you need it" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Asistencia rápida cuando la necesites"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Une assistance rapide dès que vous en avez besoin"
-          }
-        }
-      }
-    },
-    "paywall.footer.cancel_anytime" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "cancel anytime"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "cancela cuando quieras"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "annulable à tout moment"
-          }
-        }
-      }
-    },
-    "paywall.footer.price_unit %@ %@" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$@/%2$@ • cancel anytime"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$@/%2$@ • cancela cuando quieras"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$@/%2$@ • annulable à tout moment"
-          }
-        }
-      }
-    },
-    "paywall.unit.year" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "year"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "año"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "an"
-          }
-        }
-      }
-    },
-    "paywall.unit.month" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "month"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "mes"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "mois"
-          }
-        }
-      }
-    },
-    "Today" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Hoy"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Aujourd'hui"
-          }
-        }
-      }
-    },
-    "Value" : {
-
-    },
-    "y" : {
-
     }
   },
   "version" : "1.2"
