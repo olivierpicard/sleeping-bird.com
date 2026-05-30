@@ -9,8 +9,6 @@ import SwiftUI
 import UIKit
 
 struct VoiceLanguageConfigView: View {
-    var onBack: () -> Void = {}
-    var onContinue: (VoiceLanguageOption) -> Void = { _ in }
 
     @AppStorage(VoiceLanguageOption.storageKey)
     private var storedLanguageID = VoiceLanguageOption.default.id
@@ -37,10 +35,7 @@ struct VoiceLanguageConfigView: View {
         VStack(alignment: .leading, spacing: 0) {
             progressBar
                 .padding(.top, 8)
-
-            backButton
-                .padding(.top, 20)
-
+            
             micHero
                 .frame(maxWidth: .infinity)
                 .padding(.top, 24)
@@ -60,7 +55,7 @@ struct VoiceLanguageConfigView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
     }
 
-    // MARK: Progress
+    // MARK: - Progress
 
     private var progressBar: some View {
         HStack(spacing: 8) {
@@ -74,25 +69,8 @@ struct VoiceLanguageConfigView: View {
         .accessibilityLabel("Step 2 of 4")
     }
 
-    // MARK: Back
 
-    private var backButton: some View {
-        Button(action: onBack) {
-            Label("Back", systemImage: "chevron.left")
-                .labelStyle(.iconOnly)
-                .font(.headline)
-                .foregroundStyle(.primary)
-                .frame(width: 44, height: 44)
-                .background(
-                    Circle().strokeBorder(
-                        Color(uiColor: .systemGray4),
-                        lineWidth: 1
-                    )
-                )
-        }
-    }
-
-    // MARK: Hero
+    //  MARK: - Hero
 
     private var isDark: Bool { colorScheme == .dark }
 
@@ -120,7 +98,7 @@ struct VoiceLanguageConfigView: View {
         .accessibilityHidden(true)
     }
 
-    // MARK: Title
+    // MARK: - Title
 
     private var titleBlock: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -135,7 +113,7 @@ struct VoiceLanguageConfigView: View {
         }
     }
 
-    // MARK: Selector
+    // MARK: - Selector
 
     private var languageSelector: some View {
         Button {
@@ -199,10 +177,10 @@ struct VoiceLanguageConfigView: View {
         .contentShape(Rectangle())
     }
 
-    // MARK: Continue
+    // MARK: - Continue
 
     private var continueButton: some View {
-        Button(action: { onContinue(selection) }) {
+        Button(action: { }) {
             // Distinct key: the shared "Continue" key is mapped to "Subscribe" by the paywall.
             Text("Next")
                 .font(.headline)

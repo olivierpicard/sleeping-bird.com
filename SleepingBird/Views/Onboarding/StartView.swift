@@ -10,7 +10,8 @@ import SwiftUI
 import UIKit
 
 struct StartView: View {
-    var onGetStarted: () -> Void = {}
+
+    var onStart: () -> Void = {}
 
     @Environment(\.colorScheme) private var colorScheme
 
@@ -174,7 +175,7 @@ struct StartView: View {
 
     private var ctaBlock: some View {
         VStack(spacing: 16) {
-            Button(action: onGetStarted) {
+            Button(action: onStart) {
                 Label("Get Started", systemImage: "arrow.right")
                 .font(.headline)
                 .frame(maxWidth: .infinity)
