@@ -36,7 +36,24 @@ struct DashboardView: View {
                 .listRowBackground(Color.clear)
                 .swipeActions(edge: .trailing, allowsFullSwipe: true) {
                     Button(role: .destructive) {
-                        modelContext.delete(metric)
+                        delete(metric)
+                    } label: {
+                        Label("Delete", systemImage: "trash")
+                    }
+                }
+                .contextMenu {
+                    Button {
+                        selectedMetric = metric
+                    } label: {
+                        Label("View details", systemImage: "chart.xyaxis.line")
+                    }
+                    Button {
+                        editingMetric = metric
+                    } label: {
+                        Label("Add entry", systemImage: "plus")
+                    }
+                    Button(role: .destructive) {
+                        delete(metric)
                     } label: {
                         Label("Delete", systemImage: "trash")
                     }
@@ -62,6 +79,10 @@ struct DashboardView: View {
                 }
             }
         }
+    }
+
+    private func delete(_ metric: Metric) {
+        modelContext.delete(metric)
     }
 }
 
