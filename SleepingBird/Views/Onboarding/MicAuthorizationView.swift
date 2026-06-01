@@ -138,13 +138,23 @@ struct MicAuthorizationView: View {
     // MARK: - Permission
 
     private func requestMicrophoneAccess() {
-        Task {
+        // In SwiftUI Previews the system permission prompt can't be presented,
+        // so the request never resumes — advance without it.
+        guard !isRunningInPreview else {
+            onComplete()
+            return
+        }
+        Task { @MainActor in
             await AVAudioApplication.requestRecordPermission()
             onComplete()
         }
     }
+
+    private var isRunningInPreview: Bool {
+        ProcessInfo.processInfo.environment["XCODE_RUNNING_FOR_PREVIEWS"] == "1"
+    }
 }
 
 #Preview {
-    MicAuthorizationView()
+    MicAuthorizationView() 
 }

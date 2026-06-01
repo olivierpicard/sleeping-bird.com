@@ -24,8 +24,33 @@ struct SpeechAnimation: View {
     @State private var availableWidth: CGFloat = 0
     @State private var animationTask: Task<Void, Never>?
 
-    private var words: [String] {
-        text.components(separatedBy: .whitespaces).filter { !$0.isEmpty }
+    /// A single word plus whether it should render bold.
+    private struct Word {
+        let text: String
+        let isBold: Bool
+    }
+
+    /// Splits `text` into words, treating `**…**` markers as bold spans
+    /// (a span may cover multiple words, e.g. `**45 minute run**`).
+    private var words: [Word] {
+        var result: [Word] = []
+        var bold = false
+        for token in text.components(separatedBy: .whitespaces) where !token.isEmpty {
+            var word = token
+            let opens = word.hasPrefix("**")
+            if opens { word.removeFirst(2) }
+            let closes = word.hasSuffix("**")
+            if closes { word.removeLast(2) }
+            guard !word.isEmpty else { continue }
+            result.append(Word(text: word, isBold: bold || opens))
+            if opens { bold = true }
+            if closes { bold = false }
+        }
+        return result
+    }
+
+    private func font(bold: Bool) -> Font {
+        bold ? font.weight(.bold) : font
     }
 
     private var spaceWidth: CGFloat {
@@ -99,7 +124,13 @@ struct SpeechAnimation: View {
 
     /// A single line: full text laid out, clipped to the revealed width.
     private func lineView(_ line: [Int]) -> some View {
-        let fullText = line.map { words[$0] }.joined(separator: " ")
+        var fullText = AttributedString()
+        for (offset, index) in line.enumerated() {
+            if offset > 0 { fullText += AttributedString(" ") }
+            var piece = AttributedString(words[index].text)
+            piece.font = font(bold: words[index].isBold)
+            fullText += piece
+        }
         let width = revealedWidth(in: line)
         return Text(fullText)
             .font(font)
@@ -113,8 +144,8 @@ struct SpeechAnimation: View {
     private var measuringOverlay: some View {
         ZStack {
             ForEach(words.indices, id: \.self) { i in
-                Text(words[i])
-                    .font(font)
+                Text(words[i].text)
+                    .font(font(bold: words[i].isBold))
                     .lineLimit(1)
                     .fixedSize()
                     .background(
@@ -181,11 +212,11 @@ struct SpeechAnimation: View {
         Color(uiColor: .systemBackground).ignoresSafeArea()
         VStack(spacing: 32) {
             SpeechAnimation(
-                text: "Grocery shopping $80.000",
+                text: "Grocery shopping **$80.000**",
                 wordInterval: 0.35
             )
             SpeechAnimation(
-                text: "I went for a 45 minute run this morning before breakfast and felt great",
+                text: "I went for a **45 minute run** this morning before breakfast and felt great",
                 wordInterval: 0.2
             )
         }

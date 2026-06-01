@@ -10,6 +10,7 @@ import SwiftUI
 enum OnboardingStep: Hashable {
     case language
     case microphone
+    case guided
 }
 
 struct OnboardingFlow: View {
@@ -25,7 +26,9 @@ struct OnboardingFlow: View {
                     case .language:
                         VoiceLanguageConfigView { path.append(.microphone) }
                     case .microphone:
-                        MicAuthorizationView(onComplete: onComplete)
+                        MicAuthorizationView { path.append(.guided) }
+                    case .guided:
+                        GuidedAnimation(onComplete: onComplete)
                     }
                 }
         }

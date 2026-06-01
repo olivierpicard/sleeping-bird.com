@@ -17,14 +17,15 @@ import SwiftUI
 /// transition between cycles. The sequence loops forever.
 struct GuidedAnimation: View {
     var color: Color = .indigo
+    var onComplete: () -> Void = {}
 
     /// Example phrases cycled through, paired index-for-index with `cards`.
     private let texts = [
-        "Note the dates I put gas in my car",
-        "Keep track of my post workout fatigue",
-        "Track if I took my medication",
-        "Help me reach my 10 pages reading a day goal",
-        "Track my mood using happy, neutral, sad, or anxious"
+        "Note the **dates** I put **gas** in my car",
+        "Track if I took my **medication**",
+        "Help me reach my 10 pages reading a day **goal**",
+        "Track my mood using happy, neutral, sad, or anxious",
+        "Keep track of my post workout fatigue"
     ]
 
     /// Delay between each revealed word.
@@ -41,9 +42,36 @@ struct GuidedAnimation: View {
     @State private var index = 0
     @State private var stage: Stage = .bubble
     @State private var micActive = true
+    @State private var showNext = false
     @State private var cycleTask: Task<Void, Never>?
 
     var body: some View {
+        VStack(alignment: .center, spacing: 0) {
+            progressBar
+                .padding(.top, 8)
+
+            Spacer(minLength: 0)
+            hero
+                .padding(.horizontal, -24)
+            Spacer(minLength: 0)
+
+            if showNext {
+                nextButton
+                    .transition(.opacity.combined(with: .move(edge: .bottom)))
+            }
+        }
+        .padding(.horizontal, 24)
+        .padding(.bottom, 16)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+        .background {
+            EmptyDashboardBackground(intensity: 0.3)
+                .ignoresSafeArea()
+        }
+        .onAppear { startCycle() }
+        .onDisappear { cycleTask?.cancel() }
+    }
+
+    private var hero: some View {
         ZStack(alignment: .top) {
             MicWavesAnimation(color: color, isActive: micActive)
                 .padding(.vertical, 20)
@@ -53,7 +81,7 @@ struct GuidedAnimation: View {
                     SpeechAnimation(text: texts[index], wordInterval: wordInterval)
                         .id("bubble-\(index)")
                         .transition(bubbleTransition)
-                    
+
                 case .card:
                     cardView(for: cards[index])
                         .id("card-\(index)")
@@ -65,24 +93,49 @@ struct GuidedAnimation: View {
             .clipped()
             .offset(y: -10)
         }
-        .onAppear { startCycle() }
-        .onDisappear { cycleTask?.cancel() }
     }
 
-    /// The full `MetricView` is shrunk down so the card floats in the same slot
-    /// as the speech bubble, just above the mic. Scaling from the bottom keeps
-    /// its baseline aligned with the bubble it rises out of.
+    // MARK: - Progress
+
+    private var progressBar: some View {
+        HStack(spacing: 8) {
+            ForEach(0..<4, id: \.self) { _ in
+                Capsule()
+                    .fill(color)
+                    .frame(height: 5)
+            }
+        }
+        .accessibilityElement()
+        .accessibilityLabel("Step 4 of 4")
+    }
+
+    // MARK: - Next
+
+    private var nextButton: some View {
+        Button(action: onComplete) {
+            Text("Next")
+                .font(.headline)
+                .frame(maxWidth: .infinity)
+                .frame(height: 32)
+        }
+        .controlSize(.extraLarge)
+        .buttonStyle(.glassProminent)
+        .tint(color)
+    }
+
+    /// Only the chart is shown, wrapped in the same bubble as the speech text so
+    /// it floats in the same slot just above the mic, without the full card chrome.
     private func cardView(for info: CardInfo) -> some View {
-        MetricView(
-            title: info.title,
-            emoji: info.emoji,
-            value: info.value,
-            mainColor: info.color,
-            onAddTapped: {},
-            chart: info.chart
-        )
-        .frame(width: 420)
-        .scaleEffect(0.8, anchor: .top)
+        AnyView(info.chart)
+            .frame(height: 100)
+            .padding(.horizontal, 24)
+            .padding(.vertical, -5)
+            .background(
+                RoundedRectangle(cornerRadius: 20, style: .continuous)
+                    .fill(Color(uiColor: .systemBackground))
+//                    .fill(Color(uiColor: .clear))
+//                    .shadow(color: .black.opacity(0.12), radius: 12, y: 4)
+            )
     }
 
     /// Bubble fades in at the start of a cycle and slides up out when it becomes a card.
@@ -132,19 +185,16 @@ struct GuidedAnimation: View {
                     index = (index + 1) % texts.count
                     stage = .bubble
                     micActive = true
+                    showNext = true
                 }
             }
         }
     }
 }
 
-/// A fake metric card paired with each example phrase, used purely for the
+/// A fake metric chart paired with each example phrase, used purely for the
 /// onboarding showcase.
 private struct CardInfo {
-    let title: String
-    let emoji: String
-    let value: String
-    let color: Color
     let chart: any MiniChart
 }
 
@@ -162,32 +212,13 @@ extension GuidedAnimation {
         [
             // "Note the dates I put gas in my car"
             CardInfo(
-                title: "Gas Fill-Ups",
-                emoji: "⛽️",
-                value: "Jun 1",
-                color: .orange,
                 chart: EventCalendarMiniChart(
-                    data: Self.recentDays(40) { [2, 9, 18, 27].contains($0) },
+                    data: Self.recentDays(60) { [0, 15, 30, 56].contains($0) },
                     color: .orange
-                )
-            ),
-            // "Keep track of my post workout fatigue"
-            CardInfo(
-                title: "Workout Fatigue",
-                emoji: "😮‍💨",
-                value: "Medium",
-                color: .teal,
-                chart: LineMiniChart(
-                    data: [4, 6, 5, 7, 3, 5, 6, 4, 7, 5, 6, 5],
-                    color: .teal
                 )
             ),
             // "Track if I took my medication"
             CardInfo(
-                title: "Medication",
-                emoji: "💊",
-                value: "Taken",
-                color: .pink,
                 chart: TrailingCalendarMiniChart(
                     data: Self.recentDays(7) { $0 != 4 },
                     color: .pink
@@ -195,27 +226,23 @@ extension GuidedAnimation {
             ),
             // "Help me reach my 10 pages reading a day goal"
             CardInfo(
-                title: "Pages Read",
-                emoji: "📖",
-                value: "7 / 10",
-                color: .blue,
                 chart: LinearGaugeMiniChart(current: 7, goal: 10, color: .blue)
             ),
             // "Track my mood using happy, neutral, sad, or anxious"
             CardInfo(
-                title: "Mood",
-                emoji: "🙂",
-                value: "Happy",
-                color: .purple,
-                chart: StackedBarMiniChart(entries: [
-                    .init(timeIndex: 0, category: "Happy", value: 1),
-                    .init(timeIndex: 1, category: "Neutral", value: 1),
-                    .init(timeIndex: 2, category: "Anxious", value: 1),
-                    .init(timeIndex: 3, category: "Happy", value: 1),
-                    .init(timeIndex: 4, category: "Sad", value: 1),
-                    .init(timeIndex: 5, category: "Neutral", value: 1),
-                    .init(timeIndex: 6, category: "Happy", value: 1)
+                chart: DividerBarMiniChart(entries: [
+                    .init(category: "Happy", value: 3),
+                    .init(category: "Neutral", value: 2),
+                    .init(category: "Sad", value: 1),
+                    .init(category: "Anxious", value: 1)
                 ])
+            ),
+            // "Keep track of my post workout fatigue"
+            CardInfo(
+                chart: LineMiniChart(
+                    data: [4, 6, 5, 7, 3, 5, 6, 4, 7, 5, 6, 5],
+                    color: .teal
+                )
             )
         ]
     }
