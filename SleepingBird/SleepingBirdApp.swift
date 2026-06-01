@@ -27,7 +27,7 @@ struct SleepingBirdApp: App {
 
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            RootView()
                 .environment(generator)
         }
         .modelContainer(for: Metric.self)
