@@ -36,7 +36,9 @@ struct MetricInputSheet: View {
 
     init(
         instruction: String = "",
-        transcriber: Transcriber = DeepgramNova3Transcriber(),
+        transcriber: Transcriber = DeepgramNova3Transcriber(
+            config: .make(language: VoiceLanguageOption.saved.id)
+        ),
         spectrumLogic: SpectrumViewModel = LiveSpectrumViewModel(),
         showMicPermissionAlert: Bool = false
     ) {

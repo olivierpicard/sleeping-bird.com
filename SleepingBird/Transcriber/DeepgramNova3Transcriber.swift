@@ -28,14 +28,24 @@ final class DeepgramNova3Transcriber: Transcriber {
         /// When `false`, only final (committed) transcripts are delivered.
         var interimResults: Bool
 
-        static let `default` = Config(
-            apiKey: ArkanaKeys.Global().deepgramApiKey,
-            endpoint: URL(
-                string:
-                    "wss://api.deepgram.com/v1/listen?endpointing=10&interim_results=true&smart_format=true&language=multi&model=nova-3&encoding=linear16&sample_rate=16000"
-            )!,
-            interimResults: true
-        )
+        /// Builds a config for the given Deepgram `language` param (a BCP-47
+        /// code such as `"en"`, `"fr"`, `"es-419"`). Pass `"multi"` for
+        /// automatic multilingual detection.
+        static func make(
+            language: String = "multi",
+            interimResults: Bool = true
+        ) -> Config {
+            Config(
+                apiKey: ArkanaKeys.Global().deepgramApiKey,
+                endpoint: URL(
+                    string:
+                        "wss://api.deepgram.com/v1/listen?endpointing=10&interim_results=true&smart_format=true&language=\(language)&model=nova-3&encoding=linear16&sample_rate=16000"
+                )!,
+                interimResults: interimResults
+            )
+        }
+
+        static let `default` = make()
     }
 
     // MARK: - Private state
@@ -66,6 +76,11 @@ final class DeepgramNova3Transcriber: Transcriber {
         self.onText = onText
         committedText = ""
         interimText = ""
+
+        let language =
+            URLComponents(url: config.endpoint, resolvingAgainstBaseURL: false)?
+            .queryItems?.first { $0.name == "language" }?.value ?? "?"
+        print("Nova3 language: \(language)")
 
         var request = URLRequest(url: config.endpoint)
         request.setValue(
