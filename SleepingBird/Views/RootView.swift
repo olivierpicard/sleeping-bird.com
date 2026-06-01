@@ -9,8 +9,8 @@ import SwiftData
 import SwiftUI
 
 struct RootView: View {
-//    @AppStorage("hasCompletedOnboarding") private var hasCompletedOnboarding = false
-    @State private var hasCompletedOnboarding = false
+    @AppStorage("hasCompletedOnboarding") private var hasCompletedOnboarding = false
+//    @State private var hasCompletedOnboarding = false
 
     var body: some View {
         ZStack {
