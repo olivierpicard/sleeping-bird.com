@@ -24,6 +24,13 @@ final class MicBroker {
     private static let targetSampleRate: Double = 16_000
     private static let targetChannelCount: AVAudioChannelCount = 1
 
+    /// Whether the user has granted microphone recording permission.
+    /// Keeps `AVFoundation` permission APIs contained within `MicBroker`;
+    /// other layers consult this Bool rather than touching `AVAudioApplication`.
+    var hasPermission: Bool {
+        AVAudioApplication.shared.recordPermission == .granted
+    }
+
     /// Subscribe to PCM buffers. The handler runs on a background audio thread.
     /// Returns a token used to `unsubscribe`.
     @discardableResult

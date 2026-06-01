@@ -60,6 +60,8 @@ final class DeepgramNova3Transcriber: Transcriber {
 
     // MARK: - Transcriber
 
+    var hasMicPermission: Bool { broker.hasPermission }
+
     func start(onText: @escaping (String) -> Void) {
         self.onText = onText
         committedText = ""

@@ -34,3 +34,4 @@ struct RootView: View {
         .environment(MetricGenerator())
         .modelContainer(for: Metric.self, inMemory: true)
 }
+

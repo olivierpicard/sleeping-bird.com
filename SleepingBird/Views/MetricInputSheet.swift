@@ -1,5 +1,6 @@
 import SwiftData
 import SwiftUI
+import UIKit
 
 private struct PlaceholderExample {
     let text: String
@@ -21,11 +22,13 @@ struct MetricInputSheet: View {
     @Environment(\.modelContext) private var context
     @Environment(MetricGenerator.self) private var generator
     @Environment(\.locale) private var locale
+    @Environment(\.openURL) private var openURL
     @State private var instruction: String = ""
     @State private var fontSize: CGFloat = 40
     @State private var placeholderIndex: Int = 0
     @State private var isListening: Bool = false
     @State private var isEditing: Bool = false
+    @State private var showMicPermissionAlert: Bool = false
     @FocusState private var isFocused: Bool
     @Namespace private var glassNamespace
     private let transcriber: Transcriber
@@ -34,12 +37,14 @@ struct MetricInputSheet: View {
     init(
         instruction: String = "",
         transcriber: Transcriber = DeepgramNova3Transcriber(),
-        spectrumLogic: SpectrumViewModel = LiveSpectrumViewModel()
+        spectrumLogic: SpectrumViewModel = LiveSpectrumViewModel(),
+        showMicPermissionAlert: Bool = false
     ) {
         _instruction = State(initialValue: instruction)
         _fontSize = State(
             initialValue: Self.computeFontSize(for: instruction)
         )
+        _showMicPermissionAlert = State(initialValue: showMicPermissionAlert)
         self.transcriber = transcriber
         self.spectrumLogic = spectrumLogic
     }
@@ -60,6 +65,10 @@ struct MetricInputSheet: View {
     }
 
     private func toggleMic() {
+        if !isListening && !transcriber.hasMicPermission {
+            showMicPermissionAlert = true
+            return
+        }
         let willListen = !isListening
         withAnimation(.spring(response: 0.45, dampingFraction: 0.85)) {
             isListening = willListen
@@ -153,6 +162,19 @@ struct MetricInputSheet: View {
                 }
             }
             .presentationDragIndicator(.visible)
+            .alert(
+                "metric_input_sheet.mic_permission.title",
+                isPresented: $showMicPermissionAlert
+            ) {
+                Button("metric_input_sheet.mic_permission.settings") {
+                    if let url = URL(string: UIApplication.openSettingsURLString) {
+                        openURL(url)
+                    }
+                }
+                Button("metric_input_sheet.mic_permission.cancel", role: .cancel) {}
+            } message: {
+                Text("metric_input_sheet.mic_permission.message")
+            }
             .onDisappear { transcriber.stop() }
             .navigationTitle("Add a metric").navigationBarTitleDisplayMode(
                 .inline
@@ -201,7 +223,7 @@ struct MetricInputSheet: View {
                             )
                     }
                     micButton
-                    if !isListening { Spacer(minLength: 0) }
+                    if !isListening { Spacer(minLength: 0) } 
                 }
             }
         }
@@ -274,6 +296,23 @@ struct MetricInputSheet: View {
             instruction: "",
             transcriber: FakeTranscriber(),
             spectrumLogic: FakeSpectrumViewModel(),
+        )
+    }
+    .presentationDetents([.large])
+    .environment(MetricGenerator())
+    .modelContainer(for: Metric.self, inMemory: true)
+}
+
+#Preview("Mic permission denied") {
+    @Previewable @State var showSheet = true
+
+    NavigationStack {
+    }
+    .sheet(isPresented: $showSheet) {
+        MetricInputSheet(
+            transcriber: FakeTranscriber(hasMicPermission: false),
+            spectrumLogic: FakeSpectrumViewModel(),
+            showMicPermissionAlert: true,
         )
     }
     .presentationDetents([.large])

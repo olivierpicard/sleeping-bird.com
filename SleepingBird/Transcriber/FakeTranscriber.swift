@@ -6,17 +6,22 @@ import Foundation
 final class FakeTranscriber: Transcriber {
     private let words: [String]
     private let interval: TimeInterval
+    private let micPermission: Bool
     private var timer: Timer?
     private var index: Int = 0
     private var accumulated: String = ""
 
     init(
         text: String = "I want to track how much coffee I drink per day and see if it affects my sleep quality",
-        interval: TimeInterval = 0.25
+        interval: TimeInterval = 0.25,
+        hasMicPermission: Bool = true
     ) {
         self.words = text.split(separator: " ").map(String.init)
         self.interval = interval
+        self.micPermission = hasMicPermission
     }
+
+    var hasMicPermission: Bool { micPermission }
 
     func start(onText: @escaping (_ text: String) -> Void) {
         stop()

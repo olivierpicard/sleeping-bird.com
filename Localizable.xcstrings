@@ -907,6 +907,94 @@
         }
       }
     },
+    "metric_input_sheet.mic_permission.cancel" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancel"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancelar"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Annuler"
+          }
+        }
+      }
+    },
+    "metric_input_sheet.mic_permission.message" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Voice dictation needs access to your microphone. Turn it on in Settings to dictate your metric."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El dictado por voz necesita acceder al micrófono. Actívalo en Ajustes para dictar tu métrica."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La dictée vocale a besoin d'accéder au microphone. Activez-le dans Réglages pour dicter votre métrique."
+          }
+        }
+      }
+    },
+    "metric_input_sheet.mic_permission.settings" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open Settings"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir Ajustes"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvrir Réglages"
+          }
+        }
+      }
+    },
+    "metric_input_sheet.mic_permission.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Microphone Access Needed"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Acceso al micrófono necesario"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Accès au microphone requis"
+          }
+        }
+      }
+    },
     "metric_input_sheet.placeholder.coffee" : {
       "localizations" : {
         "en" : {
