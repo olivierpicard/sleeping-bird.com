@@ -17,7 +17,7 @@ struct StartView: View {
 
     @State private var titleAppeared = false
     @State private var subtitleAppeared = false
-    @State private var emojisAppeared = false
+    @State private var revealedEmojis: Set<Int> = []
     @State private var buttonAppeared = false
     @State private var footerAppeared = false
     @State private var floatPhase = false
@@ -113,6 +113,8 @@ struct StartView: View {
         let rotation: Double = offsetFromCenter * 8
         let zIndex: Double = isCenter ? 10 : (10 - abs(offsetFromCenter))
 
+        let shown = revealedEmojis.contains(index)
+
         let restingX = center.x + CGFloat(offsetFromCenter) * spread
         let restingY = center.y + abs(offsetFromCenter) * 6
         let startX = center.x
@@ -162,11 +164,11 @@ struct StartView: View {
         .shadow(color: card.tint.opacity(0.5), radius: 24, x: 0, y: 12)
         .rotationEffect(.degrees(rotation))
         .position(
-            x: emojisAppeared ? restingX : startX,
-            y: (emojisAppeared ? restingY : startY) + floatY
+            x: shown ? restingX : startX,
+            y: (shown ? restingY : startY) + floatY
         )
-        .scaleEffect(emojisAppeared ? 1 : 0.3)
-        .opacity(emojisAppeared ? 1 : 0)
+        .scaleEffect(shown ? 1 : 0.3)
+        .opacity(shown ? 1 : 0)
         .zIndex(zIndex)
         .accessibilityHidden(true)
     }
@@ -214,9 +216,19 @@ struct StartView: View {
         withAnimation(.spring(response: 1.3, dampingFraction: 0.85).delay(0.35)) {
             subtitleAppeared = true
         }
-        withAnimation(.spring(response: 1.6, dampingFraction: 0.75).delay(0.7)) {
-            emojisAppeared = true
+
+        // Spread the emojis in from the center outward with a gentle stagger.
+        let middle = Double(emojiCards.count - 1) / 2.0
+        let revealOrder = emojiCards.indices.sorted {
+            abs(Double($0) - middle) < abs(Double($1) - middle)
         }
+        for (rank, index) in revealOrder.enumerated() {
+            let delay = 0.7 + Double(rank) * 0.08
+            withAnimation(.spring(response: 0.9, dampingFraction: 0.78).delay(delay)) {
+                _ = revealedEmojis.insert(index)
+            }
+        }
+
         withAnimation(.spring(response: 1.1, dampingFraction: 0.75).delay(1.4)) {
             buttonAppeared = true
         }
