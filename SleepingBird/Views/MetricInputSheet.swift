@@ -66,6 +66,19 @@ struct MetricInputSheet: View {
         isFocused = false
     }
 
+    private func submit() {
+        guard !instruction.isEmpty else {
+            exitEditMode()
+            return
+        }
+        generator.generate(
+            instruction: instruction,
+            into: context,
+            locale: locale
+        )
+        dismiss()
+    }
+
     private func toggleMic() {
         if !isListening && !transcriber.hasMicPermission {
             showMicPermissionAlert = true
@@ -98,6 +111,7 @@ struct MetricInputSheet: View {
                     if isEditing {
                         TextField("", text: $instruction, axis: .vertical)
                             .focused($isFocused)
+                            .submitLabel(.done)
                             .multilineTextAlignment(.center)
                             .onChange(of: instruction) { _, new in
                                 if new.contains("\n") {
@@ -105,7 +119,7 @@ struct MetricInputSheet: View {
                                         of: "\n",
                                         with: ""
                                     )
-                                    exitEditMode()
+                                    submit()
                                 }
                             }
                     } else if instruction.isEmpty {
@@ -122,7 +136,10 @@ struct MetricInputSheet: View {
                                         .animation(.easeOut(duration: 0.3))
                                 )
                             )
-                            .onTapGesture { enterEditMode() }
+                            .onTapGesture {
+                                instruction = placeholderExamples[placeholderIndex].text
+                                enterEditMode()
+                            }
                     } else {
                         Text(instruction)
                             .onTapGesture { enterEditMode() }
@@ -189,14 +206,7 @@ struct MetricInputSheet: View {
                 }
 
                 ToolbarItem(placement: .confirmationAction) {
-                    Button(action: {
-                        generator.generate(
-                            instruction: instruction,
-                            into: context,
-                            locale: locale
-                        )
-                        dismiss()
-                    }) {
+                    Button(action: { submit() }) {
                         Image(systemName: "checkmark")
                     }
                     .buttonStyle(.glassProminent)
@@ -213,7 +223,7 @@ struct MetricInputSheet: View {
             HStack(spacing: isListening ? 12 : 0) {
                 if !isEditing && !isListening { Spacer(minLength: 0) }
                 keyboardButton
-                    .padding(.trailing, isEditing ? 0 : -5)
+                    .padding(.trailing, isEditing ? 0 : -5) 
                 if isEditing {
                     Spacer(minLength: 0)
                 } else {
