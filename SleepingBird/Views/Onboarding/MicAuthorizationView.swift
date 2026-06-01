@@ -77,14 +77,15 @@ struct MicAuthorizationView: View {
                 .fill(accent.opacity(isDark ? 0.28 : 0.12))
                 .frame(width: 132, height: 132)
                 .overlay(alignment: .bottomTrailing) {
-                    Image(systemName: "checkmark.circle.fill")
-                        .font(.system(size: 40))
-                        .symbolRenderingMode(.palette)
-                        .foregroundStyle(.white, .green)
+                    Image(systemName: "lock.shield.fill")
+                        .font(.system(size: 25, weight: .semibold))
+                        .foregroundStyle(.white)
+                        .frame(width: 40, height: 40)
+                        .background(Circle().fill(accent))
                         .background(
                             Circle()
                                 .fill(Color(uiColor: .systemBackground))
-                                .padding(3)
+                                .padding(-3)
                         )
                         .offset(x: 6, y: 6)
                 }

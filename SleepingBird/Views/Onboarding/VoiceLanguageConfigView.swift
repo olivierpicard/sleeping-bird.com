@@ -100,6 +100,19 @@ struct VoiceLanguageConfigView: View {
             Circle()
                 .fill(accent.opacity(isDark ? 0.28 : 0.12))
                 .frame(width: 132, height: 132)
+                .overlay(alignment: .bottomTrailing) {
+                    Image(systemName: "globe")
+                        .font(.system(size: 22, weight: .semibold))
+                        .foregroundStyle(.white)
+                        .frame(width: 40, height: 40)
+                        .background(Circle().fill(accent))
+                        .background(
+                            Circle()
+                                .fill(Color(uiColor: .systemBackground))
+                                .padding(-3)
+                        )
+                        .offset(x: 6, y: 6)
+                }
             Image(systemName: "mic.fill")
                 .font(.system(size: 48))
                 .foregroundStyle(accent)
