@@ -9,9 +9,12 @@ import SwiftUI
 
 enum OnboardingStep: Hashable {
     case language
+    case microphone
 }
 
 struct OnboardingFlow: View {
+    var onComplete: () -> Void = {}
+
     @State private var path: [OnboardingStep] = []
 
     var body: some View {
@@ -20,7 +23,9 @@ struct OnboardingFlow: View {
                 .navigationDestination(for: OnboardingStep.self) { step in
                     switch step {
                     case .language:
-                        VoiceLanguageConfigView()
+                        VoiceLanguageConfigView { path.append(.microphone) }
+                    case .microphone:
+                        MicAuthorizationView(onComplete: onComplete)
                     }
                 }
         }

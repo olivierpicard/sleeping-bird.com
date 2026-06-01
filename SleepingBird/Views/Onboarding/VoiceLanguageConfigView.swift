@@ -10,6 +10,9 @@ import UIKit
 
 struct VoiceLanguageConfigView: View {
 
+    /// Invoked when the user taps "Next" to advance the onboarding flow.
+    var onContinue: () -> Void = {}
+
     @AppStorage(VoiceLanguageOption.storageKey)
     private var storedLanguageID = VoiceLanguageOption.default.id
     @State private var isPickerPresented = false
@@ -32,27 +35,33 @@ struct VoiceLanguageConfigView: View {
     private let accent = Color.indigo
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
+        VStack(alignment: .center, spacing: 0) {
             progressBar
                 .padding(.top, 8)
-            
+
             micHero
                 .frame(maxWidth: .infinity)
-                .padding(.top, 24)
-                .padding(.bottom, 32)
+                .padding(.top, 40)
+
+//            Spacer(minLength: 24)
 
             titleBlock
+                .padding(.top, 50)
 
             languageSelector
-                .padding(.top, 28)
+                .padding(.top, 24)
 
-            Spacer(minLength: 24)
+            Spacer(minLength: 0)
 
             continueButton
         }
         .padding(.horizontal, 24)
         .padding(.bottom, 16)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+        .background {
+            EmptyDashboardBackground(intensity: 0.3)
+                .ignoresSafeArea()
+        }
     }
 
     // MARK: - Progress
@@ -81,18 +90,18 @@ struct VoiceLanguageConfigView: View {
                     accent.opacity(isDark ? 0.30 : 0.12),
                     lineWidth: isDark ? 1.5 : 1
                 )
-                .frame(width: 220, height: 220)
+                .frame(width: 300, height: 300)
             Circle()
                 .strokeBorder(
                     accent.opacity(isDark ? 0.45 : 0.18),
                     lineWidth: isDark ? 1.5 : 1
                 )
-                .frame(width: 160, height: 160)
+                .frame(width: 220, height: 220)
             Circle()
                 .fill(accent.opacity(isDark ? 0.28 : 0.12))
-                .frame(width: 96, height: 96)
+                .frame(width: 132, height: 132)
             Image(systemName: "mic.fill")
-                .font(.system(size: 34))
+                .font(.system(size: 48))
                 .foregroundStyle(accent)
         }
         .accessibilityHidden(true)
@@ -101,16 +110,19 @@ struct VoiceLanguageConfigView: View {
     // MARK: - Title
 
     private var titleBlock: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .center, spacing: 8) {
             Text("Your language")
                 .font(.system(size: 36, weight: .heavy))
+                .multilineTextAlignment(.center)
                 .fixedSize(horizontal: false, vertical: true)
 
             Text("We use this to transcribe your voice metrics accurately.")
                 .font(.body)
                 .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
                 .fixedSize(horizontal: false, vertical: true)
         }
+        .frame(maxWidth: .infinity)
     }
 
     // MARK: - Selector
@@ -180,7 +192,7 @@ struct VoiceLanguageConfigView: View {
     // MARK: - Continue
 
     private var continueButton: some View {
-        Button(action: { }) {
+        Button(action: { onContinue() }) {
             // Distinct key: the shared "Continue" key is mapped to "Subscribe" by the paywall.
             Text("Next")
                 .font(.headline)

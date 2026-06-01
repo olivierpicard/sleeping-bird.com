@@ -87,7 +87,7 @@
         }
       }
     },
-    "By continuing, you agree to our Terms and Privacy Policy." : {
+    "By continuing, you agree to our [Terms and Privacy Policy](sleepingbird://legal)." : {
 
     },
     "Category" : {
@@ -105,6 +105,12 @@
           }
         }
       }
+    },
+    "Change" : {
+
+    },
+    "Close" : {
+
     },
     "COLOR" : {
       "localizations" : {
@@ -763,6 +769,9 @@
     "Label" : {
 
     },
+    "Language & Region" : {
+
+    },
     "Last updated %@" : {
 
     },
@@ -1052,6 +1061,9 @@
         }
       }
     },
+    "microphone" : {
+
+    },
     "Monthly" : {
       "localizations" : {
         "es" : {
@@ -1083,6 +1095,9 @@
           }
         }
       }
+    },
+    "Next" : {
+
     },
     "No Ads, Full Privacy" : {
       "localizations" : {
@@ -1322,6 +1337,15 @@
     "Sleeping Bird" : {
 
     },
+    "Sleeping Bird listens only while you record, to log entries out loud." : {
+
+    },
+    "Step 2 of 4" : {
+
+    },
+    "Step 3 of 4" : {
+
+    },
     "Terms & Privacy" : {
 
     },
@@ -1363,6 +1387,9 @@
           }
         }
       }
+    },
+    "Turn on your" : {
+
     },
     "Unlimited Metrics" : {
       "localizations" : {
@@ -1415,7 +1442,16 @@
     "Value" : {
 
     },
+    "We use this to transcribe your voice metrics accurately." : {
+
+    },
     "Welcome to %@" : {
+
+    },
+    "x x" : {
+
+    },
+    "xx" : {
 
     },
     "y" : {
@@ -1452,6 +1488,9 @@
           }
         }
       }
+    },
+    "Your language" : {
+
     }
   },
   "version" : "1.2"
