@@ -2,7 +2,7 @@ import StoreKit
 import SwiftUI
 
 struct PaywallView: View {
-    @State private var store = Store()
+    @Environment(Store.self) private var store
     @State private var selectedPlan: Store.Plan = .yearly
     @State private var selectedSharing: Sharing = .single
     @Environment(\.dismiss) private var dismiss
@@ -412,6 +412,7 @@ private struct FeatureRow: View {
     NavigationStack {}
         .sheet(isPresented: $showSheet) {
             PaywallView()
+                .environment(Store())
         }
         .presentationDetents([.large])
         .environment(\.locale, Locale(identifier: "es"))

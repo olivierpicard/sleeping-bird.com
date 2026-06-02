@@ -24,11 +24,13 @@ class AppDelegate: NSObject, UIApplicationDelegate {
 struct SleepingBirdApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
     @State private var generator = MetricGenerator()
+    @State private var store = Store()
 
     var body: some Scene {
         WindowGroup {
             RootView()
                 .environment(generator)
+                .environment(store)
         }
         .modelContainer(for: Metric.self)
     }

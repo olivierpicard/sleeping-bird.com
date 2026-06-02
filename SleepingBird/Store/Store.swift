@@ -13,6 +13,7 @@ final class Store {
     private(set) var purchasedProductIDs: Set<String> = []
     private(set) var isLoadingProducts = false
     private(set) var purchaseInProgress = false
+    private(set) var hasLoadedEntitlements = false
 
     var isPremium: Bool { !purchasedProductIDs.isEmpty }
 
@@ -21,6 +22,7 @@ final class Store {
         Task {
             await loadProducts()
             await refreshPurchased()
+            hasLoadedEntitlements = true
         }
     }
 
