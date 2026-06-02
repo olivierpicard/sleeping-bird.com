@@ -7,18 +7,34 @@
     "%lld" : {
 
     },
-    "Add a metric" : {
+    "Add a tracker" : {
       "localizations" : {
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Añadir una métrica"
+            "value" : "Añadir un seguimiento"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ajouter une métrique"
+            "value" : "Ajouter un suivi"
+          }
+        }
+      }
+    },
+    "Add entry" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añadir medida"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajouter une mesure"
           }
         }
       }
@@ -87,8 +103,37 @@
         }
       }
     },
+    "Anxious" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ansioso"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anxieux"
+          }
+        }
+      }
+    },
     "By continuing, you agree to our [Terms and Privacy Policy](sleepingbird://legal)." : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Al continuar, aceptas nuestros [Términos y política de privacidad](sleepingbird://legal)."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "En continuant, vous acceptez nos [Conditions et politique de confidentialité](sleepingbird://legal)."
+          }
+        }
+      }
     },
     "Category" : {
       "localizations" : {
@@ -107,10 +152,36 @@
       }
     },
     "Change" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cambiar"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modifier"
+          }
+        }
+      }
     },
     "Close" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cerrar"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fermer"
+          }
+        }
+      }
     },
     "COLOR" : {
       "localizations" : {
@@ -204,6 +275,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Créez vos métriques oralement"
+          }
+        }
+      }
+    },
+    "Create trackers just by dictating your intentions — your voice is never stored or shared." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Crea tus trackers con solo dictar tus intenciones — Tu voz nunca se almacena ni se comparte."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Créer des trackers juste en dictant vos intentions — Votre voix n’est jamais stockée ni partagée."
           }
         }
       }
@@ -384,19 +471,19 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Add a metric"
+            "value" : "Add a tracker"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Añadir una métrica"
+            "value" : "Añadir un seguimiento"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ajouter une métrique"
+            "value" : "Ajouter un suivi"
           }
         }
       }
@@ -748,7 +835,20 @@
       }
     },
     "Get Started" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comenzar"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Commencer"
+          }
+        }
+      }
     },
     "Goal: %@" : {
       "localizations" : {
@@ -766,11 +866,88 @@
         }
       }
     },
+    "Happy" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Feliz"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Joyeux"
+          }
+        }
+      }
+    },
+    "Help me hit my **goal** of 10 pages a day" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ayúdame a llegar a mi **objetivo** de 10 páginas al día"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aide-moi à atteindre mon **objectif** de 10 pages par jour"
+          }
+        }
+      }
+    },
+    "Help us understand you better" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Para entenderte mejor"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pour mieux vous comprendre"
+          }
+        }
+      }
+    },
+    "It all starts with your %@" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Todo empieza con tu %@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tout commence par votre %@"
+          }
+        }
+      }
+    },
     "Label" : {
 
     },
     "Language & Region" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Idioma y región"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Langue et région"
+          }
+        }
+      }
     },
     "Last updated %@" : {
 
@@ -1149,8 +1326,21 @@
         }
       }
     },
-    "microphone" : {
-
+    "mic" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "micro"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "micro"
+          }
+        }
+      }
     },
     "Monthly" : {
       "localizations" : {
@@ -1168,12 +1358,12 @@
         }
       }
     },
-    "My Metrics" : {
+    "My Trackers" : {
       "localizations" : {
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Mis registros"
+            "value" : "Mis seguimientos"
           }
         },
         "fr" : {
@@ -1184,8 +1374,37 @@
         }
       }
     },
+    "Neutral" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Neutral"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Neutre"
+          }
+        }
+      }
+    },
     "Next" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Siguiente"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Suivant"
+          }
+        }
+      }
     },
     "No Ads, Full Privacy" : {
       "localizations" : {
@@ -1215,6 +1434,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Aucune donnée pour l'instant"
+          }
+        }
+      }
+    },
+    "Note the **dates** I fill up **gas**" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apunta las **fechas** en que pongo **gasolina**"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Note les **dates** où je fais le **plein**"
           }
         }
       }
@@ -1406,6 +1641,22 @@
         }
       }
     },
+    "Remind me if I took my **medication**" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recuérdame si tomé mis **medicamentos**"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rappelle-moi si j'ai pris mes **médicaments**"
+          }
+        }
+      }
+    },
     "Restore Purchases" : {
       "localizations" : {
         "es" : {
@@ -1422,45 +1673,91 @@
         }
       }
     },
-    "Sleeping Bird" : {
-
-    },
-    "Sleeping Bird listens only while you record, to log entries out loud." : {
-
-    },
-    "Step 2 of 4" : {
-
-    },
-    "Step 3 of 4" : {
-
-    },
-    "Step 4 of 4" : {
-
-    },
-    "Terms & Privacy" : {
-
-    },
-    "Thanks for trusting us with your data." : {
-
-    },
-    "Today" : {
-      "extractionState" : "stale",
+    "Sad" : {
       "localizations" : {
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Hoy"
+            "value" : "Triste"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Aujourd'hui"
+            "value" : "Triste"
           }
         }
       }
     },
-    "Track anything. Just say it out loud." : {
+    "Sleeping Bird" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sleeping Bird"
+          }
+        }
+      }
+    },
+    "Step 2 of 4" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paso 2 de 4"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Étape 2 sur 4"
+          }
+        }
+      }
+    },
+    "Step 3 of 4" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paso 3 de 4"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Étape 3 sur 4"
+          }
+        }
+      }
+    },
+    "Step 4 of 4" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paso 4 de 4"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Étape 4 sur 4"
+          }
+        }
+      }
+    },
+    "Terms & Privacy" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Conditions et politique de confidentialité"
+          }
+        }
+      }
+    },
+    "Thanks for trusting us with your data." : {
 
     },
     "Track as many metrics as you want" : {
@@ -1479,8 +1776,53 @@
         }
       }
     },
-    "Turn on your" : {
-
+    "Track how tired I feel after **working out**" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apunta mi **cansancio** después de entrenar"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Note ma **fatigue** après l'entraînement"
+          }
+        }
+      }
+    },
+    "Track my mood — happy, neutral, sad, or anxious" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lleva un registro de mi **humor** : feliz, neutral, triste o ansioso"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Suis mon **humeur** : joyeux, neutre, triste ou anxieux"
+          }
+        }
+      }
+    },
+    "Track what matters" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lleva el control de lo que te importa."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Suivez tout ce qui vous importe."
+          }
+        }
+      }
     },
     "Unlimited Metrics" : {
       "localizations" : {
@@ -1533,11 +1875,47 @@
     "Value" : {
 
     },
-    "We use this to transcribe your voice metrics accurately." : {
-
+    "View details" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Voir les détails"
+          }
+        }
+      }
     },
-    "Welcome to %@" : {
-
+    "We'll use your language to understand your voice more accurately." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Usaremos tu idioma para entender tu voz con mayor precisión."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nous utiliserons votre langue pour comprendre votre voix avec plus de précision."
+          }
+        }
+      }
+    },
+    "Welcome 👋" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bienvenido 👋"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bienvenue 👋"
+          }
+        }
+      }
     },
     "x x" : {
 
@@ -1579,9 +1957,6 @@
           }
         }
       }
-    },
-    "Your language" : {
-
     }
   },
   "version" : "1.2"
