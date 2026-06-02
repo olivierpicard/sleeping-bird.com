@@ -27,7 +27,7 @@ struct MicAuthorizationView: View {
 
                         Spacer(minLength: 0)
             titleBlock
-                .padding(.bottom, 90)
+                .padding(.bottom, 140)
 
 
             continueButton
@@ -94,24 +94,19 @@ struct MicAuthorizationView: View {
                 .foregroundStyle(accent)
         }
         .accessibilityHidden(true)
-    }
+    }    
 
     // MARK: - Title
 
     private var titleBlock: some View {
         VStack(alignment: .center, spacing: 8) {
-            VStack(spacing: 0) {
-                Text("Turn on your")
-                    .foregroundStyle(.primary)
-                Text("microphone")
-                    .foregroundStyle(accent)
-            }
-            .font(.system(size: 36, weight: .heavy))
-            .multilineTextAlignment(.center)
-            .fixedSize(horizontal: false, vertical: true)
+            Text("It all starts with your \(Text("mic").foregroundStyle(accent))")
+                .font(.system(size: 36, weight: .heavy))
+                .multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true)
 
             Text(
-                "Sleeping Bird listens only while you record, to log entries out loud."
+                "Create trackers just by dictating your intentions — your voice is never stored or shared."
             )
             .font(.body)
             .foregroundStyle(.secondary)

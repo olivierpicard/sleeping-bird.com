@@ -57,13 +57,21 @@ struct StartView: View {
     private var titleBlock: some View {
         VStack(alignment: .center, spacing: 12) {
 
-            Text("Welcome to \(Text("Sleeping Bird").foregroundStyle(brandGradient))")
-                .font(.system(size: 45))
-                .fontWeight(.heavy)
-                .multilineTextAlignment(.center)
-                .opacity(titleAppeared ? 1 : 0)
+            VStack(alignment: .center, spacing: 4) {
+                Text("Welcome 👋")
+                    .font(.title2)
+                    .fontWeight(.semibold)
+                    .foregroundStyle(.secondary)
 
-            Text("Track anything. Just say it out loud.")
+                Text("Sleeping Bird")
+                    .font(.system(size: 45))
+                    .fontWeight(.heavy)
+                    .foregroundStyle(brandGradient)
+            }
+            .multilineTextAlignment(.center)
+            .opacity(titleAppeared ? 1 : 0)
+
+            Text("Track what matters")
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
@@ -311,5 +319,5 @@ private extension Color {
 
 #Preview {
     StartView()
-        .environment(\.locale, Locale(identifier: "en_US"))
+        .environment(\.locale, Locale(identifier: "es"))
 }

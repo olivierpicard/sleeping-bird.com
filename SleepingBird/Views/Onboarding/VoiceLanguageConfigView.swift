@@ -46,7 +46,7 @@ struct VoiceLanguageConfigView: View {
 //            Spacer(minLength: 24)
 
             titleBlock
-                .padding(.top, 50)
+                .padding(.top, 30)
 
             languageSelector
                 .padding(.top, 24)
@@ -124,12 +124,12 @@ struct VoiceLanguageConfigView: View {
 
     private var titleBlock: some View {
         VStack(alignment: .center, spacing: 8) {
-            Text("Your language")
+            Text("Help us understand you better")
                 .font(.system(size: 36, weight: .heavy))
                 .multilineTextAlignment(.center)
                 .fixedSize(horizontal: false, vertical: true)
 
-            Text("We use this to transcribe your voice metrics accurately.")
+            Text("We'll use your language to understand your voice more accurately.")
                 .font(.body)
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
@@ -175,24 +175,29 @@ struct VoiceLanguageConfigView: View {
             Text(option.flag)
                 .font(.title)
                 .frame(width: 34)
+                .accessibilityHidden(true)
 
             if showRegionInline {
                 HStack(spacing: 8) {
                     Text(option.language)
                         .font(.headline)
                         .foregroundStyle(.primary)
-                    Text(option.region)
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
+                    if let region = option.region {
+                        Text(region)
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                    }
                 }
             } else {
                 VStack(alignment: .leading, spacing: 1) {
                     Text(option.language)
                         .font(.headline)
                         .foregroundStyle(.primary)
-                    Text(option.region)
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
+                    if let region = option.region {
+                        Text(region)
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                    }
                 }
             }
             Spacer(minLength: 0)
@@ -200,6 +205,8 @@ struct VoiceLanguageConfigView: View {
         .padding(.horizontal, 16)
         .padding(.vertical, 14)
         .contentShape(Rectangle())
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(option.accessibilityLabel)
     }
 
     // MARK: - Continue
@@ -237,14 +244,17 @@ private struct VoiceLanguagePicker: View {
                         Text(option.flag)
                             .font(.title)
                             .frame(width: 34)
+                            .accessibilityHidden(true)
 
                         VStack(alignment: .leading, spacing: 1) {
                             Text(option.language)
                                 .font(.headline)
                                 .foregroundStyle(.primary)
-                            Text(option.region)
-                                .font(.subheadline)
-                                .foregroundStyle(.secondary)
+                            if let region = option.region {
+                                Text(region)
+                                    .font(.subheadline)
+                                    .foregroundStyle(.secondary)
+                            }
                         }
 
                         Spacer(minLength: 0)
@@ -256,6 +266,8 @@ private struct VoiceLanguagePicker: View {
                         }
                     }
                     .contentShape(Rectangle())
+                    .accessibilityElement(children: .combine)
+                    .accessibilityLabel(option.accessibilityLabel)
                 }
                 .buttonStyle(.plain)
                 .listRowInsets(
@@ -283,8 +295,30 @@ private struct VoiceLanguagePicker: View {
 struct VoiceLanguageOption: Identifiable, Equatable {
     let id: String
     let flag: String
-    let language: String
-    let region: String
+
+    /// Locale built from this option's own identifier. Localizing *through this*
+    /// yields endonyms — each name rendered in its own language/script.
+    private var locale: Locale { Locale(identifier: id) }
+
+    /// Language name in its own language: "English", "Français", "日本語", "العربية".
+    var language: String {
+        let code = locale.language.languageCode?.identifier ?? id
+        return locale.localizedString(forLanguageCode: code) ?? code
+    }
+
+    /// Region name in its own language, or `nil` when the id carries no region.
+    /// "en-GB" → "United Kingdom", "es-419" → "Latinoamérica", "en"/"ar" → nil.
+    var region: String? {
+        guard let code = locale.region?.identifier else { return nil }
+        return locale.localizedString(forRegionCode: code)
+    }
+
+    /// VoiceOver label combining language and region (the flag is read poorly,
+    /// so it's hidden in the UI). e.g. "English, United Kingdom" or "العربية".
+    var accessibilityLabel: String {
+        guard let region else { return language }
+        return "\(language), \(region)"
+    }
 
     /// `UserDefaults`/`@AppStorage` key under which the chosen id is persisted.
     static let storageKey = "voiceLanguage"
@@ -300,251 +334,185 @@ struct VoiceLanguageOption: Identifiable, Equatable {
         return all.first { $0.id == id } ?? .default
     }
 
-    static let all: [VoiceLanguageOption] = [
+    /// All options, ordered by their endonym (each language's own name).
+    static let all: [VoiceLanguageOption] = catalog.sorted {
+        $0.language.localizedStandardCompare($1.language) == .orderedAscending
+    }
+
+    // Display names are derived from `id` at render time (endonyms); only the
+    // flag is curated here, since it isn't reliably derivable from a locale.
+    // Source order is grouped by English name for maintenance; `all` re-sorts
+    // by endonym for display.
+    private static let catalog: [VoiceLanguageOption] = [
         // Arabic
-        .init(
-            id: "ar",
-            flag: "🇸🇦",
-            language: "Arabic",
-            region: "Modern Standard"
-        ),
-        .init(id: "ar-EG", flag: "🇪🇬", language: "Arabic", region: "Egypt"),
-        .init(
-            id: "ar-SA",
-            flag: "🇸🇦",
-            language: "Arabic",
-            region: "Saudi Arabia"
-        ),
-        .init(
-            id: "ar-AE",
-            flag: "🇦🇪",
-            language: "Arabic",
-            region: "United Arab Emirates"
-        ),
-        .init(id: "ar-IQ", flag: "🇮🇶", language: "Arabic", region: "Iraq"),
-        .init(
-            id: "ar-LB",
-            flag: "🇱🇧",
-            language: "Arabic",
-            region: "Lebanon (Levantine)"
-        ),
-        .init(
-            id: "ar-MA",
-            flag: "🇲🇦",
-            language: "Arabic",
-            region: "Morocco (Maghrebi)"
-        ),
-        .init(id: "ar-SD", flag: "🇸🇩", language: "Arabic", region: "Sudan"),
+        .init(id: "ar", flag: "🇸🇦"),
+        .init(id: "ar-EG", flag: "🇪🇬"),
+        .init(id: "ar-SA", flag: "🇸🇦"),
+        .init(id: "ar-AE", flag: "🇦🇪"),
+        .init(id: "ar-IQ", flag: "🇮🇶"),
+        .init(id: "ar-LB", flag: "🇱🇧"),
+        .init(id: "ar-MA", flag: "🇲🇦"),
+        .init(id: "ar-SD", flag: "🇸🇩"),
 
         // Belarusian
-        .init(id: "be", flag: "🇧🇾", language: "Belarusian", region: "Belarus"),
+        .init(id: "be", flag: "🇧🇾"),
 
         // Bengali
-        .init(id: "bn", flag: "🇧🇩", language: "Bengali", region: "Bangladesh"),
+        .init(id: "bn", flag: "🇧🇩"),
 
         // Bosnian
-        .init(
-            id: "bs",
-            flag: "🇧🇦",
-            language: "Bosnian",
-            region: "Bosnia & Herzegovina"
-        ),
+        .init(id: "bs", flag: "🇧🇦"),
 
         // Bulgarian
-        .init(id: "bg", flag: "🇧🇬", language: "Bulgarian", region: "Bulgaria"),
+        .init(id: "bg", flag: "🇧🇬"),
 
         // Catalan
-        .init(id: "ca", flag: "🇪🇸", language: "Catalan", region: "Catalonia"),
+        .init(id: "ca", flag: "🇪🇸"),
 
         // Chinese
-        .init(
-            id: "zh",
-            flag: "🇨🇳",
-            language: "Chinese",
-            region: "Mandarin, Simplified"
-        ),
-        .init(
-            id: "zh-TW",
-            flag: "🇹🇼",
-            language: "Chinese",
-            region: "Mandarin, Traditional"
-        ),
-        .init(
-            id: "zh-HK",
-            flag: "🇭🇰",
-            language: "Cantonese",
-            region: "Hong Kong"
-        ),
+        .init(id: "zh", flag: "🇨🇳"),
+        .init(id: "zh-TW", flag: "🇹🇼"),
+        .init(id: "zh-HK", flag: "🇭🇰"),
 
         // Croatian
-        .init(id: "hr", flag: "🇭🇷", language: "Croatian", region: "Croatia"),
+        .init(id: "hr", flag: "🇭🇷"),
 
         // Czech
-        .init(id: "cs", flag: "🇨🇿", language: "Czech", region: "Czechia"),
+        .init(id: "cs", flag: "🇨🇿"),
 
         // Danish
-        .init(id: "da", flag: "🇩🇰", language: "Danish", region: "Denmark"),
+        .init(id: "da", flag: "🇩🇰"),
 
         // Dutch
-        .init(id: "nl", flag: "🇳🇱", language: "Dutch", region: "Netherlands"),
+        .init(id: "nl", flag: "🇳🇱"),
 
         // English
-        .init(
-            id: "en",
-            flag: "🇺🇸",
-            language: "English",
-            region: "United States"
-        ),
-        .init(id: "en-AU", flag: "🇦🇺", language: "English", region: "Australia"),
-        .init(
-            id: "en-GB",
-            flag: "🇬🇧",
-            language: "English",
-            region: "United Kingdom"
-        ),
-        .init(id: "en-IN", flag: "🇮🇳", language: "English", region: "India"),
-        .init(
-            id: "en-NZ",
-            flag: "🇳🇿",
-            language: "English",
-            region: "New Zealand"
-        ),
+        .init(id: "en", flag: "🇺🇸"),
+        .init(id: "en-AU", flag: "🇦🇺"),
+        .init(id: "en-GB", flag: "🇬🇧"),
+        .init(id: "en-IN", flag: "🇮🇳"),
+        .init(id: "en-NZ", flag: "🇳🇿"),
 
         // Estonian
-        .init(id: "et", flag: "🇪🇪", language: "Estonian", region: "Estonia"),
+        .init(id: "et", flag: "🇪🇪"),
 
         // Finnish
-        .init(id: "fi", flag: "🇫🇮", language: "Finnish", region: "Finland"),
+        .init(id: "fi", flag: "🇫🇮"),
 
         // Flemish
-        .init(id: "nl-BE", flag: "🇧🇪", language: "Flemish", region: "Belgium"),
+        .init(id: "nl-BE", flag: "🇧🇪"),
 
         // French
-        .init(id: "fr", flag: "🇫🇷", language: "French", region: "France"),
-        .init(id: "fr-CA", flag: "🇨🇦", language: "French", region: "Canada"),
+        .init(id: "fr", flag: "🇫🇷"),
+        .init(id: "fr-CA", flag: "🇨🇦"),
 
         // German
-        .init(id: "de", flag: "🇩🇪", language: "German", region: "Germany"),
-        .init(
-            id: "de-CH",
-            flag: "🇨🇭",
-            language: "German",
-            region: "Switzerland"
-        ),
+        .init(id: "de", flag: "🇩🇪"),
+        .init(id: "de-CH", flag: "🇨🇭"),
 
         // Greek
-        .init(id: "el", flag: "🇬🇷", language: "Greek", region: "Greece"),
+        .init(id: "el", flag: "🇬🇷"),
 
         // Gujarati
-        .init(id: "gu", flag: "🇮🇳", language: "Gujarati", region: "India"),
+        .init(id: "gu", flag: "🇮🇳"),
 
         // Hebrew
-        .init(id: "he", flag: "🇮🇱", language: "Hebrew", region: "Israel"),
+        .init(id: "he", flag: "🇮🇱"),
 
         // Hindi
-        .init(id: "hi", flag: "🇮🇳", language: "Hindi", region: "India"),
+        .init(id: "hi", flag: "🇮🇳"),
 
         // Hungarian
-        .init(id: "hu", flag: "🇭🇺", language: "Hungarian", region: "Hungary"),
+        .init(id: "hu", flag: "🇭🇺"),
 
         // Indonesian
-        .init(id: "id", flag: "🇮🇩", language: "Indonesian", region: "Indonesia"),
+        .init(id: "id", flag: "🇮🇩"),
 
         // Italian
-        .init(id: "it", flag: "🇮🇹", language: "Italian", region: "Italy"),
+        .init(id: "it", flag: "🇮🇹"),
 
         // Japanese
-        .init(id: "ja", flag: "🇯🇵", language: "Japanese", region: "Japan"),
+        .init(id: "ja", flag: "🇯🇵"),
 
         // Kannada
-        .init(id: "kn", flag: "🇮🇳", language: "Kannada", region: "India"),
+        .init(id: "kn", flag: "🇮🇳"),
 
         // Korean
-        .init(id: "ko", flag: "🇰🇷", language: "Korean", region: "South Korea"),
+        .init(id: "ko", flag: "🇰🇷"),
 
         // Latvian
-        .init(id: "lv", flag: "🇱🇻", language: "Latvian", region: "Latvia"),
+        .init(id: "lv", flag: "🇱🇻"),
 
         // Lithuanian
-        .init(id: "lt", flag: "🇱🇹", language: "Lithuanian", region: "Lithuania"),
+        .init(id: "lt", flag: "🇱🇹"),
 
         // Macedonian
-        .init(
-            id: "mk",
-            flag: "🇲🇰",
-            language: "Macedonian",
-            region: "North Macedonia"
-        ),
+        .init(id: "mk", flag: "🇲🇰"),
 
         // Malay
-        .init(id: "ms", flag: "🇲🇾", language: "Malay", region: "Malaysia"),
+        .init(id: "ms", flag: "🇲🇾"),
 
         // Marathi
-        .init(id: "mr", flag: "🇮🇳", language: "Marathi", region: "India"),
+        .init(id: "mr", flag: "🇮🇳"),
 
         // Norwegian
-        .init(id: "no", flag: "🇳🇴", language: "Norwegian", region: "Norway"),
+        .init(id: "no", flag: "🇳🇴"),
 
         // Persian
-        .init(id: "fa", flag: "🇮🇷", language: "Persian", region: "Iran"),
+        .init(id: "fa", flag: "🇮🇷"),
 
         // Polish
-        .init(id: "pl", flag: "🇵🇱", language: "Polish", region: "Poland"),
+        .init(id: "pl", flag: "🇵🇱"),
 
         // Portuguese
-        .init(id: "pt", flag: "🇵🇹", language: "Portuguese", region: "Portugal"),
-        .init(id: "pt-BR", flag: "🇧🇷", language: "Portuguese", region: "Brazil"),
+        .init(id: "pt", flag: "🇵🇹"),
+        .init(id: "pt-BR", flag: "🇧🇷"),
 
         // Romanian
-        .init(id: "ro", flag: "🇷🇴", language: "Romanian", region: "Romania"),
+        .init(id: "ro", flag: "🇷🇴"),
 
         // Russian
-        .init(id: "ru", flag: "🇷🇺", language: "Russian", region: "Russia"),
+        .init(id: "ru", flag: "🇷🇺"),
 
         // Serbian
-        .init(id: "sr", flag: "🇷🇸", language: "Serbian", region: "Serbia"),
+        .init(id: "sr", flag: "🇷🇸"),
 
         // Slovak
-        .init(id: "sk", flag: "🇸🇰", language: "Slovak", region: "Slovakia"),
+        .init(id: "sk", flag: "🇸🇰"),
 
         // Slovenian
-        .init(id: "sl", flag: "🇸🇮", language: "Slovenian", region: "Slovenia"),
+        .init(id: "sl", flag: "🇸🇮"),
 
         // Spanish
-        .init(id: "es", flag: "🇪🇸", language: "Spanish", region: "Spain"),
-        .init(
-            id: "es-419",
-            flag: "🌎",
-            language: "Spanish",
-            region: "Latin America"
-        ),
+        .init(id: "es", flag: "🇪🇸"),
+        .init(id: "es-419", flag: "🌎"),
 
         // Swedish
-        .init(id: "sv", flag: "🇸🇪", language: "Swedish", region: "Sweden"),
+        .init(id: "sv", flag: "🇸🇪"),
 
         // Tagalog
-        .init(id: "tl", flag: "🇵🇭", language: "Tagalog", region: "Philippines"),
+        .init(id: "tl", flag: "🇵🇭"),
 
         // Tamil
-        .init(id: "ta", flag: "🇮🇳", language: "Tamil", region: "India"),
+        .init(id: "ta", flag: "🇮🇳"),
 
         // Telugu
-        .init(id: "te", flag: "🇮🇳", language: "Telugu", region: "India"),
+        .init(id: "te", flag: "🇮🇳"),
 
         // Thai
-        .init(id: "th", flag: "🇹🇭", language: "Thai", region: "Thailand"),
+        .init(id: "th", flag: "🇹🇭"),
 
         // Turkish
-        .init(id: "tr", flag: "🇹🇷", language: "Turkish", region: "Turkey"),
+        .init(id: "tr", flag: "🇹🇷"),
 
         // Ukrainian
-        .init(id: "uk", flag: "🇺🇦", language: "Ukrainian", region: "Ukraine"),
+        .init(id: "uk", flag: "🇺🇦"),
 
         // Urdu
-        .init(id: "ur", flag: "🇵🇰", language: "Urdu", region: "Pakistan"),
+        .init(id: "ur", flag: "🇵🇰"),
 
         // Vietnamese
-        .init(id: "vi", flag: "🇻🇳", language: "Vietnamese", region: "Vietnam"),
+        .init(id: "vi", flag: "🇻🇳"),
     ]
 }
 

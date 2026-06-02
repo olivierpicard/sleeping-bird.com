@@ -195,7 +195,7 @@ struct MetricInputSheet: View {
                 Text("metric_input_sheet.mic_permission.message")
             }
             .onDisappear { transcriber.stop() }
-            .navigationTitle("Add a metric").navigationBarTitleDisplayMode(
+            .navigationTitle("Add a tracker").navigationBarTitleDisplayMode(
                 .inline
             )
             .toolbar {

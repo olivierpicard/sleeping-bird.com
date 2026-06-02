@@ -19,14 +19,17 @@ struct GuidedAnimation: View {
     var color: Color = .indigo
     var onComplete: () -> Void = {}
 
+
     /// Example phrases cycled through, paired index-for-index with `cards`.
-    private let texts = [
-        "Note the **dates** I put **gas** in my car",
-        "Track if I took my **medication**",
-        "Help me reach my 10 pages reading a day **goal**",
-        "Track my mood using happy, neutral, sad, or anxious",
-        "Keep track of my post workout fatigue"
-    ]
+    private var texts: [String] {
+        [
+            String(localized: "Note the **dates** I fill up **gas**"),
+            String(localized: "Remind me if I took my **medication**"),
+            String(localized: "Help me hit my **goal** of 10 pages a day"),
+            String(localized: "Track my mood — happy, neutral, sad, or anxious"),
+            String(localized: "Track how tired I feel after **working out**"),
+        ]
+    }
 
     /// Delay between each revealed word.
     private let wordInterval: TimeInterval = 0.3
@@ -231,16 +234,16 @@ extension GuidedAnimation {
             // "Track my mood using happy, neutral, sad, or anxious"
             CardInfo(
                 chart: DividerBarMiniChart(entries: [
-                    .init(category: "Happy", value: 3),
-                    .init(category: "Neutral", value: 2),
-                    .init(category: "Sad", value: 1),
-                    .init(category: "Anxious", value: 1)
+                    .init(category: String(localized: "Happy"), value: 3),
+                    .init(category: String(localized: "Neutral"), value: 2),
+                    .init(category: String(localized: "Sad"), value: 1),
+                    .init(category: String(localized: "Anxious"), value: 1)
                 ])
             ),
             // "Keep track of my post workout fatigue"
             CardInfo(
                 chart: LineMiniChart(
-                    data: [4, 6, 5, 7, 3, 5, 6, 4, 7, 5, 6, 5],
+                    data: [7, 5, 4, 6, 4, 5, 6, 3, 6, 5, 6, 5],
                     color: .teal
                 )
             )
@@ -254,3 +257,4 @@ extension GuidedAnimation {
         GuidedAnimation()
     }
 }
+ 

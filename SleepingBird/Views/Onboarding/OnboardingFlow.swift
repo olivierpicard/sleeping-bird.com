@@ -37,4 +37,5 @@ struct OnboardingFlow: View {
 
 #Preview {
     OnboardingFlow()
+        .environment(\.locale, Locale(identifier: "es"))
 }

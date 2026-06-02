@@ -71,11 +71,11 @@ struct DashboardView: View {
             }
         }
         .scrollContentBackground(.hidden)
-        .navigationTitle("My Metrics")
+        .navigationTitle("My Trackers")
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
                 Button(action: onAddMetric) {
-                    Label("Add a metric", systemImage: "plus")
+                    Label("Add a tracker", systemImage: "plus")
                 }
             }
         }
