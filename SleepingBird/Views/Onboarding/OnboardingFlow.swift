@@ -20,6 +20,7 @@ struct OnboardingFlow: View {
 
     var body: some View {
         NavigationStack(path: $path) {
+//            GuidedAnimation(onComplete: onComplete)
             StartView { path.append(.language) }
                 .navigationDestination(for: OnboardingStep.self) { step in
                     switch step {

@@ -50,8 +50,8 @@ struct GuidedAnimation: View {
 
     var body: some View {
         VStack(alignment: .center, spacing: 0) {
-            progressBar
-                .padding(.top, 8)
+//            progressBar
+//                .padding(.top, 8)
 
             Spacer(minLength: 0)
             hero

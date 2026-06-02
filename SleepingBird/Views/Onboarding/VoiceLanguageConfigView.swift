@@ -13,6 +13,10 @@ struct VoiceLanguageConfigView: View {
     /// Invoked when the user taps "Next" to advance the onboarding flow.
     var onContinue: () -> Void = {}
 
+    /// Multiplier applied to the hero mic's dimensions (rings, fill, icons).
+    /// `1` is the original size; values below shrink it proportionally.
+    var heroScale: CGFloat = 0.8
+
     @AppStorage(VoiceLanguageOption.storageKey)
     private var storedLanguageID = VoiceLanguageOption.default.id
     @State private var isPickerPresented = false
@@ -36,20 +40,21 @@ struct VoiceLanguageConfigView: View {
 
     var body: some View {
         VStack(alignment: .center, spacing: 0) {
-            progressBar
-                .padding(.top, 8)
+//            progressBar
+//                .padding(.top, 8)
 
             micHero
                 .frame(maxWidth: .infinity)
                 .padding(.top, 40)
 
-//            Spacer(minLength: 24)
+            Spacer(minLength: 0)
 
             titleBlock
-                .padding(.top, 30)
+//                .padding(.top, 24)
 
             languageSelector
                 .padding(.top, 24)
+                .padding(.bottom, 34)
 
             Spacer(minLength: 0)
 
@@ -90,34 +95,35 @@ struct VoiceLanguageConfigView: View {
                     accent.opacity(isDark ? 0.30 : 0.12),
                     lineWidth: isDark ? 1.5 : 1
                 )
-                .frame(width: 300, height: 300)
+                .frame(width: 300 * heroScale, height: 300 * heroScale)
             Circle()
                 .strokeBorder(
                     accent.opacity(isDark ? 0.45 : 0.18),
                     lineWidth: isDark ? 1.5 : 1
                 )
-                .frame(width: 220, height: 220)
+                .frame(width: 220 * heroScale, height: 220 * heroScale)
             Circle()
                 .fill(accent.opacity(isDark ? 0.28 : 0.12))
-                .frame(width: 132, height: 132)
+                .frame(width: 132 * heroScale, height: 132 * heroScale)
                 .overlay(alignment: .bottomTrailing) {
                     Image(systemName: "globe")
-                        .font(.system(size: 22, weight: .semibold))
+                        .font(.system(size: 22 * heroScale, weight: .semibold))
                         .foregroundStyle(.white)
-                        .frame(width: 40, height: 40)
+                        .frame(width: 40 * heroScale, height: 40 * heroScale)
                         .background(Circle().fill(accent))
                         .background(
                             Circle()
                                 .fill(Color(uiColor: .systemBackground))
-                                .padding(-3)
+                                .padding(-3 * heroScale)
                         )
-                        .offset(x: 6, y: 6)
+                        .offset(x: 6 * heroScale, y: 6 * heroScale)
                 }
             Image(systemName: "mic.fill")
-                .font(.system(size: 48))
+                .font(.system(size: 48 * heroScale))
                 .foregroundStyle(accent)
         }
         .accessibilityHidden(true)
+
     }
 
     // MARK: - Title
