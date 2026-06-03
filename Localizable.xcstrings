@@ -1486,6 +1486,29 @@
         }
       }
     },
+    "paywall.cta.free_trial" : {
+      "comment" : "Purchase button CTA on paywall screen",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Try Free for 7 Days"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Prueba gratis 7 días"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "7 jours offerts"
+          }
+        }
+      }
+    },
     "paywall.footer.cancel_anytime" : {
       "localizations" : {
         "en" : {

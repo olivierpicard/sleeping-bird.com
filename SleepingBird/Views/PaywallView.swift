@@ -240,7 +240,7 @@ struct PaywallView: View {
                             ProgressView()
                                 .tint(.white)
                         } else {
-                            Label("Continue", systemImage: "arrow.right")
+                            Label("paywall.cta.free_trial", systemImage: "arrow.right")
                                 .font(.headline)
                                 .foregroundStyle(.white)
                         }
@@ -415,5 +415,5 @@ private struct FeatureRow: View {
                 .environment(Store())
         }
         .presentationDetents([.large])
-        .environment(\.locale, Locale(identifier: "es"))
+        .environment(\.locale, Locale(identifier: "fr"))
 }

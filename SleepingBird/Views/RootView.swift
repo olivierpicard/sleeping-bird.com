@@ -39,9 +39,12 @@ struct RootView: View {
             }
         }
         .animation(.easeInOut(duration: 1.5), value: hasCompletedOnboarding)
-        .sheet(isPresented: .constant(isLocked)) {
+        .sheet(isPresented: .constant(true)) {
             PaywallView()
         }
+//        .sheet(isPresented: .constant(isLocked)) {
+//            PaywallView()
+//        }
     }
 }
 
