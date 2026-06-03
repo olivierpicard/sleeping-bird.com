@@ -3,6 +3,7 @@ import SwiftUI
 
 struct PaywallView: View {
     @Environment(Store.self) private var store
+    @Environment(\.openURL) private var openURL
     @State private var selectedPlan: Store.Plan = .yearly
     @State private var selectedSharing: Sharing = .single
     @Environment(\.dismiss) private var dismiss
@@ -36,6 +37,11 @@ struct PaywallView: View {
         return String(
             localized: "paywall.footer.price_unit \(product.displayPrice) \(unit)"
         )
+    }
+
+    private func contactSupport() {
+        guard let url = SupportMailLink(anonymousID: anonymousID).url else { return }
+        openURL(url)
     }
 
     var body: some View {
@@ -190,7 +196,7 @@ struct PaywallView: View {
                             .clipShape(RoundedRectangle(cornerRadius: 16))
                         }
 
-                        Button(action: {}) {
+                        Button(action: contactSupport) {
                             Label("Contact Support", systemImage: "envelope")
                                 .font(.headline)
                                 .foregroundStyle(.primary)

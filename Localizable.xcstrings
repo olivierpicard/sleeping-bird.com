@@ -232,6 +232,7 @@
       }
     },
     "Continue" : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -1766,6 +1767,50 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Étape 4 sur 4"
+          }
+        }
+      }
+    },
+    "support.email.body %@ %@ %@ %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "\n\n\n———\nPlease keep the information below so we can assist you:\nApp version: %1$@ (%2$@)\nDevice: %3$@\nAccount ID: %4$@"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "\n\n\n———\nPor favor, conserva la información de abajo para que podamos ayudarte:\nVersión de la app: %1$@ (%2$@)\nDispositivo: %3$@\nID de cuenta: %4$@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "\n\n\n———\nMerci de conserver les informations ci-dessous pour que nous puissions vous aider :\nVersion de l'app : %1$@ (%2$@)\nAppareil : %3$@\nIdentifiant du compte : %4$@"
+          }
+        }
+      }
+    },
+    "support.email.subject" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "SleepingBird Support"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Soporte de SleepingBird"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Assistance SleepingBird"
           }
         }
       }
