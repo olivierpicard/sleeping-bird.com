@@ -20,6 +20,7 @@ struct RootView: View {
     /// StoreKit to finish loading entitlements so premium users never see a
     /// flash of the paywall on launch.
     private var isLocked: Bool {
+        
         print(store.isPremium)
         return store.hasLoadedEntitlements
             && metrics.count >= 1
@@ -54,3 +55,4 @@ struct RootView: View {
         .environment(Store()) 
         .modelContainer(for: Metric.self, inMemory: true)
 }
+ 

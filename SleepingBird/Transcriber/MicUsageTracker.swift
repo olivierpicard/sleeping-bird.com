@@ -35,7 +35,7 @@ final class MicUsageTracker {
 
     init(
         window: TimeInterval = 60*10,
-        budget: TimeInterval = 180,
+        budget: TimeInterval = 60*3,
         cooldown: TimeInterval = 60*30,
         defaults: UserDefaults = .standard
     ) {
