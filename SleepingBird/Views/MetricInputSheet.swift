@@ -1,4 +1,5 @@
 import SwiftData
+import PostHog
 import SwiftUI
 import UIKit
 
@@ -8,13 +9,34 @@ private struct PlaceholderExample {
 }
 
 private let placeholderExamples: [PlaceholderExample] = [
-    .init(text: String(localized: "metric_input_sheet.placeholder.water"), duration: 2),
-    .init(text: String(localized: "metric_input_sheet.placeholder.coffee"), duration: 3.0),
-    .init(text: String(localized: "metric_input_sheet.placeholder.meditation"), duration: 4.0),
-    .init(text: String(localized: "metric_input_sheet.placeholder.pain"), duration: 2.5),
-    .init(text: String(localized: "metric_input_sheet.placeholder.fuel"), duration: 3.5),
-    .init(text: String(localized: "metric_input_sheet.placeholder.mood"), duration: 3.0),
-    .init(text: String(localized: "metric_input_sheet.placeholder.pee"), duration: 3.0),
+    .init(
+        text: String(localized: "metric_input_sheet.placeholder.water"),
+        duration: 2
+    ),
+    .init(
+        text: String(localized: "metric_input_sheet.placeholder.coffee"),
+        duration: 3.0
+    ),
+    .init(
+        text: String(localized: "metric_input_sheet.placeholder.meditation"),
+        duration: 4.0
+    ),
+    .init(
+        text: String(localized: "metric_input_sheet.placeholder.pain"),
+        duration: 2.5
+    ),
+    .init(
+        text: String(localized: "metric_input_sheet.placeholder.fuel"),
+        duration: 3.5
+    ),
+    .init(
+        text: String(localized: "metric_input_sheet.placeholder.mood"),
+        duration: 3.0
+    ),
+    .init(
+        text: String(localized: "metric_input_sheet.placeholder.pee"),
+        duration: 3.0
+    ),
 ]
 
 struct MetricInputSheet: View {
@@ -109,6 +131,10 @@ struct MetricInputSheet: View {
         withAnimation(.spring(response: 0.45, dampingFraction: 0.85)) {
             isListening = true
         }
+        PostHogSDK.shared.capture(
+            "mic_listen",
+            properties: ["listening_status": "started"]
+        )
         listenStartedAt = .now
         transcriber.start { instruction = $0 }
         autoCutTask = Task { @MainActor in
@@ -178,7 +204,8 @@ struct MetricInputSheet: View {
                                 )
                             )
                             .onTapGesture {
-                                instruction = placeholderExamples[placeholderIndex].text
+                                instruction =
+                                    placeholderExamples[placeholderIndex].text
                                 enterEditMode()
                             }
                     } else {
@@ -227,11 +254,16 @@ struct MetricInputSheet: View {
                 isPresented: $showMicPermissionAlert
             ) {
                 Button("metric_input_sheet.mic_permission.settings") {
-                    if let url = URL(string: UIApplication.openSettingsURLString) {
+                    if let url = URL(
+                        string: UIApplication.openSettingsURLString
+                    ) {
                         openURL(url)
                     }
                 }
-                Button("metric_input_sheet.mic_permission.cancel", role: .cancel) {}
+                Button(
+                    "metric_input_sheet.mic_permission.cancel",
+                    role: .cancel
+                ) {}
             } message: {
                 Text("metric_input_sheet.mic_permission.message")
             }
@@ -274,7 +306,7 @@ struct MetricInputSheet: View {
             HStack(spacing: isListening ? 12 : 0) {
                 if !isEditing && !isListening { Spacer(minLength: 0) }
                 keyboardButton
-                    .padding(.trailing, isEditing ? 0 : -5) 
+                    .padding(.trailing, isEditing ? 0 : -5)
                 if isEditing {
                     Spacer(minLength: 0)
                 } else {
@@ -286,7 +318,7 @@ struct MetricInputSheet: View {
                             )
                     }
                     micButton
-                    if !isListening { Spacer(minLength: 0) } 
+                    if !isListening { Spacer(minLength: 0) }
                 }
             }
         }

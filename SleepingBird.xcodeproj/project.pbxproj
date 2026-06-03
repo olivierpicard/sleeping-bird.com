@@ -11,6 +11,7 @@
 		8116F4162FB494C200E703A6 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 8116F4152FB494C100E703A6 /* Localizable.xcstrings */; };
 		8152B34D2F91B3E100D421C2 /* .gitignore in Resources */ = {isa = PBXBuildFile; fileRef = 8152B34C2F91B3E100D421C2 /* .gitignore */; };
 		8152B3672F91C55700D421C2 /* ArkanaKeys in Frameworks */ = {isa = PBXBuildFile; productRef = 8152B3662F91C55700D421C2 /* ArkanaKeys */; };
+		8159B9532FD09CAD00AC3BFF /* PostHog in Frameworks */ = {isa = PBXBuildFile; productRef = 8159B9522FD09CAD00AC3BFF /* PostHog */; };
 		81BB91BE2F95603F00E4A4C5 /* FirebaseAILogic in Frameworks */ = {isa = PBXBuildFile; productRef = 81BB91BD2F95603F00E4A4C5 /* FirebaseAILogic */; };
 		81BB91C12F95609700E4A4C5 /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 81BB91C02F95609700E4A4C5 /* FirebaseAnalytics */; };
 		81E2ADCA2FC766DB0024AC56 /* InAppPurchases.storekit in Resources */ = {isa = PBXBuildFile; fileRef = 81E2ADC92FC766DB0024AC56 /* InAppPurchases.storekit */; };
@@ -35,6 +36,16 @@
 		81F8D8382F8DEA6600E96BF9 /* SleepingBird.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SleepingBird.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		8159B9502FD09C8B00AC3BFF /* Exceptions for "SleepingBird" folder in "SleepingBird" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 81F8D8372F8DEA6600E96BF9 /* SleepingBird */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		8104B76B2FA770680087967B /* SleepingBirdTests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
@@ -43,6 +54,9 @@
 		};
 		81F8D83A2F8DEA6600E96BF9 /* SleepingBird */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				8159B9502FD09C8B00AC3BFF /* Exceptions for "SleepingBird" folder in "SleepingBird" target */,
+			);
 			path = SleepingBird;
 			sourceTree = "<group>";
 		};
@@ -62,6 +76,7 @@
 			files = (
 				81BB91BE2F95603F00E4A4C5 /* FirebaseAILogic in Frameworks */,
 				81BB91C12F95609700E4A4C5 /* FirebaseAnalytics in Frameworks */,
+				8159B9532FD09CAD00AC3BFF /* PostHog in Frameworks */,
 				8152B3672F91C55700D421C2 /* ArkanaKeys in Frameworks */,
 				810156502FA5283200E02CC5 /* Inject in Frameworks */,
 			);
@@ -125,6 +140,7 @@
 				81F8D8342F8DEA6600E96BF9 /* Sources */,
 				81F8D8352F8DEA6600E96BF9 /* Frameworks */,
 				81F8D8362F8DEA6600E96BF9 /* Resources */,
+				8159B9542FD09D2000AC3BFF /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -139,6 +155,7 @@
 				81BB91BD2F95603F00E4A4C5 /* FirebaseAILogic */,
 				81BB91C02F95609700E4A4C5 /* FirebaseAnalytics */,
 				8101564F2FA5283200E02CC5 /* Inject */,
+				8159B9522FD09CAD00AC3BFF /* PostHog */,
 			);
 			productName = SleepingBird;
 			productReference = 81F8D8382F8DEA6600E96BF9 /* SleepingBird.app */;
@@ -177,6 +194,7 @@
 				8152B3652F91C55700D421C2 /* XCLocalSwiftPackageReference "ArkanaKeys/ArkanaKeys" */,
 				81BB91BC2F95603F00E4A4C5 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 				8101564E2FA5283200E02CC5 /* XCRemoteSwiftPackageReference "Inject" */,
+				8159B9512FD09CAD00AC3BFF /* XCRemoteSwiftPackageReference "posthog-ios" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 81F8D8392F8DEA6600E96BF9 /* Products */;
@@ -208,6 +226,28 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		8159B9542FD09D2000AC3BFF /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"$(DWARF_DSYM_FOLDER_PATH)/$(DWARF_DSYM_FILE_NAME)/Contents/Resources/DWARF/$(EXECUTABLE_NAME)",
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "POSTHOG_INCLUDE_SOURCE=1 ${BUILD_DIR%/Build/*}/SourcePackages/checkouts/posthog-ios/build-tools/upload-symbols.sh\n";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		8104B7522FA76EAD0087967B /* Sources */ = {
@@ -410,9 +450,11 @@
 				DEVELOPMENT_TEAM = 5MSAR5N3G6;
 				EMIT_FRONTEND_COMMAND_LINES = YES;
 				ENABLE_PREVIEWS = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = SleepingBird/Info.plist;
 				INFOPLIST_KEY_DEEPGRAM_API_KEY = "$(DEEPGRAM_API_KEY)";
-				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Sleeping​Bird needs microphone access to transcribe your voice input";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Sleeping​Bird needs microphone access to transcribe your voice";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -453,9 +495,11 @@
 				DEVELOPMENT_TEAM = 5MSAR5N3G6;
 				EMIT_FRONTEND_COMMAND_LINES = YES;
 				ENABLE_PREVIEWS = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = SleepingBird/Info.plist;
 				INFOPLIST_KEY_DEEPGRAM_API_KEY = "$(DEEPGRAM_API_KEY)";
-				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Sleeping​Bird needs microphone access to transcribe your voice input";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Sleeping​Bird needs microphone access to transcribe your voice";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -530,6 +574,14 @@
 				minimumVersion = 1.6.0;
 			};
 		};
+		8159B9512FD09CAD00AC3BFF /* XCRemoteSwiftPackageReference "posthog-ios" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/PostHog/posthog-ios.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 3.59.2;
+			};
+		};
 		81BB91BC2F95603F00E4A4C5 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
@@ -549,6 +601,11 @@
 		8152B3662F91C55700D421C2 /* ArkanaKeys */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = ArkanaKeys;
+		};
+		8159B9522FD09CAD00AC3BFF /* PostHog */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8159B9512FD09CAD00AC3BFF /* XCRemoteSwiftPackageReference "posthog-ios" */;
+			productName = PostHog;
 		};
 		81BB91BD2F95603F00E4A4C5 /* FirebaseAILogic */ = {
 			isa = XCSwiftPackageProductDependency;

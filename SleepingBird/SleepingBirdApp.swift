@@ -6,6 +6,7 @@
 //
 
 import FirebaseCore
+import PostHog
 import SwiftData
 import SwiftUI
 
@@ -15,6 +16,24 @@ class AppDelegate: NSObject, UIApplicationDelegate {
         didFinishLaunchingWithOptions launchOptions: [UIApplication
             .LaunchOptionsKey: Any]? = nil
     ) -> Bool {
+        let POSTHOG_PROJECT_TOKEN =
+            "phc_rPp6UtzHioADKcqVuMVrs2rWi33wCVABLbSbMdPBVCf5"
+        let POSTHOG_HOST = "https://eu.i.posthog.com"
+
+        let config = PostHogConfig(
+            projectToken: POSTHOG_PROJECT_TOKEN,
+            host: POSTHOG_HOST
+        )
+
+        config.errorTrackingConfig.autoCapture = true
+        PostHogSDK.shared.setup(config)
+
+        #if DEBUG
+            PostHogSDK.shared.register(["environment": "dev"])
+        #else
+            PostHogSDK.shared.register(["environment": "prod"])
+        #endif
+
         FirebaseApp.configure()
         return true
     }
