@@ -618,7 +618,7 @@ extension AggregationMethod {
         color: .pink,
         data: Metric.fakeData(for: schema.config, days: 365 * 5)
     )
-    return NavigationStack {
+    NavigationStack {
         MetricDetailView(metric: metric)
     }
 }
@@ -630,7 +630,7 @@ extension AggregationMethod {
         color: .indigo,
         data: Metric.fakeData(for: schema.config, days: 365)
     )
-    return NavigationStack {
+    NavigationStack {
         MetricDetailView(metric: metric)
     }
 }
@@ -642,7 +642,7 @@ extension AggregationMethod {
         color: .orange,
         data: Metric.fakeData(for: schema.config, days: 365)
     )
-    return NavigationStack {
+    NavigationStack {
         MetricDetailView(metric: metric)
     }
 }
@@ -657,7 +657,7 @@ extension AggregationMethod {
         color: .purple,
         data: Metric.fakeData(for: schema.config, days: 365)
     )
-    return NavigationStack {
+    NavigationStack {
         MetricDetailView(metric: metric)
     }
 }
@@ -669,7 +669,7 @@ extension AggregationMethod {
         color: .teal,
         data: Metric.fakeData(for: schema.config, days: 365)
     )
-    return NavigationStack {
+    NavigationStack {
         MetricDetailView(metric: metric)
     }
 }
@@ -687,7 +687,7 @@ extension AggregationMethod {
             days: 5
         )
     )
-    return NavigationStack {
+    NavigationStack {
         MetricDetailView(metric: metric)
     }
 }

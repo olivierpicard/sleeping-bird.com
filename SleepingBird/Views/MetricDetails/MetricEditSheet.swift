@@ -383,7 +383,6 @@ private extension String {
     }
 }
 
-#if DEBUG
 #Preview("Number") {
     let schema = MetricSchema.Fake.number(
         title: "Heart Rate",
@@ -403,7 +402,6 @@ private extension String {
         MetricEditSheet(metric: metric)
     }
 }
-#endif
 
 
 

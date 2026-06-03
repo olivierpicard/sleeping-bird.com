@@ -1,4 +1,3 @@
-#if DEBUG
 import Foundation
 
 /// DEBUG-only `Transcriber` that emits a hardcoded sentence word-by-word
@@ -46,4 +45,3 @@ final class FakeTranscriber: Transcriber {
         timer = nil
     }
 }
-#endif

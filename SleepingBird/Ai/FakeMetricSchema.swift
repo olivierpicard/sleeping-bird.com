@@ -5,7 +5,6 @@
 //  Created by Olivier Picard on 20/04/2026.
 //
 
-#if DEBUG
     extension MetricSchema {
         enum Fake {
             static func number(
@@ -167,4 +166,3 @@
         }
     }
 
-#endif

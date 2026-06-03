@@ -7,7 +7,6 @@
 
 import Foundation
 
-#if DEBUG
     extension Metric {
         static func fakeData(for config: MetricConfig, days: Int = 14)
             -> [DataPoint]
@@ -56,4 +55,3 @@ import Foundation
             return false
         }
     }
-#endif
