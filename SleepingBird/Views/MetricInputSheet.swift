@@ -29,10 +29,18 @@ struct MetricInputSheet: View {
     @State private var isListening: Bool = false
     @State private var isEditing: Bool = false
     @State private var showMicPermissionAlert: Bool = false
+    @State private var showMicBlockedAlert: Bool = false
+    @State private var usage: MicUsageTracker
+    @State private var autoCutTask: Task<Void, Never>?
+    @State private var listenStartedAt: Date?
     @FocusState private var isFocused: Bool
     @Namespace private var glassNamespace
     private let transcriber: Transcriber
     private let spectrumLogic: SpectrumViewModel
+
+    /// Hard cap on a single listening session. Live dictation streams to a
+    /// paid speech API, so an unattended mic is cut off after this long.
+    private let maxListeningDuration: TimeInterval = 60
 
     init(
         instruction: String = "",
@@ -40,13 +48,15 @@ struct MetricInputSheet: View {
             config: .make(language: VoiceLanguageOption.saved.id)
         ),
         spectrumLogic: SpectrumViewModel = LiveSpectrumViewModel(),
-        showMicPermissionAlert: Bool = false
+        showMicPermissionAlert: Bool = false,
+        usage: MicUsageTracker = MicUsageTracker()
     ) {
         _instruction = State(initialValue: instruction)
         _fontSize = State(
             initialValue: Self.computeFontSize(for: instruction)
         )
         _showMicPermissionAlert = State(initialValue: showMicPermissionAlert)
+        _usage = State(initialValue: usage)
         self.transcriber = transcriber
         self.spectrumLogic = spectrumLogic
     }
@@ -80,19 +90,50 @@ struct MetricInputSheet: View {
     }
 
     private func toggleMic() {
-        if !isListening && !transcriber.hasMicPermission {
+        if isListening {
+            stopListening()
+            return
+        }
+        if usage.isBlocked {
+            showMicBlockedAlert = true
+            return
+        }
+        if !transcriber.hasMicPermission {
             showMicPermissionAlert = true
             return
         }
-        let willListen = !isListening
+        startListening()
+    }
+
+    private func startListening() {
         withAnimation(.spring(response: 0.45, dampingFraction: 0.85)) {
-            isListening = willListen
+            isListening = true
         }
-        if willListen {
-            transcriber.start { instruction = $0 }
-        } else {
-            transcriber.stop()
+        listenStartedAt = .now
+        transcriber.start { instruction = $0 }
+        autoCutTask = Task { @MainActor in
+            try? await Task.sleep(
+                nanoseconds: UInt64(maxListeningDuration * 1_000_000_000)
+            )
+            if Task.isCancelled { return }
+            stopListening()
         }
+    }
+
+    private func stopListening() {
+        autoCutTask?.cancel()
+        autoCutTask = nil
+        let wasListening = isListening
+        withAnimation(.spring(response: 0.45, dampingFraction: 0.85)) {
+            isListening = false
+        }
+        transcriber.stop()
+        guard wasListening, let started = listenStartedAt else { return }
+        listenStartedAt = nil
+        let nowBlocked = usage.record(
+            duration: Date.now.timeIntervalSince(started)
+        )
+        if nowBlocked { showMicBlockedAlert = true }
     }
 
     private static func computeFontSize(for text: String) -> CGFloat {
@@ -194,7 +235,17 @@ struct MetricInputSheet: View {
             } message: {
                 Text("metric_input_sheet.mic_permission.message")
             }
-            .onDisappear { transcriber.stop() }
+            .alert(
+                "metric_input_sheet.mic_blocked.title",
+                isPresented: $showMicBlockedAlert
+            ) {
+                Button("metric_input_sheet.mic_blocked.ok", role: .cancel) {}
+            } message: {
+                Text(
+                    "metric_input_sheet.mic_blocked.message \(usage.blockRemainingMinutes)"
+                )
+            }
+            .onDisappear { stopListening() }
             .navigationTitle("Add a tracker").navigationBarTitleDisplayMode(
                 .inline
             )
@@ -249,6 +300,7 @@ struct MetricInputSheet: View {
         .buttonStyle(.glass)
         .controlSize(.extraLarge)
         .glassEffectID("mic", in: glassNamespace)
+        .opacity(usage.isBlocked ? 0.4 : 1)
     }
 
     private var keyboardButton: some View {

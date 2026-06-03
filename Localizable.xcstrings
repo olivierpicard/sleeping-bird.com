@@ -1085,6 +1085,72 @@
         }
       }
     },
+    "metric_input_sheet.mic_blocked.message %lld" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You've used a lot of voice dictation in a short time. To keep things running smoothly, voice input is paused for about %lld minutes."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Has usado mucho el dictado por voz en poco tiempo. Para mantener un buen funcionamiento, la entrada de voz se pausa durante unos %lld minutos."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vous avez beaucoup utilisé la dictée vocale en peu de temps. Pour garantir un bon fonctionnement, la saisie vocale est suspendue pendant environ %lld minutes."
+          }
+        }
+      }
+    },
+    "metric_input_sheet.mic_blocked.ok" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OK"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OK"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OK"
+          }
+        }
+      }
+    },
+    "metric_input_sheet.mic_blocked.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Voice Input Paused"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Entrada de voz en pausa"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saisie vocale en pause"
+          }
+        }
+      }
+    },
     "metric_input_sheet.mic_permission.cancel" : {
       "localizations" : {
         "en" : {
