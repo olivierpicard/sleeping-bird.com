@@ -23,6 +23,7 @@ class AppDelegate: NSObject, UIApplicationDelegate {
 @main
 struct SleepingBirdApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
+    @Environment(\.scenePhase) private var scenePhase
     @State private var generator = MetricGenerator()
     @State private var store = Store()
 
@@ -33,5 +34,10 @@ struct SleepingBirdApp: App {
                 .environment(store)
         }
         .modelContainer(for: Metric.self)
+        .onChange(of: scenePhase) { _, newPhase in
+            if newPhase == .active {
+                Task { await store.refreshPurchased() }
+            }
+        }
     }
 }
