@@ -6,6 +6,7 @@
 //
 
 import SwiftData
+import PostHog
 import SwiftUI
 
 struct RootView: View {
@@ -35,6 +36,7 @@ struct RootView: View {
             } else {
                 OnboardingFlow(onComplete: {
                     hasCompletedOnboarding = true
+                    PostHogSDK.shared.capture("onboading_completed")
                 })
                 .transition(.opacity)
             }

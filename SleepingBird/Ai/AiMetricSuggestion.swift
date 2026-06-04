@@ -35,17 +35,11 @@ struct AiMetricSuggestion {
     }
 
     func generate(userInstruction: String) async throws -> MetricSchema {
-        print(createUserPrompt(userInstruction: userInstruction))
-        let start = ContinuousClock.now
         let result = try await AiSchemaCompletion(
             userPrompt: createUserPrompt(userInstruction: userInstruction),
             systemPrompt: systemPrompt
         )
         .generate(as: MetricSchema.self)
-        let elapsed = ContinuousClock.now - start
-
-        print("[AiMetricSuggestion] generate completed in \(elapsed)")
-        print(result)
 
         return result
     }

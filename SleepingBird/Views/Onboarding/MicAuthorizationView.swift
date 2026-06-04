@@ -6,6 +6,7 @@
 //
 
 import AVFoundation
+import PostHog
 import SwiftUI
 import UIKit
 
@@ -44,6 +45,7 @@ struct MicAuthorizationView: View {
             EmptyDashboardBackground(intensity: 0.3)
                 .ignoresSafeArea()
         }
+        .trackScreen("Onboarding_Microphone")
     }
 
     // MARK: - Progress
@@ -148,7 +150,11 @@ struct MicAuthorizationView: View {
             return
         }
         Task { @MainActor in
-            await AVAudioApplication.requestRecordPermission()
+            let granted = await AVAudioApplication.requestRecordPermission()
+            PostHogSDK.shared.capture(
+                "mic_permission_responded",
+                properties: ["granted": granted]
+            )
             onComplete()
         }
     }

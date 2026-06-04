@@ -120,6 +120,7 @@ struct EmptyDashboardView: View {
 
         }
         .padding()
+        .trackScreen("EmptyDashboard")
         //        .background {
         //            EmptyDashboardBackground()
         //        }

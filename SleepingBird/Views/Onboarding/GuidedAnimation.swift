@@ -72,6 +72,7 @@ struct GuidedAnimation: View {
         }
         .onAppear { startCycle() }
         .onDisappear { cycleTask?.cancel() }
+        .trackScreen("Onboarding_Guided")
     }
 
     private var hero: some View {

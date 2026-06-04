@@ -6,6 +6,7 @@
 //
 
 import Charts
+import PostHog
 import SwiftUI
 
 struct MetricDetailView: View {
@@ -196,7 +197,12 @@ struct MetricDetailView: View {
             MetricInputFactory.make(from: metric) { point in
                 try? metric.append(point)
                 isAddingEntry = false
+                PostHogSDK.shared.capture(
+                    "entry_added",
+                    properties: ["via": "details"]
+                )
             }
+            .trackScreen("AddEntry")
         }
         .onAppear {
             recomputeBins()
@@ -215,6 +221,10 @@ struct MetricDetailView: View {
             recomputeDatetimeFilledDays()
             recomputeCategoryEntries()
         }
+        .trackScreen(
+            "MetricDetail",
+            ["chart": metric.visual.chart.rawValue]
+        )
     }
 
     // MARK: - Header
@@ -390,6 +400,7 @@ struct MetricDetailView: View {
                     .swipeActions(edge: .trailing, allowsFullSwipe: true) {
                         Button(role: .destructive) {
                             delete(visible[index])
+                            PostHogSDK.shared.capture("entry_deleted")
                         } label: {
                             Label("Delete", systemImage: "trash")
                         }

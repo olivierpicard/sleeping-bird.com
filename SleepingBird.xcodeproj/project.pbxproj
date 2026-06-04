@@ -52,6 +52,11 @@
 			path = SleepingBirdTests;
 			sourceTree = "<group>";
 		};
+		8159B9562FD1493700AC3BFF /* docs */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = docs;
+			sourceTree = "<group>";
+		};
 		81F8D83A2F8DEA6600E96BF9 /* SleepingBird */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
@@ -95,6 +100,7 @@
 				8152B36A2F91CB9B00D421C2 /* .arkana.yml */,
 				81F8D83A2F8DEA6600E96BF9 /* SleepingBird */,
 				8104B76B2FA770680087967B /* SleepingBirdTests */,
+				8159B9562FD1493700AC3BFF /* docs */,
 			);
 			sourceTree = "<group>";
 		};

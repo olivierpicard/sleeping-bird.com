@@ -65,6 +65,7 @@ struct MetricEditSheet: View {
             }
             .background(Color(uiColor: .systemGroupedBackground))
             .scrollDismissesKeyboard(.interactively)
+            .trackScreen("MetricEdit")
             .navigationTitle("Edit metric")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {

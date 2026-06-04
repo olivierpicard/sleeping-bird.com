@@ -1,7 +1,17 @@
-import SwiftData
 import PostHog
+import SwiftData
 import SwiftUI
 import UIKit
+
+private enum InputMode: String {
+    case keyboard
+    case label
+}
+
+private enum SubmitTrigger: String {
+    case keyboard
+    case toolbar
+}
 
 private struct PlaceholderExample {
     let text: String
@@ -83,12 +93,16 @@ struct MetricInputSheet: View {
         self.spectrumLogic = spectrumLogic
     }
 
-    private func enterEditMode() {
+    private func enterEditMode(via mode: InputMode) {
         if isListening { toggleMic() }
         withAnimation(.spring(response: 0.45, dampingFraction: 0.85)) {
             isEditing = true
         }
         isFocused = true
+        PostHogSDK.shared.capture(
+            "instruction_edition_entered",
+            properties: ["input_mode": mode.rawValue]
+        )
     }
 
     private func exitEditMode() {
@@ -98,11 +112,21 @@ struct MetricInputSheet: View {
         isFocused = false
     }
 
-    private func submit() {
+    private func submit(via trigger: SubmitTrigger) {
         guard !instruction.isEmpty else {
             exitEditMode()
             return
         }
+
+        PostHogSDK.shared.capture(
+            "instruction_submitted",
+            properties: [
+                "trigger": trigger.rawValue,
+                "length": instruction.count,
+                "word_count": instruction.split(separator: " ").count,
+                "locale": locale.identifier,
+            ]
+        )
         generator.generate(
             instruction: instruction,
             into: context,
@@ -117,6 +141,10 @@ struct MetricInputSheet: View {
             return
         }
         if usage.isBlocked {
+            PostHogSDK.shared.capture(
+                "dictation_blocked_retry",
+                properties: ["remaing_minutes": usage.blockRemainingMinutes]
+            )
             showMicBlockedAlert = true
             return
         }
@@ -131,10 +159,7 @@ struct MetricInputSheet: View {
         withAnimation(.spring(response: 0.45, dampingFraction: 0.85)) {
             isListening = true
         }
-        PostHogSDK.shared.capture(
-            "mic_listen",
-            properties: ["listening_status": "started"]
-        )
+        PostHogSDK.shared.capture("dictation_started")
         listenStartedAt = .now
         transcriber.start { instruction = $0 }
         autoCutTask = Task { @MainActor in
@@ -142,6 +167,7 @@ struct MetricInputSheet: View {
                 nanoseconds: UInt64(maxListeningDuration * 1_000_000_000)
             )
             if Task.isCancelled { return }
+            PostHogSDK.shared.capture("dictation_autocut_triggered")
             stopListening()
         }
     }
@@ -156,10 +182,19 @@ struct MetricInputSheet: View {
         transcriber.stop()
         guard wasListening, let started = listenStartedAt else { return }
         listenStartedAt = nil
-        let nowBlocked = usage.record(
-            duration: Date.now.timeIntervalSince(started)
+        let duration = Date.now.timeIntervalSince(started)
+        PostHogSDK.shared.capture(
+            "dictation_stopped",
+            properties: ["duration_s": Int(duration)]
         )
-        if nowBlocked { showMicBlockedAlert = true }
+        let nowBlocked = usage.record(duration: duration)
+        if nowBlocked {
+            PostHogSDK.shared.capture(
+                "dictation_blocked",
+                properties: ["remaing_minutes": usage.blockRemainingMinutes]
+            )
+            showMicBlockedAlert = true
+        }
     }
 
     private static func computeFontSize(for text: String) -> CGFloat {
@@ -186,7 +221,7 @@ struct MetricInputSheet: View {
                                         of: "\n",
                                         with: ""
                                     )
-                                    submit()
+                                    submit(via: .keyboard)
                                 }
                             }
                     } else if instruction.isEmpty {
@@ -206,11 +241,11 @@ struct MetricInputSheet: View {
                             .onTapGesture {
                                 instruction =
                                     placeholderExamples[placeholderIndex].text
-                                enterEditMode()
+                                enterEditMode(via: .label)
                             }
                     } else {
                         Text(instruction)
-                            .onTapGesture { enterEditMode() }
+                            .onTapGesture { enterEditMode(via: .label) }
                     }
                 }
                 .font(.system(size: fontSize, weight: .semibold))
@@ -278,6 +313,7 @@ struct MetricInputSheet: View {
                 )
             }
             .onDisappear { stopListening() }
+            .trackScreen("MetricCreation")
             .navigationTitle("Add a tracker").navigationBarTitleDisplayMode(
                 .inline
             )
@@ -289,7 +325,7 @@ struct MetricInputSheet: View {
                 }
 
                 ToolbarItem(placement: .confirmationAction) {
-                    Button(action: { submit() }) {
+                    Button(action: { submit(via: .toolbar) }) {
                         Image(systemName: "checkmark")
                     }
                     .buttonStyle(.glassProminent)
@@ -336,7 +372,9 @@ struct MetricInputSheet: View {
     }
 
     private var keyboardButton: some View {
-        Button(action: { isEditing ? exitEditMode() : enterEditMode() }) {
+        Button(action: {
+            isEditing ? exitEditMode() : enterEditMode(via: .keyboard)
+        }) {
             Image(
                 systemName: isEditing
                     ? "keyboard.chevron.compact.down" : "keyboard"

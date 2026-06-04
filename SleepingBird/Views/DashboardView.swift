@@ -1,3 +1,4 @@
+import PostHog
 import SwiftData
 import SwiftUI
 
@@ -37,6 +38,10 @@ struct DashboardView: View {
                 .swipeActions(edge: .trailing, allowsFullSwipe: true) {
                     Button(role: .destructive) {
                         delete(metric)
+                        PostHogSDK.shared.capture(
+                            "metric_deleted",
+                            properties: ["via": "swipe_actions"]
+                        )
                     } label: {
                         Label("Delete", systemImage: "trash")
                     }
@@ -54,6 +59,10 @@ struct DashboardView: View {
                     }
                     Button(role: .destructive) {
                         delete(metric)
+                        PostHogSDK.shared.capture(
+                            "metric_deleted",
+                            properties: ["via": "context_menu"]
+                        )
                     } label: {
                         Label("Delete", systemImage: "trash")
                     }
@@ -68,9 +77,15 @@ struct DashboardView: View {
             MetricInputFactory.make(from: metric) { point in
                 try? metric.append(point)
                 editingMetric = nil
+                PostHogSDK.shared.capture(
+                    "entry_added",
+                    properties: ["via": "dashboard"]
+                )
             }
+            .trackScreen("AddEntry")
         }
         .scrollContentBackground(.hidden)
+        .trackScreen("Dashboard")
         .navigationTitle("My Trackers")
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
@@ -151,7 +166,7 @@ private func seedContainer(_ container: ModelContainer) -> ModelContainer {
         (
             MetricSchema.Fake.binary(title: "Medication taken", emoji: "💊"),
             []
-        )
+        ),
     ]
     for (schema, data) in schemas {
         container.mainContext.insert(Metric(from: schema, data: data))

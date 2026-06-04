@@ -42,6 +42,17 @@ enum MetricConfig: Codable {
     case binary(BinaryConfig)
     case duration(DurationConfig)
     case datetime(DatetimeConfig)
+
+    var analyticsName: String {
+        switch self {
+        case .number: return "number"
+        case .categorySingleChoice: return "category_single"
+        case .categoryMultipleChoice: return "category_multiple"
+        case .binary: return "binary"
+        case .duration: return "duration"
+        case .datetime: return "datetime"
+        }
+    }
 }
 
 @Generable(description: "Match with a number metric type")
@@ -106,7 +117,7 @@ struct DurationConfig: Codable {
 
 @Generable(description: "Match a pure datetime or date event")
 struct DatetimeConfig: Codable {
-    var format = "date and/or time " // This is a random value. Without it Dashboad preview using fake crash. This line is not related to generation behaviour
+    var format = "date and/or time "  // This is a random value. Without it Dashboad preview using fake crash. This line is not related to generation behaviour
 }
 
 // MARK: - Metric Behaviour

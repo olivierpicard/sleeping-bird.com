@@ -50,6 +50,7 @@ struct StartView: View {
                 .ignoresSafeArea()
         }
         .onAppear(perform: runEntranceAnimation)
+        .trackScreen("Onboarding_Start")
     }
 
     // MARK: Title

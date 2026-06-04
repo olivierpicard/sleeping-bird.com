@@ -1,4 +1,5 @@
 import Foundation
+import PostHog
 import SwiftData
 
 @Observable
@@ -14,15 +15,22 @@ final class MetricGenerator {
         self.pending = pending
     }
 
-    func generate(instruction: String, into context: ModelContext, locale: Locale = .current) {
+    func generate(
+        instruction: String,
+        into context: ModelContext,
+        locale: Locale = .current
+    ) {
         let p = Pending(instruction: instruction)
         pending.append(p)
         Task { @MainActor in
             defer { pending.removeAll { $0.id == p.id } }
             do {
-                let schema = try await AiMetricSuggestion(locale: locale).generate(
-                    userInstruction: instruction
-                )
+                let start = ContinuousClock.now
+                let schema = try await AiMetricSuggestion(locale: locale)
+                    .generate(
+                        userInstruction: instruction
+                    )
+                let elapsed = ContinuousClock.now - start
                 let metric = Metric(
                     from: schema
                 )
@@ -33,8 +41,23 @@ final class MetricGenerator {
                 //                    data: Metric.fakeData(for: schema.config)
                 //                )
                 context.insert(metric)
+                let configJSON = (try? JSONEncoder().encode(schema.config))
+                    .flatMap { String(data: $0, encoding: .utf8) }
+                PostHogSDK.shared.capture(
+                    "data_schema_generated",
+                    properties: [
+                        "duration_s": elapsed.components.seconds,
+                        "emoji": schema.emoji,
+                        "config_type": schema.config.analyticsName,
+                        "chart_type": "\(schema.visual.chart)",
+                        "config_json": configJSON ?? "",
+                    ]
+                )
             } catch {
-                print("generation failed: \(error)")
+                PostHogSDK.shared.captureException(
+                    error,
+                    properties: ["instruction_length": instruction.count]
+                )
             }
         }
     }

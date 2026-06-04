@@ -268,6 +268,7 @@ struct PaywallView: View {
         }
         .background(Color(.systemGroupedBackground))
         .interactiveDismissDisabled()
+        .trackScreen("Paywall")
     }
 }
 

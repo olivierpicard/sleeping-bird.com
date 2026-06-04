@@ -5,6 +5,7 @@
 //  Created by Olivier Picard on 29/05/2026.
 //
 
+import PostHog
 import SwiftUI
 import UIKit
 
@@ -40,9 +41,6 @@ struct VoiceLanguageConfigView: View {
 
     var body: some View {
         VStack(alignment: .center, spacing: 0) {
-//            progressBar
-//                .padding(.top, 8)
-
             micHero
                 .frame(maxWidth: .infinity)
                 .padding(.top, 40)
@@ -50,7 +48,6 @@ struct VoiceLanguageConfigView: View {
             Spacer(minLength: 0)
 
             titleBlock
-//                .padding(.top, 24)
 
             languageSelector
                 .padding(.top, 24)
@@ -67,6 +64,7 @@ struct VoiceLanguageConfigView: View {
             EmptyDashboardBackground(intensity: 0.3)
                 .ignoresSafeArea()
         }
+        .trackScreen("Onboarding_Language")
     }
 
     // MARK: - Progress
@@ -82,7 +80,6 @@ struct VoiceLanguageConfigView: View {
         .accessibilityElement()
         .accessibilityLabel("Step 2 of 4")
     }
-
 
     //  MARK: - Hero
 
@@ -135,11 +132,13 @@ struct VoiceLanguageConfigView: View {
                 .multilineTextAlignment(.center)
                 .fixedSize(horizontal: false, vertical: true)
 
-            Text("We'll use your language to understand your voice more accurately.")
-                .font(.body)
-                .foregroundStyle(.secondary)
-                .multilineTextAlignment(.center)
-                .fixedSize(horizontal: false, vertical: true)
+            Text(
+                "We'll use your language to understand your voice more accurately."
+            )
+            .font(.body)
+            .foregroundStyle(.secondary)
+            .multilineTextAlignment(.center)
+            .fixedSize(horizontal: false, vertical: true)
         }
         .frame(maxWidth: .infinity)
     }
@@ -244,6 +243,10 @@ private struct VoiceLanguagePicker: View {
             List(VoiceLanguageOption.all) { option in
                 Button {
                     selection = option
+                    PostHogSDK.shared.capture(
+                        "dictation_language_changed",
+                        properties: ["language_code": option.id]
+                    )
                     dismiss()
                 } label: {
                     HStack(spacing: 14) {
