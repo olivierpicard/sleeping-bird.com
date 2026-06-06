@@ -7,6 +7,7 @@
 
 import FirebaseCore
 import PostHog
+import RevenueCat
 import SwiftData
 import SwiftUI
 
@@ -25,12 +26,41 @@ class AppDelegate: NSObject, UIApplicationDelegate {
             host: POSTHOG_HOST
         )
 
+        config.captureScreenViews = false
         config.errorTrackingConfig.autoCapture = true
         PostHogSDK.shared.setup(config)
+        
+//        Purchases.shared.syncPurchases { (customerInfo, error) in
+//            if let error = error {
+//                print("Restore failed: \(error.localizedDescription)")
+//                return
+//            }
+//            
+//            guard let customerInfo = customerInfo else { return }
+//            
+//            // 1. Check if they actually have the premium entitlement
+//            if customerInfo.entitlements["premium"]?.isActive == true {
+//                
+//                // 2. THIS is the master ID across device changes
+//                let masterRevenueCatUserID = customerInfo.originalAppUserId
+//                let currentActiveUserID = Purchases.shared.appUserID
+//                
+//                print("The underlying master user ID is: \(masterRevenueCatUserID)")
+//                print("The current session user ID is: \(currentActiveUserID)")
+//                
+//                // 3. Update your local state or map it to PostHog
+////                self.alignIdentities(masterID: masterRevenueCatUserID)
+//            }
+//        }
 
         #if DEBUG
+            PostHogSDK.shared.identify(
+                UniqueIdentityStore().get(),
+                userProperties: ["is_internal": true]
+            )
             PostHogSDK.shared.register(["environment": "dev"])
         #else
+            PostHogSDK.shared.identify(UniqueIdentityStore().get())
             PostHogSDK.shared.register(["environment": "prod"])
         #endif
 
@@ -45,6 +75,17 @@ struct SleepingBirdApp: App {
     @Environment(\.scenePhase) private var scenePhase
     @State private var generator = MetricGenerator()
     @State private var store = Store()
+
+    init() {
+        Purchases.configure(
+            with: Configuration.Builder(
+                withAPIKey: "appl_AcawmFKcLsssZrqzjhIjDDbevCS"
+            )
+            .with(appUserID: UniqueIdentityStore().get())
+            .with(purchasesAreCompletedBy: .myApp, storeKitVersion: .storeKit2)
+            .build()
+        )
+    }
 
     var body: some Scene {
         WindowGroup {

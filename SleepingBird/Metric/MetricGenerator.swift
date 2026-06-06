@@ -31,6 +31,7 @@ final class MetricGenerator {
                         userInstruction: instruction
                     )
                 let elapsed = ContinuousClock.now - start
+                let durationS = ((elapsed / .seconds(1)) * 10).rounded() / 10
                 let metric = Metric(
                     from: schema
                 )
@@ -46,7 +47,7 @@ final class MetricGenerator {
                 PostHogSDK.shared.capture(
                     "data_schema_generated",
                     properties: [
-                        "duration_s": elapsed.components.seconds,
+                        "duration_s": durationS,
                         "emoji": schema.emoji,
                         "config_type": schema.config.analyticsName,
                         "chart_type": "\(schema.visual.chart)",

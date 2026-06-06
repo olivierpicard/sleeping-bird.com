@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		810156502FA5283200E02CC5 /* Inject in Frameworks */ = {isa = PBXBuildFile; productRef = 8101564F2FA5283200E02CC5 /* Inject */; };
 		8116F4162FB494C200E703A6 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 8116F4152FB494C100E703A6 /* Localizable.xcstrings */; };
+		81195CF22FD2AE8900D74692 /* RevenueCat in Frameworks */ = {isa = PBXBuildFile; productRef = 81195CF12FD2AE8900D74692 /* RevenueCat */; };
 		8152B34D2F91B3E100D421C2 /* .gitignore in Resources */ = {isa = PBXBuildFile; fileRef = 8152B34C2F91B3E100D421C2 /* .gitignore */; };
 		8152B3672F91C55700D421C2 /* ArkanaKeys in Frameworks */ = {isa = PBXBuildFile; productRef = 8152B3662F91C55700D421C2 /* ArkanaKeys */; };
 		8159B9532FD09CAD00AC3BFF /* PostHog in Frameworks */ = {isa = PBXBuildFile; productRef = 8159B9522FD09CAD00AC3BFF /* PostHog */; };
@@ -81,6 +82,7 @@
 			files = (
 				81BB91BE2F95603F00E4A4C5 /* FirebaseAILogic in Frameworks */,
 				81BB91C12F95609700E4A4C5 /* FirebaseAnalytics in Frameworks */,
+				81195CF22FD2AE8900D74692 /* RevenueCat in Frameworks */,
 				8159B9532FD09CAD00AC3BFF /* PostHog in Frameworks */,
 				8152B3672F91C55700D421C2 /* ArkanaKeys in Frameworks */,
 				810156502FA5283200E02CC5 /* Inject in Frameworks */,
@@ -162,6 +164,7 @@
 				81BB91C02F95609700E4A4C5 /* FirebaseAnalytics */,
 				8101564F2FA5283200E02CC5 /* Inject */,
 				8159B9522FD09CAD00AC3BFF /* PostHog */,
+				81195CF12FD2AE8900D74692 /* RevenueCat */,
 			);
 			productName = SleepingBird;
 			productReference = 81F8D8382F8DEA6600E96BF9 /* SleepingBird.app */;
@@ -201,6 +204,7 @@
 				81BB91BC2F95603F00E4A4C5 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 				8101564E2FA5283200E02CC5 /* XCRemoteSwiftPackageReference "Inject" */,
 				8159B9512FD09CAD00AC3BFF /* XCRemoteSwiftPackageReference "posthog-ios" */,
+				81195CF02FD2AE8900D74692 /* XCRemoteSwiftPackageReference "purchases-ios-spm" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 81F8D8392F8DEA6600E96BF9 /* Products */;
@@ -451,6 +455,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = SleepingBird/SleepingBird.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 5MSAR5N3G6;
@@ -476,7 +481,7 @@
 					"-Xlinker",
 					"-interposable",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.alizetech.SleepingBird;
+				PRODUCT_BUNDLE_IDENTIFIER = com.alizetech.sleepingbird;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -496,6 +501,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = SleepingBird/SleepingBird.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 5MSAR5N3G6;
@@ -517,7 +523,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.alizetech.SleepingBird;
+				PRODUCT_BUNDLE_IDENTIFIER = com.alizetech.sleepingbird;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -580,6 +586,14 @@
 				minimumVersion = 1.6.0;
 			};
 		};
+		81195CF02FD2AE8900D74692 /* XCRemoteSwiftPackageReference "purchases-ios-spm" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/RevenueCat/purchases-ios-spm.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.77.0;
+			};
+		};
 		8159B9512FD09CAD00AC3BFF /* XCRemoteSwiftPackageReference "posthog-ios" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/PostHog/posthog-ios.git";
@@ -603,6 +617,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 8101564E2FA5283200E02CC5 /* XCRemoteSwiftPackageReference "Inject" */;
 			productName = Inject;
+		};
+		81195CF12FD2AE8900D74692 /* RevenueCat */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 81195CF02FD2AE8900D74692 /* XCRemoteSwiftPackageReference "purchases-ios-spm" */;
+			productName = RevenueCat;
 		};
 		8152B3662F91C55700D421C2 /* ArkanaKeys */ = {
 			isa = XCSwiftPackageProductDependency;

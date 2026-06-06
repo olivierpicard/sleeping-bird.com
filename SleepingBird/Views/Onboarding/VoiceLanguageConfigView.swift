@@ -296,6 +296,7 @@ private struct VoiceLanguagePicker: View {
                 }
             }
         }
+        .trackScreen("Onboarding_VoiceLanguage")
     }
 }
 

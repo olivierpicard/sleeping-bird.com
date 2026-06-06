@@ -23,7 +23,7 @@
     "_disableDialogs" : false,
     "_failTransactionsEnabled" : false,
     "_locale" : "en_US",
-    "_renewalBillingIssuesEnabled" : false,
+    "_renewalBillingIssuesEnabled" : true,
     "_storefront" : "USA",
     "_storeKitErrors" : [
       {
@@ -162,7 +162,7 @@
               "locale" : "es_ES"
             }
           ],
-          "productID" : "com.sleepingbird.premium.monthly",
+          "productID" : "com.alizetech.sleepingbird.premium.monthly",
           "recurringSubscriptionPeriod" : "P1M",
           "referenceName" : "Monthly",
           "subscriptionGroupID" : "432D5797",
@@ -231,7 +231,7 @@
               "locale" : "fr"
             }
           ],
-          "productID" : "com.sleepingbird.premium.yearly",
+          "productID" : "com.alizetech.sleepingbird.premium.yearly",
           "recurringSubscriptionPeriod" : "P1Y",
           "referenceName" : "Yearly",
           "subscriptionGroupID" : "432D5797",
@@ -243,6 +243,10 @@
       ]
     }
   ],
+  "subscriptionOffersKeyPair" : {
+    "id" : "6C1A969C",
+    "privateKey" : "MIGTAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBHkwdwIBAQQgPOxKcdLrRzS01AN1/znCP8lvgUWhWa/dBnAXPlcjS0WgCgYIKoZIzj0DAQehRANCAARsTigJvDPMnNAQ/wd1WwpsURQmCQHOWWGqb0gwK7EBHQn0PsKRKMSMCUOlYN3wj0wTgNdKeYWlAWFJWg5Hgd0n"
+  },
   "version" : {
     "major" : 5,
     "minor" : 0

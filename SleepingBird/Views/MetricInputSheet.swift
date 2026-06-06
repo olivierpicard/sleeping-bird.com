@@ -100,7 +100,7 @@ struct MetricInputSheet: View {
         }
         isFocused = true
         PostHogSDK.shared.capture(
-            "instruction_edition_entered",
+            "instruction_edit_mode_entered",
             properties: ["input_mode": mode.rawValue]
         )
     }
@@ -143,7 +143,7 @@ struct MetricInputSheet: View {
         if usage.isBlocked {
             PostHogSDK.shared.capture(
                 "dictation_blocked_retry",
-                properties: ["remaing_minutes": usage.blockRemainingMinutes]
+                properties: ["remaining_minutes": usage.blockRemainingMinutes]
             )
             showMicBlockedAlert = true
             return
@@ -191,7 +191,7 @@ struct MetricInputSheet: View {
         if nowBlocked {
             PostHogSDK.shared.capture(
                 "dictation_blocked",
-                properties: ["remaing_minutes": usage.blockRemainingMinutes]
+                properties: ["remaining_minutes": usage.blockRemainingMinutes]
             )
             showMicBlockedAlert = true
         }

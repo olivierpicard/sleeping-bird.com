@@ -75,7 +75,7 @@ struct MetricView: View {
                     feedbackTrigger.toggle()
                     onAddTapped()
                 }) {
-                    Image(systemName: "square.and.pencil")
+                    Image(systemName: "plus")
                         .font(.title3.weight(.bold))
                         .foregroundStyle(mainColor)
                         .padding(.vertical, 3)

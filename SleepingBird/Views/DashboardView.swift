@@ -90,7 +90,7 @@ struct DashboardView: View {
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
                 Button(action: onAddMetric) {
-                    Label("Add a tracker", systemImage: "plus")
+                    Label("Add a tracker", systemImage: "square.and.pencil")
                 }
             }
         }

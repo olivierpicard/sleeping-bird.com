@@ -8,7 +8,7 @@ struct PaywallView: View {
     @State private var selectedSharing: Sharing = .single
     @Environment(\.dismiss) private var dismiss
 
-    private let anonymousID = "$RCAnonymousID:0110333ef6a440c89beafb82647556f2"
+    private let userId = UniqueIdentityStore().get()
 
     enum Sharing { case single, family }
 
@@ -40,7 +40,7 @@ struct PaywallView: View {
     }
 
     private func contactSupport() {
-        guard let url = SupportMailLink(anonymousID: anonymousID).url else { return }
+        guard let url = SupportMailLink(anonymousID: userId).url else { return }
         openURL(url)
     }
 
@@ -214,7 +214,7 @@ struct PaywallView: View {
                         }
 
                         VStack(spacing: 4) {
-                            Text(anonymousID)
+                            Text(userId)
                                 .font(.caption2)
                                 .foregroundStyle(.secondary)
                                 .lineLimit(1)

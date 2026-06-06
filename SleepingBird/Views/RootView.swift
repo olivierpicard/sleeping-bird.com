@@ -31,12 +31,13 @@ struct RootView: View {
     var body: some View {
         ZStack {
             if hasCompletedOnboarding {
+                
                 ContentView()
                     .transition(.opacity)
             } else {
                 OnboardingFlow(onComplete: {
                     hasCompletedOnboarding = true
-                    PostHogSDK.shared.capture("onboading_completed")
+                    PostHogSDK.shared.capture("onboarding_completed")
                 })
                 .transition(.opacity)
             }
