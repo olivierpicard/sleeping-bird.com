@@ -1,6 +1,6 @@
 //
 //  EmptyDashboardBackground.swift
-//  SleepingBird
+//  ArperBird
 //
 //  Created by Olivier Picard on 08/05/2026.
 //

@@ -119,18 +119,38 @@
         }
       }
     },
-    "By continuing, you agree to our [Terms and Privacy Policy](sleepingbird://legal)." : {
+    "Arper Bird" : {
+
+    },
+    "Ask anything..." : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Al continuar, aceptas nuestros [Términos y política de privacidad](sleepingbird://legal)."
+            "value" : "Pregunta lo que quieras..."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "En continuant, vous acceptez nos [Conditions et politique de confidentialité](sleepingbird://legal)."
+            "value" : "Demandez n'importe quoi..."
+          }
+        }
+      }
+    },
+    "By continuing, you agree to our [Terms and Privacy Policy](arperbird://legal)." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Al continuar, aceptas nuestros [Términos y política de privacidad](arperbird://legal)."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "En continuant, vous acceptez nos [Conditions et politique de confidentialité](arperbird://legal)."
           }
         }
       }
@@ -183,6 +203,23 @@
         }
       }
     },
+    "Coffee ☕️" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Café ☕️"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Café ☕️"
+          }
+        }
+      }
+    },
     "COLOR" : {
       "localizations" : {
         "es" : {
@@ -227,23 +264,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Contacter le support"
-          }
-        }
-      }
-    },
-    "Continue" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Suscribirse"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "S'abonner"
           }
         }
       }
@@ -467,102 +487,9 @@
         }
       }
     },
-    "empty_dashboard.add_metric" : {
+    "Fuel Spend ⛽️" : {
+      "extractionState" : "stale",
       "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Add a tracker"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Añadir un seguimiento"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ajouter un suivi"
-          }
-        }
-      }
-    },
-    "empty_dashboard.app_name" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "SLEEPING BIRD"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "SLEEPING BIRD"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "SLEEPING BIRD"
-          }
-        }
-      }
-    },
-    "empty_dashboard.badge.ask_anything" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ask anything..."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pregunta lo que quieras..."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Demandez n'importe quoi..."
-          }
-        }
-      }
-    },
-    "empty_dashboard.badge.coffee" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Coffee ☕️"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Café ☕️"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Café ☕️"
-          }
-        }
-      }
-    },
-    "empty_dashboard.badge.fuel_spend" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Fuel Spend ⛽️"
-          }
-        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -573,248 +500,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Carburant ⛽️"
-          }
-        }
-      }
-    },
-    "empty_dashboard.badge.maintenance" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Maintenance 💰🚗"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mantenimiento 💰🚗"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Entretien 💰🚗"
-          }
-        }
-      }
-    },
-    "empty_dashboard.badge.meditation" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Meditation ⏱️🧘"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Meditación ⏱️🧘"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Méditation ⏱️🧘"
-          }
-        }
-      }
-    },
-    "empty_dashboard.badge.mood" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mood 😁"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ánimo 😁"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Humeur 😁"
-          }
-        }
-      }
-    },
-    "empty_dashboard.badge.pain" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pain 😖"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Dolor 😖"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Douleur 😖"
-          }
-        }
-      }
-    },
-    "empty_dashboard.badge.proteins" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Proteins 🥩🌱"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Proteínas 🥩🌱"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Protéines 🥩🌱"
-          }
-        }
-      }
-    },
-    "empty_dashboard.badge.sleeps" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sleeps 💤"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sueño 💤"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sommeil 💤"
-          }
-        }
-      }
-    },
-    "empty_dashboard.badge.water" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Water 💧"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Agua 💧"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Eau 💧"
-          }
-        }
-      }
-    },
-    "empty_dashboard.headline_1" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "What do you"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "¿Qué quieres"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Que voulez-vous"
-          }
-        }
-      }
-    },
-    "empty_dashboard.headline_2" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Want to measure?"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "medir?"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "mesurer ?"
-          }
-        }
-      }
-    },
-    "empty_dashboard.subtitle" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Track anything you want.\nJust say it out loud."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Registra lo que quieras.\nSolo dilo en voz alta."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Suivez tout ce que vous voulez.\nDites-le simplement à voix haute."
-          }
-        }
-      }
-    },
-    "empty_dashboard.tap_to_start" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "tap to start"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "toca para empezar"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "appuyez pour commencer"
           }
         }
       }
@@ -952,6 +637,40 @@
     },
     "Last updated %@" : {
 
+    },
+    "Maintenance 💰🚗" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mantenimiento 💰🚗"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Entretien 💰🚗"
+          }
+        }
+      }
+    },
+    "Meditation ⏱️🧘" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Meditación ⏱️🧘"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Méditation ⏱️🧘"
+          }
+        }
+      }
     },
     "metric_edit_sheet.field.name" : {
       "localizations" : {
@@ -1425,6 +1144,23 @@
         }
       }
     },
+    "Mood 😁" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ánimo 😁"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Humeur 😁"
+          }
+        }
+      }
+    },
     "My Trackers" : {
       "localizations" : {
         "es" : {
@@ -1549,6 +1285,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Plage : %1$@ – %2$@"
+          }
+        }
+      }
+    },
+    "Pain 😖" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dolor 😖"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Douleur 😖"
           }
         }
       }
@@ -1699,6 +1452,23 @@
         }
       }
     },
+    "Proteins 🥩🌱" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Proteínas 🥩🌱"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Protéines 🥩🌱"
+          }
+        }
+      }
+    },
     "Range" : {
       "localizations" : {
         "es" : {
@@ -1779,12 +1549,19 @@
         }
       }
     },
-    "Sleeping Bird" : {
+    "Sleeps 💤" : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Sleeping Bird"
+            "value" : "Sueño 💤"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sommeil 💤"
           }
         }
       }
@@ -1864,19 +1641,35 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "SleepingBird Support"
+            "value" : "ArperBird Support"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Soporte de SleepingBird"
+            "value" : "Soporte de ArperBird"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Assistance SleepingBird"
+            "value" : "Assistance ArperBird"
+          }
+        }
+      }
+    },
+    "tap to start" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "toca para empezar"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "appuyez pour commencer"
           }
         }
       }
@@ -1893,6 +1686,22 @@
     },
     "Thanks for trusting us with your data." : {
 
+    },
+    "Track anything you want.\nJust say it out loud." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Registra lo que quieras.\nSolo dilo en voz alta."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Suivez tout ce que vous voulez.\nDites-le simplement à voix haute."
+          }
+        }
+      }
     },
     "Track as many metrics as you want" : {
       "localizations" : {
@@ -2019,6 +1828,39 @@
         }
       }
     },
+    "Want to measure?" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "medir?"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "mesurer ?"
+          }
+        }
+      }
+    },
+    "Water 💧" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Agua 💧"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eau 💧"
+          }
+        }
+      }
+    },
     "We'll use your language to understand your voice more accurately." : {
       "localizations" : {
         "es" : {
@@ -2047,6 +1889,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Bienvenue 👋"
+          }
+        }
+      }
+    },
+    "What do you" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Qué quieres"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Que voulez-vous"
           }
         }
       }

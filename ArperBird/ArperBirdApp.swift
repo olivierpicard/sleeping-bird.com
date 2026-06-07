@@ -1,6 +1,6 @@
 //
-//  SleepingBirdApp.swift
-//  SleepingBird
+//  ArperBirdApp.swift
+//  ArperBird
 //
 //  Created by Olivier Picard on 14/04/2026.
 //
@@ -70,7 +70,7 @@ class AppDelegate: NSObject, UIApplicationDelegate {
 }
 
 @main
-struct SleepingBirdApp: App {
+struct ArperBirdApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
     @Environment(\.scenePhase) private var scenePhase
     @State private var generator = MetricGenerator()

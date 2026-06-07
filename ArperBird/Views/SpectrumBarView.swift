@@ -1,6 +1,6 @@
 //
 //  SpectrumBarView.swift
-//  SleepingBird
+//  ArperBird
 //
 
 import SwiftUI

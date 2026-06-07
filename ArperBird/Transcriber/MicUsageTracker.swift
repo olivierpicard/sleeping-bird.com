@@ -1,6 +1,6 @@
 //
 //  MicUsageTracker.swift
-//  SleepingBird
+//  ArperBird
 //
 //  Tracks cumulative microphone (transcription) usage to cap cost.
 //  Live dictation streams to a paid speech API, so a session left

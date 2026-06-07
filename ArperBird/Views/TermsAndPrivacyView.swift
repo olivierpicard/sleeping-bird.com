@@ -1,6 +1,6 @@
 //
 //  TermsAndPrivacyView.swift
-//  SleepingBird
+//  ArperBird
 //
 //  Created by Olivier Picard on 29/05/2026.
 //
@@ -64,7 +64,7 @@ struct TermsAndPrivacyView: View {
 
     private var header: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("Sleeping Bird")
+            Text("Arper Bird")
                 .font(.largeTitle)
                 .fontWeight(.heavy)
                 .foregroundStyle(brandGradient)

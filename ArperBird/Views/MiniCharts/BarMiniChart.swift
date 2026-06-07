@@ -1,6 +1,6 @@
 //
 //  BarMiniChart.swift
-//  SleepingBird
+//  ArperBird
 //
 //  Created by Olivier Picard on 26/04/2026.
 //

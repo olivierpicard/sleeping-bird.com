@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
-   LastUpgradeVersion = "2640"
+   LastUpgradeVersion = "2650"
    version = "1.7">
    <BuildAction
       parallelizeBuildables = "YES"
@@ -16,9 +16,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "81F8D8372F8DEA6600E96BF9"
-               BuildableName = "SleepingBird.app"
-               BlueprintName = "SleepingBird"
-               ReferencedContainer = "container:SleepingBird.xcodeproj">
+               BuildableName = "ArperBird.app"
+               BlueprintName = "ArperBird"
+               ReferencedContainer = "container:ArperBird.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -27,22 +27,18 @@
       buildConfiguration = "Debug"
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
-      shouldUseLaunchSchemeArgsEnv = "YES">
-      <TestPlans>
-         <TestPlanReference
-            reference = "container:SleepingBird.xctestplan"
-            default = "YES">
-         </TestPlanReference>
-      </TestPlans>
+      shouldUseLaunchSchemeArgsEnv = "YES"
+      shouldAutocreateTestPlan = "YES">
       <Testables>
          <TestableReference
-            skipped = "NO">
+            skipped = "NO"
+            parallelizable = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "8104B7552FA76EAD0087967B"
-               BuildableName = "SleepingBirdTests.xctest"
-               BlueprintName = "SleepingBirdTests"
-               ReferencedContainer = "container:SleepingBird.xcodeproj">
+               BuildableName = "ArperBirdTests.xctest"
+               BlueprintName = "ArperBirdTests"
+               ReferencedContainer = "container:ArperBird.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
@@ -63,14 +59,11 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "81F8D8372F8DEA6600E96BF9"
-            BuildableName = "SleepingBird.app"
-            BlueprintName = "SleepingBird"
-            ReferencedContainer = "container:SleepingBird.xcodeproj">
+            BuildableName = "ArperBird.app"
+            BlueprintName = "ArperBird"
+            ReferencedContainer = "container:ArperBird.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
-      <StoreKitConfigurationFileReference
-         identifier = "../../InAppPurchases.storekit">
-      </StoreKitConfigurationFileReference>
    </LaunchAction>
    <ProfileAction
       buildConfiguration = "Release"
@@ -83,9 +76,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "81F8D8372F8DEA6600E96BF9"
-            BuildableName = "SleepingBird.app"
-            BlueprintName = "SleepingBird"
-            ReferencedContainer = "container:SleepingBird.xcodeproj">
+            BuildableName = "ArperBird.app"
+            BlueprintName = "ArperBird"
+            ReferencedContainer = "container:ArperBird.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

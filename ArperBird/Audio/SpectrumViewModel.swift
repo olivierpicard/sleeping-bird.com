@@ -1,6 +1,6 @@
 //
 //  SpectrumViewModel.swift
-//  SleepingBird
+//  ArperBird
 //
 
 import Foundation

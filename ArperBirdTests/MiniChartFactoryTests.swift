@@ -1,11 +1,11 @@
 //
 //  MiniChartFactoryTests.swift
-//  SleepingBirdTests
+//  ArperBirdTests
 //
 
 import XCTest
 import SwiftUI
-@testable import SleepingBird
+@testable import ArperBird
 
 @MainActor
 final class MiniChartFactoryTests: XCTestCase {

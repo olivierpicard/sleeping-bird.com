@@ -1,6 +1,6 @@
 //
 //  AudioWebSocketStreamer.swift
-//  SleepingBird
+//  ArperBird
 //
 //  Created by Olivier Picard on 16/04/2026.
 //

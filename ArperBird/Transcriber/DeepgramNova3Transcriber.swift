@@ -1,6 +1,6 @@
 //
 //  DeepgramNova3Transcriber.swift
-//  SleepingBird
+//  ArperBird
 //
 //  Created by Olivier Picard on 17/04/2026.
 //

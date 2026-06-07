@@ -1,11 +1,11 @@
 //
 //  MetricAggregatorTests.swift
-//  SleepingBirdTests
+//  ArperBirdTests
 //
 
 import Testing
 import Foundation
-@testable import SleepingBird
+@testable import ArperBird
 
 @Suite("MetricAggregator")
 @MainActor

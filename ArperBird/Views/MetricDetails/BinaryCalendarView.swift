@@ -1,6 +1,6 @@
 //
 //  BinaryCalendarView.swift
-//  SleepingBird
+//  ArperBird
 //
 //  Created by Olivier Picard on 04/05/2026.
 //

@@ -1,13 +1,13 @@
 # Error Tracking (PostHog)
 
-How crash / exception reporting is wired up in SleepingBird, and why it's set up
+How crash / exception reporting is wired up in ArperBird, and why it's set up
 the way it is. Read this before touching anything PostHog-related — there are a
 few non-obvious gotchas that are easy to "fix" into being broken.
 
 ## TL;DR
 
 - Crashes are captured by **PostHog error tracking** (`autoCapture`), configured
-  in `AppDelegate` (`SleepingBirdApp.swift`).
+  in `AppDelegate` (`ArperBirdApp.swift`).
 - Readable stack traces require **dSYM files** to be uploaded to PostHog. That
   upload is done automatically by a **Run Script build phase** — but **only on
   Release builds**. Debug builds intentionally do not upload.
@@ -20,7 +20,7 @@ few non-obvious gotchas that are easy to "fix" into being broken.
 ## What's already set up (don't redo these)
 
 1. **SDK init** — `AppDelegate.application(_:didFinishLaunchingWithOptions:)` in
-   `SleepingBird/SleepingBirdApp.swift`:
+   `ArperBird/ArperBirdApp.swift`:
    ```swift
    let config = PostHogConfig(projectToken: …, host: "https://eu.i.posthog.com")
    config.errorTrackingConfig.autoCapture = true
@@ -28,7 +28,7 @@ few non-obvious gotchas that are easy to "fix" into being broken.
    ```
    We're on the **EU** PostHog instance.
 
-2. **dSYM upload build phase** — a Run Script phase on the `SleepingBird` target
+2. **dSYM upload build phase** — a Run Script phase on the `ArperBird` target
    (Build Phases tab). Its script is:
    ```sh
    POSTHOG_INCLUDE_SOURCE=1 ${BUILD_DIR%/Build/*}/SourcePackages/checkouts/posthog-ios/build-tools/upload-symbols.sh
@@ -99,7 +99,7 @@ Reasons this is the right default:
 - **The debugger intercepts the crash.** When run from Xcode, lldb pauses on the
   exception before PostHog's handler runs. Either continue (`c`) past it, or
   untick **Edit Scheme → Run → "Debug executable"** so it runs detached.
-- **Unsymbolicated frames (`SleepingBird +0x…`) mean "no matching dSYM uploaded"**
+- **Unsymbolicated frames (`ArperBird +0x…`) mean "no matching dSYM uploaded"**
   — not that tracking is broken. Almost always because you crashed a Debug build
   (which never uploads) or a Release build whose dSYM upload hasn't run.
 
@@ -129,10 +129,10 @@ or a missed Release build).
 
 ```sh
 # Single dSYM file or bundle
-posthog-cli upload dsym /path/to/SleepingBird.app.dSYM
+posthog-cli upload dsym /path/to/ArperBird.app.dSYM
 
 # From an xcarchive (App Store / TestFlight)
-posthog-cli upload dsym /path/to/SleepingBird.xcarchive/dSYMs/SleepingBird.app.dSYM
+posthog-cli upload dsym /path/to/ArperBird.xcarchive/dSYMs/ArperBird.app.dSYM
 ```
 
 The CLI uses the same local credential from `posthog-cli login`. On a machine

@@ -1,6 +1,6 @@
 //
 //  MicBroker.swift
-//  SleepingBird
+//  ArperBird
 //
 
 import AVFoundation
@@ -17,7 +17,7 @@ final class MicBroker {
     private init() {}
 
     private let audioEngine = AVAudioEngine()
-    private let queue = DispatchQueue(label: "com.sleepingbird.micbroker")
+    private let queue = DispatchQueue(label: "com.alizetech.arperbird.micbroker")
     private var handlers: [UUID: (Data) -> Void] = [:]
     private var isRunning = false
 

@@ -1,6 +1,6 @@
 //
 //  EmptyDashboardView.swift
-//  SleepingBird
+//  ArperBird
 //
 //  Created by Olivier Picard on 24/04/2026.
 //
@@ -16,17 +16,17 @@ struct EmptyDashboardView: View {
         VStack(spacing: 28) {
             Spacer()
             VStack(alignment: .leading) {
-                Text(String(localized: "empty_dashboard.app_name"))
+                Text("Arper Bird")
                     .font(.caption)
                     .fontWeight(.bold)
                     .tracking(3)
                     .padding(.bottom, 2)
                     .foregroundStyle(.secondary)
 
-                Text(String(localized: "empty_dashboard.headline_1"))
+                Text("What do you")
                     .font(.largeTitle)
                     .fontWeight(.semibold)
-                Text(String(localized: "empty_dashboard.headline_2"))
+                Text("Want to measure?")
                     .font(.largeTitle)
                     .fontWeight(.heavy)
                     .foregroundStyle(
@@ -61,7 +61,7 @@ struct EmptyDashboardView: View {
                         )
                     )
                     .padding(.bottom, 5)
-                Text(String(localized: "empty_dashboard.subtitle"))
+                Text("Track anything you want.\nJust say it out loud.")
                     .font(.subheadline)
                     .multilineTextAlignment(.leading)
                     .fixedSize(horizontal: false, vertical: true)
@@ -70,23 +70,23 @@ struct EmptyDashboardView: View {
             .frame(maxWidth: .infinity, alignment: .leading)
             BadgesStackView(
                 badges: [
-                    String(localized: "empty_dashboard.badge.water"),
-                    String(localized: "empty_dashboard.badge.maintenance"),
-                    String(localized: "empty_dashboard.badge.sleeps"),
-                    String(localized: "empty_dashboard.badge.pain"),
-                    String(localized: "empty_dashboard.badge.mood"),
-                    String(localized: "empty_dashboard.badge.proteins"),
-                    String(localized: "empty_dashboard.badge.meditation"),
-                    String(localized: "empty_dashboard.badge.coffee"),
-                    String(localized: "empty_dashboard.badge.fuel_spend"),
-                    String(localized: "empty_dashboard.badge.ask_anything"),
+                    "Water 💧",
+                    "Maintenance 💰🚗",
+                    "Sleeps 💤",
+                    "Pain 😖",
+                    "Mood 😁",
+                    "Proteins 🥩🌱",
+                    "Meditation ⏱️🧘",
+                    "Coffee ☕️",
+                    "Fuel Spend ⛽️",
+                    "Ask anything...",
                 ],
                 borderThickness: 0.5
             )
             .padding(.top, 10)
             //            Spacer()
             VStack(spacing: -4) {
-                Text(String(localized: "empty_dashboard.tap_to_start"))
+                Text("tap to start")
                     .font(.custom("Bradley Hand", size: 22))
                     .rotationEffect(.degrees(-3))
                     .offset(x: 28)
@@ -106,10 +106,7 @@ struct EmptyDashboardView: View {
             .padding(.bottom, -20)
             .padding(.leading, 30)
             Button(action: onAddMetric) {
-                Label(
-                    String(localized: "empty_dashboard.add_metric"),
-                    systemImage: "plus"
-                )
+                Label("Add a tracker", systemImage: "plus")
                 .font(.largeTitle)
                 .labelStyle(.iconOnly)
                 .frame(width: 40, height: 40)

@@ -1,6 +1,6 @@
 //
 //  StartView.swift
-//  SleepingBird
+//  ArperBird
 //
 //  Created by Olivier Picard on 28/05/2026.
 //
@@ -64,7 +64,7 @@ struct StartView: View {
                     .fontWeight(.semibold)
                     .foregroundStyle(.secondary)
 
-                Text("Sleeping Bird")
+                Text("Arper Bird")
                     .font(.system(size: 45))
                     .fontWeight(.heavy)
                     .foregroundStyle(brandGradient)
@@ -199,7 +199,7 @@ struct StartView: View {
             .scaleEffect(buttonAppeared ? 1 : 0.92)
             .offset(y: buttonAppeared ? 0 : 20)
 
-            Text("By continuing, you agree to our [Terms and Privacy Policy](sleepingbird://legal).")
+            Text("By continuing, you agree to our [Terms and Privacy Policy](arperbird://legal).")
                 .font(.caption)
                 .foregroundStyle(.secondary)
                 .tint(.indigo)

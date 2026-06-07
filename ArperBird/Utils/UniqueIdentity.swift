@@ -1,6 +1,6 @@
 //
 //  UniqueIdentity.swift
-//  SleepingBird
+//  ArperBird
 //
 //  Created by Olivier Picard on 05/06/2026.
 //
@@ -16,7 +16,7 @@ import Security
 /// launches after the first unlock following a reboot.
 struct UniqueIdentityStore {
     /// Keychain account key under which the identity is stored.
-    private let account = "com.alizetech.sleepingbird.uniqueIdentity"
+    private let account = "com.alizetech.arperbird.uniqueIdentity"
 
     /// Returns the existing identity, creating and persisting one if none exists.
     func get() -> String {

@@ -1,6 +1,6 @@
 //
 //  MicAuthorizationView.swift
-//  SleepingBird
+//  ArperBird
 //
 //  Created by Olivier Picard on 31/05/2026.
 //

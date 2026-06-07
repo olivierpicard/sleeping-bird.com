@@ -1,6 +1,6 @@
 //
 //  _SliderEditor.swift
-//  SleepingBird
+//  ArperBird
 //
 //  Created by Olivier Picard on 30/04/2026.
 //

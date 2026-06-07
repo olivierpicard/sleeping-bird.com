@@ -1,6 +1,6 @@
 //
 //  BadgeRow.swift
-//  SleepingBird
+//  ArperBird
 //
 //  Created by Olivier Picard on 07/05/2026.
 //
@@ -33,7 +33,7 @@ struct BadgesStackView: View {
     var body: some View {
         WrappingHStack(hSpacing: 13, vSpacing: 13) {
             ForEach(badges, id: \.self) { item in
-                Text(item)
+                Text(LocalizedStringKey(item))
                     .padding(.all, innerPadding)
                     .padding(.horizontal, 5)
                     .background {

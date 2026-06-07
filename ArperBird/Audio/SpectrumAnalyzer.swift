@@ -1,6 +1,6 @@
 //
 //  SpectrumAnalyzer.swift
-//  SleepingBird
+//  ArperBird
 //
 
 import Accelerate

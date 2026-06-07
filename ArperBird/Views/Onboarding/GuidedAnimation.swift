@@ -1,6 +1,6 @@
 //
 //  GuideAnimation.swift
-//  SleepingBird
+//  ArperBird
 //
 //  Created by Olivier Picard on 01/06/2026.
 //

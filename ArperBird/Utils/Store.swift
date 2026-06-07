@@ -7,8 +7,8 @@ import StoreKit
 @Observable
 final class Store {
     enum Plan: String, CaseIterable {
-        case yearly = "com.alizetech.sleepingbird.premium.yearly"
-        case monthly = "com.alizetech.sleepingbird.premium.monthly"
+        case yearly = "com.alizetech.arperbird.premium.yearly"
+        case monthly = "com.alizetech.arperbird.premium.monthly"
 
         var shortName: String {
             switch self {

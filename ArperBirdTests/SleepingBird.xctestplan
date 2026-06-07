@@ -13,13 +13,10 @@
   },
   "testTargets" : [
     {
-      "skippedTests" : [
-        "MiniChartFactoryTests\/test_datetime_returnsDotMiniChart_onePerEntry()"
-      ],
       "target" : {
-        "containerPath" : "container:SleepingBird.xcodeproj",
+        "containerPath" : "container:ArperBird.xcodeproj",
         "identifier" : "8104B7552FA76EAD0087967B",
-        "name" : "SleepingBirdTests"
+        "name" : "ArperBirdTests"
       }
     }
   ],

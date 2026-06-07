@@ -1,6 +1,6 @@
 //
 //  LinearGaugeMiniChart.swift
-//  SleepingBird
+//  ArperBird
 //
 //  Created by Olivier Picard on 27/04/2026.
 //
