@@ -1,3 +1,5 @@
+import PostHog
+import RevenueCat
 import StoreKit
 import SwiftUI
 
@@ -35,13 +37,35 @@ struct PaywallView: View {
             ? String(localized: "paywall.unit.year")
             : String(localized: "paywall.unit.month")
         return String(
-            localized: "paywall.footer.price_unit \(product.displayPrice) \(unit)"
+            localized:
+                "paywall.footer.price_unit \(product.displayPrice) \(unit)"
         )
     }
 
     private func contactSupport() {
         guard let url = SupportMailLink(anonymousID: userId).url else { return }
         openURL(url)
+    }
+
+    private func restore() async {
+        // StoreKit determines the actual unlock and surfaces any user-facing
+        // error via store.lastError. The RevenueCat sync below is only for
+        // analytics identity aliasing, so its failure is logged, never shown —
+        // otherwise the user could see an error while already unlocked.
+        await store.restore()
+        do {
+            let customerInfo = try await Purchases.shared.syncPurchases()
+            let originalId = customerInfo.originalAppUserId
+            if originalId != UniqueIdentityStore().get() {
+                PostHogSDK.shared.alias(originalId)
+            }
+        } catch {
+            PostHogSDK.shared.capture(
+                "sync_revenuecat_failed",
+                properties: ["action": "restore"]
+            )
+            PostHogSDK.shared.captureException(error)
+        }
     }
 
     var body: some View {
@@ -181,7 +205,7 @@ struct PaywallView: View {
 
                     // Utility buttons
                     VStack(spacing: 12) {
-                        Button(action: { Task { await store.restore() } }) {
+                        Button(action: { Task { await restore() } }) {
                             Label(
                                 "Restore Purchases",
                                 systemImage: "arrow.counterclockwise"
@@ -235,6 +259,8 @@ struct PaywallView: View {
             Divider()
 
             VStack(spacing: 12) {
+                let isCTADisabled =
+                    selectedProduct == nil || store.purchaseInProgress
                 Button(action: {
                     guard let product = selectedProduct else { return }
                     Task {
@@ -246,17 +272,24 @@ struct PaywallView: View {
                             ProgressView()
                                 .tint(.white)
                         } else {
-                            Label("paywall.cta.free_trial", systemImage: "arrow.right")
-                                .font(.headline)
-                                .foregroundStyle(.white)
+                            Label(
+                                "paywall.cta.free_trial",
+                                systemImage: "arrow.right"
+                            )
+                            .font(.headline)
+                            .foregroundStyle(.white)
                         }
                     }
                     .frame(maxWidth: .infinity)
                     .frame(height: 54)
-                    .background(Color(red: 0.90, green: 0.38, blue: 0.32))
+                    .background(
+                        isCTADisabled
+                            ? Color(.systemGray3)
+                            : Color(red: 0.90, green: 0.38, blue: 0.32)
+                    )
                     .clipShape(RoundedRectangle(cornerRadius: 16))
                 }
-                .disabled(selectedProduct == nil || store.purchaseInProgress)
+                .disabled(isCTADisabled)
 
                 Text(footerText)
                     .font(.callout)
@@ -269,6 +302,23 @@ struct PaywallView: View {
         .background(Color(.systemGroupedBackground))
         .interactiveDismissDisabled()
         .trackScreen("Paywall")
+        .task {
+            // Retry if the launch-time load failed, so the paywall shows live
+            // prices instead of stale placeholders.
+            if store.products.isEmpty { await store.loadProducts() }
+        }
+        .alert(
+            "store.error.title",
+            isPresented: Binding(
+                get: { store.lastError != nil },
+                set: { if !$0 { store.lastError = nil } }
+            ),
+            presenting: store.lastError
+        ) { _ in
+            Button("store.error.dismiss", role: .cancel) {}
+        } message: { error in
+            Text(error.errorDescription ?? "")
+        }
     }
 }
 
@@ -321,7 +371,9 @@ private struct PlanCard: View {
                         .foregroundStyle(.primary)
                 }
 
-                Text(price ?? "—")
+                // Wider stand-in so the redacted bar reads as a price while
+                // products load, instead of a thin dash.
+                Text(price ?? "$00.00")
                     .font(.title2)
                     .fontWeight(.bold)
                     .foregroundStyle(.primary)
@@ -422,5 +474,5 @@ private struct FeatureRow: View {
                 .environment(Store())
         }
         .presentationDetents([.large])
-        .environment(\.locale, Locale(identifier: "fr"))
+        .environment(\.locale, Locale(identifier: "en"))
 }

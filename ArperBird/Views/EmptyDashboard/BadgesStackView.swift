@@ -10,14 +10,14 @@ import SwiftUI
 struct BadgesStackView: View {
     @Environment(\.colorScheme) private var colorScheme
     
-    let badges: [String]
+    let badges: [LocalizedStringKey]
     let innerPadding: Double
     let borderThickness: Double
     let borderColor: Color
     let cornerRadius: Double
 
     init(
-        badges: [String],
+        badges: [LocalizedStringKey],
         innerPadding: Double = 8,
         borderThickness: Double = 1,
         borderColor: Color = Color.gray,
@@ -32,8 +32,8 @@ struct BadgesStackView: View {
 
     var body: some View {
         WrappingHStack(hSpacing: 13, vSpacing: 13) {
-            ForEach(badges, id: \.self) { item in
-                Text(LocalizedStringKey(item))
+            ForEach(badges.indices, id: \.self) { index in
+                Text(badges[index])
                     .padding(.all, innerPadding)
                     .padding(.horizontal, 5)
                     .background {
@@ -62,7 +62,7 @@ struct BadgesStackView: View {
             "Pain",
             "Mood",
             "Relax Time",
-            "Coffee",
+            "Coffee ☕️", // Translated
             "Meat ate",
             "Car cost",
         ])

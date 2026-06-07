@@ -16,6 +16,9 @@ struct RootView: View {
     @Environment(Store.self) private var store
     @Query private var metrics: [Metric]
 
+    /// TESTING ONLY: force-presents the paywall a moment after launch.
+    @State private var showPaywallForTesting = false
+
     /// The free allowance is one generated metric. Once the user has used it
     /// and is not premium, the paywall blocks interaction. We wait for
     /// StoreKit to finish loading entitlements so premium users never see a
@@ -31,7 +34,6 @@ struct RootView: View {
     var body: some View {
         ZStack {
             if hasCompletedOnboarding {
-                
                 ContentView()
                     .transition(.opacity)
             } else {
@@ -42,8 +44,13 @@ struct RootView: View {
                 .transition(.opacity)
             }
         }
+//        .task {
+//            // TESTING ONLY: wait a bit, then present the paywall.
+//            try? await Task.sleep(for: .seconds(2))
+//            showPaywallForTesting = true
+//        }
         .animation(.easeInOut(duration: 1.5), value: hasCompletedOnboarding)
-//        .sheet(isPresented: .constant(true)) {
+//        .sheet(isPresented: $showPaywallForTesting) {
 //            PaywallView()
 //        }
         .sheet(isPresented: .constant(isLocked)) {

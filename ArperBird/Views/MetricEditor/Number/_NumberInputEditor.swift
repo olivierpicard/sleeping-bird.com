@@ -50,20 +50,24 @@ struct _NumberInputEditor: View {
         VStack(spacing: 32) {
             VStack(spacing: 8) {
                 HStack(alignment: .firstTextBaseline, spacing: 8) {
-                    TextField(String(localized: "number_input_editor.placeholder"), text: $text)
-                        .font(.system(size: 64, weight: .light))
-                            .keyboardType(
-                                step < 1 || min < 0
-                                    ? .numbersAndPunctuation : .numberPad
-                            )
-                        .multilineTextAlignment(.center)
-                        .focused($isFocused)
-                        .fixedSize()
-                        .foregroundStyle(fieldColor)
-                        .onChange(of: text) { _, _ in
-                            fieldColor = text.isEmpty || isValid ? .primary : .red
-                        }
-                        
+                    TextField(
+                        LocalizedStringKey("number_input_editor.placeholder"),
+                        text: $text
+                    )
+                    .font(.system(size: 64, weight: .light))
+                    .keyboardType(
+                        step < 1 || min < 0
+                            ? .numbersAndPunctuation : .numberPad
+                    )
+                    .multilineTextAlignment(.center)
+                    .focused($isFocused)
+                    .fixedSize()
+                    .foregroundStyle(fieldColor)
+                    .onChange(of: text) { _, _ in
+                        fieldColor =
+                            text.isEmpty || isValid ? .primary : .red
+                    }
+
                     if let unit {
                         Text(unit)
                             .font(.title3)
@@ -71,7 +75,9 @@ struct _NumberInputEditor: View {
                     }
                 }
 
-                Text("number_input_editor.range \(_meFormat(min, step: step)) \(_meFormat(max, step: step))")
+                Text(
+                    "number_input_editor.range \(_meFormat(min, step: step)) \(_meFormat(max, step: step))"
+                )
                 .font(.caption)
                 .foregroundStyle(.secondary)
             }
@@ -106,4 +112,5 @@ struct _NumberInputEditor: View {
             ) { _ in }
 
         }
+        .environment(\.locale, Locale(identifier: "es"))
 }

@@ -120,10 +120,22 @@
       }
     },
     "Arper Bird" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Arper Bird"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Arper Bird"
+          }
+        }
+      }
     },
     "Ask anything..." : {
-      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -204,7 +216,6 @@
       }
     },
     "Coffee ☕️" : {
-      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -488,7 +499,6 @@
       }
     },
     "Fuel Spend ⛽️" : {
-      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -639,7 +649,6 @@
 
     },
     "Maintenance 💰🚗" : {
-      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -656,7 +665,6 @@
       }
     },
     "Meditation ⏱️🧘" : {
-      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -1145,7 +1153,6 @@
       }
     },
     "Mood 😁" : {
-      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -1290,7 +1297,6 @@
       }
     },
     "Pain 😖" : {
-      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -1453,7 +1459,6 @@
       }
     },
     "Proteins 🥩🌱" : {
-      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -1550,7 +1555,6 @@
       }
     },
     "Sleeps 💤" : {
-      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -1610,6 +1614,116 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Étape 4 sur 4"
+          }
+        }
+      }
+    },
+    "store.error.dismiss" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OK"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OK"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OK"
+          }
+        }
+      }
+    },
+    "store.error.purchase" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your purchase couldn't be completed, and you haven't been charged. Please try again."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se pudo completar tu compra y no se te ha cobrado nada. Inténtalo de nuevo."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Votre achat n'a pas pu être finalisé et aucun montant ne vous a été débité. Veuillez réessayer."
+          }
+        }
+      }
+    },
+    "store.error.restore" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Couldn't restore your purchases. Please try again."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se pudieron restaurar tus compras. Inténtalo de nuevo."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Impossible de restaurer vos achats. Veuillez réessayer."
+          }
+        }
+      }
+    },
+    "store.error.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Something went wrong"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Algo salió mal"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Une erreur est survenue"
+          }
+        }
+      }
+    },
+    "store.error.verification" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your purchase went through, but we couldn't confirm it on this device. Tap Restore Purchases to unlock — you won't be charged again."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tu compra se realizó, pero no pudimos confirmarla en este dispositivo. Toca Restaurar compras para acceder; no se te volverá a cobrar."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Votre achat a bien été effectué, mais nous n'avons pas pu le confirmer sur cet appareil. Touchez Restaurer les achats pour y accéder — vous ne serez pas débité une seconde fois."
           }
         }
       }
@@ -1676,6 +1790,12 @@
     },
     "Terms & Privacy" : {
       "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Términos y Privacidad"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1820,6 +1940,12 @@
     },
     "View details" : {
       "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ver detalles"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1845,7 +1971,6 @@
       }
     },
     "Water 💧" : {
-      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {

@@ -18,11 +18,35 @@ final class Store {
         }
     }
 
+    enum StoreError: LocalizedError, Identifiable {
+        case purchase, verification, restore
+
+        var id: String {
+            switch self {
+            case .purchase: return "purchase"
+            case .verification: return "verification"
+            case .restore: return "restore"
+            }
+        }
+
+        var errorDescription: String? {
+            switch self {
+            case .purchase:
+                return String(localized: "store.error.purchase")
+            case .verification:
+                return String(localized: "store.error.verification")
+            case .restore:
+                return String(localized: "store.error.restore")
+            }
+        }
+    }
+
     private(set) var products: [Product] = []
     private(set) var purchasedProductIDs: Set<String> = []
     private(set) var isLoadingProducts = false
     private(set) var purchaseInProgress = false
     private(set) var hasLoadedEntitlements = false
+    var lastError: StoreError?
 
     var isPremium: Bool { !purchasedProductIDs.isEmpty }
 
@@ -47,6 +71,9 @@ final class Store {
                 for: Plan.allCases.map(\.rawValue)
             )
         } catch {
+            // No user-facing error here: this runs at launch and on paywall
+            // appearance, where redacted prices and a disabled CTA already
+            // convey the failure. Surfacing it would pop a stale modal.
             PostHogSDK.shared.capture("products_load_failed")
             PostHogSDK.shared.captureException(error)
         }
@@ -56,6 +83,7 @@ final class Store {
     func purchase(_ product: Product) async -> Bool {
         purchaseInProgress = true
         defer { purchaseInProgress = false }
+        lastError = nil
         let properties = purchaseProperties(for: product)
         let isTrial = await isEligibleForIntroTrial(product)
         PostHogSDK.shared.capture("purchase_started", properties: properties)
@@ -86,6 +114,7 @@ final class Store {
                         error,
                         properties: properties
                     )
+                    lastError = .verification
                     return false
                 }
             case .userCancelled:
@@ -106,13 +135,26 @@ final class Store {
         } catch {
             PostHogSDK.shared.capture("purchase_failed", properties: properties)
             PostHogSDK.shared.captureException(error, properties: properties)
+            lastError = .purchase
             return false
         }
     }
 
-    func restore() async {
+    /// Restores entitlements via StoreKit — the source of truth for `isPremium`.
+    /// Returns whether the sync succeeded; on failure `lastError` is set and
+    /// `restore_completed` is not emitted.
+    @discardableResult
+    func restore() async -> Bool {
         PostHogSDK.shared.capture("restore_started")
-        try? await AppStore.sync()
+        lastError = nil
+        do {
+            try await AppStore.sync()
+        } catch {
+            PostHogSDK.shared.capture("restore_failed")
+            PostHogSDK.shared.captureException(error)
+            lastError = .restore
+            return false
+        }
         await refreshPurchased()
         PostHogSDK.shared.capture(
             "restore_completed",
@@ -121,6 +163,7 @@ final class Store {
                 "is_premium": isPremium,
             ]
         )
+        return true
     }
 
     /// Whether this purchase will apply the introductory free trial, i.e. the
