@@ -23,7 +23,6 @@ final class MetricGenerator {
         let p = Pending(instruction: instruction)
         pending.append(p)
         Task { @MainActor in
-            defer { pending.removeAll { $0.id == p.id } }
             do {
                 let start = ContinuousClock.now
                 let schema = try await AiMetricSuggestion(locale: locale)
@@ -42,6 +41,12 @@ final class MetricGenerator {
                 //                    data: Metric.fakeData(for: schema.config)
                 //                )
                 context.insert(metric)
+                // Let @Query observe the insert before we drop the
+                // placeholder. Otherwise there's a frame where both `metrics`
+                // and `pending` are empty and the dashboard flashes its empty
+                // state before the real card appears.
+                await Task.yield()
+                pending.removeAll { $0.id == p.id }
                 let configJSON = (try? JSONEncoder().encode(schema.config))
                     .flatMap { String(data: $0, encoding: .utf8) }
                 PostHogSDK.shared.capture(
@@ -55,6 +60,7 @@ final class MetricGenerator {
                     ]
                 )
             } catch {
+                pending.removeAll { $0.id == p.id }
                 PostHogSDK.shared.captureException(
                     error,
                     properties: ["instruction_length": instruction.count]
