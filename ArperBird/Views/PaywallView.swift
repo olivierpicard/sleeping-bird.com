@@ -1,5 +1,3 @@
-import PostHog
-import RevenueCat
 import StoreKit
 import SwiftUI
 
@@ -49,23 +47,10 @@ struct PaywallView: View {
 
     private func restore() async {
         // StoreKit determines the actual unlock and surfaces any user-facing
-        // error via store.lastError. The RevenueCat sync below is only for
-        // analytics identity aliasing, so its failure is logged, never shown —
-        // otherwise the user could see an error while already unlocked.
+        // error via store.lastError. Identity stays aligned via the shared,
+        // iCloud-synced UUID used as both the RevenueCat appUserID and PostHog
+        // distinct_id, so there is nothing to reconcile here on restore.
         await store.restore()
-        do {
-            let customerInfo = try await Purchases.shared.syncPurchases()
-            let originalId = customerInfo.originalAppUserId
-            if originalId != UniqueIdentityStore().get() {
-                PostHogSDK.shared.alias(originalId)
-            }
-        } catch {
-            PostHogSDK.shared.capture(
-                "sync_revenuecat_failed",
-                properties: ["action": "restore"]
-            )
-            PostHogSDK.shared.captureException(error)
-        }
     }
 
     var body: some View {

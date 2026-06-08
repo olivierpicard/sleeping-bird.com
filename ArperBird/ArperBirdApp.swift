@@ -29,29 +29,6 @@ class AppDelegate: NSObject, UIApplicationDelegate {
         config.captureScreenViews = false
         config.errorTrackingConfig.autoCapture = true
         PostHogSDK.shared.setup(config)
-        
-//        Purchases.shared.syncPurchases { (customerInfo, error) in
-//            if let error = error {
-//                print("Restore failed: \(error.localizedDescription)")
-//                return
-//            }
-//            
-//            guard let customerInfo = customerInfo else { return }
-//            
-//            // 1. Check if they actually have the premium entitlement
-//            if customerInfo.entitlements["premium"]?.isActive == true {
-//                
-//                // 2. THIS is the master ID across device changes
-//                let masterRevenueCatUserID = customerInfo.originalAppUserId
-//                let currentActiveUserID = Purchases.shared.appUserID
-//                
-//                print("The underlying master user ID is: \(masterRevenueCatUserID)")
-//                print("The current session user ID is: \(currentActiveUserID)")
-//                
-//                // 3. Update your local state or map it to PostHog
-////                self.alignIdentities(masterID: masterRevenueCatUserID)
-//            }
-//        }
 
         #if DEBUG
             PostHogSDK.shared.identify(

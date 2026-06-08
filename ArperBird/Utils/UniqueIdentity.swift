@@ -34,12 +34,24 @@ struct UniqueIdentityStore {
         return identity
     }
 
+    /// Removes the stored identity from the Keychain.
+    ///
+    /// The next `get()` generates a brand-new UUID, simulating a fresh install.
+    /// Kept for test purposes (exercising the restore flow); not called in the
+    /// normal app lifecycle.
+    func delete() {
+        SecItemDelete(baseQuery() as CFDictionary)
+    }
+
     // MARK: - Keychain access
 
+    /// Matches the identity item regardless of its iCloud-sync flag, so we find
+    /// both legacy (per-device) items and synchronizable ones written below.
     private func baseQuery() -> [String: Any] {
         [
             kSecClass as String: kSecClassGenericPassword,
             kSecAttrAccount as String: account,
+            kSecAttrSynchronizable as String: kSecAttrSynchronizableAny,
         ]
     }
 
@@ -65,6 +77,11 @@ struct UniqueIdentityStore {
         SecItemDelete(baseQuery() as CFDictionary)
 
         var attributes = baseQuery()
+        // Write a concrete value (not `...Any`) so the item is created as
+        // iCloud-synced: the same Apple ID gets the same identity across
+        // devices/reinstalls, keeping the RevenueCat appUserID and PostHog
+        // distinct_id aligned so RC-origin events match the right person.
+        attributes[kSecAttrSynchronizable as String] = true
         attributes[kSecValueData as String] = data
         attributes[kSecAttrAccessible as String] = kSecAttrAccessibleAfterFirstUnlock
 
