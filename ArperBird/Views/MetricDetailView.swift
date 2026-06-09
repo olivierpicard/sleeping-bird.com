@@ -186,7 +186,9 @@ struct MetricDetailView: View {
                 .tint(metric.color)
             }
             ToolbarItem(placement: .topBarTrailing) {
-                Button("Edit") { isEditing = true }
+                Button(action: { isEditing = true }) {
+                    Label("Edit", systemImage: "slider.horizontal.3")
+                }
                     .tint(metric.color)
             }
         }
