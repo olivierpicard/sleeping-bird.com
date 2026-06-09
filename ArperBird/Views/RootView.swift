@@ -8,6 +8,7 @@
 import SwiftData
 import PostHog
 import SwiftUI
+import TipKit
 
 struct RootView: View {
     @AppStorage("hasCompletedOnboarding") private var hasCompletedOnboarding = false
@@ -25,7 +26,6 @@ struct RootView: View {
     /// flash of the paywall on launch.
     private var isLocked: Bool {
         
-        print(store.isPremium)
         return store.hasLoadedEntitlements
             && metrics.count >= 1
             && !store.isPremium
@@ -55,6 +55,9 @@ struct RootView: View {
 //        }
         .sheet(isPresented: .constant(isLocked)) {
             PaywallView()
+        }
+        .onChange(of: isLocked, initial: true) { _, locked in
+            AddEntryTip.isPaywallPresented = locked
         }
     }
 }

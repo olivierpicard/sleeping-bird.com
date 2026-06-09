@@ -80,7 +80,6 @@ final class DeepgramNova3Transcriber: Transcriber {
         let language =
             URLComponents(url: config.endpoint, resolvingAgainstBaseURL: false)?
             .queryItems?.first { $0.name == "language" }?.value ?? "?"
-        print("Nova3 language: \(language)")
 
         var request = URLRequest(url: config.endpoint)
         request.setValue(
@@ -156,7 +155,6 @@ final class DeepgramNova3Transcriber: Transcriber {
             : committedText + (committedText.isEmpty ? "" : " ") + interimText
 
         DispatchQueue.main.async { [weak self] in
-            print("final: \(isFinal) --- Full text: \(fullText)")
             self?.onText?(fullText)
         }
     }

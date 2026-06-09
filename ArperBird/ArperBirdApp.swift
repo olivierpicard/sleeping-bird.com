@@ -10,6 +10,7 @@ import PostHog
 import RevenueCat
 import SwiftData
 import SwiftUI
+import TipKit
 
 class AppDelegate: NSObject, UIApplicationDelegate {
     func application(
@@ -62,6 +63,11 @@ struct ArperBirdApp: App {
             .with(purchasesAreCompletedBy: .myApp, storeKitVersion: .storeKit2)
             .build()
         )
+
+        try? Tips.configure([
+            .displayFrequency(.immediate),
+            .datastoreLocation(.applicationDefault),
+        ])
     }
 
     var body: some Scene {

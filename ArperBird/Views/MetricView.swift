@@ -6,9 +6,12 @@
 //
 
 import SwiftUI
+import TipKit
 
 struct MetricView: View {
     @Environment(\.colorScheme) private var colorScheme
+
+    private let addEntryTip = AddEntryTip()
 
     let title: String
     let emoji: String
@@ -73,6 +76,7 @@ struct MetricView: View {
                 Spacer()
                 Button(action: {
                     feedbackTrigger.toggle()
+                    addEntryTip.invalidate(reason: .actionPerformed)
                     onAddTapped()
                 }) {
                     Image(systemName: "plus")
@@ -83,6 +87,7 @@ struct MetricView: View {
                 }
                 .buttonStyle(.bordered)
                 .tint(mainColor.mix(with: .gray, by: 0.5))
+                .popoverTip(addEntryTip, arrowEdge: .top)
 //                .shadow(
 //                    color: mainColor.opacity(0.8),
 //                    radius: 6,
@@ -123,6 +128,12 @@ struct MetricView: View {
             x: 0,
             y: 0
         )
+        .task {
+            
+            guard !AddEntryTip.hasSettled else { return }
+            try? await Task.sleep(for: .seconds(1.5))
+            AddEntryTip.hasSettled = true
+        }
 
     }
 

@@ -7,6 +7,50 @@
     "%lld" : {
 
     },
+    "add_entry_tip.message" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tap + to log a new value for this tracker."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Toca + para registrar un nuevo valor de este seguimiento."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Touchez + pour enregistrer une nouvelle valeur pour ce suivi."
+          }
+        }
+      }
+    },
+    "add_entry_tip.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add an entry"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añadir un registro"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajouter une entrée"
+          }
+        }
+      }
+    },
     "Add a tracker" : {
       "localizations" : {
         "es" : {
