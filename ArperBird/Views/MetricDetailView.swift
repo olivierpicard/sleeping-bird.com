@@ -142,46 +142,20 @@ struct MetricDetailView: View {
     }
 
     var body: some View {
-        List {
-            Section {
-                VStack(spacing: 24) {
-                    header
-
-                    Group {
-                        if isBinary {
-                            binaryCalendarSection
-                                .padding(.top)
-                        } else if isDatetime {
-                            datetimeCalendarSection
-                                .padding(.top)
-                        } else if isCategory {
-                            rangePicker
-                                .frame(maxWidth: 280)
-                            categoryChartSection
-                        } else {
-                            rangePicker
-                                .frame(maxWidth: 280)
-                            chartSection
-                        }
-                    }
-                }
-                .listRowInsets(
-                    EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16)
-                )
-                .listRowSeparator(.hidden)
-                .listRowBackground(Color.clear)
+        Group {
+            if metric.data.isEmpty {
+                emptyState
+            } else {
+                populatedList
             }
-
-            recentEntries
         }
-        .listStyle(.insetGrouped)
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
                     isAddingEntry = true
                 } label: {
-                    Image(systemName: "plus")
+                    Label("Add entry", systemImage: "plus")
                 }
                 .tint(metric.color)
             }
@@ -229,19 +203,197 @@ struct MetricDetailView: View {
         )
     }
 
+    // MARK: - Populated List
+
+    private var populatedList: some View {
+        List {
+            Section {
+                VStack(spacing: 24) {
+                    header
+
+                    Group {
+                        if isBinary {
+                            binaryCalendarSection
+                                .padding(.top)
+                        } else if isDatetime {
+                            datetimeCalendarSection
+                                .padding(.top)
+                        } else if isCategory {
+                            rangePicker
+                                .frame(maxWidth: 280)
+                            categoryChartSection
+                        } else {
+                            rangePicker
+                                .frame(maxWidth: 280)
+                            chartSection
+                        }
+                    }
+                }
+                .listRowInsets(
+                    EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16)
+                )
+                .listRowSeparator(.hidden)
+                .listRowBackground(Color.clear)
+            }
+
+            recentEntries
+        }
+        .listStyle(.insetGrouped)
+    }
+
+    // MARK: - Empty State
+
+    private var emptyStateSymbol: String {
+        switch metric.visual.chart {
+        case .line: return "chart.xyaxis.line"
+        case .bar: return "chart.bar.fill"
+        case .pie: return "chart.pie.fill"
+        case .calendar: return "calendar"
+        case .dailyGauge: return "gauge.with.dots.needle.bottom.50percent"
+        }
+    }
+
+    private var emptySubtitle: AttributedString {
+        var string = AttributedString(
+            localized: "metric_detail.empty.subtitle"
+        )
+        if let range = string.range(of: "+") {
+            string[range].foregroundColor = metric.color
+            string[range].font = .body.weight(.bold)
+        }
+        return string
+    }
+
+    private var emptyState: some View {
+        VStack(spacing: 0) {
+            metricLabel
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.horizontal, 20)
+                .padding(.top, 8)
+
+            Spacer()
+
+            VStack(spacing: 20) {
+                RoundedRectangle(cornerRadius: 24, style: .continuous)
+                    .fill(metric.color.opacity(0.12))
+                    .frame(width: 96, height: 96)
+                    .overlay {
+                        Image(systemName: emptyStateSymbol)
+                            .font(.system(size: 38, weight: .semibold))
+                            .foregroundStyle(metric.color)
+                    }
+
+                VStack(spacing: 8) {
+                    Text("metric_detail.empty.title")
+                        .font(.title2)
+                        .fontWeight(.bold)
+                        .foregroundStyle(.primary)
+                        .multilineTextAlignment(.center)
+
+                    Text(emptySubtitle)
+                        .font(.body)
+                        .foregroundStyle(.secondary)
+                        .multilineTextAlignment(.center)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                .padding(.horizontal, 20)
+
+//                Button(action: { isAddingEntry = true }) {
+//                    Label("metric_detail.empty.cta", systemImage: "plus")
+//                        .font(.headline)
+//                        .padding(.horizontal, 8)
+//                        .padding(.vertical, 4)
+//                }
+//                .controlSize(.large)
+//                .buttonStyle(.glassProminent)
+//                .tint(metric.color)
+//                .padding(.top, 15)
+            }
+
+            Spacer()
+            Spacer()
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+
+    // MARK: - Empty State (card variant)
+
+//    private var emptyStateCard: some View {
+//        VStack(spacing: 0) {
+//            metricLabel
+//                .frame(maxWidth: .infinity, alignment: .leading)
+//                .padding(.horizontal, 20)
+//                .padding(.top, 8)
+//
+//            Spacer()
+//
+//            VStack(spacing: 20) {
+//                RoundedRectangle(cornerRadius: 20, style: .continuous)
+//                    .fill(metric.color.opacity(0.12))
+//                    .frame(width: 88, height: 88)
+//                    .overlay {
+//                        Image(systemName: emptyStateSymbol)
+//                            .font(.system(size: 34, weight: .semibold))
+//                            .foregroundStyle(metric.color)
+//                    }
+//
+//                VStack(spacing: 8) {
+//                    Text("metric_detail.empty.card.title")
+//                        .font(.title2)
+//                        .fontWeight(.bold)
+//                        .foregroundStyle(.primary)
+//                        .multilineTextAlignment(.center)
+//
+//                    Text("metric_detail.empty.card.subtitle")
+//                        .font(.body)
+//                        .foregroundStyle(.secondary)
+//                        .multilineTextAlignment(.center)
+//                        .fixedSize(horizontal: false, vertical: true)
+//                }
+//
+//                Button(action: { isAddingEntry = true }) {
+//                    Label("metric_detail.empty.card.cta", systemImage: "plus")
+//                        .font(.headline)
+//                        .frame(maxWidth: .infinity)
+//                        .padding(.vertical, 4)
+//                }
+//                .controlSize(.large)
+//                .buttonStyle(.glassProminent)
+//                .tint(metric.color)
+//                .padding(.top, 4)
+//            }
+//            .padding(28)
+//            .frame(maxWidth: .infinity)
+//            .background(
+//                RoundedRectangle(cornerRadius: 28, style: .continuous)
+//                    .fill(Color(.secondarySystemGroupedBackground))
+//            )
+//            .padding(.horizontal, 16)
+//            .padding(.bottom, 24)
+//            
+//            Spacer()
+//        }
+//        .frame(maxWidth: .infinity, maxHeight: .infinity)
+//        .background(Color(.systemGroupedBackground))
+//    }
+
     // MARK: - Header
+
+    private var metricLabel: some View {
+        HStack(spacing: 8) {
+            Text(metric.emoji)
+                .font(.title3)
+            Text(metric.name.uppercased())
+                .font(.caption)
+                .fontWeight(.semibold)
+                .tracking(1.2)
+                .foregroundStyle(metric.color)
+        }
+    }
 
     private var header: some View {
         VStack(alignment: .leading) {
-            HStack(spacing: 8) {
-                Text(metric.emoji)
-                    .font(.title3)
-                Text(metric.name.uppercased())
-                    .font(.caption)
-                    .fontWeight(.semibold)
-                    .tracking(1.2)
-                    .foregroundStyle(metric.color)
-            }
+            metricLabel
 
             HStack(alignment: .lastTextBaseline, spacing: 6) {
                 Text(displayedValueText)
@@ -682,6 +834,14 @@ extension AggregationMethod {
         color: .teal,
         data: Metric.fakeData(for: schema.config, days: 365)
     )
+    NavigationStack {
+        MetricDetailView(metric: metric)
+    }
+}
+
+#Preview("Empty") {
+    let schema = MetricSchema.Fake.categorySingle(title: "Daily Mood", emoji: "🎭")
+    let metric = Metric(from: schema, color: .orange)
     NavigationStack {
         MetricDetailView(metric: metric)
     }
