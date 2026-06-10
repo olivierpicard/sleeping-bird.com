@@ -6,12 +6,9 @@ struct PaywallView: View {
     @Environment(Store.self) private var store
     @Environment(\.openURL) private var openURL
     @State private var selectedPlan: Store.Plan = .yearly
-    @State private var selectedSharing: Sharing = .single
     @Environment(\.dismiss) private var dismiss
 
     private let userId = UniqueIdentityStore().get()
-
-    enum Sharing { case single, family }
 
     private var selectedProduct: Product? { store.product(for: selectedPlan) }
 
@@ -85,19 +82,12 @@ struct PaywallView: View {
                     }
                     .padding()
                     .padding(.bottom, 15)
-                    //                    Text("What you get")
-                    //                        .font(.title2)
-                    //                        .padding()
 
                     // Feature rows
                     VStack(spacing: 12) {
                         FeatureRow(
                             icon: "mic",
-                            iconColor: Color(
-                                red: 0.90,
-                                green: 0.38,
-                                blue: 0.32
-                            ),
+                            iconColor: .paywallAccent,
                             iconBackground: Color(
                                 red: 0.99,
                                 green: 0.82,
@@ -191,33 +181,21 @@ struct PaywallView: View {
 
                     // Utility buttons
                     VStack(spacing: 12) {
-                        let isRestoreDisabled =
-                            store.restoreInProgress || store.purchaseInProgress
-                        Button(action: { Task { await restore() } }) {
-                            Group {
-                                if store.restoreInProgress {
-                                    ProgressView()
-                                        .tint(.white)
-                                } else {
-                                    Label(
-                                        "Restore Purchases",
-                                        systemImage: "arrow.counterclockwise"
-                                    )
-                                    .font(.headline)
-                                    .foregroundStyle(.white)
-                                }
-                            }
-                            .frame(maxWidth: .infinity)
-                            .frame(height: 54)
-                            .background(
-                                isRestoreDisabled
-                                    ? Color(.systemGray3)
-                                    : Color(red: 0.20, green: 0.20, blue: 0.20)
+                        PaywallActionButton(
+                            isLoading: store.restoreInProgress,
+                            isDisabled: store.restoreInProgress
+                                || store.purchaseInProgress,
+                            background: .paywallDarkButton,
+                            accessibilityLabel: "Restore Purchases",
+                            action: { Task { await restore() } }
+                        ) {
+                            Label(
+                                "Restore Purchases",
+                                systemImage: "arrow.counterclockwise"
                             )
-                            .clipShape(RoundedRectangle(cornerRadius: 16))
-                            .accessibilityLabel("Restore Purchases")
+                            .font(.headline)
+                            .foregroundStyle(.white)
                         }
-                        .disabled(isRestoreDisabled)
 
                         Button(action: contactSupport) {
                             Label("Contact Support", systemImage: "envelope")
@@ -260,39 +238,23 @@ struct PaywallView: View {
             Divider()
 
             VStack(spacing: 12) {
-                let isCTADisabled =
-                    selectedProduct == nil || store.purchaseInProgress
-                    || store.restoreInProgress
-                Button(action: {
-                    guard let product = selectedProduct else { return }
-                    Task {
-                        if await store.purchase(product) { dismiss() }
-                    }
-                }) {
-                    Group {
-                        if store.purchaseInProgress {
-                            ProgressView()
-                                .tint(.white)
-                        } else {
-                            Label(
-                                "paywall.cta.free_trial",
-                                systemImage: "arrow.right"
-                            )
-                            .font(.headline)
-                            .foregroundStyle(.white)
+                PaywallActionButton(
+                    isLoading: store.purchaseInProgress,
+                    isDisabled: selectedProduct == nil
+                        || store.purchaseInProgress || store.restoreInProgress,
+                    background: .paywallAccent,
+                    accessibilityLabel: "paywall.cta.free_trial",
+                    action: {
+                        guard let product = selectedProduct else { return }
+                        Task {
+                            if await store.purchase(product) { dismiss() }
                         }
                     }
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 54)
-                    .background(
-                        isCTADisabled
-                            ? Color(.systemGray3)
-                            : Color(red: 0.90, green: 0.38, blue: 0.32)
-                    )
-                    .clipShape(RoundedRectangle(cornerRadius: 16))
-                    .accessibilityLabel("paywall.cta.free_trial")
+                ) {
+                    Label("paywall.cta.free_trial", systemImage: "arrow.right")
+                        .font(.headline)
+                        .foregroundStyle(.white)
                 }
-                .disabled(isCTADisabled)
 
                 Text(footerText)
                     .font(.callout)
@@ -325,6 +287,54 @@ struct PaywallView: View {
     }
 }
 
+/// The shared full-width action button used for both the primary CTA and the
+/// "Restore Purchases" row: a 54pt rounded bar that swaps its label for a
+/// spinner while loading and greys out when disabled, keeping its VoiceOver
+/// name in both states.
+private struct PaywallActionButton<Content: View>: View {
+    let isLoading: Bool
+    let isDisabled: Bool
+    let background: Color
+    let accessibilityLabel: LocalizedStringKey
+    let action: () -> Void
+    @ViewBuilder let content: () -> Content
+
+    var body: some View {
+        Button(action: action) {
+            Group {
+                if isLoading {
+                    ProgressView()
+                        .tint(.white)
+                } else {
+                    content()
+                }
+            }
+            .frame(maxWidth: .infinity)
+            .frame(height: 54)
+            .background(isDisabled ? Color(.systemGray3) : background)
+            .clipShape(RoundedRectangle(cornerRadius: 16))
+            .accessibilityLabel(accessibilityLabel)
+        }
+        .disabled(isDisabled)
+    }
+}
+
+extension Color {
+    /// The paywall's brand accent (warm red), used for the primary CTA.
+    fileprivate static let paywallAccent = Color(
+        red: 0.90,
+        green: 0.38,
+        blue: 0.32
+    )
+
+    /// The dark neutral fill for secondary actions like "Restore Purchases".
+    fileprivate static let paywallDarkButton = Color(
+        red: 0.20,
+        green: 0.20,
+        blue: 0.20
+    )
+}
+
 private struct PlanCard: View {
     let emoji: String
     let title: LocalizedStringKey
@@ -340,7 +350,6 @@ private struct PlanCard: View {
                     Text(emoji)
                         .font(.title)
                         .padding(10)
-                        .clipShape(RoundedRectangle(cornerRadius: 10))
 
                     Spacer()
 
@@ -397,30 +406,6 @@ private struct PlanCard: View {
             )
         }
         .buttonStyle(.plain)
-    }
-}
-
-private struct SharingButton: View {
-    let label: String
-    let isSelected: Bool
-    let action: () -> Void
-
-    var body: some View {
-        Button(action: action) {
-            Text(label)
-                .font(.subheadline)
-                .fontWeight(.semibold)
-                .foregroundStyle(isSelected ? .white : .primary)
-                .frame(maxWidth: .infinity)
-                .frame(height: 44)
-                .background(
-                    isSelected
-                        ? Color(red: 0.20, green: 0.20, blue: 0.20)
-                        : Color.clear
-                )
-                .clipShape(RoundedRectangle(cornerRadius: 14))
-                .padding(3)
-        }
     }
 }
 
