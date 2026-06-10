@@ -17,8 +17,8 @@ class Metric: Identifiable {
     var colorHex: String
     var config: MetricConfig
     var visual: MetricVisual
-    var data: [DataPoint]
-    var createdAt: Date
+    var data: [DataPoint] = []
+    var createdAt: Date = Date()
 
     enum AppendError: Error {
         case typeMismatch(expected: String, got: String)

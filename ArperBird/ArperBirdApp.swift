@@ -54,6 +54,26 @@ struct ArperBirdApp: App {
     @State private var generator = MetricGenerator()
     @State private var store = Store()
 
+    /// Persistent SwiftData container built with an explicit `VersionedSchema`
+    /// and `SchemaMigrationPlan` so user data survives App Store updates
+    /// deterministically, instead of relying on implicit lightweight migration.
+    private let modelContainer: ModelContainer = {
+        let schema = Schema(versionedSchema: SchemaV1.self)
+        let configuration = ModelConfiguration(
+            schema: schema,
+            isStoredInMemoryOnly: false
+        )
+        do {
+            return try ModelContainer(
+                for: schema,
+                migrationPlan: MetricMigrationPlan.self,
+                configurations: [configuration]
+            )
+        } catch {
+            fatalError("Could not create ModelContainer: \(error)")
+        }
+    }()
+
     init() {
         Purchases.configure(
             with: Configuration.Builder(
@@ -76,7 +96,7 @@ struct ArperBirdApp: App {
                 .environment(generator)
                 .environment(store)
         }
-        .modelContainer(for: Metric.self)
+        .modelContainer(modelContainer)
         .onChange(of: scenePhase) { _, newPhase in
             if newPhase == .active {
                 Task { await store.refreshPurchased() }
