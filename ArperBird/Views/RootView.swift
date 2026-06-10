@@ -53,7 +53,12 @@ struct RootView: View {
 //        .sheet(isPresented: $showPaywallForTesting) {
 //            PaywallView()
 //        }
-        .sheet(isPresented: .constant(isLocked)) {
+        // Presentation is fully derived from `isLocked`: the paywall shows
+        // whenever the free allowance is used up and gates its own dismissal on
+        // a premium unlock. We ignore SwiftUI's dismissal writes (rather than
+        // using `.constant`, whose dropped writes can desync presentation state)
+        // so the sheet can't be swiped away while still locked.
+        .sheet(isPresented: Binding(get: { isLocked }, set: { _ in })) {
             PaywallView()
         }
         .onChange(of: isLocked, initial: true) { _, locked in

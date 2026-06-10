@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import PostHog
 import Security
 
 /// Stores a stable, per-install UUID in the Keychain.
@@ -85,6 +86,14 @@ struct UniqueIdentityStore {
         attributes[kSecValueData as String] = data
         attributes[kSecAttrAccessible as String] = kSecAttrAccessibleAfterFirstUnlock
 
-        SecItemAdd(attributes as CFDictionary, nil)
+        let status = SecItemAdd(attributes as CFDictionary, nil)
+        guard status != errSecSuccess else { return }
+        // A failed write means the next `get()` mints a brand-new UUID, which
+        // would silently fragment the user's analytics and RevenueCat identity.
+        // Surface it so the breakage is visible instead of invisible.
+        PostHogSDK.shared.capture(
+            "identity_keychain_write_failed",
+            properties: ["os_status": Int(status)]
+        )
     }
 }
