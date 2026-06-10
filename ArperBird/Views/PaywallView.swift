@@ -1,5 +1,6 @@
 import StoreKit
 import SwiftUI
+import UIKit
 
 struct PaywallView: View {
     @Environment(Store.self) private var store
@@ -50,7 +51,7 @@ struct PaywallView: View {
         // error via store.lastError. Identity stays aligned via the shared,
         // iCloud-synced UUID used as both the RevenueCat appUserID and PostHog
         // distinct_id, so there is nothing to reconcile here on restore.
-        await store.restore()
+        if await store.restore(), store.isPremium { dismiss() }
     }
 
     var body: some View {
@@ -214,6 +215,7 @@ struct PaywallView: View {
                                     : Color(red: 0.20, green: 0.20, blue: 0.20)
                             )
                             .clipShape(RoundedRectangle(cornerRadius: 16))
+                            .accessibilityLabel("Restore Purchases")
                         }
                         .disabled(isRestoreDisabled)
 
@@ -241,8 +243,10 @@ struct PaywallView: View {
                                 .lineLimit(1)
                                 .minimumScaleFactor(0.6)
 
-                            Button(action: {}) {
-                                Text("Copy")
+                            Button(action: {
+                                UIPasteboard.general.string = userId
+                            }) {
+                                Label("Copy", systemImage: "doc.on.doc")
                                     .font(.headline)
                             }
                         }
@@ -258,6 +262,7 @@ struct PaywallView: View {
             VStack(spacing: 12) {
                 let isCTADisabled =
                     selectedProduct == nil || store.purchaseInProgress
+                    || store.restoreInProgress
                 Button(action: {
                     guard let product = selectedProduct else { return }
                     Task {
@@ -285,6 +290,7 @@ struct PaywallView: View {
                             : Color(red: 0.90, green: 0.38, blue: 0.32)
                     )
                     .clipShape(RoundedRectangle(cornerRadius: 16))
+                    .accessibilityLabel("paywall.cta.free_trial")
                 }
                 .disabled(isCTADisabled)
 
