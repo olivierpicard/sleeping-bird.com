@@ -69,6 +69,9 @@ struct DashboardView: View {
                 }
             }
             FeedbackCardView()
+                .listRowInsets(rowInsets)
+                .listRowSeparator(.hidden)
+                .listRowBackground(Color.clear)
         }
         .listStyle(.plain)
         .navigationDestination(item: $selectedMetric) { metric in

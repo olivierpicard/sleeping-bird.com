@@ -36,13 +36,15 @@ struct FeedbackCardView: View {
             Label("Open email", systemImage: "arrow.up.forward.square")
                 .labelStyle(.iconOnly)
         }
+        .background(.clear)
         .padding()
+        .clipShape(RoundedRectangle(cornerRadius: 20))
+        .onTapGesture(perform: onCardTapped)
         .overlay {
             RoundedRectangle(cornerRadius: 20)
                 .stroke(Color(.gray), style: StrokeStyle(lineWidth: 1, dash: [6]))
                 
         }
-        .onTapGesture(perform: onCardTapped)
     }
 
     private func onCardTapped() {
