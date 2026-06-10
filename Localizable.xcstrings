@@ -7,6 +7,9 @@
     "%lld" : {
 
     },
+    "💬" : {
+
+    },
     "Add a tracker" : {
       "localizations" : {
         "es" : {
@@ -542,6 +545,86 @@
         }
       }
     },
+    "What I liked:\n\n\nWhat's buggy / bothered me:\n\n\nAn idea:\n\n\n---\nVersion: %1$@ (%2$@)\nDevice: %3$@ — iOS %4$@\nLocale: %5$@\nVoice: %6$@\nID: %7$@" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lo que me gustó:\n\n\nLo que falla / me molestó:\n\n\nUna idea:\n\n\n---\nVersión: %1$@ (%2$@)\nDispositivo: %3$@ — iOS %4$@\nIdioma: %5$@\nVoz: %6$@\nID: %7$@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ce qui m'a plu :\n\n\nCe qui bug / m'a gêné :\n\n\nUne idée :\n\n\n---\nVersion : %1$@ (%2$@)\nAppareil : %3$@ — iOS %4$@\nLangue : %5$@\nVoix : %6$@\nID : %7$@"
+          }
+        }
+      }
+    },
+    "Feedback Arper Bird version %@" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comentarios Arper Bird versión %@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Retour Arper Bird version %@"
+          }
+        }
+      }
+    },
+    "Open email" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir el correo"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvrir l'e-mail"
+          }
+        }
+      }
+    },
+    "Help us improve the app" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ayúdanos a mejorar la app"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aidez-nous à améliorer l'app"
+          }
+        }
+      }
+    },
+    "An idea? A bug?" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Una idea? ¿Un fallo?"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Une idée ? Un bug ?"
+          }
+        }
+      }
+    },
     "Fuel Spend ⛽️" : {
       "localizations" : {
         "es" : {
@@ -720,95 +803,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Méditation ⏱️🧘"
-          }
-        }
-      }
-    },
-    "metric_detail.empty.card.cta" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Add a value"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Añadir un valor"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ajouter une valeur"
-          }
-        }
-      }
-    },
-    "metric_detail.empty.card.subtitle" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "You haven't logged any values for this tracker yet."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Aún no has registrado ningún valor para este seguimiento."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Vous n'avez encore enregistré aucune valeur pour ce suivi."
-          }
-        }
-      }
-    },
-    "metric_detail.empty.card.title" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Start tracking"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Empieza a registrar"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Commencez le suivi"
-          }
-        }
-      }
-    },
-    "metric_detail.empty.cta" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Add data"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Añadir datos"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ajouter des données"
           }
         }
       }

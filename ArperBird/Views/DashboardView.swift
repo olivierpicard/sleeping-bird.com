@@ -68,6 +68,7 @@ struct DashboardView: View {
                     }
                 }
             }
+            FeedbackCardView()
         }
         .listStyle(.plain)
         .navigationDestination(item: $selectedMetric) { metric in
