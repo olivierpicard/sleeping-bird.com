@@ -45,6 +45,7 @@ final class Store {
     private(set) var purchasedProductIDs: Set<String> = []
     private(set) var isLoadingProducts = false
     private(set) var purchaseInProgress = false
+    private(set) var restoreInProgress = false
     private(set) var hasLoadedEntitlements = false
     var lastError: StoreError?
 
@@ -145,6 +146,8 @@ final class Store {
     /// `restore_completed` is not emitted.
     @discardableResult
     func restore() async -> Bool {
+        restoreInProgress = true
+        defer { restoreInProgress = false }
         PostHogSDK.shared.capture("restore_started")
         lastError = nil
         do {

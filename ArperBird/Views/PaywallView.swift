@@ -190,20 +190,32 @@ struct PaywallView: View {
 
                     // Utility buttons
                     VStack(spacing: 12) {
+                        let isRestoreDisabled =
+                            store.restoreInProgress || store.purchaseInProgress
                         Button(action: { Task { await restore() } }) {
-                            Label(
-                                "Restore Purchases",
-                                systemImage: "arrow.counterclockwise"
-                            )
-                            .font(.headline)
-                            .foregroundStyle(.white)
+                            Group {
+                                if store.restoreInProgress {
+                                    ProgressView()
+                                        .tint(.white)
+                                } else {
+                                    Label(
+                                        "Restore Purchases",
+                                        systemImage: "arrow.counterclockwise"
+                                    )
+                                    .font(.headline)
+                                    .foregroundStyle(.white)
+                                }
+                            }
                             .frame(maxWidth: .infinity)
                             .frame(height: 54)
                             .background(
-                                Color(red: 0.20, green: 0.20, blue: 0.20)
+                                isRestoreDisabled
+                                    ? Color(.systemGray3)
+                                    : Color(red: 0.20, green: 0.20, blue: 0.20)
                             )
                             .clipShape(RoundedRectangle(cornerRadius: 16))
                         }
+                        .disabled(isRestoreDisabled)
 
                         Button(action: contactSupport) {
                             Label("Contact Support", systemImage: "envelope")
