@@ -100,7 +100,7 @@ struct FeedbackCardView: View {
 
         var components = URLComponents()
         components.scheme = "mailto"
-        components.path = "feedback@arperbird.com"
+        components.path = "support@sleeping-bird.com"
         components.queryItems = [
             URLQueryItem(name: "subject", value: subject),
             URLQueryItem(name: "body", value: body),
