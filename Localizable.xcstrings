@@ -1506,6 +1506,29 @@
         }
       }
     },
+    "paywall.cta.subscribe" : {
+      "comment" : "Purchase button CTA on paywall when the user is not eligible for the free trial",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Subscribe"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Suscríbete"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "S'abonner"
+          }
+        }
+      }
+    },
     "paywall.footer.cancel_anytime" : {
       "localizations" : {
         "en" : {
@@ -1546,6 +1569,50 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%1$@/%2$@ • annulable à tout moment"
+          }
+        }
+      }
+    },
+    "paywall.restore.empty.message" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "We couldn't find any previous purchases to restore on this Apple Account."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No encontramos compras anteriores para restaurar en esta cuenta de Apple."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nous n'avons trouvé aucun achat précédent à restaurer sur ce compte Apple."
+          }
+        }
+      }
+    },
+    "paywall.restore.empty.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No Purchases Found"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se encontraron compras"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucun achat trouvé"
           }
         }
       }

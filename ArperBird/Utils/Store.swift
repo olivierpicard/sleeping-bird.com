@@ -47,6 +47,13 @@ final class Store {
     private(set) var purchaseInProgress = false
     private(set) var restoreInProgress = false
     private(set) var hasLoadedEntitlements = false
+    /// Product IDs the user is still eligible to start the introductory free
+    /// trial on. Empty until `refreshIntroEligibility()` runs.
+    private(set) var introEligibleProductIDs: Set<String> = []
+    /// Whether intro eligibility has been resolved against loaded products at
+    /// least once. Lets callers tell "known: not eligible" apart from "not yet
+    /// resolved" (the rare launch where products failed to load).
+    private(set) var hasResolvedIntroEligibility = false
     var lastError: StoreError?
 
     var isPremium: Bool { !purchasedProductIDs.isEmpty }
@@ -56,12 +63,34 @@ final class Store {
         Task {
             await loadProducts()
             await refreshPurchased()
+            // Resolve eligibility before flipping the entitlements barrier so the
+            // paywall (gated on `hasLoadedEntitlements`) always opens with a
+            // determined CTA — no flash of one label flipping to the other.
+            await refreshIntroEligibility()
             hasLoadedEntitlements = true
         }
     }
 
     func product(for plan: Plan) -> Product? {
         products.first { $0.id == plan.rawValue }
+    }
+
+    /// Whether the user can still start the introductory free trial on `plan`.
+    func isEligibleForIntroOffer(_ plan: Plan) -> Bool {
+        introEligibleProductIDs.contains(plan.rawValue)
+    }
+
+    /// Recomputes intro-offer eligibility for the loaded products. No-op for
+    /// `hasResolvedIntroEligibility` when products haven't loaded yet, so the
+    /// resolved flag only flips once the answer is real.
+    func refreshIntroEligibility() async {
+        guard !products.isEmpty else { return }
+        var eligible: Set<String> = []
+        for product in products where await isEligibleForIntroTrial(product) {
+            eligible.insert(product.id)
+        }
+        introEligibleProductIDs = eligible
+        hasResolvedIntroEligibility = true
     }
 
     func loadProducts() async {

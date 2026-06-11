@@ -6,11 +6,20 @@ struct PaywallView: View {
     @Environment(Store.self) private var store
     @Environment(\.openURL) private var openURL
     @State private var selectedPlan: Store.Plan = .yearly
+    @State private var showNothingToRestore = false
     @Environment(\.dismiss) private var dismiss
 
     private let userId = UniqueIdentityStore().get()
 
     private var selectedProduct: Product? { store.product(for: selectedPlan) }
+
+    /// The primary CTA copy: the free-trial promise only when the user is still
+    /// eligible for the intro offer, otherwise a neutral "Subscribe" (StoreKit
+    /// charges immediately once the trial has been consumed).
+    private var ctaLabel: LocalizedStringKey {
+        store.isEligibleForIntroOffer(selectedPlan)
+            ? "paywall.cta.free_trial" : "paywall.cta.subscribe"
+    }
 
     private var yearlyDiscount: String? {
         guard let yearly = store.product(for: .yearly),
@@ -48,7 +57,14 @@ struct PaywallView: View {
         // error via store.lastError. Identity stays aligned via the shared,
         // iCloud-synced UUID used as both the RevenueCat appUserID and PostHog
         // distinct_id, so there is nothing to reconcile here on restore.
-        if await store.restore(), store.isPremium { dismiss() }
+        // A failed sync surfaces via store.lastError; a successful sync that
+        // found no entitlement gets a gentle "nothing to restore" alert.
+        guard await store.restore() else { return }
+        if store.isPremium {
+            dismiss()
+        } else {
+            showNothingToRestore = true
+        }
     }
 
     var body: some View {
@@ -243,7 +259,7 @@ struct PaywallView: View {
                     isDisabled: selectedProduct == nil
                         || store.purchaseInProgress || store.restoreInProgress,
                     background: .paywallAccent,
-                    accessibilityLabel: "paywall.cta.free_trial",
+                    accessibilityLabel: ctaLabel,
                     action: {
                         guard let product = selectedProduct else { return }
                         Task {
@@ -251,7 +267,7 @@ struct PaywallView: View {
                         }
                     }
                 ) {
-                    Label("paywall.cta.free_trial", systemImage: "arrow.right")
+                    Label(ctaLabel, systemImage: "arrow.right")
                         .font(.headline)
                         .foregroundStyle(.white)
                 }
@@ -269,8 +285,13 @@ struct PaywallView: View {
         .trackScreen("Paywall")
         .task {
             // Retry if the launch-time load failed, so the paywall shows live
-            // prices instead of stale placeholders.
+            // prices instead of stale placeholders. Resolve eligibility too if it
+            // never ran (no products at launch), so the CTA settles on its final
+            // label once products arrive.
             if store.products.isEmpty { await store.loadProducts() }
+            if !store.hasResolvedIntroEligibility {
+                await store.refreshIntroEligibility()
+            }
         }
         .alert(
             "store.error.title",
@@ -283,6 +304,14 @@ struct PaywallView: View {
             Button("store.error.dismiss", role: .cancel) {}
         } message: { error in
             Text(error.errorDescription ?? "")
+        }
+        .alert(
+            "paywall.restore.empty.title",
+            isPresented: $showNothingToRestore
+        ) {
+            Button("store.error.dismiss", role: .cancel) {}
+        } message: {
+            Text("paywall.restore.empty.message")
         }
     }
 }
