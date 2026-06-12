@@ -131,7 +131,7 @@ struct MetricView: View {
         .task {
             
             guard !AddEntryTip.hasSettled else { return }
-            try? await Task.sleep(for: .seconds(1.5))
+            try? await Task.sleep(for: .seconds(3.5))
             AddEntryTip.hasSettled = true
         }
 
