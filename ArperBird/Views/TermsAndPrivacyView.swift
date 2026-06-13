@@ -98,7 +98,9 @@ struct TermsAndPrivacyView: View {
         VStack(alignment: .leading, spacing: 16) {
             sectionTitle("Terms of Service", systemImage: "doc.text")
 
-            paragraph("By using Sleeping Bird you agree to these terms. The app lets you describe metrics you want to track, interprets your description, and renders charts to help you visualize your personal data.")
+            paragraph(
+                "By using Arper Bird you agree to these terms. The app lets you describe metrics you want to track, interprets your description with AI, and renders charts to help you visualize your personal data."
+            )
 
             subsection(
                 "Acceptable use",
@@ -117,7 +119,7 @@ struct TermsAndPrivacyView: View {
 
             subsection(
                 "Disclaimer",
-                "Sleeping Bird is provided \u{201C}as is.\u{201D} It is not a medical, financial, or professional advice tool. Decisions you make based on your tracked data are your own."
+                "Arper Bird is provided \u{201C}as is.\u{201D} It is not a medical, financial, or professional advice tool. Decisions you make based on your tracked data are your own."
             )
         }
     }
@@ -128,16 +130,38 @@ struct TermsAndPrivacyView: View {
         VStack(alignment: .leading, spacing: 16) {
             sectionTitle("Privacy Policy", systemImage: "lock.shield")
 
-            paragraph("We designed Sleeping Bird to keep your data private. Here's what we collect and why.")
-
-            subsection(
-                "Data stored on your device",
-                "Your metrics, data points, and charts are stored locally on your device. They are not uploaded to our servers."
+            paragraph(
+                "We designed Arper Bird to keep your data private. Your metrics live on your device — we don't run accounts or upload your tracked data to our own servers. Here's what leaves your device, and to whom."
             )
 
             subsection(
-                "Voice & text descriptions",
-                "When you dictate or type a metric description, the text is sent to our AI provider to interpret it into a chart configuration. Voice is transcribed in real time and is not retained after transcription."
+                "Data stored on your device",
+                "The values you record, your metric names, and your descriptions are stored locally on your device using Apple's on-device database. They never leave your device, and we never receive a copy of them."
+            )
+
+            subsection(
+                "Voice transcription (Deepgram)",
+                "When you dictate a metric, your microphone audio is streamed in real time to Deepgram, our transcription provider, and turned into text. The audio is not stored by our services after it is transcribed."
+            )
+
+            subsection(
+                "AI interpretation (Google Firebase / Gemini)",
+                "The text of your description is sent to Google's Gemini model via Firebase AI to interpret it into a chart configuration. Only the description you write or dictate is sent — not your recorded data points. AI interpretation isn't perfect and may occasionally misread your description."
+            )
+
+            subsection(
+                "Subscriptions (RevenueCat & App Store)",
+                "If you subscribe, your purchase is processed by Apple's App Store and validated through RevenueCat. They handle billing; we don't see your payment details."
+            )
+
+            subsection(
+                "Analytics & crash reports (PostHog)",
+                "We use PostHog, hosted in the EU, to understand how the app is used and to receive crash reports so we can fix bugs. This includes the structure of the metrics you create — their type, chart, units, and any category labels you define — but never the values you log against them, your metric names, or your descriptions. Events are tied to a random identifier generated on your device — not to your name, email, or Apple ID."
+            )
+
+            subsection(
+                "Your anonymous identifier",
+                "To keep analytics and subscriptions consistent across reinstalls, we store a random identifier in your device's Keychain. It contains no personal information and is never linked to your real identity."
             )
 
             subsection(
@@ -147,7 +171,7 @@ struct TermsAndPrivacyView: View {
 
             subsection(
                 "Contact",
-                "Questions about your privacy? Reach us at privacy@sleeping-bird.com."
+                "Questions about your privacy? Reach us at \(SupportMailLink.address)."
             )
         }
     }
@@ -164,7 +188,8 @@ struct TermsAndPrivacyView: View {
 
     // MARK: Building blocks
 
-    private func sectionTitle(_ title: String, systemImage: String) -> some View {
+    private func sectionTitle(_ title: String, systemImage: String) -> some View
+    {
         Label(title, systemImage: systemImage)
             .font(.title2)
             .fontWeight(.bold)
@@ -190,7 +215,9 @@ struct TermsAndPrivacyView: View {
         let formatter = DateFormatter()
         formatter.dateStyle = .long
         formatter.timeStyle = .none
-        return formatter.string(from: Date(timeIntervalSince1970: 1_748_476_800)) // 2025-05-29
+        return formatter.string(
+            from: Date(timeIntervalSince1970: 1_781_308_800)
+        )  // 2026-06-13
     }()
 }
 
@@ -199,7 +226,7 @@ struct TermsAndPrivacyView: View {
 }
 
 #Preview("Privacy first") {
-    TermsAndPrivacyView(initialSection: .privacy) 
+    TermsAndPrivacyView(initialSection: .privacy)
 }
 
 #Preview("Dark") {
