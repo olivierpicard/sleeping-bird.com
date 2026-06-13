@@ -46,7 +46,7 @@ The PostHog project token, RevenueCat API key, and Firebase config live in sourc
 
 `DataPoint` is a `Codable` enum with associated values: `.number(Date, Double)`, `.category(Date, [String])`, `.binary(Date, Bool)`, `.datetime(Date)`, `.duration(Date, TimeInterval)`. Use `metric.append(_:)` to add a point — it validates the type matches `config`.
 
-`Metric` is the only `@Model`; the SwiftData container is declared once via `.modelContainer(for: Metric.self)` in `ArperBirdApp`.
+`Metric` is the only `@Model`. The SwiftData container is built once in `ArperBirdApp` from an **explicit** `Schema(versionedSchema: SchemaV1.self)` + `migrationPlan: MetricMigrationPlan.self` (not `.modelContainer(for:)`), so user data survives App Store updates deterministically rather than via runtime-inferred lightweight migration. To evolve the persisted shape, follow the recipe in `Metric/MetricMigrationPlan.swift`: add a new `SchemaVN` `VersionedSchema`, append it to `MetricMigrationPlan.schemas`, and add a `.lightweight`/`.custom` `MigrationStage`. **Caveat:** `config`, `visual`, and `data` are `Codable` blobs to SwiftData — changes *inside* those types are invisible to the plan, so keep their `Codable` encodings backward-compatible by hand (only add cases/optional fields; never reorder or rename coding keys).
 
 ### AI Metric Generation Pipeline
 
@@ -98,6 +98,7 @@ Each editor takes the metric's color and an `onAdd` closure that produces the ma
 - **`ArperBirdApp`** — sets up `AppDelegate` (PostHog + Firebase + RevenueCat init), injects `MetricGenerator` and `Store` environments, declares the `Metric` model container, and refreshes purchases on `scenePhase == .active`.
 - **`RootView`** — gates on `@AppStorage("hasCompletedOnboarding")`: shows `OnboardingFlow` (StartView → language → mic authorization → guided animation) or `ContentView`. **Free-tier limit**: the app presents `PaywallView` as a non-dismissible sheet once `metrics.count >= 1 && !store.isPremium` — but only after `store.hasLoadedEntitlements`, to avoid a paywall flash for premium users on launch.
 - **`ContentView`** — `NavigationStack` showing `EmptyDashboardView` or `DashboardView` (`@Query`-driven cards + pending placeholders), with `MetricInputSheet` as the add-metric sheet.
+- **Onboarding tip (TipKit)** — `Tips/AddEntryTip.swift` points the user at a card's "+" button after they create their first metric. `TipKit` is configured in `ArperBirdApp`; the tip is gated by `@Parameter` flags (`hasSettled`, `isPaywallPresented`) set from `RootView`/`MetricView` so it animates in only after the card settles and never over the paywall, and is invalidated once the button is tapped.
 
 ### Payments (`Store`)
 
