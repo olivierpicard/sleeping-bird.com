@@ -1,6 +1,454 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "Terms of Service" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Conditions d'utilisation"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Términos del servicio"
+          }
+        }
+      }
+    },
+    "By using Arper Bird you agree to these terms. The app lets you describe metrics you want to track, interprets your description with AI, and renders charts to help you visualize your personal data." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "En utilisant Arper Bird, vous acceptez ces conditions. L'application vous permet de décrire les mesures que vous souhaitez suivre, interprète votre description grâce à l'IA et génère des graphiques pour vous aider à visualiser vos données personnelles."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Al usar Arper Bird, aceptas estos términos. La aplicación te permite describir las métricas que quieres seguir, interpreta tu descripción con IA y genera gráficos para ayudarte a visualizar tus datos personales."
+          }
+        }
+      }
+    },
+    "Acceptable use" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Utilisation acceptable"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Uso aceptable"
+          }
+        }
+      }
+    },
+    "You are responsible for the content you create. Don't use the app to store unlawful material or to infringe the rights of others." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vous êtes responsable du contenu que vous créez. N'utilisez pas l'application pour stocker du contenu illégal ou pour porter atteinte aux droits d'autrui."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eres responsable del contenido que creas. No uses la aplicación para almacenar material ilícito ni para infringir los derechos de otras personas."
+          }
+        }
+      }
+    },
+    "Your content" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Votre contenu"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tu contenido"
+          }
+        }
+      }
+    },
+    "The metrics and data points you record belong to you. We don't claim ownership over anything you track." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les mesures et les données que vous enregistrez vous appartiennent. Nous ne revendiquons aucun droit de propriété sur ce que vous suivez."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Las métricas y los datos que registras te pertenecen. No reclamamos la propiedad de nada de lo que registras."
+          }
+        }
+      }
+    },
+    "Subscriptions" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abonnements"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Suscripciones"
+          }
+        }
+      }
+    },
+    "Premium features are offered as an auto-renewing subscription billed through your App Store account. You can manage or cancel it anytime in your device settings." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les fonctionnalités premium sont proposées sous forme d'abonnement à renouvellement automatique, facturé via votre compte App Store. Vous pouvez le gérer ou l'annuler à tout moment dans les réglages de votre appareil."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Las funciones premium se ofrecen como una suscripción de renovación automática facturada a través de tu cuenta de la App Store. Puedes gestionarla o cancelarla en cualquier momento en los ajustes de tu dispositivo."
+          }
+        }
+      }
+    },
+    "Disclaimer" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Avertissement"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aviso legal"
+          }
+        }
+      }
+    },
+    "Arper Bird is provided “as is.” It is not a medical, financial, or professional advice tool. Decisions you make based on your tracked data are your own." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Arper Bird est fourni « en l'état ». Il ne s'agit pas d'un outil de conseil médical, financier ou professionnel. Les décisions que vous prenez sur la base de vos données vous appartiennent."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Arper Bird se ofrece «tal cual». No es una herramienta de asesoramiento médico, financiero ni profesional. Las decisiones que tomes a partir de tus datos son tu responsabilidad."
+          }
+        }
+      }
+    },
+    "Privacy Policy" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Politique de confidentialité"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Política de privacidad"
+          }
+        }
+      }
+    },
+    "We designed Arper Bird to keep your data private. Your metrics live on your device — we don't run accounts or upload your tracked data to our own servers. Here's what leaves your device, and to whom." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nous avons conçu Arper Bird pour préserver la confidentialité de vos données. Vos mesures restent sur votre appareil — nous ne gérons pas de comptes et n'envoyons pas vos données suivies vers nos propres serveurs. Voici ce qui quitte votre appareil, et à destination de qui."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diseñamos Arper Bird para mantener la privacidad de tus datos. Tus métricas permanecen en tu dispositivo: no gestionamos cuentas ni subimos tus datos a nuestros propios servidores. Esto es lo que sale de tu dispositivo y a quién."
+          }
+        }
+      }
+    },
+    "Data stored on your device" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Données stockées sur votre appareil"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Datos almacenados en tu dispositivo"
+          }
+        }
+      }
+    },
+    "The values you record, your metric names, and your descriptions are stored locally on your device using Apple's on-device database. They never leave your device, and we never receive a copy of them." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les valeurs que vous enregistrez, les noms de vos mesures et vos descriptions sont stockés localement sur votre appareil à l'aide de la base de données intégrée d'Apple. Ils ne quittent jamais votre appareil et nous n'en recevons jamais de copie."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Los valores que registras, los nombres de tus métricas y tus descripciones se almacenan localmente en tu dispositivo mediante la base de datos integrada de Apple. Nunca salen de tu dispositivo y nunca recibimos una copia de ellos."
+          }
+        }
+      }
+    },
+    "Voice transcription (Deepgram)" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Transcription vocale (Deepgram)"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Transcripción de voz (Deepgram)"
+          }
+        }
+      }
+    },
+    "When you dictate a metric, your microphone audio is streamed in real time to Deepgram, our transcription provider, and turned into text. The audio is not stored by our services after it is transcribed." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lorsque vous dictez une mesure, le son de votre microphone est transmis en temps réel à Deepgram, notre prestataire de transcription, puis converti en texte. L'audio n'est pas conservé par nos services une fois la transcription effectuée."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cuando dictas una métrica, el audio de tu micrófono se transmite en tiempo real a Deepgram, nuestro proveedor de transcripción, y se convierte en texto. El audio no se almacena en nuestros servicios una vez transcrito."
+          }
+        }
+      }
+    },
+    "AI interpretation (Google Firebase / Gemini)" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Interprétation par l'IA (Google Firebase / Gemini)"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Interpretación con IA (Google Firebase / Gemini)"
+          }
+        }
+      }
+    },
+    "The text of your description is sent to Google's Gemini model via Firebase AI to interpret it into a chart configuration. Only the description you write or dictate is sent — not your recorded data points. AI interpretation isn't perfect and may occasionally misread your description." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le texte de votre description est envoyé au modèle Gemini de Google via Firebase AI afin de l'interpréter en une configuration de graphique. Seule la description que vous écrivez ou dictez est envoyée — pas les données que vous avez enregistrées. L'interprétation par l'IA n'est pas parfaite et peut parfois mal comprendre votre description."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El texto de tu descripción se envía al modelo Gemini de Google a través de Firebase AI para interpretarlo y convertirlo en una configuración de gráfico. Solo se envía la descripción que escribes o dictas, no los datos que has registrado. La interpretación con IA no es perfecta y, en ocasiones, puede malinterpretar tu descripción."
+          }
+        }
+      }
+    },
+    "Subscriptions (RevenueCat & App Store)" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abonnements (RevenueCat et App Store)"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Suscripciones (RevenueCat y App Store)"
+          }
+        }
+      }
+    },
+    "If you subscribe, your purchase is processed by Apple's App Store and validated through RevenueCat. They handle billing; we don't see your payment details." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Si vous vous abonnez, votre achat est traité par l'App Store d'Apple et validé via RevenueCat. Ils gèrent la facturation ; nous n'avons pas accès à vos informations de paiement."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Si te suscribes, tu compra la procesa la App Store de Apple y se valida a través de RevenueCat. Ellos gestionan la facturación; nosotros no vemos los datos de tu pago."
+          }
+        }
+      }
+    },
+    "Analytics & crash reports (PostHog)" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Analyses et rapports d'erreur (PostHog)"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Analíticas e informes de errores (PostHog)"
+          }
+        }
+      }
+    },
+    "We use PostHog, hosted in the EU, to understand how the app is used and to receive crash reports so we can fix bugs. This includes the structure of the metrics you create — their type, chart, units, and any category labels you define — but never the values you log against them, your metric names, or your descriptions. Events are tied to a random identifier generated on your device — not to your name, email, or Apple ID." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nous utilisons PostHog, hébergé dans l'UE, pour comprendre comment l'application est utilisée et recevoir des rapports d'erreur afin de corriger les bugs. Cela inclut la structure des mesures que vous créez — leur type, leur graphique, leurs unités et les libellés de catégories que vous définissez — mais jamais les valeurs que vous enregistrez, les noms de vos mesures ou vos descriptions. Les événements sont associés à un identifiant aléatoire généré sur votre appareil — pas à votre nom, votre adresse e-mail ou votre identifiant Apple."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Usamos PostHog, alojado en la UE, para entender cómo se usa la aplicación y recibir informes de errores para poder corregir fallos. Esto incluye la estructura de las métricas que creas (su tipo, gráfico, unidades y las etiquetas de categoría que definas), pero nunca los valores que registras, los nombres de tus métricas ni tus descripciones. Los eventos se asocian a un identificador aleatorio generado en tu dispositivo, no a tu nombre, correo electrónico ni ID de Apple."
+          }
+        }
+      }
+    },
+    "Your anonymous identifier" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Votre identifiant anonyme"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tu identificador anónimo"
+          }
+        }
+      }
+    },
+    "To keep analytics and subscriptions consistent across reinstalls, we store a random identifier in your device's Keychain. It contains no personal information and is never linked to your real identity." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pour assurer la cohérence des analyses et des abonnements après une réinstallation, nous stockons un identifiant aléatoire dans le trousseau (Keychain) de votre appareil. Il ne contient aucune information personnelle et n'est jamais associé à votre identité réelle."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Para mantener la coherencia de las analíticas y las suscripciones tras una reinstalación, almacenamos un identificador aleatorio en el Llavero (Keychain) de tu dispositivo. No contiene información personal y nunca se vincula a tu identidad real."
+          }
+        }
+      }
+    },
+    "What we don't do" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ce que nous ne faisons pas"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lo que no hacemos"
+          }
+        }
+      }
+    },
+    "We don't sell your data, and we don't use your tracked metrics for advertising." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nous ne vendons pas vos données et n'utilisons pas vos mesures à des fins publicitaires."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No vendemos tus datos ni usamos tus métricas con fines publicitarios."
+          }
+        }
+      }
+    },
+    "Contact" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Contact"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Contacto"
+          }
+        }
+      }
+    },
+    "Questions about your privacy? Reach us at %@." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Des questions sur la confidentialité de vos données ? Contactez-nous à l'adresse %@."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Tienes preguntas sobre la privacidad de tus datos? Escríbenos a %@."
+          }
+        }
+      }
+    },
     "" : {
 
     },
@@ -423,7 +871,20 @@
       }
     },
     "Done" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Terminé"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Listo"
+          }
+        }
+      }
     },
     "duration.unit.h" : {
       "localizations" : {
@@ -773,7 +1234,20 @@
       }
     },
     "Last updated %@" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dernière mise à jour le %@"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Última actualización: %@"
+          }
+        }
+      }
     },
     "Maintenance 💰🚗" : {
       "localizations" : {
@@ -2043,7 +2517,20 @@
       }
     },
     "Thanks for trusting us with your data." : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Merci de nous confier vos données."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gracias por confiarnos tus datos."
+          }
+        }
+      }
     },
     "Track anything you want.\nJust say it out loud." : {
       "localizations" : {

@@ -188,7 +188,8 @@ struct TermsAndPrivacyView: View {
 
     // MARK: Building blocks
 
-    private func sectionTitle(_ title: String, systemImage: String) -> some View
+    private func sectionTitle(_ title: LocalizedStringKey, systemImage: String)
+        -> some View
     {
         Label(title, systemImage: systemImage)
             .font(.title2)
@@ -196,7 +197,9 @@ struct TermsAndPrivacyView: View {
             .foregroundStyle(.primary)
     }
 
-    private func subsection(_ title: String, _ body: String) -> some View {
+    private func subsection(_ title: LocalizedStringKey, _ body: LocalizedStringKey)
+        -> some View
+    {
         VStack(alignment: .leading, spacing: 6) {
             Text(title)
                 .font(.headline)
@@ -204,7 +207,7 @@ struct TermsAndPrivacyView: View {
         }
     }
 
-    private func paragraph(_ text: String) -> some View {
+    private func paragraph(_ text: LocalizedStringKey) -> some View {
         Text(text)
             .font(.body)
             .foregroundStyle(.secondary)
@@ -223,6 +226,7 @@ struct TermsAndPrivacyView: View {
 
 #Preview {
     TermsAndPrivacyView()
+        .environment(\.locale, Locale(identifier: "es"))
 }
 
 #Preview("Privacy first") {
