@@ -23,7 +23,7 @@ struct AiSchemaCompletion {
     {
         let ai = FirebaseAI.firebaseAI(backend: .googleAI())
         let session = ai.generativeModelSession(
-            model: "gemini-3-flash-preview",
+            model: "gemini-3.5-flash",
             instructions: systemPrompt
         )
         let result = try await session.respond(
