@@ -11,7 +11,7 @@ final class FakeTranscriber: Transcriber {
     private var accumulated: String = ""
 
     init(
-        text: String = "I want to track how much coffee I drink per day and see if it affects my sleep quality",
+        text: String = "I want to track how much coffee I drink per day",
         interval: TimeInterval = 0.25,
         hasMicPermission: Bool = true
     ) {

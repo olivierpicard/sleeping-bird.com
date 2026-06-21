@@ -41,7 +41,7 @@ import Foundation
                     )
                 case .datetime:
                     let randomOffset = TimeInterval.random(
-                        in: 0...(60 * 60 * 24 * 90)
+                        in: 0...(60 * 60 * 24 * 30 * 6)
                     )
                     return .datetime(date.addingTimeInterval(-randomOffset))
                 }

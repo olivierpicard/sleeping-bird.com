@@ -864,3 +864,81 @@ extension AggregationMethod {
         MetricDetailView(metric: metric)
     }
 }
+
+#Preview("Plant watered") {
+    let schema = MetricSchema.Fake.binary(
+        title: "Plant watered",
+        emoji: "🪴",
+        trueLabel: "Watered",
+        falseLabel: "Skipped"
+    )
+    let calendar = Calendar.current
+    let now = Date()
+    // Watered on a regular ~3-day cadence over the last few months.
+    let data: [DataPoint] = (0..<120).reversed().compactMap { offset in
+        guard offset % 3 == 0 else { return nil }
+        let date =
+            calendar.date(byAdding: .day, value: -offset, to: now) ?? now
+        return .binary(date, true)
+    }
+    let metric = Metric(from: schema, color: .green, data: data)
+    NavigationStack {
+        MetricDetailView(metric: metric)
+    }
+}
+
+#Preview("Pages read") {
+    let schema = MetricSchema.Fake.number(
+        title: "Pages read",
+        emoji: "📖",
+        unit: "pages",
+        min: 0,
+        max: 120,
+        granularity: 1,
+        goal: 30,
+        behavior: .cumulative,
+        chart: .dailyGauge
+    )
+    // A realistic reading habit: most days 15–45 pages, a few rest days.
+    let data: [DataPoint] = {
+        let calendar = Calendar.current
+        let now = Date()
+        let restDays: Set<Int> = [0, 3, 9, 17, 24, 38, 51, 66, 79, 92]
+        var points: [DataPoint] = []
+        for offset in (0..<110).reversed() {
+            if restDays.contains(offset) { continue }
+            let date =
+                calendar.date(byAdding: .day, value: -offset, to: now) ?? now
+            points.append(.number(date, Double(Int.random(in: 15...45))))
+        }
+        // Make today land just over the goal for a satisfying gauge.
+        points.append(.number(now, 32))
+        return points
+    }()
+    let metric = Metric(from: schema, color: .brown, data: data)
+    NavigationStack {
+        MetricDetailView(metric: metric)
+    }
+}
+
+#Preview("Alcohol-free days") {
+    let schema = MetricSchema.Fake.binary(
+        title: "Alcohol-free days",
+        emoji: "🌿",
+        trueLabel: "Alcohol-free",
+        falseLabel: "Had a drink"
+    )
+    let calendar = Calendar.current
+    let now = Date()
+    // A strong, aspirational streak with a few earlier slips.
+    let slips: Set<Int> = [47, 52, 68, 81, 95]
+    let data: [DataPoint] = (0..<110).reversed().map { offset in
+        let date =
+            calendar.date(byAdding: .day, value: -offset, to: now) ?? now
+        return .binary(date, !slips.contains(offset))
+    }
+    let metric = Metric(from: schema, color: .teal, data: data)
+    NavigationStack {
+        MetricDetailView(metric: metric)
+    }
+}

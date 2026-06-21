@@ -107,7 +107,43 @@ struct DashboardView: View {
 
 // MARK: - Previews
 
+private func daysAgo(_ days: Int) -> Date {
+    Calendar.current.date(byAdding: .day, value: -days, to: Date()) ?? Date()
+}
+
 private func seedContainer(_ container: ModelContainer) -> ModelContainer {
+    // Defined winner: Sugar (9), then Period (6), with the rest trailing.
+    let breakoutEntries: [(Int, [String])] = [
+        (13, ["Sugar", "Dairy"]),
+        (12, ["Sugar"]),
+        (11, ["Period", "Stress"]),
+        (10, ["Sugar", "Period"]),
+        (9, ["Stress"]),
+        (8, ["Sugar", "Lack of sleep"]),
+        (7, ["Period"]),
+        (6, ["Sugar", "Dairy"]),
+        (5, ["Sugar", "Period"]),
+        (4, ["Sugar", "Stress"]),
+        (3, ["Period", "Stress"]),
+        (2, ["Sugar"]),
+        (1, ["Period", "Lack of sleep"]),
+        (0, ["Sugar", "Dairy"]),
+    ]
+    let breakoutData: [DataPoint] = breakoutEntries.map { offset, labels in
+        DataPoint.category(daysAgo(offset), labels)
+    }
+    // Coherent gas fill-ups: ~twice a month (every ~16 days), going back ~4 months.
+    let gasData: [DataPoint] = [4, 20, 35, 51, 66, 82, 97, 113].map { offset in
+        DataPoint.datetime(daysAgo(offset))
+    }
+    // Coffees per day: realistic 1–4 cups, hovering around 2–3.
+    let coffeeData: [DataPoint] = [
+        (18, 3),(17, 2),(16, 4),(15, 1),(14, 1), (13, 3), (12, 3), (11, 2), (10, 4), (9, 1), (8, 3), (7, 2),
+        (6, 3), (5, 2), (4, 4), (3, 1), (2, 3), (1, 2), (0, 4),
+    ].map { offset, cups in
+        DataPoint.number(daysAgo(offset), Double(cups))
+    }
+
     let schemas: [(MetricSchema, [DataPoint])] = [
         // number + gauge → LinearGaugeMiniChart
         (
@@ -139,6 +175,7 @@ private func seedContainer(_ container: ModelContainer) -> ModelContainer {
             ),
             Metric.fakeData(for: MetricSchema.Fake.number(chart: .line).config)
         ),
+        
         // duration + bar → BarMiniChart
         (
             MetricSchema.Fake.duration(title: "Sleep", emoji: "🌙", chart: .bar),
@@ -149,28 +186,54 @@ private func seedContainer(_ container: ModelContainer) -> ModelContainer {
             MetricSchema.Fake.categorySingle(title: "Mood", emoji: "😊"),
             Metric.fakeData(for: MetricSchema.Fake.categorySingle().config)
         ),
-        // categoryMultipleChoice → DividerBarMiniChart
-        (
-            MetricSchema.Fake.categoryMultiple(title: "Symptoms", emoji: "🤒"),
-            Metric.fakeData(for: MetricSchema.Fake.categoryMultiple().config)
-        ),
-        // binary → TrailingCalendarMiniChart
-        (
-            MetricSchema.Fake.binary(title: "Workout Done", emoji: "💪"),
-            Metric.fakeData(for: MetricSchema.Fake.binary().config)
-        ),
+        
+        
+        
+        
+        
         // datetime → EventCalendarMiniChart
         (
             MetricSchema.Fake.datetime(
-                title: "Doctor Appointments",
-                emoji: "🏥"
+                title: "When I put gas",
+                emoji: "⛽️"
             ),
-            Metric.fakeData(for: MetricSchema.Fake.datetime().config)
+            gasData
         ),
+
+        // categoryMultipleChoice → DividerBarMiniChart
         (
-            MetricSchema.Fake.binary(title: "Medication taken", emoji: "💊"),
-            []
+            MetricSchema.Fake.categoryMultiple(
+                title: "Skin / Breakout triggers",
+                emoji: "🧴",
+                labels: ["Dairy", "Sugar", "Stress", "Period", "Lack of sleep"]
+            ),
+            breakoutData
         ),
+        
+        // binary → TrailingCalendarMiniChart
+        (
+            MetricSchema.Fake.binary(title: "Medication Taken", emoji: "💊"),
+            Metric.fakeData(for: MetricSchema.Fake.binary().config)
+        ),
+
+        // number + bar → BarMiniChart
+        (
+            MetricSchema.Fake.number(
+                title: "Coffees per day",
+                emoji: "☕️",
+                unit: "cups",
+                min: 0,
+                max: 8,
+                granularity: 1,
+                goal: nil,
+                chart: .bar
+            ),
+            coffeeData
+        ),
+//        (
+//            MetricSchema.Fake.binary(title: "Medication taken", emoji: "💊"),
+//            []
+//        ),
     ]
     for (schema, data) in schemas {
         container.mainContext.insert(Metric(from: schema, data: data))
