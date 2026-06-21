@@ -86,7 +86,7 @@ struct _StepperEditor: View {
     @Previewable @State var isSheetPresented = true
     NavigationStack { Text("") }
     .sheet(isPresented: $isSheetPresented) {
-        _StepperEditor(min: 0, max: 20, defaultValue: 8, step: 1, unit: "glasses", mainColor: .blue) { _ in }
+        _StepperEditor(min: 0, max: 20, defaultValue: 8, step: 1, unit: "glasses", mainColor: .blue) { _ in } 
     }
 }
 

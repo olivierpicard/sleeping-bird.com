@@ -44,15 +44,8 @@ struct RootView: View {
                 .transition(.opacity)
             }
         }
-//        .task {
-//            // TESTING ONLY: wait a bit, then present the paywall.
-//            try? await Task.sleep(for: .seconds(2))
-//            showPaywallForTesting = true
-//        }
         .animation(.easeInOut(duration: 1.5), value: hasCompletedOnboarding)
-//        .sheet(isPresented: $showPaywallForTesting) {
-//            PaywallView()
-//        }
+
         // Presentation is fully derived from `isLocked`: the paywall shows
         // whenever the free allowance is used up and gates its own dismissal on
         // a premium unlock. We ignore SwiftUI's dismissal writes (rather than

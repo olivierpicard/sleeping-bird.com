@@ -121,5 +121,5 @@ struct _CategoryMultipleEditor: View {
                 mainColor: .orange,
                 onAdd: { _ in }
             )
-        }
+        } 
 }
