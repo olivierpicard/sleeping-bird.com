@@ -14,7 +14,7 @@ enum MetricViewFactory {
         from metric: Metric,
         onAddTapped: @escaping () -> Void,
         onCardTapped: @escaping () -> Void = {}
-    ) -> MetricView {
+    ) -> some View {
         MetricView(
             title: metric.name,
             emoji: metric.emoji,

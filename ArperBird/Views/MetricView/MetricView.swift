@@ -1,5 +1,5 @@
 //
-//  TrackerView.swift
+//  MetricView.swift
 //  ArperBird
 //
 //  Created by Olivier Picard on 21/04/2026.
@@ -8,110 +8,37 @@
 import SwiftUI
 import TipKit
 
-struct MetricView: View {
+/// A metric card. The header and chart are injected, so the same card chrome
+/// (background, border, shadow, tap handling) is reused for read-only cards and
+/// for the editable "create a tracker" flow.
+struct MetricView<Header: View, Chart: View>: View {
     @Environment(\.colorScheme) private var colorScheme
 
-    private let addEntryTip = AddEntryTip()
-
-    let title: String
-    let emoji: String
-    let value: String
     let mainColor: Color
-    let onAddTapped: () -> Void
     let onCardTapped: () -> Void
-    let chart: (any MiniChart)?
-
-    @State private var feedbackTrigger = false
-
-    private let emojiSize: CGFloat = 52
-
-    private static let categoryPalette: [Color] = [
-        .blue, .green, .orange, .red, .purple, .teal, .pink, .yellow,
-    ]
+    @ViewBuilder let header: () -> Header
+    @ViewBuilder let chart: () -> Chart
 
     init(
-        title: String,
-        emoji: String,
-        value: String,
         mainColor: Color,
-        onAddTapped: @escaping () -> Void,
         onCardTapped: @escaping () -> Void = {},
-        chart: (any MiniChart)? = nil
+        @ViewBuilder header: @escaping () -> Header,
+        @ViewBuilder chart: @escaping () -> Chart
     ) {
-        self.title = title
-        self.emoji = emoji
-        self.value = value
         self.mainColor = mainColor
-        self.onAddTapped = onAddTapped
         self.onCardTapped = onCardTapped
+        self.header = header
         self.chart = chart
     }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            HStack {
-                Text(emoji)
-                    .font(.system(size: emojiSize * 0.6))
-                    .frame(width: emojiSize, height: emojiSize)
-                    .background {
-                        mainColor.opacity(0.03)
-                            .background(.ultraThinMaterial)
-                    }
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 12)
-                            .strokeBorder(mainColor.opacity(0.4), lineWidth: 1)
-                    )
+            header()
+                .padding(.horizontal)
+                .padding(.top, 23)
 
-                VStack(alignment: .leading, spacing: 0) {
-                    Text(title.uppercased())
-                        .font(.caption)
-                        .fontWeight(.medium)
-                        .foregroundStyle(.secondary)
-                    Text(value)
-                        .font(.title2)
-                        .fontWeight(.semibold)
-                }
-
-                Spacer()
-                Button(action: {
-                    feedbackTrigger.toggle()
-                    addEntryTip.invalidate(reason: .actionPerformed)
-                    onAddTapped()
-                }) {
-                    Image(systemName: "plus")
-                        .font(.title3.weight(.bold))
-                        .foregroundStyle(mainColor)
-                        .padding(.vertical, 3)
-
-                }
-                .buttonStyle(.bordered)
-                .tint(mainColor.mix(with: .gray, by: 0.5))
-                .popoverTip(addEntryTip, arrowEdge: .top)
-//                .shadow(
-//                    color: mainColor.opacity(0.8),
-//                    radius: 6,
-//                    x: 0,
-//                    y: 0
-//                )
-                .sensoryFeedback(
-                    .impact(flexibility: .soft),
-                    trigger: feedbackTrigger
-                )
-
-            }
-            .padding(.horizontal)
-            .padding(.top, 23)
-
-            if let chart {
-                AnyView(chart)
-                    .frame(height: 100)
-                    .padding(.horizontal)
-            } else {
-                NoDataMiniChart()
-                    .frame(height: 100)
-            }
-
+            chart()
+                .frame(height: 100)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .contentShape(RoundedRectangle(cornerRadius: 12))
@@ -129,12 +56,10 @@ struct MetricView: View {
             y: 0
         )
         .task {
-            
             guard !AddEntryTip.hasSettled else { return }
             try? await Task.sleep(for: .seconds(3.5))
             AddEntryTip.hasSettled = true
         }
-
     }
 
     private var isDarkMode: Bool {
@@ -146,14 +71,54 @@ struct MetricView: View {
     }
 
     private var cardShadowRadius: CGFloat {
-//        isDarkMode ? 10 : 4
         isDarkMode ? 4 : 4
     }
 
     private var cardStrokeStyle: StrokeStyle {
         StrokeStyle(lineWidth: isDarkMode ? 0 : 0)
     }
+}
 
+// MARK: - Convenience: standard read-only card
+
+extension MetricView where Header == MetricHeaderTextView, Chart == AnyView {
+    /// The standard card: a text header and an optional `MiniChart`
+    /// (falling back to `NoDataMiniChart`). Keeps every existing call site unchanged.
+    init(
+        title: String,
+        emoji: String,
+        value: String,
+        mainColor: Color,
+        onAddTapped: @escaping () -> Void = {},
+        onCardTapped: @escaping () -> Void = {},
+        chart: (any MiniChart)? = nil
+    ) {
+        self.init(
+            mainColor: mainColor,
+            onCardTapped: onCardTapped,
+            header: {
+                MetricHeaderTextView(
+                    title: title,
+                    emoji: emoji,
+                    value: value,
+                    mainColor: mainColor,
+                    onAddTapped: onAddTapped
+                )
+            },
+            chart: {
+                AnyView(
+                    Group {
+                        if let chart {
+                            AnyView(chart)
+                                .padding(.horizontal)
+                        } else {
+                            NoDataMiniChart()
+                        }
+                    }
+                )
+            }
+        )
+    }
 }
 
 #Preview("Line Chart") {
@@ -244,6 +209,23 @@ struct MetricView: View {
         mainColor: .purple,
         onAddTapped: {},
         chart: nil
+    )
+    .padding()
+}
+
+#Preview("Editable header") {
+    @Previewable @State var title = ""
+    MetricView(
+        mainColor: .gray,
+        header: {
+            MetricHeaderEditingView(
+                emoji: "🫥",
+                mainColor: .gray,
+                title: $title,
+                placeholder: "Tracker name"
+            )
+        },
+        chart: { NoDataMiniChart() }
     )
     .padding()
 }
