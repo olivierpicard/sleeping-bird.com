@@ -14,30 +14,32 @@ enum TrackerKind: String, CaseIterable {
 }
 
 struct TrackerTypeView: View {
-    @Environment(\.dismiss) private var dismiss
     let name: String
     let color: Color
     let emoji: String
+    var onNext: (TrackerKind) -> Void
 
     private let options: [TrackerTypeOption]
-    @State private var selection: UUID
+    @State private var selection: TrackerKind
 
     init(
         name: String = String(localized: "tracker_type.placeholder_name"),
         color: Color = .gray,
-        emoji: String = "🫥"
+        emoji: String = "🫥",
+        onNext: @escaping (TrackerKind) -> Void = { _ in }
     ) {
         self.name = name
         self.color = color
         self.emoji = emoji
+        self.onNext = onNext
         let options = Self.makeOptions(color: color)
         self.options = options
-        _selection = State(initialValue: options.first?.id ?? UUID())
+        _selection = State(initialValue: options.first?.kind ?? .number)
     }
 
     /// The tracker type matching the currently visible carousel page.
     private var selectedOption: TrackerTypeOption? {
-        options.first { $0.id == selection }
+        options.first { $0.kind == selection }
     }
 
     /// CTA reflecting the highlighted type, e.g. "Select type: Date".
@@ -52,43 +54,36 @@ struct TrackerTypeView: View {
     }
 
     var body: some View {
-        NavigationStack {
-            VStack {
-                TabView(selection: $selection) {
-                    ForEach(options) { option in
-                        cardPage(for: option)
-                            .tag(option.id)
-                    }
-                }
-                .tabViewStyle(.page(indexDisplayMode: .never))
-                .frame(height: 320)
-
-                pageIndicator
-
-                Spacer()
-
-                Button(action: { _ = selectedOption?.kind }) {
-                    Text(ctaTitle)
-                        .font(.headline)
-                        .frame(maxWidth: .infinity)
-                        .frame(height: 32)
-                }
-                .controlSize(.extraLarge)
-                .buttonStyle(.glassProminent)
-                .padding()
-            }
-            .trackScreen("ManualTrackerCreationType")
-            .navigationTitle("Add a tracker")
-            .navigationSubtitle("What is the tracker type ?")
-            .navigationBarTitleDisplayMode(.large)
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button(action: { dismiss() }) {
-                        Image(systemName: "xmark")
-                    }
+        VStack {
+            TabView(selection: $selection) {
+                ForEach(options) { option in
+                    cardPage(for: option)
+                        .tag(option.kind)
                 }
             }
+            .tabViewStyle(.page(indexDisplayMode: .never))
+            .frame(height: 320)
+
+            pageIndicator
+
+            Spacer()
+
+            Button(action: {
+                if let kind = selectedOption?.kind { onNext(kind) }
+            }) {
+                Text(ctaTitle)
+                    .font(.headline)
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 32)
+            }
+            .controlSize(.extraLarge)
+            .buttonStyle(.glassProminent)
+            .padding()
         }
+        .trackScreen("ManualTrackerCreationType")
+        .navigationTitle("Add a tracker")
+        .navigationSubtitle("What is the tracker type ?")
+        .navigationBarTitleDisplayMode(.large)
     }
 
     @ViewBuilder
@@ -131,7 +126,7 @@ struct TrackerTypeView: View {
             ForEach(options) { option in
                 Circle()
                     .fill(
-                        option.id == selection
+                        option.kind == selection
                             ? color : Color.secondary.opacity(0.3)
                     )
                     .frame(width: 7, height: 7)
@@ -143,7 +138,7 @@ struct TrackerTypeView: View {
     // MARK: - Carousel options
 
     private struct TrackerTypeOption: Identifiable {
-        let id = UUID()
+        var id: TrackerKind { kind }
         let kind: TrackerKind
         let label: LocalizedStringResource
         let sublabel: LocalizedStringKey
@@ -231,7 +226,9 @@ struct TrackerTypeView: View {
     NavigationStack {
     }
     .sheet(isPresented: $showSheet) {
-        TrackerTypeView()
+        NavigationStack {
+            TrackerTypeView()
+        }
     }
     .presentationDetents([.large])
 }
