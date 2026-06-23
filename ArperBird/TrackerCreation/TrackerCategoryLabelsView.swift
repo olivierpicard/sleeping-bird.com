@@ -12,6 +12,12 @@ import SwiftUI
 /// preview of the picker the user will later tap through. Starts with two empty
 /// rows and grows via the "Add category" button.
 struct TrackerCategoryLabelsView: View {
+    /// Allowed label count for a manually created `choices` tracker. Kept local
+    /// to this screen on purpose — not wired to `CategoryConfig`'s `@Guide`
+    /// bounds — so the manual flow stays decoupled from the AI schema.
+    private static let minLabels = 2
+    private static let maxLabels = 15
+
     let color: Color
     var onNext: ([String]) -> Void
 
@@ -43,7 +49,8 @@ struct TrackerCategoryLabelsView: View {
 
     /// Need at least two real labels, and no half-typed blanks left dangling.
     private var canContinue: Bool {
-        filledLabels.count >= 2 && filledLabels.count == categories.count
+        filledLabels.count >= Self.minLabels
+            && filledLabels.count == categories.count
     }
 
     var body: some View {
@@ -55,7 +62,9 @@ struct TrackerCategoryLabelsView: View {
                         categoryRow(at: index, placeholder: placeholder(at: index))
                     }
 
-                    addButton
+                    if categories.count < Self.maxLabels {
+                        addButton
+                    }
                 }
                 .padding()
             }
