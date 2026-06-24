@@ -1,115 +1,42 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
-    "tracker_type.cta" : {
+    "" : {
+
+    },
+    "%@ %@" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "Select type: %@"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tipo elegido: %@"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Type choisi : %@"
+            "state" : "new",
+            "value" : "%1$@ %2$@"
           }
         }
       }
     },
-    "Like a period start, last haircut, car service..." : {
+    "%@ %@ per day" : {
       "localizations" : {
-        "es" : {
+        "en" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "Como el inicio del periodo, el último corte de pelo, la revisión del coche..."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Comme le début des règles, la dernière coupe de cheveux, la révision de la voiture..."
+            "state" : "new",
+            "value" : "%1$@ %2$@ per day"
           }
         }
       }
     },
-    "Like mood, meal type, symptoms..." : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Como el estado de ánimo, el tipo de comida, los síntomas..."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Comme l'humeur, le type de repas, les symptômes..."
-          }
-        }
-      }
-    },
-    "Like steps, water intake, or calories" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Como los pasos, el consumo de agua o las calorías"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Comme les pas, la consommation d'eau ou les calories"
-          }
-        }
-      }
-    },
-    "Like took meds, went to the gym, ate healthy..." : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Como tomar la medicación, ir al gimnasio, comer sano..."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Comme prendre ses médicaments, aller à la salle, manger sainement..."
-          }
-        }
-      }
-    },
-    "Like workouts, reading, screen time..." : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Como entrenamientos, lectura, tiempo de pantalla..."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Comme le sport, la lecture, le temps d'écran..."
-          }
-        }
-      }
-    },
-    "" : {
+    "%@ per day" : {
 
     },
     "%lld" : {
 
     },
+    "🎉" : {
+
+    },
     "💬" : {
+
+    },
+    "A goal to reach per day" : {
 
     },
     "Acceptable use" : {
@@ -144,6 +71,9 @@
         }
       }
     },
+    "Add category" : {
+
+    },
     "Add entry" : {
       "localizations" : {
         "es" : {
@@ -159,6 +89,9 @@
           }
         }
       }
+    },
+    "Add to dashboard" : {
+
     },
     "Add your first value" : {
       "localizations" : {
@@ -219,6 +152,9 @@
           }
         }
       }
+    },
+    "Adds up over the day" : {
+
     },
     "Advanced Charts" : {
       "localizations" : {
@@ -380,6 +316,9 @@
         }
       }
     },
+    "Binary" : {
+
+    },
     "By continuing, you agree to our [Terms and Privacy Policy](arperbird://legal)." : {
       "localizations" : {
         "es" : {
@@ -411,6 +350,9 @@
           }
         }
       }
+    },
+    "Can be represented by numbers" : {
+
     },
     "Category" : {
       "localizations" : {
@@ -556,6 +498,9 @@
         }
       }
     },
+    "Couldn't suggest goals" : {
+
+    },
     "Create metrics and log entries just by speaking" : {
       "localizations" : {
         "es" : {
@@ -604,6 +549,9 @@
         }
       }
     },
+    "Daily goal" : {
+
+    },
     "Data stored on your device" : {
       "localizations" : {
         "es" : {
@@ -635,6 +583,9 @@
           }
         }
       }
+    },
+    "Decrease" : {
+
     },
     "Delete" : {
       "localizations" : {
@@ -820,6 +771,9 @@
         }
       }
     },
+    "Finding goals…" : {
+
+    },
     "Fuel Spend ⛽️" : {
       "localizations" : {
         "es" : {
@@ -880,6 +834,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Objectif : %@"
+          }
+        }
+      }
+    },
+    "Goal: %@ %@ per day" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Goal: %1$@ %2$@ per day"
           }
         }
       }
@@ -948,6 +912,9 @@
         }
       }
     },
+    "How do you measure “%@”?" : {
+
+    },
     "If you subscribe, your purchase is processed by Apple's App Store and validated through RevenueCat. They handle billing; we don't see your payment details." : {
       "localizations" : {
         "es" : {
@@ -963,6 +930,9 @@
           }
         }
       }
+    },
+    "Increase" : {
+
     },
     "It all starts with your %@" : {
       "localizations" : {
@@ -1011,6 +981,92 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Dernière mise à jour le %@"
+          }
+        }
+      }
+    },
+    "Like a period start, last haircut, car service..." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Como el inicio del periodo, el último corte de pelo, la revisión del coche..."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comme le début des règles, la dernière coupe de cheveux, la révision de la voiture..."
+          }
+        }
+      }
+    },
+    "Like mood, meal type, symptoms..." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Como el estado de ánimo, el tipo de comida, los síntomas..."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comme l'humeur, le type de repas, les symptômes..."
+          }
+        }
+      }
+    },
+    "Like steps, water intake, or calories" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Como los pasos, el consumo de agua o las calorías"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comme les pas, la consommation d'eau ou les calories"
+          }
+        }
+      }
+    },
+    "Like steps, water intake, or time spent..." : {
+
+    },
+    "Like took meds, went to the gym, ate healthy..." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Como tomar la medicación, ir al gimnasio, comer sano..."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comme prendre ses médicaments, aller à la salle, manger sainement..."
+          }
+        }
+      }
+    },
+    "Like weight, temperature, or heart rate..." : {
+
+    },
+    "Like workouts, reading, screen time..." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Como entrenamientos, lectura, tiempo de pantalla..."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comme le sport, la lecture, le temps d'écran..."
           }
         }
       }
@@ -1723,6 +1779,9 @@
         }
       }
     },
+    "Other" : {
+
+    },
     "Pain 😖" : {
       "localizations" : {
         "es" : {
@@ -1917,6 +1976,12 @@
         }
       }
     },
+    "Pick a goal to track" : {
+
+    },
+    "Pick a unit" : {
+
+    },
     "Placeholder" : {
 
     },
@@ -2096,6 +2161,15 @@
         }
       }
     },
+    "Save a date on calendar" : {
+
+    },
+    "Set your goal" : {
+
+    },
+    "Single or multiple choice" : {
+
+    },
     "Sleeps 💤" : {
       "localizations" : {
         "es" : {
@@ -2111,6 +2185,9 @@
           }
         }
       }
+    },
+    "Snapshot" : {
+
     },
     "Step 2 of 4" : {
       "localizations" : {
@@ -2458,6 +2535,9 @@
         }
       }
     },
+    "Time spent on an activity" : {
+
+    },
     "To keep analytics and subscriptions consistent across reinstalls, we store a random identifier in your device's Keychain. It contains no personal information and is never linked to your real identity." : {
       "localizations" : {
         "es" : {
@@ -2555,6 +2635,7 @@
       }
     },
     "tracker_type.binary.label" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -2577,6 +2658,7 @@
       }
     },
     "tracker_type.binary.sublabel" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -2599,6 +2681,7 @@
       }
     },
     "tracker_type.choices.label" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -2621,6 +2704,7 @@
       }
     },
     "tracker_type.choices.sublabel" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -2638,6 +2722,28 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Graphique à barres divisé horizontalement"
+          }
+        }
+      }
+    },
+    "tracker_type.cta" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select type: %@"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tipo elegido: %@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Type choisi : %@"
           }
         }
       }
@@ -2665,6 +2771,7 @@
       }
     },
     "tracker_type.date.sublabel" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -2709,6 +2816,7 @@
       }
     },
     "tracker_type.duration.sublabel" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -2753,6 +2861,7 @@
       }
     },
     "tracker_type.goal.sublabel" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -2775,6 +2884,7 @@
       }
     },
     "tracker_type.number.label" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -2797,6 +2907,7 @@
       }
     },
     "tracker_type.number.sublabel" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -2827,6 +2938,12 @@
           }
         }
       }
+    },
+    "Try again" : {
+
+    },
+    "Type my own…" : {
+
     },
     "Unlimited Metrics" : {
       "localizations" : {
@@ -3023,6 +3140,9 @@
         }
       }
     },
+    "What are the categories ?" : {
+
+    },
     "What do you" : {
       "localizations" : {
         "es" : {
@@ -3055,6 +3175,15 @@
         }
       }
     },
+    "What is the number type ?" : {
+
+    },
+    "What is the tracker name ?" : {
+
+    },
+    "What is the tracker type ?" : {
+
+    },
     "What we don't do" : {
       "localizations" : {
         "es" : {
@@ -3070,6 +3199,9 @@
           }
         }
       }
+    },
+    "What's your daily target for “%@”?" : {
+
     },
     "When you dictate a metric, your microphone audio is streamed in real time to Deepgram, our transcription provider, and turned into text. The audio is not stored by our services after it is transcribed." : {
       "localizations" : {
@@ -3112,6 +3244,9 @@
         }
       }
     },
+    "Yes/No choices" : {
+
+    },
     "You are responsible for the content you create. Don't use the app to store unlawful material or to infringe the rights of others." : {
       "localizations" : {
         "es" : {
@@ -3127,6 +3262,9 @@
           }
         }
       }
+    },
+    "You're all set!" : {
+
     },
     "Your anonymous identifier" : {
       "localizations" : {
@@ -3175,6 +3313,9 @@
           }
         }
       }
+    },
+    "Your tracker is ready to go." : {
+
     }
   },
   "version" : "1.2"

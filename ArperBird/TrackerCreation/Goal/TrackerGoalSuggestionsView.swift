@@ -10,48 +10,48 @@ import SwiftUI
 /// The step that follows naming on the `goal` path. It hands the tracker name to
 /// `GoalAiCompletion`, which proposes a few ready-made ways to track it — unit,
 /// daily target, emoji — and presents them as swipeable preview cards. The user
-/// picks one (Next) or tweaks it (Edit, not yet wired).
+/// either accepts a card as-is (Next) or tweaks it (Edit); both branches are
+/// driven by the enclosing `TrackerCreationFlow` via the closures below.
 struct TrackerGoalSuggestionsView: View {
-    let name: String
+    /// The flow's shared state. The view reads `name`/`suggestions`/`phase` from
+    /// it and asks it to load — the model memoizes the fetch, so reappearing
+    /// after a pop reuses the result instead of re-triggering the AI.
+    let model: TrackerCreationModel
     let color: Color
-    /// Seam over the AI call so previews/tests can supply suggestions without a
-    /// network round-trip. Defaults to the real `GoalAiCompletion`.
-    var generate: (String) async throws -> [GoalAiCompletionSchema]
+    /// The visible card was accepted as-is.
     var onNext: (GoalAiCompletionSchema) -> Void
+    /// "Edit" was tapped on the visible card. The full suggestion list already
+    /// lives on `model`, so only the chosen card is handed back.
+    var onEdit: (GoalAiCompletionSchema) -> Void
 
-    @State private var suggestions: [Suggestion] = []
+    /// Display cards derived from `model.suggestions`. Cached in local `@State`
+    /// (which a covered destination retains) so the preview gauges — seeded with
+    /// random fake data — don't rebuild and flicker on every render or pop-back.
+    @State private var cards: [Suggestion] = []
     @State private var selection: Suggestion.ID?
-    @State private var phase: Phase = .loading
-    @State private var isEditingUnit = false
-
-    private enum Phase { case loading, loaded, failed }
 
     init(
-        name: String = "Daily steps",
+        model: TrackerCreationModel,
         color: Color = .accent,
-        generate: @escaping (String) async throws -> [GoalAiCompletionSchema] = {
-            try await GoalAiCompletion().generate(for: $0)
-        },
-        onNext: @escaping (GoalAiCompletionSchema) -> Void = { _ in }
+        onNext: @escaping (GoalAiCompletionSchema) -> Void = { _ in },
+        onEdit: @escaping (GoalAiCompletionSchema) -> Void = { _ in }
     ) {
-        self.name = name
+        self.model = model
         self.color = color
-        self.generate = generate
         self.onNext = onNext
+        self.onEdit = onEdit
     }
 
     /// The suggestion backing the currently visible carousel page.
     private var selectedSuggestion: Suggestion? {
-        suggestions.first { $0.id == selection }
+        cards.first { $0.id == selection }
     }
 
     var body: some View {
         VStack {
-            switch phase {
-            case .loading:
-                Spacer()
-                ProgressView("Finding goals…")
-                Spacer()
+            switch model.phase {
+            case .idle, .loading:
+                loadingState
             case .failed:
                 Spacer()
                 ContentUnavailableView {
@@ -63,27 +63,28 @@ struct TrackerGoalSuggestionsView: View {
                 }
                 Spacer()
             case .loaded:
-                carousel
-                actionBar
+                // The model is loaded but this fresh view instance may not have
+                // built its cards yet; hold the spinner until it has.
+                if cards.isEmpty {
+                    loadingState
+                } else {
+                    carousel
+                    actionBar
+                }
             }
         }
         .task { await load() }
-        .navigationDestination(isPresented: $isEditingUnit) {
-            // Page 1 of the edit sub-flow. Page 2 (the daily goal) is wired
-            // through `onNext` in a later step.
-            TrackerGoalUnitListView(
-                name: name,
-                options: suggestions.map {
-                    .init(unit: $0.schema.unit, dailyGoal: $0.schema.dailyGoal)
-                },
-                selectedUnit: selectedSuggestion?.schema.unit,
-                color: color
-            )
-        }
         .trackScreen("ManualTrackerCreationGoalSuggestions")
         .navigationTitle("Add a tracker")
         .navigationSubtitle("Pick a goal to track")
         .navigationBarTitleDisplayMode(.large)
+    }
+
+    @ViewBuilder
+    private var loadingState: some View {
+        Spacer()
+        ProgressView("Finding goals…")
+        Spacer()
     }
 
     // MARK: - Carousel
@@ -91,7 +92,7 @@ struct TrackerGoalSuggestionsView: View {
     private var carousel: some View {
         VStack {
             TabView(selection: $selection) {
-                ForEach(suggestions) { suggestion in
+                ForEach(cards) { suggestion in
                     cardPage(for: suggestion)
                         .tag(suggestion.id as Suggestion.ID?)
                 }
@@ -112,7 +113,7 @@ struct TrackerGoalSuggestionsView: View {
                 mainColor: color,
                 header: {
                     MetricHeaderTextView(
-                        title: name,
+                        title: model.name,
                         emoji: suggestion.schema.emoji,
                         value: valueText(for: suggestion.schema),
                         mainColor: color,
@@ -130,7 +131,7 @@ struct TrackerGoalSuggestionsView: View {
     /// swipe. Mirrors `TrackerTypeView`'s indicator.
     private var pageIndicator: some View {
         HStack(spacing: 8) {
-            ForEach(suggestions) { suggestion in
+            ForEach(cards) { suggestion in
                 Circle()
                     .fill(
                         suggestion.id == selection
@@ -147,7 +148,11 @@ struct TrackerGoalSuggestionsView: View {
     private var actionBar: some View {
         HStack(spacing: 12) {
             // Branches into the unit/goal edit sub-flow for the visible card.
-            Button(action: { isEditingUnit = true }) {
+            Button(action: {
+                if let selected = selectedSuggestion {
+                    onEdit(selected.schema)
+                }
+            }) {
                 Label("Edit", systemImage: "pencil")
                     .font(.headline)
                     .frame(height: 32)
@@ -173,23 +178,22 @@ struct TrackerGoalSuggestionsView: View {
 
     // MARK: - Loading
 
+    /// Asks the model to load (a no-op once it already has, so a pop-back never
+    /// re-triggers the AI), then builds the display cards once. Because `cards`
+    /// is retained `@State`, the rebuild is skipped on reappearance — keeping the
+    /// current page and avoiding gauge flicker.
     @MainActor
     private func load() async {
-        phase = .loading
-        do {
-            let goals = try await generate(name)
-            let built = goals.map {
-                Suggestion(
-                    schema: $0,
-                    metric: Self.metric(for: $0, name: name, color: color)
-                )
-            }
-            suggestions = built
-            selection = built.first?.id
-            phase = built.isEmpty ? .failed : .loaded
-        } catch {
-            phase = .failed
+        await model.loadSuggestionsIfNeeded()
+        guard cards.isEmpty, !model.suggestions.isEmpty else { return }
+        let built = model.suggestions.map {
+            Suggestion(
+                schema: $0,
+                metric: Self.metric(for: $0, name: model.name, color: color)
+            )
         }
+        cards = built
+        selection = built.first?.id
     }
 
     // MARK: - Formatting
@@ -247,14 +251,18 @@ struct TrackerGoalSuggestionsView: View {
 
 #Preview {
     @Previewable @State var showSheet = true
+    @Previewable @State var model: TrackerCreationModel = {
+        let model = TrackerCreationModel(
+            generate: { try await GoalAiCompletion().generateFake(for: $0) }
+        )
+        model.name = "Drink more water"
+        return model
+    }()
     NavigationStack {
     }
     .sheet(isPresented: $showSheet) {
         NavigationStack {
-            TrackerGoalSuggestionsView(
-                name: "Drink more water",
-                generate: { try await GoalAiCompletion().generateFake(for: $0) }
-            )
+            TrackerGoalSuggestionsView(model: model)
         }
     }
     .presentationDetents([.large])
