@@ -11,6 +11,7 @@ enum TrackerCreationStep: Hashable {
     case numberType
     case categoryLabels
     case name
+    case goalSuggestions
 }
 
 /// Coordinates the manual tracker-creation steps in a single push-based
@@ -24,6 +25,7 @@ struct TrackerCreationFlow: View {
     @State private var kind: TrackerKind?
     @State private var behavior: MetricBehavior?
     @State private var categoryLabels: [String] = []
+    @State private var name = ""
 
     /// The step that follows type selection. The open-ended "Other" number kind
     /// needs an extra step to disambiguate cumulative vs snapshot behavior, and
@@ -56,7 +58,20 @@ struct TrackerCreationFlow: View {
                         path.append(.name)
                     }
                 case .name:
-                    TrackerNameView(onNext: { _ in onComplete() })
+                    TrackerNameView(onNext: { enteredName in
+                        name = enteredName
+                        // The goal path branches into AI-suggested configurations;
+                        // every other kind is fully specified by now.
+                        if kind == .goal {
+                            path.append(.goalSuggestions)
+                        } else {
+                            onComplete()
+                        }
+                    })
+                case .goalSuggestions:
+                    TrackerGoalSuggestionsView(name: name) { _ in
+                        onComplete()
+                    }
                 }
             }
 
@@ -80,3 +95,4 @@ struct TrackerCreationFlow: View {
     }
     .presentationDetents([.large])
 }
+
