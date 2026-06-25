@@ -28,7 +28,9 @@ struct ContentView: View {
             isPresented: $showModal,
             onDismiss: { showModal = false }
         ) {
-            MetricInputSheet()
+//            MetricInputSheet()
+//                .presentationDetents([.large])
+            TrackerCreationFlow()
                 .presentationDetents([.large])
         }
     }

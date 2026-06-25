@@ -23,7 +23,7 @@ struct TrackerTypeView: View {
     @State private var selection: TrackerKind
 
     init(
-        name: String = String(localized: "tracker_type.placeholder_name"),
+        name: String = String(localized: "Your tracker name"),
         color: Color = .gray,
         emoji: String = "🫥",
         onNext: @escaping (TrackerKind) -> Void = { _ in }

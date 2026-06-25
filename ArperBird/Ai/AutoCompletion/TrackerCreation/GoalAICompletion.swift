@@ -37,7 +37,7 @@ struct GoalAiCompletion {
     func generate(for instruction: String) async throws
         -> [GoalAiCompletionSchema]
     {
-        try await AiSchemaCompletion(
+        let goals = try await AiSchemaCompletion(
             userPrompt: AIAutoCompleteInstruction.userPrompt(
                 for: instruction,
                 locale: locale
@@ -46,5 +46,7 @@ struct GoalAiCompletion {
         )
         .generate(as: GoalAiCompletionListSchema.self)
         .goals
+        
+        return goals
     }
 }

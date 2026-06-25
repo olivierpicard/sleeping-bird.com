@@ -28,7 +28,11 @@ enum MetricViewFactory {
 
     // MARK: - Display Value
 
-    private static func value(for metric: Metric) -> String {
+    /// The card's headline value for a metric, windowed to the aggregation
+    /// bucket and reduced by its method (falling back to a type-appropriate
+    /// placeholder when empty). Exposed so the tracker-creation reveal can label
+    /// its sample card the same way the dashboard does.
+    static func value(for metric: Metric) -> String {
         guard !metric.data.isEmpty else {
             return placeholder(for: metric.config)
         }

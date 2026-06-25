@@ -50,12 +50,32 @@ final class TrackerCreationModel {
     /// runs once per name and never re-fires on back-navigation.
     private var loadedName: String?
 
+    // MARK: - Duration sub-flow
+
+    /// Loading state of the duration auto-completion request.
+    private(set) var durationPhase: Phase = .idle
+    /// The AI-suggested upper bound for the duration wheel, in seconds, and a
+    /// matching emoji. Populated once per name from `DurationAiCompletion`.
+    private(set) var durationMaxSeconds = 0
+    var durationEmoji = ""
+
+    /// Seam over the duration AI call, mirroring `generate`. Takes the tracker
+    /// name.
+    private let generateDuration: (String) async throws -> DurationAiCompletionSchema
+    /// The name `durationMaxSeconds`/`durationEmoji` were loaded for. Guards the
+    /// fetch so it runs once per name and never re-fires on back-navigation.
+    private var loadedDurationName: String?
+
     init(
         generate: @escaping (String) async throws -> [GoalAiCompletionSchema] = {
             try await GoalAiCompletion().generate(for: "- Tracker name: \($0)")
+        },
+        generateDuration: @escaping (String) async throws -> DurationAiCompletionSchema = {
+            try await DurationAiCompletion().generate(for: "- Tracker name: \($0)")
         }
     ) {
         self.generate = generate
+        self.generateDuration = generateDuration
     }
 
     // MARK: - Goal suggestions
@@ -75,6 +95,33 @@ final class TrackerCreationModel {
         } catch {
             phase = .failed
         }
+    }
+
+    // MARK: - Duration completion
+
+    /// Fetches the duration config (max wheel value + emoji) for `name`, but only
+    /// when it hasn't already been loaded for that name (or the previous attempt
+    /// failed). Re-entrant calls — e.g. returning to the loading screen — are
+    /// no-ops, so the AI never re-triggers on back-navigation.
+    func loadDurationIfNeeded() async {
+        guard loadedDurationName != name || durationPhase == .failed else { return }
+        durationPhase = .loading
+        do {
+            let schema = try await generateDuration(name)
+            durationMaxSeconds = schema.maxInSeconds
+            durationEmoji = schema.emoji
+            loadedDurationName = name
+            durationPhase = .loaded
+        } catch {
+            durationPhase = .failed
+        }
+    }
+
+    /// Persist the upper bound the user dialled in on the duration config wheels,
+    /// overriding the AI suggestion. A method because `durationMaxSeconds` is
+    /// otherwise `private(set)` to protect the load memoization.
+    func setDurationMax(_ seconds: Int) {
+        durationMaxSeconds = max(0, seconds)
     }
 
     // MARK: - Goal selection

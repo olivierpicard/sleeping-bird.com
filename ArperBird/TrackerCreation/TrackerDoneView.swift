@@ -1,5 +1,5 @@
 //
-//  TrackerGoalDoneView.swift
+//  TrackerDoneView.swift
 //  ArperBird
 //
 //  Created by Olivier Picard on 24/06/2026.
@@ -7,19 +7,23 @@
 
 import SwiftUI
 
-/// The closing beat of the goal sub-flow, shown after `TrackerGoalValueView`.
-/// An implicit congratulation: the fully assembled card drops in under a short
-/// headline with a sparkle burst, so the reward is *seeing the thing they just
-/// built*. The gauge reads an honest 0% — the card has no entries yet — which
-/// doubles as a gentle nudge toward adding the first value.
-struct TrackerGoalDoneView: View {
-    let name: String
-    let emoji: String
-    let unit: String
-    /// The daily target chosen on `TrackerGoalValueView`. Anchors the gauge goal
-    /// and the "per day" recap line.
-    let goal: Double
+/// The closing beat shared by every tracker-creation path. An implicit
+/// congratulation: the fully assembled card drops in under a short headline with
+/// a sparkle burst, so the reward is *seeing the thing they just built*.
+///
+/// The card is rendered through the same `MiniChartFactory`/`MetricViewFactory`
+/// the dashboard uses — seeded by the caller with sample data so the chart looks
+/// alive in the reveal — which is what lets one screen serve the goal, duration,
+/// and every other tracker type from a single `Metric`.
+struct TrackerDoneView: View {
+    /// The fully assembled tracker, ready to render as a real card. Seeded with
+    /// sample data by the caller so the chart looks alive in the reveal.
+    let metric: Metric
     let color: Color
+    /// An optional one-line recap under the card, e.g. "Goal: 8 glasses per day"
+    /// or "Tracks up to 2h". Each path supplies its own; omitted when there's
+    /// nothing meaningful to add.
+    var recap: LocalizedStringKey?
     var onDone: () -> Void
 
     /// Drives the entrance: the card springs up from small and translucent once
@@ -30,18 +34,14 @@ struct TrackerGoalDoneView: View {
     @State private var glow = false
 
     init(
-        name: String = "Drink more water",
-        emoji: String = "💧",
-        unit: String = "glasses",
-        goal: Double = 8,
+        metric: Metric,
         color: Color = .accent,
+        recap: LocalizedStringKey? = nil,
         onDone: @escaping () -> Void = {}
     ) {
-        self.name = name
-        self.emoji = emoji
-        self.unit = unit
-        self.goal = goal
+        self.metric = metric
         self.color = color
+        self.recap = recap
         self.onDone = onDone
     }
 
@@ -65,7 +65,11 @@ struct TrackerGoalDoneView: View {
                 .offset(y: hasAppeared ? 0 : 70)
                 .opacity(hasAppeared ? 1 : 0)
 
-            recap
+            if let recap {
+                Text(recap)
+                    .font(.subheadline.weight(.medium))
+                    .foregroundStyle(.secondary)
+            }
 
             Spacer()
             Spacer()
@@ -100,7 +104,7 @@ struct TrackerGoalDoneView: View {
                 withAnimation(.easeInOut(duration: 0.7)) { glow = false }
             }
         }
-        .trackScreen("ManualTrackerCreationGoalDone")
+        .trackScreen("ManualTrackerCreationDone")
         .navigationTitle("")
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden()
@@ -127,35 +131,26 @@ struct TrackerGoalDoneView: View {
 
     // MARK: - Card
 
-    /// The real card chrome, with the daily gauge the user just configured —
-    /// shown at 0% because there are no entries yet.
+    /// The real card chrome, rendered from the assembled `Metric` through the
+    /// same factories the dashboard uses — so whatever type the user built shows
+    /// up here exactly as it will on the dashboard, just with sample data.
     private var card: some View {
         MetricView(
             mainColor: color,
             header: {
                 MetricHeaderTextView(
-                    title: name,
-                    emoji: emoji,
-                    value: "0 \(unit)",
+                    title: metric.name,
+                    emoji: metric.emoji,
+                    value: MetricViewFactory.value(for: metric),
                     mainColor: color,
                     showAddButton: false
                 )
             },
             chart: {
-                AnyView(
-                    LinearGaugeMiniChart(current: 0, goal: goal, color: color)
-                        .padding(.horizontal)
-                )
+                AnyView(MiniChartFactory.make(from: metric))
+                    .padding(.horizontal)
             }
         )
-    }
-
-    // MARK: - Recap
-
-    private var recap: some View {
-        Text("Goal: \(goal.formatted(.number)) \(unit) per day")
-            .font(.subheadline.weight(.medium))
-            .foregroundStyle(.secondary)
     }
 }
 
@@ -213,26 +208,39 @@ private struct SparkleBurst: View {
     }
 }
 
-#Preview("Small count") {
+#Preview("Goal gauge") {
+    let schema = MetricSchema.Fake.number(
+        title: "Drink more water",
+        emoji: "💧",
+        unit: "glasses",
+        min: 2,
+        max: 8,
+        granularity: 1,
+        goal: 8,
+        chart: .dailyGauge
+    )
     NavigationStack {
-        TrackerGoalDoneView(
-            name: "Drink more water",
-            emoji: "💧",
-            unit: "glasses",
-            goal: 8,
-            color: .accent
+        TrackerDoneView(
+            metric: Metric(from: schema, color: .blue, data: Metric.fakeData(for: schema.config)),
+            color: .blue,
+            recap: "Goal: 8 glasses per day"
         )
     }
 }
 
-#Preview("Large value") {
+#Preview("Duration bars") {
+    let schema = MetricSchema.Fake.duration(
+        title: "Workout",
+        emoji: "🏋️",
+        granularity: "h",
+        maxInSeconds: 2 * 3600,
+        chart: .bar
+    )
     NavigationStack {
-        TrackerGoalDoneView(
-            name: "Walk more",
-            emoji: "👟",
-            unit: "steps",
-            goal: 8000,
-            color: .blue
+        TrackerDoneView(
+            metric: Metric(from: schema, color: .orange, data: Metric.fakeData(for: schema.config)),
+            color: .orange,
+            recap: "Tracks up to 2h"
         )
     }
 }
