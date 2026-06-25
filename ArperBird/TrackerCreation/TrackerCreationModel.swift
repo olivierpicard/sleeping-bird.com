@@ -26,7 +26,6 @@ final class TrackerCreationModel {
 
     var kind: TrackerKind?
     var behavior: MetricBehavior?
-    var categoryLabels: [String] = []
     var name = ""
 
     // MARK: - Goal sub-flow
@@ -66,16 +65,48 @@ final class TrackerCreationModel {
     /// fetch so it runs once per name and never re-fires on back-navigation.
     private var loadedDurationName: String?
 
+    // MARK: - Category sub-flow
+
+    /// Loading state of the category auto-completion request.
+    private(set) var categoryPhase: Phase = .idle
+    /// The AI-suggested labels, used to *seed* the editable labels screen. The
+    /// user can then add, rename, or delete rows; their final list is written
+    /// back here on "Next" — so this property is both the seed and the result,
+    /// mirroring how `durationMaxSeconds` works on the duration path.
+    var categoryLabels: [String] = []
+    /// The AI's *original* suggested labels, kept separately so we can tell
+    /// whether the user replaced or deleted any of them — `categoryLabels` is
+    /// overwritten with the user's final list on "Next", so it can't be diffed
+    /// against the suggestion. See `shouldReclassifyChoice(for:)`.
+    private(set) var categorySuggestedLabels: [String] = []
+    /// Whether several picks are allowed per entry (multiple choice) rather than
+    /// exactly one (single choice). Seeded from the AI's judgment during loading,
+    /// then confirmed (or flipped) by the user on the category-type screen — so,
+    /// like `categoryLabels`, this is both the seed and the result.
+    var categoryAllowsMultiple = false
+    var categoryEmoji = ""
+
+    /// Seam over the category AI call, mirroring `generate`. Takes the tracker
+    /// name.
+    private let generateCategory: (String) async throws -> CategoryAiCompletionSchema
+    /// The name the category suggestion was loaded for. Guards the fetch so it
+    /// runs once per name and never re-fires on back-navigation.
+    private var loadedCategoryName: String?
+
     init(
         generate: @escaping (String) async throws -> [GoalAiCompletionSchema] = {
             try await GoalAiCompletion().generate(for: "- Tracker name: \($0)")
         },
         generateDuration: @escaping (String) async throws -> DurationAiCompletionSchema = {
             try await DurationAiCompletion().generate(for: "- Tracker name: \($0)")
+        },
+        generateCategory: @escaping (String) async throws -> CategoryAiCompletionSchema = {
+            try await CategoryAiCompletion().generate(for: "- Tracker name: \($0)")
         }
     ) {
         self.generate = generate
         self.generateDuration = generateDuration
+        self.generateCategory = generateCategory
     }
 
     // MARK: - Goal suggestions
@@ -122,6 +153,62 @@ final class TrackerCreationModel {
     /// otherwise `private(set)` to protect the load memoization.
     func setDurationMax(_ seconds: Int) {
         durationMaxSeconds = max(0, seconds)
+    }
+
+    // MARK: - Category completion
+
+    /// Fetches the category suggestion (labels + single/multiple + emoji) for
+    /// `name`, but only when it hasn't already been loaded for that name (or the
+    /// previous attempt failed). Re-entrant calls are no-ops, so the AI never
+    /// re-triggers on back-navigation — and any edits the user made to
+    /// `categoryLabels` survive, since a no-op load leaves them untouched.
+    func loadCategoryIfNeeded() async {
+        guard loadedCategoryName != name || categoryPhase == .failed else { return }
+        categoryPhase = .loading
+        do {
+            let schema = try await generateCategory(name)
+            categoryLabels = schema.categories
+            categorySuggestedLabels = schema.categories
+            categoryAllowsMultiple = schema.allowsMultipleSelection
+            categoryEmoji = schema.emoji
+            loadedCategoryName = name
+            categoryPhase = .loaded
+        } catch {
+            categoryPhase = .failed
+        }
+    }
+
+    /// Whether the user's final labels diverge enough from the AI's suggestion to
+    /// warrant re-deriving the single/multiple flag. The first guess was made from
+    /// the tracker name alone; replacing or deleting a suggested label is the
+    /// signal it misread the metric. Additions are ignored — they don't
+    /// contradict the AI's read — so this is a subset check, normalized for
+    /// whitespace and case so incidental edits don't trip it.
+    func shouldReclassifyChoice(for finalLabels: [String]) -> Bool {
+        let norm: (String) -> String = {
+            $0.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+        }
+        let seed = Set(categorySuggestedLabels.map(norm))
+        // A replace or delete drops one of the AI's labels from the final set.
+        return !seed.isSubset(of: Set(finalLabels.map(norm)))
+    }
+
+    /// Re-asks the AI for *only* the single/multiple flag, now that the user's
+    /// real labels are known — keeping everything else (labels, emoji) the user
+    /// settled on. Drives `categoryPhase` so the loading screen can show its
+    /// spinner / retry, and passes the labels through the existing
+    /// `generateCategory` seam so the AI judges with them in hand.
+    func reclassifyChoice(for labels: [String]) async {
+        categoryPhase = .loading
+        do {
+            let schema = try await generateCategory(
+                "\(name)\n- Categories: \(labels.joined(separator: ", "))"
+            )
+            categoryAllowsMultiple = schema.allowsMultipleSelection
+            categoryPhase = .loaded
+        } catch {
+            categoryPhase = .failed
+        }
     }
 
     // MARK: - Goal selection

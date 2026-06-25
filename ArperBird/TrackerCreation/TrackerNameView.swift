@@ -15,6 +15,10 @@ struct TrackerNameView: View {
     @State private var name = ""
     @FocusState private var isNameFocused: Bool
 
+    private var isNameValid: Bool {
+        !name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    }
+
     var body: some View {
         VStack {
             MetricView(
@@ -42,6 +46,7 @@ struct TrackerNameView: View {
             }
             .controlSize(.extraLarge)
             .buttonStyle(.glassProminent)
+            .disabled(!isNameValid)
             .padding()
         }
         .onAppear {

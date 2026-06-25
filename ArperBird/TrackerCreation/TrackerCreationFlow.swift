@@ -10,7 +10,13 @@ import SwiftUI
 
 enum TrackerCreationStep: Hashable {
     case numberType
+    case categoryLoading
     case categoryLabels
+    /// Transient spinner shown only when the user edits the AI's suggested labels:
+    /// re-derives the single/multiple flag before the reveal. See
+    /// `TrackerCreationModel.reclassifyChoice(for:)`.
+    case categoryReclassify
+    case categoryType
     case name
     case goalSuggestions
     case goalUnit
@@ -36,18 +42,21 @@ struct TrackerCreationFlow: View {
     /// lets data survive back-navigation; see `TrackerCreationModel`.
     @State private var model = TrackerCreationModel()
 
+    /// Drives the single/multiple type-picker sheet opened from the reveal's
+    /// choice chip — the one sheet in an otherwise push-based flow.
+    @State private var isEditingChoice = false
+
     /// The goal path has no color-picker step yet, so previews and the assembled
     /// gauge card share the app accent.
     private let color: Color = .accent
 
     /// The step that follows type selection. The open-ended "Other" number kind
-    /// needs an extra step to disambiguate cumulative vs snapshot behavior, and
-    /// `choices` needs the user to author their category labels; every other kind
-    /// (goal included) jumps straight to naming.
+    /// needs an extra step to disambiguate cumulative vs snapshot behavior; every
+    /// other kind (goal, duration, and choices included) jumps straight to naming
+    /// — the name is what their AI-driven steps key off of.
     private func step(after kind: TrackerKind) -> TrackerCreationStep {
         switch kind {
         case .number: .numberType
-        case .choices: .categoryLabels
         default: .name
         }
     }
@@ -79,10 +88,52 @@ struct TrackerCreationFlow: View {
                 model.behavior = selectedBehavior
                 path.append(.name)
             }
+        case .categoryLoading:
+            TrackerCategoryLoadingView(model: model) {
+                // Swap this transient spinner out of the path for the labels
+                // screen, so tapping "back" from the labels returns to naming
+                // rather than re-showing the loading screen. Mutating the top
+                // entry in place animates as a normal push.
+                if let top = path.indices.last {
+                    path[top] = .categoryLabels
+                }
+            }
         case .categoryLabels:
-            TrackerCategoryLabelsView { labels in
+            TrackerCategoryLabelsView(
+                color: color,
+                initialLabels: model.categoryLabels
+            ) { labels in
+                // Trust the AI's single/multiple guess unless the user replaced or
+                // deleted one of its labels — that edit is the signal the name-only
+                // guess misread the metric, so re-derive the flag from the real
+                // labels. Additions alone keep the AI's guess.
+                let edited = model.shouldReclassifyChoice(for: labels)
                 model.categoryLabels = labels
-                path.append(.name)
+                path.append(edited ? .categoryReclassify : .done)
+            }
+        case .categoryReclassify:
+            TrackerCategoryLoadingView(
+                model: model,
+                load: { await model.reclassifyChoice(for: model.categoryLabels) }
+            ) {
+                // Swap this transient spinner out of the path for the reveal, so
+                // tapping "back" from the reveal returns to the labels screen
+                // rather than re-showing the spinner. Mirrors `.categoryLoading`.
+                if let top = path.indices.last {
+                    path[top] = .done
+                }
+            }
+        case .categoryType:
+            // No longer reachable: the single/multiple flag now comes from the AI
+            // (re-derived only when the user edits labels). Kept wired for an easy
+            // revert; the screen itself is preserved.
+            TrackerCategoryTypeView(
+                color: color,
+                labels: model.categoryLabels,
+                initialAllowsMultiple: model.categoryAllowsMultiple
+            ) { allowsMultiple in
+                model.categoryAllowsMultiple = allowsMultiple
+                path.append(.done)
             }
         case .name:
             TrackerNameView(onNext: { enteredName in
@@ -94,6 +145,8 @@ struct TrackerCreationFlow: View {
                     path.append(.goalSuggestions)
                 case .duration:
                     path.append(.durationLoading)
+                case .choices:
+                    path.append(.categoryLoading)
                 default:
                     break
                 }
@@ -158,9 +211,27 @@ struct TrackerCreationFlow: View {
             TrackerDoneView(
                 metric: doneMetric(),
                 color: color,
-                recap: doneRecap()
+                recap: doneRecap(),
+                categoryChoice: doneCategoryChoice(),
+                onEditChoice: { isEditingChoice = true }
             ) {
                 complete()
+            }
+            // Reuse the existing single/multiple picker as an edit sheet off the
+            // reveal. Confirming writes `categoryAllowsMultiple` back to the model,
+            // which re-derives the recap and the card's chart (pie ↔ bar) in place.
+            .sheet(isPresented: $isEditingChoice) {
+                NavigationStack {
+                    TrackerCategoryTypeView(
+                        color: color,
+                        labels: model.categoryLabels,
+                        initialAllowsMultiple: model.categoryAllowsMultiple
+                    ) { allowsMultiple in
+                        model.categoryAllowsMultiple = allowsMultiple
+                        isEditingChoice = false
+                    }
+                }
+                .presentationDetents([.medium, .large])
             }
         }
     }
@@ -214,6 +285,23 @@ struct TrackerCreationFlow: View {
                 maxInSeconds: max(1, model.durationMaxSeconds),
                 chart: .bar
             )
+        case .choices:
+            // Single choice reads best as a pie (composition of one pick per
+            // entry); multiple choice as a bar (independent counts per label) —
+            // matching the type-picker carousel.
+            return model.categoryAllowsMultiple
+                ? MetricSchema.Fake.categoryMultiple(
+                    title: model.name,
+                    emoji: model.categoryEmoji,
+                    labels: model.categoryLabels,
+                    chart: .bar
+                )
+                : MetricSchema.Fake.categorySingle(
+                    title: model.name,
+                    emoji: model.categoryEmoji,
+                    labels: model.categoryLabels,
+                    chart: .pie
+                )
         default:
             // The goal path: a daily-gauge number whose sample always lands
             // above zero (min is a fifth of the goal) so the gauge reads as a
@@ -231,6 +319,14 @@ struct TrackerCreationFlow: View {
         }
     }
 
+    /// The selection mode surfaced by the reveal's choice chip — only on the
+    /// choices path, where flipping single ↔ multiple is meaningful. Nil
+    /// everywhere else, which hides the chip.
+    private func doneCategoryChoice() -> TrackerDoneView.CategoryChoice? {
+        guard model.kind == .choices else { return nil }
+        return model.categoryAllowsMultiple ? .multiple : .single
+    }
+
     /// The one-line recap under the reveal card, tailored to the path.
     private func doneRecap() -> LocalizedStringKey? {
         switch model.kind {
@@ -243,6 +339,10 @@ struct TrackerCreationFlow: View {
                 ? (minutes > 0 ? "\(hours)h \(minutes)m" : "\(hours)h")
                 : "\(minutes)m"
             return "Tracks up to \(text)"
+        case .choices:
+            return model.categoryAllowsMultiple
+                ? "Pick several from \(model.categoryLabels.count) categories"
+                : "Pick one of \(model.categoryLabels.count) categories"
         default:
             return "Goal: \(model.goalValue.formatted(.number)) \(model.selectedUnit) per day"
         }
@@ -259,4 +359,3 @@ struct TrackerCreationFlow: View {
     .presentationDetents([.large])
     .modelContainer(for: Metric.self, inMemory: true)
 }
-

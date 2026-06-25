@@ -24,6 +24,14 @@ struct TrackerDoneView: View {
     /// or "Tracks up to 2h". Each path supplies its own; omitted when there's
     /// nothing meaningful to add.
     var recap: LocalizedStringKey?
+    /// On the choices path, the entry's selection mode. When set, a tappable link
+    /// surfaces it beside the recap so the user can flip single ↔ multiple from the
+    /// reveal. Omitted (nil) on every other path, where it's meaningless.
+    var categoryChoice: CategoryChoice?
+    /// Invoked when the choice chip is tapped — the flow routes this to a
+    /// `TrackerCategoryTypeView` sheet so the user can flip single ↔ multiple from
+    /// the reveal.
+    var onEditChoice: () -> Void
     var onDone: () -> Void
 
     /// Drives the entrance: the card springs up from small and translucent once
@@ -37,11 +45,15 @@ struct TrackerDoneView: View {
         metric: Metric,
         color: Color = .accent,
         recap: LocalizedStringKey? = nil,
+        categoryChoice: CategoryChoice? = nil,
+        onEditChoice: @escaping () -> Void = {},
         onDone: @escaping () -> Void = {}
     ) {
         self.metric = metric
         self.color = color
         self.recap = recap
+        self.categoryChoice = categoryChoice
+        self.onEditChoice = onEditChoice
         self.onDone = onDone
     }
 
@@ -65,11 +77,7 @@ struct TrackerDoneView: View {
                 .offset(y: hasAppeared ? 0 : 70)
                 .opacity(hasAppeared ? 1 : 0)
 
-            if let recap {
-                Text(recap)
-                    .font(.subheadline.weight(.medium))
-                    .foregroundStyle(.secondary)
-            }
+            recapSection
 
             Spacer()
             Spacer()
@@ -151,6 +159,77 @@ struct TrackerDoneView: View {
                     .padding(.horizontal)
             }
         )
+    }
+
+    // MARK: - Recap & choice link
+
+    /// The recap line plus, on the choices path, the tappable single/multiple
+    /// link stacked beneath it.
+    @ViewBuilder
+    private var recapSection: some View {
+        VStack(spacing: 12) {
+            if let recap {
+                Text(recap)
+                    .font(.subheadline.weight(.medium))
+                    .foregroundStyle(.secondary)
+            }
+            if let categoryChoice {
+                choiceChip(categoryChoice)
+            }
+        }
+        .multilineTextAlignment(.center)
+    }
+
+    /// A quiet, tappable capsule carrying the choice glyph, its label, and a
+    /// chevron — understated (secondary tint, soft fill, small type) so it sits
+    /// below the recap without competing with the celebration, while still reading
+    /// as a control to tap into the type picker.
+    private func choiceChip(_ choice: CategoryChoice) -> some View {
+        Button(action: onEditChoice) {
+            HStack(spacing: 6) {
+                Image(systemName: choice.glyph)
+                Text(choice.title)
+                Image(systemName: "chevron.right")
+                    .font(.caption2.weight(.semibold))
+                    .foregroundStyle(.tertiary)
+            }
+            .font(.footnote.weight(.medium))
+            .foregroundStyle(.secondary)
+            .padding(.horizontal, 12)
+            .padding(.vertical, 6)
+            .background(Capsule().fill(.quaternary.opacity(0.5)))
+            .overlay(content: {
+                Capsule().stroke(.quaternary, lineWidth: 1)
+            })
+        }
+        .buttonStyle(.plain)
+        .accessibilityHint("Switches between single and multiple choice")
+    }
+}
+
+// MARK: - Choice link types
+
+extension TrackerDoneView {
+    /// A category entry's selection mode, surfaced by the reveal's choice link.
+    /// Mirrors the glyphs and wording of `TrackerCategoryTypeView` so the link and
+    /// the picker it leads to read the same.
+    enum CategoryChoice {
+        case single
+        case multiple
+
+        var title: LocalizedStringKey {
+            switch self {
+            case .single: "Single choice"
+            case .multiple: "Multiple choice"
+            }
+        }
+
+        var glyph: String {
+            switch self {
+            case .single: "largecircle.fill.circle"
+            case .multiple: "checkmark.square.fill"
+            }
+        }
     }
 }
 
@@ -241,6 +320,37 @@ private struct SparkleBurst: View {
             metric: Metric(from: schema, color: .orange, data: Metric.fakeData(for: schema.config)),
             color: .orange,
             recap: "Tracks up to 2h"
+        )
+    }
+}
+
+#if DEBUG
+/// A category reveal card whose chart matches the selection mode — pie for single,
+/// bar for multiple — so toggling the choice link in the previews below re-reveals
+/// the right chart, mirroring `TrackerCreationFlow.doneSchema()`.
+private func categoryRevealMetric(multiple: Bool) -> Metric {
+    let labels = ["Happy", "Calm", "Tired", "Anxious"]
+    let schema =
+        multiple
+        ? MetricSchema.Fake.categoryMultiple(
+            title: "Mood", emoji: "🎭", labels: labels, chart: .bar)
+        : MetricSchema.Fake.categorySingle(
+            title: "Mood", emoji: "🎭", labels: labels, chart: .pie)
+    return Metric(from: schema, color: .pink, data: Metric.fakeData(for: schema.config))
+}
+#endif
+
+#Preview("Choice link") {
+    @Previewable @State var multiple = false
+    NavigationStack {
+        TrackerDoneView(
+            metric: categoryRevealMetric(multiple: multiple),
+            color: .pink,
+            recap: multiple
+                ? "Pick several from 4 categories"
+                : "Pick one of 4 categories",
+            categoryChoice: multiple ? .multiple : .single,
+            onEditChoice: { multiple.toggle() }
         )
     }
 }

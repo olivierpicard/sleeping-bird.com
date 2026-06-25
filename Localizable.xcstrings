@@ -268,6 +268,9 @@
         }
       }
     },
+    "Any that apply" : {
+
+    },
     "Arper Bird" : {
       "localizations" : {
         "es" : {
@@ -497,6 +500,9 @@
           }
         }
       }
+    },
+    "Couldn't set up your tracker" : {
+
     },
     "Couldn't suggest goals" : {
 
@@ -1635,6 +1641,9 @@
         }
       }
     },
+    "Multiple choice" : {
+
+    },
     "My Trackers" : {
       "localizations" : {
         "es" : {
@@ -1762,6 +1771,12 @@
           }
         }
       }
+    },
+    "One answer per entry" : {
+
+    },
+    "One pick or several?" : {
+
     },
     "Open email" : {
       "localizations" : {
@@ -1982,6 +1997,12 @@
     "Pick a unit" : {
 
     },
+    "Pick one of %lld categories" : {
+
+    },
+    "Pick several from %lld categories" : {
+
+    },
     "Placeholder" : {
 
     },
@@ -2164,7 +2185,19 @@
     "Save a date on calendar" : {
 
     },
+    "Set the duration" : {
+
+    },
     "Set your goal" : {
+
+    },
+    "Setting things up" : {
+
+    },
+    "Setting up your tracker…" : {
+
+    },
+    "Single choice" : {
 
     },
     "Single or multiple choice" : {
@@ -2375,6 +2408,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Abonnements (RevenueCat et App Store)"
+          }
+        }
+      }
+    },
+    "Switches between single and multiple choice" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cambia entre elección única y múltiple"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bascule entre choix unique et choix multiple"
           }
         }
       }
@@ -2930,6 +2979,7 @@
       }
     },
     "tracker_type.placeholder_name" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -2938,6 +2988,9 @@
           }
         }
       }
+    },
+    "Tracks up to %@" : {
+
     },
     "Try again" : {
 
@@ -3200,6 +3253,9 @@
         }
       }
     },
+    "What's the longest “%@” usually lasts?" : {
+
+    },
     "What's your daily target for “%@”?" : {
 
     },
@@ -3315,6 +3371,9 @@
       }
     },
     "Your tracker is ready to go." : {
+
+    },
+    "Your tracker name" : {
 
     }
   },

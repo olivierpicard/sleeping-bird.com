@@ -28,16 +28,24 @@ struct TrackerCategoryLabelsView: View {
         "Bored", "Stressed", "Grateful",
     ]
 
-    /// Two starting rows, the minimum the picker needs to be meaningful.
-    @State private var categories: [Category] = [Category(), Category()]
+    /// The editable rows, seeded in `init` from the AI suggestion (or two empty
+    /// rows when none was supplied).
+    @State private var categories: [Category]
     @FocusState private var focused: UUID?
 
     init(
         color: Color = .accent,
+        initialLabels: [String] = [],
         onNext: @escaping ([String]) -> Void = { _ in }
     ) {
         self.color = color
         self.onNext = onNext
+
+        // Seed one row per suggested label, then pad up to the minimum so the
+        // picker always starts meaningful even if the AI returned too few.
+        var seeded = initialLabels.map { Category(text: $0) }
+        while seeded.count < Self.minLabels { seeded.append(Category()) }
+        _categories = State(initialValue: seeded)
     }
 
     /// Trimmed, non-empty labels in their on-screen order.
@@ -82,6 +90,10 @@ struct TrackerCategoryLabelsView: View {
             .padding()
         }
         .onAppear {
+            // Only grab focus when the list starts empty; with AI-suggested
+            // labels already in place, popping the keyboard over them just gets
+            // in the way of reviewing.
+            guard filledLabels.isEmpty else { return }
             Task {
                 try? await Task.sleep(for: .milliseconds(400))
                 focused = categories.first?.id
