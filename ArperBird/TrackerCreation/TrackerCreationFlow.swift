@@ -25,6 +25,9 @@ enum TrackerCreationStep: Hashable {
     /// Transient spinner on the binary path: fetches the emoji, then hands
     /// straight off to the reveal — binary needs nothing else from the user.
     case binaryLoading
+    /// Transient spinner on the date path: fetches the emoji, then hands straight
+    /// off to the reveal — a date tracker needs nothing else from the user.
+    case dateLoading
     /// The shared celebration reveal that closes every path: the assembled card
     /// drops in under a "you're all set" headline. The destination builds the
     /// right `Metric` from `model.kind`, so a single step serves all types.
@@ -135,6 +138,8 @@ struct TrackerCreationFlow: View {
                     path.append(.categoryLoading)
                 case .binary:
                     path.append(.binaryLoading)
+                case .date:
+                    path.append(.dateLoading)
                 default:
                     break
                 }
@@ -200,6 +205,15 @@ struct TrackerCreationFlow: View {
                 // Swap this transient spinner out of the path for the reveal, so
                 // tapping "back" from the reveal returns to naming rather than
                 // re-showing the loading screen. Mirrors `.durationLoading`.
+                if let top = path.indices.last {
+                    path[top] = .done
+                }
+            }
+        case .dateLoading:
+            TrackerDateLoadingView(model: model) {
+                // Swap this transient spinner out of the path for the reveal, so
+                // tapping "back" from the reveal returns to naming rather than
+                // re-showing the loading screen. Mirrors `.binaryLoading`.
                 if let top = path.indices.last {
                     path[top] = .done
                 }
@@ -294,6 +308,14 @@ struct TrackerCreationFlow: View {
                 emoji: model.binaryEmoji,
                 chart: .calendar
             )
+        case .date:
+            // A date tracker rendered as the calendar, matching the type-picker
+            // carousel.
+            return MetricSchema.Fake.datetime(
+                title: model.name,
+                emoji: model.dateEmoji,
+                chart: .calendar
+            )
         default:
             // The goal path: a daily-gauge number whose sample always lands
             // above zero (min is a fifth of the goal) so the gauge reads as a
@@ -337,6 +359,8 @@ struct TrackerCreationFlow: View {
                 : "Pick one of \(model.categoryLabels.count) categories"
         case .binary:
             return "Track yes or no each day"
+        case .date:
+            return "Save a date on calendar"
         default:
             return "Goal: \(model.goalValue.formatted(.number)) \(model.selectedUnit) per day"
         }
@@ -348,7 +372,7 @@ struct TrackerCreationFlow: View {
     NavigationStack {
     }
     .sheet(isPresented: $showSheet) {
-        TrackerCreationFlow()
+        TrackerCreationFlow() 
     }
     .presentationDetents([.large])
     .modelContainer(for: Metric.self, inMemory: true)

@@ -102,12 +102,25 @@ final class TrackerCreationModel {
     /// so this is the lone result of its loading step.
     var binaryEmoji = ""
 
-    /// Seam over the emoji AI call, mirroring `generateDuration`. Takes the
+    /// Seam over the emoji AI call, mirroring `generateDuration`. Shared by the
+    /// binary and date paths — both need only an emoji from the AI. Takes the
     /// tracker name.
     private let generateEmoji: (String) async throws -> EmojiAiCompletionSchema
     /// The name `binaryEmoji` was loaded for. Guards the fetch so it runs once
     /// per name and never re-fires on back-navigation.
     private var loadedBinaryName: String?
+
+    // MARK: - Date sub-flow
+
+    /// Loading state of the date emoji auto-completion request.
+    private(set) var datePhase: Phase = .idle
+    /// The AI-suggested emoji for the date tracker. Like the binary path, the
+    /// date path needs nothing else from the AI — it goes straight from naming to
+    /// the reveal — so this is the lone result of its loading step.
+    var dateEmoji = ""
+    /// The name `dateEmoji` was loaded for. Guards the fetch so it runs once per
+    /// name and never re-fires on back-navigation.
+    private var loadedDateName: String?
 
     init(
         generate: @escaping (String) async throws -> [GoalAiCompletionSchema] = {
@@ -191,6 +204,25 @@ final class TrackerCreationModel {
             binaryPhase = .loaded
         } catch {
             binaryPhase = .failed
+        }
+    }
+
+    // MARK: - Date completion
+
+    /// Fetches the date emoji for `name`, but only when it hasn't already been
+    /// loaded for that name (or the previous attempt failed). Re-entrant calls —
+    /// e.g. returning to the loading screen — are no-ops, so the AI never
+    /// re-triggers on back-navigation. Mirrors `loadBinaryEmojiIfNeeded`.
+    func loadDateEmojiIfNeeded() async {
+        guard loadedDateName != name || datePhase == .failed else { return }
+        datePhase = .loading
+        do {
+            let schema = try await generateEmoji(name)
+            dateEmoji = schema.emoji
+            loadedDateName = name
+            datePhase = .loaded
+        } catch {
+            datePhase = .failed
         }
     }
 
