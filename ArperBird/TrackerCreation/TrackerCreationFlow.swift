@@ -16,13 +16,15 @@ enum TrackerCreationStep: Hashable {
     /// re-derives the single/multiple flag before the reveal. See
     /// `TrackerCreationModel.reclassifyChoice(for:)`.
     case categoryReclassify
-    case categoryType
     case name
     case goalSuggestions
     case goalUnit
     case goalValue
     case durationLoading
     case durationConfig
+    /// Transient spinner on the binary path: fetches the emoji, then hands
+    /// straight off to the reveal — binary needs nothing else from the user.
+    case binaryLoading
     /// The shared celebration reveal that closes every path: the assembled card
     /// drops in under a "you're all set" headline. The destination builds the
     /// right `Metric` from `model.kind`, so a single step serves all types.
@@ -41,10 +43,6 @@ struct TrackerCreationFlow: View {
     /// rather than in per-step `@State` and `NavigationPath` payloads — is what
     /// lets data survive back-navigation; see `TrackerCreationModel`.
     @State private var model = TrackerCreationModel()
-
-    /// Drives the single/multiple type-picker sheet opened from the reveal's
-    /// choice chip — the one sheet in an otherwise push-based flow.
-    @State private var isEditingChoice = false
 
     /// The goal path has no color-picker step yet, so previews and the assembled
     /// gauge card share the app accent.
@@ -123,18 +121,6 @@ struct TrackerCreationFlow: View {
                     path[top] = .done
                 }
             }
-        case .categoryType:
-            // No longer reachable: the single/multiple flag now comes from the AI
-            // (re-derived only when the user edits labels). Kept wired for an easy
-            // revert; the screen itself is preserved.
-            TrackerCategoryTypeView(
-                color: color,
-                labels: model.categoryLabels,
-                initialAllowsMultiple: model.categoryAllowsMultiple
-            ) { allowsMultiple in
-                model.categoryAllowsMultiple = allowsMultiple
-                path.append(.done)
-            }
         case .name:
             TrackerNameView(onNext: { enteredName in
                 model.name = enteredName
@@ -147,6 +133,8 @@ struct TrackerCreationFlow: View {
                     path.append(.durationLoading)
                 case .choices:
                     path.append(.categoryLoading)
+                case .binary:
+                    path.append(.binaryLoading)
                 default:
                     break
                 }
@@ -207,31 +195,27 @@ struct TrackerCreationFlow: View {
                 model.setDurationMax(seconds)
                 path.append(.done)
             }
+        case .binaryLoading:
+            TrackerBinaryLoadingView(model: model) {
+                // Swap this transient spinner out of the path for the reveal, so
+                // tapping "back" from the reveal returns to naming rather than
+                // re-showing the loading screen. Mirrors `.durationLoading`.
+                if let top = path.indices.last {
+                    path[top] = .done
+                }
+            }
         case .done:
             TrackerDoneView(
                 metric: doneMetric(),
                 color: color,
                 recap: doneRecap(),
                 categoryChoice: doneCategoryChoice(),
-                onEditChoice: { isEditingChoice = true }
+                // Tapping the reveal's choice chip flips single ↔ multiple right
+                // there: writing `categoryAllowsMultiple` re-derives the recap and
+                // the card's chart (pie ↔ bar) in place.
+                onToggleChoice: { model.categoryAllowsMultiple.toggle() }
             ) {
                 complete()
-            }
-            // Reuse the existing single/multiple picker as an edit sheet off the
-            // reveal. Confirming writes `categoryAllowsMultiple` back to the model,
-            // which re-derives the recap and the card's chart (pie ↔ bar) in place.
-            .sheet(isPresented: $isEditingChoice) {
-                NavigationStack {
-                    TrackerCategoryTypeView(
-                        color: color,
-                        labels: model.categoryLabels,
-                        initialAllowsMultiple: model.categoryAllowsMultiple
-                    ) { allowsMultiple in
-                        model.categoryAllowsMultiple = allowsMultiple
-                        isEditingChoice = false
-                    }
-                }
-                .presentationDetents([.medium, .large])
             }
         }
     }
@@ -302,6 +286,14 @@ struct TrackerCreationFlow: View {
                     labels: model.categoryLabels,
                     chart: .pie
                 )
+        case .binary:
+            // A yes/no tracker rendered as the binary calendar, matching the
+            // type-picker carousel.
+            return MetricSchema.Fake.binary(
+                title: model.name,
+                emoji: model.binaryEmoji,
+                chart: .calendar
+            )
         default:
             // The goal path: a daily-gauge number whose sample always lands
             // above zero (min is a fifth of the goal) so the gauge reads as a
@@ -343,6 +335,8 @@ struct TrackerCreationFlow: View {
             return model.categoryAllowsMultiple
                 ? "Pick several from \(model.categoryLabels.count) categories"
                 : "Pick one of \(model.categoryLabels.count) categories"
+        case .binary:
+            return "Track yes or no each day"
         default:
             return "Goal: \(model.goalValue.formatted(.number)) \(model.selectedUnit) per day"
         }

@@ -93,6 +93,22 @@ final class TrackerCreationModel {
     /// runs once per name and never re-fires on back-navigation.
     private var loadedCategoryName: String?
 
+    // MARK: - Binary sub-flow
+
+    /// Loading state of the binary emoji auto-completion request.
+    private(set) var binaryPhase: Phase = .idle
+    /// The AI-suggested emoji for the binary tracker. The binary path needs
+    /// nothing else from the AI — it goes straight from naming to the reveal —
+    /// so this is the lone result of its loading step.
+    var binaryEmoji = ""
+
+    /// Seam over the emoji AI call, mirroring `generateDuration`. Takes the
+    /// tracker name.
+    private let generateEmoji: (String) async throws -> EmojiAiCompletionSchema
+    /// The name `binaryEmoji` was loaded for. Guards the fetch so it runs once
+    /// per name and never re-fires on back-navigation.
+    private var loadedBinaryName: String?
+
     init(
         generate: @escaping (String) async throws -> [GoalAiCompletionSchema] = {
             try await GoalAiCompletion().generate(for: "- Tracker name: \($0)")
@@ -102,11 +118,15 @@ final class TrackerCreationModel {
         },
         generateCategory: @escaping (String) async throws -> CategoryAiCompletionSchema = {
             try await CategoryAiCompletion().generate(for: "- Tracker name: \($0)")
+        },
+        generateEmoji: @escaping (String) async throws -> EmojiAiCompletionSchema = {
+            try await EmojiAiCompletion().generate(for: "- Tracker name: \($0)")
         }
     ) {
         self.generate = generate
         self.generateDuration = generateDuration
         self.generateCategory = generateCategory
+        self.generateEmoji = generateEmoji
     }
 
     // MARK: - Goal suggestions
@@ -153,6 +173,25 @@ final class TrackerCreationModel {
     /// otherwise `private(set)` to protect the load memoization.
     func setDurationMax(_ seconds: Int) {
         durationMaxSeconds = max(0, seconds)
+    }
+
+    // MARK: - Binary completion
+
+    /// Fetches the binary emoji for `name`, but only when it hasn't already been
+    /// loaded for that name (or the previous attempt failed). Re-entrant calls —
+    /// e.g. returning to the loading screen — are no-ops, so the AI never
+    /// re-triggers on back-navigation.
+    func loadBinaryEmojiIfNeeded() async {
+        guard loadedBinaryName != name || binaryPhase == .failed else { return }
+        binaryPhase = .loading
+        do {
+            let schema = try await generateEmoji(name)
+            binaryEmoji = schema.emoji
+            loadedBinaryName = name
+            binaryPhase = .loaded
+        } catch {
+            binaryPhase = .failed
+        }
     }
 
     // MARK: - Category completion

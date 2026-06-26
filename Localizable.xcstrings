@@ -1775,9 +1775,6 @@
     "One answer per entry" : {
 
     },
-    "One pick or several?" : {
-
-    },
     "Open email" : {
       "localizations" : {
         "es" : {
@@ -2412,22 +2409,6 @@
         }
       }
     },
-    "Switches between single and multiple choice" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Cambia entre elección única y múltiple"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Bascule entre choix unique et choix multiple"
-          }
-        }
-      }
-    },
     "support.email.body %@ %@ %@ %@" : {
       "localizations" : {
         "en" : {
@@ -2468,6 +2449,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Assistance ArperBird"
+          }
+        }
+      }
+    },
+    "Switches between single and multiple choice" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cambia entre elección única y múltiple"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bascule entre choix unique et choix multiple"
           }
         }
       }

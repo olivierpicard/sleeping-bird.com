@@ -24,14 +24,14 @@ struct TrackerDoneView: View {
     /// or "Tracks up to 2h". Each path supplies its own; omitted when there's
     /// nothing meaningful to add.
     var recap: LocalizedStringKey?
-    /// On the choices path, the entry's selection mode. When set, a tappable link
+    /// On the choices path, the entry's selection mode. When set, a tappable chip
     /// surfaces it beside the recap so the user can flip single ↔ multiple from the
     /// reveal. Omitted (nil) on every other path, where it's meaningless.
     var categoryChoice: CategoryChoice?
-    /// Invoked when the choice chip is tapped — the flow routes this to a
-    /// `TrackerCategoryTypeView` sheet so the user can flip single ↔ multiple from
-    /// the reveal.
-    var onEditChoice: () -> Void
+    /// Invoked when the choice chip is tapped — the flow flips
+    /// `categoryAllowsMultiple` on the model, which re-derives the recap and the
+    /// card's chart (pie ↔ bar) in place.
+    var onToggleChoice: () -> Void
     var onDone: () -> Void
 
     /// Drives the entrance: the card springs up from small and translucent once
@@ -46,14 +46,14 @@ struct TrackerDoneView: View {
         color: Color = .accent,
         recap: LocalizedStringKey? = nil,
         categoryChoice: CategoryChoice? = nil,
-        onEditChoice: @escaping () -> Void = {},
+        onToggleChoice: @escaping () -> Void = {},
         onDone: @escaping () -> Void = {}
     ) {
         self.metric = metric
         self.color = color
         self.recap = recap
         self.categoryChoice = categoryChoice
-        self.onEditChoice = onEditChoice
+        self.onToggleChoice = onToggleChoice
         self.onDone = onDone
     }
 
@@ -181,15 +181,16 @@ struct TrackerDoneView: View {
     }
 
     /// A quiet, tappable capsule carrying the choice glyph, its label, and a
-    /// chevron — understated (secondary tint, soft fill, small type) so it sits
+    /// swap arrow — understated (secondary tint, soft fill, small type) so it sits
     /// below the recap without competing with the celebration, while still reading
-    /// as a control to tap into the type picker.
+    /// as a control that flips the selection mode in place.
     private func choiceChip(_ choice: CategoryChoice) -> some View {
-        Button(action: onEditChoice) {
+        Button(action: onToggleChoice) {
             HStack(spacing: 6) {
                 Image(systemName: choice.glyph)
+                    .foregroundStyle(color)
                 Text(choice.title)
-                Image(systemName: "chevron.right")
+                Image(systemName: "arrow.left.arrow.right")
                     .font(.caption2.weight(.semibold))
                     .foregroundStyle(.tertiary)
             }
@@ -199,7 +200,7 @@ struct TrackerDoneView: View {
             .padding(.vertical, 6)
             .background(Capsule().fill(.quaternary.opacity(0.5)))
             .overlay(content: {
-                Capsule().stroke(.quaternary, lineWidth: 1)
+                Capsule().stroke(color.opacity(0.4), lineWidth: 1)
             })
         }
         .buttonStyle(.plain)
@@ -210,9 +211,8 @@ struct TrackerDoneView: View {
 // MARK: - Choice link types
 
 extension TrackerDoneView {
-    /// A category entry's selection mode, surfaced by the reveal's choice link.
-    /// Mirrors the glyphs and wording of `TrackerCategoryTypeView` so the link and
-    /// the picker it leads to read the same.
+    /// A category entry's selection mode, surfaced by the reveal's choice chip.
+    /// Tapping the chip flips between the two cases in place.
     enum CategoryChoice {
         case single
         case multiple
@@ -350,7 +350,7 @@ private func categoryRevealMetric(multiple: Bool) -> Metric {
                 ? "Pick several from 4 categories"
                 : "Pick one of 4 categories",
             categoryChoice: multiple ? .multiple : .single,
-            onEditChoice: { multiple.toggle() }
+            onToggleChoice: { multiple.toggle() }
         )
     }
 }
