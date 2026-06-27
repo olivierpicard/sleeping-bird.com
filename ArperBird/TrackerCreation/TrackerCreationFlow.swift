@@ -266,27 +266,7 @@ struct TrackerCreationFlow: View {
             // model in place (max, choice), and only a real `body` that *reads*
             // the model re-renders on those writes. Deriving the reveal inside
             // `destination(for:)` instead would leave the pushed card stale.
-            DoneRevealStep(
-                metric: { doneMetric() },
-                recap: { doneRecap() },
-                categoryChoice: { doneCategoryChoice() },
-                numberFacets: { doneNumberFacets() },
-                color: color,
-                onToggleChoice: { model.categoryAllowsMultiple.toggle() },
-                onEditMax: { model.setNumberMax($0) },
-                onToggleBehavior: {
-                    // Flip cumulative ↔ snapshot in place; defaulting an unset
-                    // behavior to snapshot mirrors how the reveal derives it.
-                    model.behavior =
-                        (model.behavior ?? .snapshot) == .cumulative
-                        ? .snapshot : .cumulative
-                },
-                // Picking a unit re-anchors its suggested max/granularity, so the
-                // Max chip and card update alongside the unit. Only AI units are
-                // offered, so this never lands on the custom path.
-                onSelectUnit: { model.chooseNumberUnit($0) },
-                onDone: complete
-            )
+            DoneRevealStep(model: model, metric: { doneMetric() }, color: color, onDone: complete)
         }
     }
 
@@ -408,89 +388,70 @@ struct TrackerCreationFlow: View {
         }
     }
 
-    /// The selection mode surfaced by the reveal's choice chip — only on the
-    /// choices path, where flipping single ↔ multiple is meaningful. Nil
-    /// everywhere else, which hides the chip.
-    private func doneCategoryChoice() -> TrackerDoneView.CategoryChoice? {
-        guard model.kind == .choices else { return nil }
-        return model.categoryAllowsMultiple ? .multiple : .single
-    }
-
-    /// The number path's editable facets, surfaced by the reveal's chip row —
-    /// only on the number ("Other") path, where the max/behavior/unit are
-    /// meaningful. Nil everywhere else, which hides the row.
-    private func doneNumberFacets() -> TrackerDoneView.NumberFacets? {
-        guard model.kind == .number else { return nil }
-        return .init(
-            maxValue: model.numberMax,
-            behavior: model.behavior ?? .snapshot,
-            unit: model.numberUnit.isEmpty ? nil : model.numberUnit,
-            // Only the AI's proposed units — the chip's menu offers no custom entry.
-            units: model.numberSuggestions.compactMap(\.unit)
-        )
-    }
-
-    /// The one-line recap under the reveal card, tailored to the path.
-    private func doneRecap() -> LocalizedStringKey? {
-        switch model.kind {
-        case .duration:
-            let seconds = max(0, model.durationMaxSeconds)
-            let hours = seconds / 3600
-            let minutes = (seconds % 3600) / 60
-            let text =
-                hours > 0
-                ? (minutes > 0 ? "\(hours)h \(minutes)m" : "\(hours)h")
-                : "\(minutes)m"
-            return "Tracks up to \(text)"
-        case .choices:
-            return model.categoryAllowsMultiple
-                ? "Pick several from \(model.categoryLabels.count) categories"
-                : "Pick one of \(model.categoryLabels.count) categories"
-        case .binary:
-            return "Track yes or no each day"
-        case .date:
-            return "Save a date on calendar"
-        case .number:
-            return model.numberUnit.isEmpty
-                ? "Track a number over time"
-                : "Tracks in \(model.numberUnit)"
-        default:
-            return
-                "Goal: \(model.goalValue.formatted(.number)) \(model.selectedUnit) per day"
-        }
-    }
 }
 
 /// Hosts the closing reveal as its own view so the model reads that drive it are
-/// tracked by a real SwiftUI `body`. The flow's chips mutate the model in place
-/// — the max from its editor sheet, the choice flag from its toggle — and it's
-/// this body re-evaluating that re-derives the card and chips from the new state.
-/// The derivations stay on the flow and are passed in as closures, invoked here.
+/// tracked by a real SwiftUI `body`. The chips mutate the model in place — the
+/// max from its editor sheet, the choice flag from its toggle — and it's this
+/// body re-evaluating that re-derives the card and the per-path recap from the
+/// new state. This is the single place that knows the tracker-creation behaviour:
+/// it picks the right dumb recap view for `model.kind` and injects the closures
+/// that write back to the model.
 private struct DoneRevealStep: View {
+    let model: TrackerCreationModel
     let metric: () -> Metric
-    let recap: () -> LocalizedStringKey?
-    let categoryChoice: () -> TrackerDoneView.CategoryChoice?
-    let numberFacets: () -> TrackerDoneView.NumberFacets?
     let color: Color
-    let onToggleChoice: () -> Void
-    let onEditMax: (Double) -> Void
-    let onToggleBehavior: () -> Void
-    let onSelectUnit: (String) -> Void
     let onDone: () -> Void
 
     var body: some View {
-        TrackerDoneView(
-            metric: metric(),
-            color: color,
-            recap: recap(),
-            categoryChoice: categoryChoice(),
-            onToggleChoice: onToggleChoice,
-            numberFacets: numberFacets(),
-            onEditMax: onEditMax,
-            onToggleBehavior: onToggleBehavior,
-            onSelectUnit: onSelectUnit,
-            onDone: onDone
-        )
+        TrackerDoneView(metric: metric(), color: color, onDone: onDone) {
+            recap
+        }
+    }
+
+    /// The path's recap line and chips, picked from `model.kind`. Each branch is a
+    /// dumb view handed typed state plus the closures that mutate the model — the
+    /// behaviour lives here, never in the recap views.
+    @ViewBuilder
+    private var recap: some View {
+        switch model.kind {
+        case .number:
+            DoneNumberRecap(
+                maxValue: model.numberMax,
+                behavior: model.behavior ?? .snapshot,
+                unit: model.numberUnit.isEmpty ? nil : model.numberUnit,
+                // Only the AI's proposed units — the chip's menu offers no custom
+                // entry, so re-anchoring always lands on a known max/granularity.
+                units: model.numberSuggestions.compactMap(\.unit),
+                color: color,
+                onEditMax: { model.setNumberMax($0) },
+                onToggleBehavior: {
+                    // Flip cumulative ↔ snapshot in place; defaulting an unset
+                    // behavior to snapshot mirrors how the reveal derives it.
+                    model.behavior =
+                        (model.behavior ?? .snapshot) == .cumulative
+                        ? .snapshot : .cumulative
+                },
+                onSelectUnit: { model.chooseNumberUnit($0) }
+            )
+        case .choices:
+            DoneCategoryRecap(
+                allowsMultiple: model.categoryAllowsMultiple,
+                count: model.categoryLabels.count,
+                color: color,
+                onToggleChoice: { model.categoryAllowsMultiple.toggle() }
+            )
+        case .binary:
+            DoneBinaryRecap()
+        case .date:
+            DoneDateRecap()
+        case .duration:
+            DoneDurationRecap(maxSeconds: model.durationMaxSeconds)
+        case .goal:
+            DoneGoalRecap(goalValue: model.goalValue, unit: model.selectedUnit)
+        case nil:
+            EmptyView() // unreachable: kind is set before any later step.
+        }
     }
 }
 
