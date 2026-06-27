@@ -125,6 +125,10 @@ final class TrackerCreationModel {
     var numberMax: Double = 0
     var numberGranularity: Double = 1
     var numberEmoji = ""
+    /// Whether the AI judged this number to have a hard upper bound (e.g. a rating
+    /// out of 10) rather than an open-ended estimate (e.g. steps). When bounded the
+    /// max is fixed by the metric itself, so the reveal hides its editable Max chip.
+    var numberIsBounded = false
 
     /// Seam over the number AI call, mirroring `generate`. Takes the tracker name.
     private let generateNumber: (String) async throws -> NumberAiCompletionListSchema
@@ -268,6 +272,7 @@ final class TrackerCreationModel {
             numberSuggestions = schema.constraints
             behavior = schema.isCumulative ? .cumulative : .snapshot
             numberEmoji = schema.emoji
+            numberIsBounded = schema.isBounded
             if let first = schema.constraints.first {
                 numberUnit = first.unit ?? ""
                 numberMax = first.typicalMax

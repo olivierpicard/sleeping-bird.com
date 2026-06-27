@@ -17,6 +17,10 @@ import SwiftUI
 struct DoneNumberRecap: View {
     /// The upper bound — shown on the Max chip and used to seed its editor.
     let maxValue: Double
+    /// Whether the number has a hard upper bound fixed by the metric itself (e.g. a
+    /// rating out of 10). When bounded the max isn't the user's to dial, so the Max
+    /// chip is hidden entirely.
+    var isBounded: Bool = false
     /// Whether readings accumulate (cumulative) or stand alone (snapshot).
     let behavior: MetricBehavior
     /// The unit label, or nil for a unitless tracker — which hides the unit chip.
@@ -37,10 +41,9 @@ struct DoneNumberRecap: View {
     @State private var editingMax = false
 
     private var recap: LocalizedStringKey {
-        if let unit {
-            "Tracks in \(unit)"
-        } else {
-            "Track a number over time"
+        switch behavior {
+        case .cumulative: "Your entries add up through the day"
+        case .snapshot: "Your entries are independent of each other"
         }
     }
 
@@ -71,12 +74,17 @@ struct DoneNumberRecap: View {
                 unitChip
             }
 
-            facetChip(
-                glyph: "arrow.up.to.line.compact",
-                label: "Max",
-                value: maxValue.formatted(.number),
-                hint: "Edit the tracker's maximum value"
-            ) { editingMax = true }
+            // A bounded number's max is fixed by the metric itself, so there's
+            // nothing for the user to dial — drop the chip rather than show a
+            // dead one.
+            if !isBounded {
+                facetChip(
+                    glyph: "arrow.up.to.line.compact",
+                    label: "Max",
+                    value: maxValue.formatted(.number),
+                    hint: "Edit the tracker's maximum value"
+                ) { editingMax = true }
+            }
 
             facetChip(
                 glyph: behavior.glyph,

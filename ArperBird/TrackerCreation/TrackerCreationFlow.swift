@@ -383,6 +383,7 @@ private struct DoneRevealStep: View {
         case .number:
             DoneNumberRecap(
                 maxValue: model.numberMax,
+                isBounded: model.numberIsBounded,
                 behavior: model.behavior ?? .snapshot,
                 unit: model.numberUnit.isEmpty ? nil : model.numberUnit,
                 // Only the AI's proposed units — the chip's menu offers no custom
