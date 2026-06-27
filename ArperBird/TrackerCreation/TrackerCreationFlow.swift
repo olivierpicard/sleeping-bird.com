@@ -318,9 +318,10 @@ struct TrackerCreationFlow: View {
                 chart: .calendar
             )
         case .number:
-            // The open-ended "Other" path: a goal-less number plotted as a line,
-            // matching the type-picker carousel. min is 0; the aggregation follows
-            // the behavior (cumulative totals sum, snapshot readings average).
+            // The open-ended "Other" path: a goal-less number whose chart follows
+            // the behavior — cumulative totals stack as bars, snapshot readings
+            // trace a line. min is 0; the aggregation follows suit too (cumulative
+            // sums, snapshot keeps the latest reading).
             let behavior = model.behavior ?? .snapshot
             return MetricSchema.Fake.number(
                 title: model.name,
@@ -332,7 +333,7 @@ struct TrackerCreationFlow: View {
                     ? model.numberGranularity : 1,
                 goal: nil,
                 behavior: behavior,
-                chart: .line,
+                chart: behavior == .cumulative ? .bar : .line,
                 method: behavior == .cumulative
                 ? .numerical(.sum) : .numerical(.latest)
             )

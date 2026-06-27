@@ -281,7 +281,7 @@ private func categoryRevealMetric(multiple: Bool) -> Metric {
         granularity: 100,
         goal: nil,
         behavior: behavior,
-        chart: .line,
+        chart: behavior == .cumulative ? .bar : .line,
         method: behavior == .cumulative ? .numerical(.sum) : .numerical(.latest)
     )
     NavigationStack {
