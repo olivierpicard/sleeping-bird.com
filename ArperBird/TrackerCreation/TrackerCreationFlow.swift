@@ -10,16 +10,10 @@ import SwiftUI
 
 enum TrackerCreationStep: Hashable {
     /// Transient spinner on the number ("Other") path: fetches the unit
-    /// suggestions + behavior, then hands off to the unit list.
+    /// suggestions + behavior + emoji, then hands straight off to the reveal —
+    /// the unit, max, and behavior are all editable there via the recap chips,
+    /// so the number path needs nothing else from the user.
     case numberLoading
-    /// Pick the unit for an open-ended number tracker, from the AI's proposals
-    /// or a custom one.
-    case numberUnit
-    /// Dial in the realistic upper bound for the chosen unit.
-    case numberMax
-    /// Cumulative vs snapshot — only reached on the number path when the user
-    /// picked a *custom* unit the AI couldn't infer a behavior for.
-    case numberType
     case categoryLoading
     case categoryLabels
     /// Transient spinner shown only when the user edits the AI's suggested labels:
@@ -90,43 +84,14 @@ struct TrackerCreationFlow: View {
         switch step {
         case .numberLoading:
             TrackerNumberLoadingView(model: model) {
-                // Swap this transient spinner out of the path for the unit list, so
-                // tapping "back" from the unit list returns to naming rather than
-                // re-showing the loading screen. Mirrors `.durationLoading`.
+                // Swap this transient spinner out of the path for the reveal, so
+                // tapping "back" from the reveal returns to naming rather than
+                // re-showing the loading screen. The AI-seeded unit, max, and
+                // behavior are all editable on the reveal's recap chips, so the
+                // number path needs no further input. Mirrors `.binaryLoading`.
                 if let top = path.indices.last {
-                    path[top] = .numberUnit
+                    path[top] = .done
                 }
-            }
-        case .numberUnit:
-            TrackerNumberUnitListView(
-                name: model.name,
-                options: model.numberSuggestions.compactMap {
-                    guard let unit = $0.unit else { return nil }
-                    return .init(unit: unit, typicalMax: $0.typicalMax)
-                },
-                selectedUnit: model.numberUnit,
-                color: color
-            ) { unit in
-                model.chooseNumberUnit(unit)
-                path.append(.numberMax)
-            }
-        case .numberMax:
-            TrackerNumberMaxView(
-                name: model.name,
-                unit: model.numberUnit,
-                suggestedMax: model.numberMax,
-                color: color
-            ) { value in
-                model.setNumberMax(value)
-                // A known unit carries the AI's behavior guess straight to the
-                // reveal; a custom one the AI never modelled routes through the
-                // number-type screen to ask cumulative vs snapshot.
-                path.append(model.numberUnitIsCustom ? .numberType : .done)
-            }
-        case .numberType:
-            TrackerNumberTypeView(color: color) { selectedBehavior in
-                model.behavior = selectedBehavior
-                path.append(.done)
             }
         case .categoryLoading:
             TrackerCategoryLoadingView(model: model) {

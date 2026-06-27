@@ -280,13 +280,6 @@ final class TrackerCreationModel {
         }
     }
 
-    /// Whether the chosen unit is a custom one the AI didn't propose. Drives the
-    /// flow's branch: a known unit carries the AI's behavior guess straight to the
-    /// reveal, while a custom one routes through the number-type screen to ask.
-    var numberUnitIsCustom: Bool {
-        !numberSuggestions.contains { $0.unit == numberUnit }
-    }
-
     /// Commit the unit chosen on the number unit list, re-anchoring the suggested
     /// max and granularity when the unit matches a suggestion; a custom unit falls
     /// back to neutral round defaults the user then dials in on the max page. The
