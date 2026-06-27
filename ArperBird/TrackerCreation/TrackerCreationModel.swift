@@ -110,6 +110,28 @@ final class TrackerCreationModel {
     /// per name and never re-fires on back-navigation.
     private var loadedBinaryName: String?
 
+    // MARK: - Number sub-flow
+
+    /// Loading state of the number auto-completion request.
+    private(set) var numberPhase: Phase = .idle
+    /// The AI-proposed units for the open-ended number tracker, each carrying a
+    /// realistic max and natural granularity. Populated once per name and read by
+    /// the unit list and the max screen alike.
+    private(set) var numberSuggestions: [NumberAiCompletionSchema] = []
+    /// The unit, upper bound, granularity and emoji assembled across the number
+    /// pages. Seeded from the chosen suggestion, then refined on the max screen.
+    /// `behavior` (above) is shared with the number-type screen on the custom path.
+    var numberUnit = ""
+    var numberMax: Double = 0
+    var numberGranularity: Double = 1
+    var numberEmoji = ""
+
+    /// Seam over the number AI call, mirroring `generate`. Takes the tracker name.
+    private let generateNumber: (String) async throws -> NumberAiCompletionListSchema
+    /// The name the number suggestions were loaded for. Guards the fetch so it
+    /// runs once per name and never re-fires on back-navigation.
+    private var loadedNumberName: String?
+
     // MARK: - Date sub-flow
 
     /// Loading state of the date emoji auto-completion request.
@@ -134,12 +156,16 @@ final class TrackerCreationModel {
         },
         generateEmoji: @escaping (String) async throws -> EmojiAiCompletionSchema = {
             try await EmojiAiCompletion().generate(for: "- Tracker name: \($0)")
+        },
+        generateNumber: @escaping (String) async throws -> NumberAiCompletionListSchema = {
+            try await NumberAiCompletion().generate(for: "- Tracker name: \($0)")
         }
     ) {
         self.generate = generate
         self.generateDuration = generateDuration
         self.generateCategory = generateCategory
         self.generateEmoji = generateEmoji
+        self.generateNumber = generateNumber
     }
 
     // MARK: - Goal suggestions
@@ -224,6 +250,63 @@ final class TrackerCreationModel {
         } catch {
             datePhase = .failed
         }
+    }
+
+    // MARK: - Number completion
+
+    /// Fetches the number units (max + granularity), shared emoji and behavior for
+    /// `name`, but only when they haven't already been loaded for that name (or the
+    /// previous attempt failed). Re-entrant calls — e.g. returning to the loading
+    /// screen — are no-ops, so the AI never re-triggers on back-navigation. Seeds
+    /// the selection with the first suggestion so the unit list and max screen have
+    /// a value to show before the user picks.
+    func loadNumberIfNeeded() async {
+        guard loadedNumberName != name || numberPhase == .failed else { return }
+        numberPhase = .loading
+        do {
+            let schema = try await generateNumber(name)
+            numberSuggestions = schema.constraints
+            behavior = schema.isCumulative ? .cumulative : .snapshot
+            numberEmoji = schema.emoji
+            if let first = schema.constraints.first {
+                numberUnit = first.unit ?? ""
+                numberMax = first.typicalMax
+                numberGranularity = first.granularity
+            }
+            loadedNumberName = schema.constraints.isEmpty ? nil : name
+            numberPhase = schema.constraints.isEmpty ? .failed : .loaded
+        } catch {
+            numberPhase = .failed
+        }
+    }
+
+    /// Whether the chosen unit is a custom one the AI didn't propose. Drives the
+    /// flow's branch: a known unit carries the AI's behavior guess straight to the
+    /// reveal, while a custom one routes through the number-type screen to ask.
+    var numberUnitIsCustom: Bool {
+        !numberSuggestions.contains { $0.unit == numberUnit }
+    }
+
+    /// Commit the unit chosen on the number unit list, re-anchoring the suggested
+    /// max and granularity when the unit matches a suggestion; a custom unit falls
+    /// back to neutral round defaults the user then dials in on the max page. The
+    /// emoji is list-level, so it stays put regardless of the chosen unit.
+    func chooseNumberUnit(_ unit: String) {
+        numberUnit = unit
+        if let match = numberSuggestions.first(where: { $0.unit == unit }) {
+            numberMax = match.typicalMax
+            numberGranularity = match.granularity
+        } else {
+            numberMax = 100
+            numberGranularity = 1
+        }
+    }
+
+    /// Persist the upper bound the user dialled in on the max screen, overriding the
+    /// AI suggestion. A method because `numberMax` is otherwise `private`-seeded to
+    /// keep the load memoization the single writer of the suggestion values.
+    func setNumberMax(_ value: Double) {
+        numberMax = max(0, value)
     }
 
     // MARK: - Category completion

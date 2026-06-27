@@ -9,6 +9,16 @@ import SwiftData
 import SwiftUI
 
 enum TrackerCreationStep: Hashable {
+    /// Transient spinner on the number ("Other") path: fetches the unit
+    /// suggestions + behavior, then hands off to the unit list.
+    case numberLoading
+    /// Pick the unit for an open-ended number tracker, from the AI's proposals
+    /// or a custom one.
+    case numberUnit
+    /// Dial in the realistic upper bound for the chosen unit.
+    case numberMax
+    /// Cumulative vs snapshot — only reached on the number path when the user
+    /// picked a *custom* unit the AI couldn't infer a behavior for.
     case numberType
     case categoryLoading
     case categoryLabels
@@ -51,24 +61,18 @@ struct TrackerCreationFlow: View {
     /// gauge card share the app accent.
     private let color: Color = .accent
 
-    /// The step that follows type selection. The open-ended "Other" number kind
-    /// needs an extra step to disambiguate cumulative vs snapshot behavior; every
-    /// other kind (goal, duration, and choices included) jumps straight to naming
-    /// — the name is what their AI-driven steps key off of.
-    private func step(after kind: TrackerKind) -> TrackerCreationStep {
-        switch kind {
-        case .number: .numberType
-        default: .name
-        }
-    }
-
     var body: some View {
         NavigationStack(path: $path) {
             TrackerTypeView { selectedKind in
                 model.kind = selectedKind
-                path.append(step(after: selectedKind))
+                // Every kind names first — the name is what each path's AI-driven
+                // steps key off of, the number ("Other") path included.
+                path.append(.name)
             }
-            .navigationDestination(for: TrackerCreationStep.self, destination: destination)
+            .navigationDestination(
+                for: TrackerCreationStep.self,
+                destination: destination
+            )
         }
         .toolbar {
             ToolbarItem(placement: .cancellationAction) {
@@ -84,10 +88,45 @@ struct TrackerCreationFlow: View {
     @ViewBuilder
     private func destination(for step: TrackerCreationStep) -> some View {
         switch step {
+        case .numberLoading:
+            TrackerNumberLoadingView(model: model) {
+                // Swap this transient spinner out of the path for the unit list, so
+                // tapping "back" from the unit list returns to naming rather than
+                // re-showing the loading screen. Mirrors `.durationLoading`.
+                if let top = path.indices.last {
+                    path[top] = .numberUnit
+                }
+            }
+        case .numberUnit:
+            TrackerNumberUnitListView(
+                name: model.name,
+                options: model.numberSuggestions.compactMap {
+                    guard let unit = $0.unit else { return nil }
+                    return .init(unit: unit, typicalMax: $0.typicalMax)
+                },
+                selectedUnit: model.numberUnit,
+                color: color
+            ) { unit in
+                model.chooseNumberUnit(unit)
+                path.append(.numberMax)
+            }
+        case .numberMax:
+            TrackerNumberMaxView(
+                name: model.name,
+                unit: model.numberUnit,
+                suggestedMax: model.numberMax,
+                color: color
+            ) { value in
+                model.setNumberMax(value)
+                // A known unit carries the AI's behavior guess straight to the
+                // reveal; a custom one the AI never modelled routes through the
+                // number-type screen to ask cumulative vs snapshot.
+                path.append(model.numberUnitIsCustom ? .numberType : .done)
+            }
         case .numberType:
-            TrackerNumberTypeView { selectedBehavior in
+            TrackerNumberTypeView(color: color) { selectedBehavior in
                 model.behavior = selectedBehavior
-                path.append(.name)
+                path.append(.done)
             }
         case .categoryLoading:
             TrackerCategoryLoadingView(model: model) {
@@ -115,7 +154,9 @@ struct TrackerCreationFlow: View {
         case .categoryReclassify:
             TrackerCategoryLoadingView(
                 model: model,
-                load: { await model.reclassifyChoice(for: model.categoryLabels) }
+                load: {
+                    await model.reclassifyChoice(for: model.categoryLabels)
+                }
             ) {
                 // Swap this transient spinner out of the path for the reveal, so
                 // tapping "back" from the reveal returns to the labels screen
@@ -140,6 +181,8 @@ struct TrackerCreationFlow: View {
                     path.append(.binaryLoading)
                 case .date:
                     path.append(.dateLoading)
+                case .number:
+                    path.append(.numberLoading)
                 default:
                     break
                 }
@@ -219,18 +262,31 @@ struct TrackerCreationFlow: View {
                 }
             }
         case .done:
-            TrackerDoneView(
-                metric: doneMetric(),
+            // Built through a dedicated view, not inline here: the chips edit the
+            // model in place (max, choice), and only a real `body` that *reads*
+            // the model re-renders on those writes. Deriving the reveal inside
+            // `destination(for:)` instead would leave the pushed card stale.
+            DoneRevealStep(
+                metric: { doneMetric() },
+                recap: { doneRecap() },
+                categoryChoice: { doneCategoryChoice() },
+                numberFacets: { doneNumberFacets() },
                 color: color,
-                recap: doneRecap(),
-                categoryChoice: doneCategoryChoice(),
-                // Tapping the reveal's choice chip flips single ↔ multiple right
-                // there: writing `categoryAllowsMultiple` re-derives the recap and
-                // the card's chart (pie ↔ bar) in place.
-                onToggleChoice: { model.categoryAllowsMultiple.toggle() }
-            ) {
-                complete()
-            }
+                onToggleChoice: { model.categoryAllowsMultiple.toggle() },
+                onEditMax: { model.setNumberMax($0) },
+                onToggleBehavior: {
+                    // Flip cumulative ↔ snapshot in place; defaulting an unset
+                    // behavior to snapshot mirrors how the reveal derives it.
+                    model.behavior =
+                        (model.behavior ?? .snapshot) == .cumulative
+                        ? .snapshot : .cumulative
+                },
+                // Picking a unit re-anchors its suggested max/granularity, so the
+                // Max chip and card update alongside the unit. Only AI units are
+                // offered, so this never lands on the custom path.
+                onSelectUnit: { model.chooseNumberUnit($0) },
+                onDone: complete
+            )
         }
     }
 
@@ -316,6 +372,25 @@ struct TrackerCreationFlow: View {
                 emoji: model.dateEmoji,
                 chart: .calendar
             )
+        case .number:
+            // The open-ended "Other" path: a goal-less number plotted as a line,
+            // matching the type-picker carousel. min is 0; the aggregation follows
+            // the behavior (cumulative totals sum, snapshot readings average).
+            let behavior = model.behavior ?? .snapshot
+            return MetricSchema.Fake.number(
+                title: model.name,
+                emoji: model.numberEmoji,
+                unit: model.numberUnit.isEmpty ? nil : model.numberUnit,
+                min: 0,
+                max: max(1, model.numberMax),
+                granularity: model.numberGranularity > 0
+                    ? model.numberGranularity : 1,
+                goal: nil,
+                behavior: behavior,
+                chart: .line,
+                method: behavior == .cumulative
+                ? .numerical(.sum) : .numerical(.latest)
+            )
         default:
             // The goal path: a daily-gauge number whose sample always lands
             // above zero (min is a fifth of the goal) so the gauge reads as a
@@ -341,6 +416,20 @@ struct TrackerCreationFlow: View {
         return model.categoryAllowsMultiple ? .multiple : .single
     }
 
+    /// The number path's editable facets, surfaced by the reveal's chip row —
+    /// only on the number ("Other") path, where the max/behavior/unit are
+    /// meaningful. Nil everywhere else, which hides the row.
+    private func doneNumberFacets() -> TrackerDoneView.NumberFacets? {
+        guard model.kind == .number else { return nil }
+        return .init(
+            maxValue: model.numberMax,
+            behavior: model.behavior ?? .snapshot,
+            unit: model.numberUnit.isEmpty ? nil : model.numberUnit,
+            // Only the AI's proposed units — the chip's menu offers no custom entry.
+            units: model.numberSuggestions.compactMap(\.unit)
+        )
+    }
+
     /// The one-line recap under the reveal card, tailored to the path.
     private func doneRecap() -> LocalizedStringKey? {
         switch model.kind {
@@ -361,9 +450,47 @@ struct TrackerCreationFlow: View {
             return "Track yes or no each day"
         case .date:
             return "Save a date on calendar"
+        case .number:
+            return model.numberUnit.isEmpty
+                ? "Track a number over time"
+                : "Tracks in \(model.numberUnit)"
         default:
-            return "Goal: \(model.goalValue.formatted(.number)) \(model.selectedUnit) per day"
+            return
+                "Goal: \(model.goalValue.formatted(.number)) \(model.selectedUnit) per day"
         }
+    }
+}
+
+/// Hosts the closing reveal as its own view so the model reads that drive it are
+/// tracked by a real SwiftUI `body`. The flow's chips mutate the model in place
+/// — the max from its editor sheet, the choice flag from its toggle — and it's
+/// this body re-evaluating that re-derives the card and chips from the new state.
+/// The derivations stay on the flow and are passed in as closures, invoked here.
+private struct DoneRevealStep: View {
+    let metric: () -> Metric
+    let recap: () -> LocalizedStringKey?
+    let categoryChoice: () -> TrackerDoneView.CategoryChoice?
+    let numberFacets: () -> TrackerDoneView.NumberFacets?
+    let color: Color
+    let onToggleChoice: () -> Void
+    let onEditMax: (Double) -> Void
+    let onToggleBehavior: () -> Void
+    let onSelectUnit: (String) -> Void
+    let onDone: () -> Void
+
+    var body: some View {
+        TrackerDoneView(
+            metric: metric(),
+            color: color,
+            recap: recap(),
+            categoryChoice: categoryChoice(),
+            onToggleChoice: onToggleChoice,
+            numberFacets: numberFacets(),
+            onEditMax: onEditMax,
+            onToggleBehavior: onToggleBehavior,
+            onSelectUnit: onSelectUnit,
+            onDone: onDone
+        )
     }
 }
 
@@ -372,7 +499,7 @@ struct TrackerCreationFlow: View {
     NavigationStack {
     }
     .sheet(isPresented: $showSheet) {
-        TrackerCreationFlow() 
+        TrackerCreationFlow()
     }
     .presentationDetents([.large])
     .modelContainer(for: Metric.self, inMemory: true)

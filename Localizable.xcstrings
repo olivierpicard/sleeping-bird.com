@@ -268,9 +268,6 @@
         }
       }
     },
-    "Any that apply" : {
-
-    },
     "Arper Bird" : {
       "localizations" : {
         "es" : {
@@ -539,6 +536,9 @@
         }
       }
     },
+    "Cumulative" : {
+
+    },
     "Current: %@" : {
       "localizations" : {
         "es" : {
@@ -760,6 +760,9 @@
           }
         }
       }
+    },
+    "Expected maximum" : {
+
     },
     "Feedback Arper Bird version %@" : {
       "localizations" : {
@@ -1089,6 +1092,25 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Entretien 💰🚗"
+          }
+        }
+      }
+    },
+    "Max" : {
+
+    },
+    "Maximum" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Máximo"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Maximum"
           }
         }
       }
@@ -1772,9 +1794,6 @@
         }
       }
     },
-    "One answer per entry" : {
-
-    },
     "Open email" : {
       "localizations" : {
         "es" : {
@@ -2185,6 +2204,9 @@
     "Set the duration" : {
 
     },
+    "Set the range" : {
+
+    },
     "Set your goal" : {
 
     },
@@ -2469,6 +2491,22 @@
         }
       }
     },
+    "Tap to change" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Toca para cambiar"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Toucher pour modifier"
+          }
+        }
+      }
+    },
     "tap to start" : {
       "localizations" : {
         "es" : {
@@ -2600,6 +2638,9 @@
         }
       }
     },
+    "Track a number over time" : {
+
+    },
     "Track anything you want.\nJust say it out loud." : {
       "localizations" : {
         "es" : {
@@ -2679,6 +2720,9 @@
           }
         }
       }
+    },
+    "Track yes or no each day" : {
+
     },
     "tracker_type.binary.label" : {
       "extractionState" : "stale",
@@ -2986,6 +3030,9 @@
         }
       }
     },
+    "Tracks in %@" : {
+
+    },
     "Tracks up to %@" : {
 
     },
@@ -2993,6 +3040,9 @@
 
     },
     "Type my own…" : {
+
+    },
+    "Unit" : {
 
     },
     "Unlimited Metrics" : {
@@ -3251,6 +3301,9 @@
       }
     },
     "What's the longest “%@” usually lasts?" : {
+
+    },
+    "What's the most “%@” you'd usually log?" : {
 
     },
     "What's your daily target for “%@”?" : {

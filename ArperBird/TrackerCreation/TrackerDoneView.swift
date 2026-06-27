@@ -32,6 +32,24 @@ struct TrackerDoneView: View {
     /// `categoryAllowsMultiple` on the model, which re-derives the recap and the
     /// card's chart (pie ↔ bar) in place.
     var onToggleChoice: () -> Void
+    /// On the number path, the tracker's editable facets — its max, its
+    /// cumulative/snapshot behavior, and its unit — surfaced as a row of tappable
+    /// chips beneath the recap. Omitted (nil) on every other path, where they're
+    /// meaningless.
+    var numberFacets: NumberFacets?
+    /// Invoked when the user commits a new maximum from the Max chip's editor
+    /// sheet — the flow writes it back onto the model, which re-derives the card
+    /// and the chip's displayed value in place.
+    var onEditMax: (Double) -> Void
+    /// Invoked when the behavior chip is tapped — the flow flips the model's
+    /// cumulative ↔ snapshot behavior, which re-derives the recap and the card's
+    /// chart (sum ↔ latest aggregation) in place.
+    var onToggleBehavior: () -> Void
+    /// Invoked when the user picks a unit from the Unit chip's inline menu — the
+    /// flow re-anchors the model's unit (and its suggested max/granularity), which
+    /// re-derives the card and the chip's displayed value in place. Only the AI's
+    /// proposed units are offered, so every pick carries a known max.
+    var onSelectUnit: (String) -> Void
     var onDone: () -> Void
 
     /// Drives the entrance: the card springs up from small and translucent once
@@ -40,6 +58,8 @@ struct TrackerDoneView: View {
     /// A one-shot color bloom around the card that flashes as it lands, then
     /// settles to the resting glow.
     @State private var glow = false
+    /// Whether the Max chip's editor sheet is up. Number path only.
+    @State private var editingMax = false
 
     init(
         metric: Metric,
@@ -47,6 +67,10 @@ struct TrackerDoneView: View {
         recap: LocalizedStringKey? = nil,
         categoryChoice: CategoryChoice? = nil,
         onToggleChoice: @escaping () -> Void = {},
+        numberFacets: NumberFacets? = nil,
+        onEditMax: @escaping (Double) -> Void = { _ in },
+        onToggleBehavior: @escaping () -> Void = {},
+        onSelectUnit: @escaping (String) -> Void = { _ in },
         onDone: @escaping () -> Void = {}
     ) {
         self.metric = metric
@@ -54,6 +78,10 @@ struct TrackerDoneView: View {
         self.recap = recap
         self.categoryChoice = categoryChoice
         self.onToggleChoice = onToggleChoice
+        self.numberFacets = numberFacets
+        self.onEditMax = onEditMax
+        self.onToggleBehavior = onToggleBehavior
+        self.onSelectUnit = onSelectUnit
         self.onDone = onDone
     }
 
@@ -97,6 +125,18 @@ struct TrackerDoneView: View {
         .background(alignment: .top) { SparkleBurst(color: color, active: hasAppeared) }
         // A success cue the moment the card lands.
         .sensoryFeedback(.success, trigger: hasAppeared)
+        // The Max chip raises this compact editor; committing writes the new bound
+        // back through `onEditMax`, and the editor dismisses itself.
+        .sheet(isPresented: $editingMax) {
+            if let numberFacets {
+                NumberMaxEditor(
+                    value: numberFacets.maxValue,
+                    unit: numberFacets.unit,
+                    color: color,
+                    onSave: onEditMax
+                )
+            }
+        }
         .onAppear {
             // A loose spring (low damping) overshoots, giving the card a bouncy
             // "pop" as it settles.
@@ -163,8 +203,9 @@ struct TrackerDoneView: View {
 
     // MARK: - Recap & choice link
 
-    /// The recap line plus, on the choices path, the tappable single/multiple
-    /// link stacked beneath it.
+    /// The recap line plus the path's tappable chips stacked beneath it: the
+    /// single/multiple link on the choices path, or the max/behavior/unit row on
+    /// the number path.
     @ViewBuilder
     private var recapSection: some View {
         VStack(spacing: 12) {
@@ -176,6 +217,9 @@ struct TrackerDoneView: View {
             if let categoryChoice {
                 choiceChip(categoryChoice)
             }
+            if let numberFacets {
+                numberFacetsRow(numberFacets)
+            }
         }
         .multilineTextAlignment(.center)
     }
@@ -186,7 +230,7 @@ struct TrackerDoneView: View {
     /// as a control that flips the selection mode in place.
     private func choiceChip(_ choice: CategoryChoice) -> some View {
         Button(action: onToggleChoice) {
-            HStack(spacing: 6) {
+            chipChrome {
                 Image(systemName: choice.glyph)
                     .foregroundStyle(color)
                 Text(choice.title)
@@ -194,17 +238,126 @@ struct TrackerDoneView: View {
                     .font(.caption2.weight(.semibold))
                     .foregroundStyle(.tertiary)
             }
+        }
+        .buttonStyle(.plain)
+        .accessibilityHint("Switches between single and multiple choice")
+    }
+
+    // MARK: - Number facet chips
+
+    /// The number path's row of editable facets, surfaced as tappable chips: the
+    /// tracker's max, its cumulative/snapshot behavior, and — when it has one —
+    /// its unit. Interaction is wired up separately; here they just render.
+    private func numberFacetsRow(_ facets: NumberFacets) -> some View {
+        // A wrapping, centered row so each chip keeps its natural width: when the
+        // three don't fit on one line they drop onto a second centered line rather
+        // than squeezing a chip's text to wrap mid-word.
+        WrappingHStack(alignment: .center, hSpacing: 8, vSpacing: 8) {
+            if facets.unit != nil {
+                unitChip(facets)
+            }
+
+            facetChip(
+                glyph: "arrow.up.to.line.compact",
+                label: "Max",
+                value: facets.maxValue.formatted(.number),
+                hint: "Edit the tracker's maximum value"
+            ) { editingMax = true }
+
+            facetChip(
+                glyph: facets.behavior.glyph,
+                label: facets.behavior.title,
+                value: nil,
+                hint: "Switch between cumulative and snapshot",
+                trailing: "arrow.left.arrow.right"
+            ) { onToggleBehavior() }
+        }
+        .padding(.horizontal)
+    }
+
+    /// The unit chip, surfaced as a `Menu` rather than a plain button: tapping it
+    /// drops an inline list of the AI's proposed units, and picking one re-anchors
+    /// the tracker's unit in place. There's deliberately no "type your own" entry —
+    /// the reveal only offers what the AI modelled, so every choice carries a known
+    /// max and granularity. The current unit is checkmarked. Shares the capsule
+    /// chrome with the other facet chips so the row reads as one family.
+    private func unitChip(_ facets: NumberFacets) -> some View {
+        Menu {
+            ForEach(facets.units, id: \.self) { option in
+                Button(action: { onSelectUnit(option) }) {
+                    if option == facets.unit {
+                        Label(option, systemImage: "checkmark")
+                    } else {
+                        Text(option)
+                    }
+                }
+            }
+        } label: {
+            chipChrome {
+                Image(systemName: "ruler")
+                    .foregroundStyle(color)
+                Text("Unit")
+                if let unit = facets.unit {
+                    Text(unit)
+                        .foregroundStyle(.primary)
+                }
+                Image(systemName: "chevron.up.chevron.down")
+                    .font(.caption2.weight(.semibold))
+                    .foregroundStyle(.tertiary)
+            }
+        }
+        // Strip the Menu's default (automatic) button styling so its label renders
+        // at the same size and tint as the plain-button facet chips beside it.
+        .buttonStyle(.plain)
+        .accessibilityLabel("Unit")
+        .accessibilityHint("Choose the tracker's unit")
+    }
+
+    /// A single number facet chip: the facet glyph, its label, an optional
+    /// emphasized value (e.g. the max), and an optional trailing glyph (e.g. the
+    /// swap arrow on the behavior chip). Shares its capsule chrome with the choice
+    /// chip so the reveal's chips read as one family.
+    private func facetChip(
+        glyph: String,
+        label: LocalizedStringKey,
+        value: String?,
+        hint: String,
+        trailing: String? = nil,
+        action: @escaping () -> Void
+    ) -> some View {
+        Button(action: action) {
+            chipChrome {
+                Image(systemName: glyph)
+                    .foregroundStyle(color)
+                Text(label)
+                if let value {
+                    Text(value)
+                        .foregroundStyle(.primary)
+                }
+                if let trailing {
+                    Image(systemName: trailing)
+                        .font(.caption2.weight(.semibold))
+                        .foregroundStyle(.tertiary)
+                }
+            }
+        }
+        .buttonStyle(.plain)
+        .accessibilityHint(hint)
+    }
+
+    /// The shared capsule chrome behind every reveal chip — soft fill, a hairline
+    /// tint stroke, secondary small type — so the choice and number-facet chips
+    /// stay visually identical.
+    private func chipChrome<Content: View>(
+        @ViewBuilder _ content: () -> Content
+    ) -> some View {
+        HStack(spacing: 6, content: content)
             .font(.footnote.weight(.medium))
             .foregroundStyle(.secondary)
             .padding(.horizontal, 12)
             .padding(.vertical, 6)
             .background(Capsule().fill(.quaternary.opacity(0.5)))
-            .overlay(content: {
-                Capsule().stroke(color.opacity(0.4), lineWidth: 1)
-            })
-        }
-        .buttonStyle(.plain)
-        .accessibilityHint("Switches between single and multiple choice")
+            .overlay { Capsule().stroke(color.opacity(0.4), lineWidth: 1) }
     }
 }
 
@@ -229,6 +382,43 @@ extension TrackerDoneView {
             case .single: "largecircle.fill.circle"
             case .multiple: "checkmark.square.fill"
             }
+        }
+    }
+
+    /// The number path's editable facets, surfaced by the reveal's chip row:
+    /// the tracker's max, its cumulative/snapshot behavior, and its unit. Nil on
+    /// every other path, which hides the row.
+    struct NumberFacets {
+        /// The upper bound — shown on the Max chip and used to seed its editor.
+        var maxValue: Double
+        /// Whether readings accumulate (cumulative) or stand alone (snapshot).
+        var behavior: MetricBehavior
+        /// The unit label, or nil for a unitless tracker — which hides the unit
+        /// chip.
+        var unit: String?
+        /// The AI's proposed units, offered in the unit chip's inline menu. The
+        /// only choices the reveal exposes — there's no custom entry.
+        var units: [String] = []
+    }
+}
+
+// MARK: - Behavior chip presentation
+
+extension MetricBehavior {
+    /// The label shown on the reveal's behavior chip.
+    var title: LocalizedStringKey {
+        switch self {
+        case .cumulative: "Cumulative"
+        case .snapshot: "Snapshot"
+        }
+    }
+
+    /// The glyph shown on the reveal's behavior chip: a summation sign for
+    /// values that accumulate, a camera for independent snapshot readings.
+    var glyph: String {
+        switch self {
+        case .cumulative: "sum"
+        case .snapshot: "camera"
         }
     }
 }
@@ -339,6 +529,45 @@ private func categoryRevealMetric(multiple: Bool) -> Metric {
     return Metric(from: schema, color: .pink, data: Metric.fakeData(for: schema.config))
 }
 #endif
+
+#Preview("Number facets") {
+    // Drive the max and behavior from state so editing the Max chip and tapping
+    // the behavior chip re-derive the card *and* the chips in place — mirroring
+    // `DoneRevealStep` in the real flow.
+    @Previewable @State var max = 12000.0
+    @Previewable @State var behavior: MetricBehavior = .cumulative
+    @Previewable @State var unit = "steps"
+    let schema = MetricSchema.Fake.number(
+        title: "Daily steps",
+        emoji: "👟",
+        unit: unit,
+        min: 0,
+        max: max,
+        granularity: 100,
+        goal: nil,
+        behavior: behavior,
+        chart: .line,
+        method: behavior == .cumulative ? .numerical(.sum) : .numerical(.latest)
+    )
+    NavigationStack {
+        TrackerDoneView(
+            metric: Metric(from: schema, color: .green, data: Metric.fakeData(for: schema.config)),
+            color: .green,
+            recap: "Counts up to \(max.formatted(.number)) \(unit)",
+            numberFacets: .init(
+                maxValue: max,
+                behavior: behavior,
+                unit: unit,
+                units: ["steps", "km", "miles"]
+            ),
+            onEditMax: { max = $0 },
+            onToggleBehavior: {
+                behavior = behavior == .cumulative ? .snapshot : .cumulative
+            },
+            onSelectUnit: { unit = $0 }
+        )
+    }
+}
 
 #Preview("Choice link") {
     @Previewable @State var multiple = false
