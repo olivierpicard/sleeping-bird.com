@@ -15,6 +15,14 @@ import SwiftUI
 /// chip's editor sheet is local presentation state — the commit still flows out
 /// through `onEditMax`.
 struct DoneNumberRecap: View {
+    /// A unit the chip can offer, paired with the AI's default max for it. Picking
+    /// the unit re-anchors the tracker's max to this value, so the Max chip never
+    /// shows a bound left over from the previous unit.
+    struct UnitOption: Hashable {
+        let name: String
+        let defaultMax: Double
+    }
+
     /// The upper bound — shown on the Max chip and used to seed its editor.
     let maxValue: Double
     /// Whether the number has a hard upper bound fixed by the metric itself (e.g. a
@@ -25,9 +33,10 @@ struct DoneNumberRecap: View {
     let behavior: MetricBehavior
     /// The unit label, or nil for a unitless tracker — which hides the unit chip.
     let unit: String?
-    /// The AI's proposed units, offered in the unit chip's inline menu. The only
-    /// choices the reveal exposes — there's no custom entry.
-    var units: [String] = []
+    /// The AI's proposed units, each with its default max, offered in the unit
+    /// chip's inline menu. The only choices the reveal exposes — there's no custom
+    /// entry.
+    var units: [UnitOption] = []
     let color: Color
     /// Invoked when the user commits a new maximum from the Max chip's editor.
     var onEditMax: (Double) -> Void = { _ in }
@@ -105,11 +114,16 @@ struct DoneNumberRecap: View {
     private var unitChip: some View {
         Menu {
             ForEach(units, id: \.self) { option in
-                Button(action: { onSelectUnit(option) }) {
-                    if option == unit {
-                        Label(option, systemImage: "checkmark")
+                // Re-anchor the unit and snap the max back to that unit's AI
+                // default, so switching units never leaves a stale bound behind.
+                Button(action: {
+                    onSelectUnit(option.name)
+                    onEditMax(option.defaultMax)
+                }) {
+                    if option.name == unit {
+                        Label(option.name, systemImage: "checkmark")
                     } else {
-                        Text(option)
+                        Text(option.name)
                     }
                 }
             }
@@ -195,7 +209,11 @@ extension MetricBehavior {
         maxValue: max,
         behavior: behavior,
         unit: unit,
-        units: ["steps", "km", "miles"],
+        units: [
+            .init(name: "steps", defaultMax: 12000),
+            .init(name: "km", defaultMax: 10),
+            .init(name: "miles", defaultMax: 6),
+        ],
         color: .green,
         onEditMax: { max = $0 },
         onToggleBehavior: {

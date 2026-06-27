@@ -293,7 +293,11 @@ private func categoryRevealMetric(multiple: Bool) -> Metric {
                 maxValue: max,
                 behavior: behavior,
                 unit: unit,
-                units: ["steps", "km", "miles"],
+                units: [
+                    .init(name: "steps", defaultMax: 12000),
+                    .init(name: "km", defaultMax: 10),
+                    .init(name: "miles", defaultMax: 6),
+                ],
                 color: .green,
                 onEditMax: { max = $0 },
                 onToggleBehavior: {

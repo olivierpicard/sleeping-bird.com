@@ -386,9 +386,14 @@ private struct DoneRevealStep: View {
                 isBounded: model.numberIsBounded,
                 behavior: model.behavior ?? .snapshot,
                 unit: model.numberUnit.isEmpty ? nil : model.numberUnit,
-                // Only the AI's proposed units — the chip's menu offers no custom
-                // entry, so re-anchoring always lands on a known max/granularity.
-                units: model.numberSuggestions.compactMap(\.unit),
+                // Only the AI's proposed units, each with its default max — the
+                // chip's menu offers no custom entry, so re-anchoring always lands
+                // on a known max/granularity.
+                units: model.numberSuggestions.compactMap { suggestion in
+                    suggestion.unit.map {
+                        .init(name: $0, defaultMax: suggestion.typicalMax)
+                    }
+                },
                 color: color,
                 onEditMax: { model.setNumberMax($0) },
                 onToggleBehavior: {
