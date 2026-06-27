@@ -270,6 +270,7 @@ private func categoryRevealMetric(multiple: Bool) -> Metric {
     // the behavior chip re-derive the card *and* the chips in place — mirroring
     // `DoneRevealStep` in the real flow.
     @Previewable @State var max = 12000.0
+    @Previewable @State var granularity = 100.0
     @Previewable @State var behavior: MetricBehavior = .cumulative
     @Previewable @State var unit = "steps"
     let schema = MetricSchema.Fake.number(
@@ -278,7 +279,7 @@ private func categoryRevealMetric(multiple: Bool) -> Metric {
         unit: unit,
         min: 0,
         max: max,
-        granularity: 100,
+        granularity: granularity,
         goal: nil,
         behavior: behavior,
         chart: behavior == .cumulative ? .bar : .line,
@@ -291,15 +292,17 @@ private func categoryRevealMetric(multiple: Bool) -> Metric {
         ) {
             DoneNumberRecap(
                 maxValue: max,
+                granularity: granularity,
                 behavior: behavior,
                 unit: unit,
                 units: [
-                    .init(name: "steps", defaultMax: 12000),
-                    .init(name: "km", defaultMax: 10),
-                    .init(name: "miles", defaultMax: 6),
+                    .init(name: "steps", defaultMax: 12000, defaultGranularity: 100),
+                    .init(name: "km", defaultMax: 10, defaultGranularity: 0.1),
+                    .init(name: "miles", defaultMax: 6, defaultGranularity: 0.1),
                 ],
                 color: .green,
                 onEditMax: { max = $0 },
+                onEditGranularity: { granularity = $0 },
                 onToggleBehavior: {
                     behavior = behavior == .cumulative ? .snapshot : .cumulative
                 },

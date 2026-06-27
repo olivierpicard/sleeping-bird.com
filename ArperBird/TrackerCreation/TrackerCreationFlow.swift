@@ -384,6 +384,7 @@ private struct DoneRevealStep: View {
         case .number:
             DoneNumberRecap(
                 maxValue: model.numberMax,
+                granularity: model.numberGranularity,
                 isBounded: model.numberIsBounded,
                 behavior: model.behavior ?? .snapshot,
                 unit: model.numberUnit.isEmpty ? nil : model.numberUnit,
@@ -392,11 +393,16 @@ private struct DoneRevealStep: View {
                 // on a known max/granularity.
                 units: model.numberSuggestions.compactMap { suggestion in
                     suggestion.unit.map {
-                        .init(name: $0, defaultMax: suggestion.typicalMax)
+                        .init(
+                            name: $0,
+                            defaultMax: suggestion.typicalMax,
+                            defaultGranularity: suggestion.granularity
+                        )
                     }
                 },
                 color: color,
                 onEditMax: { model.setNumberMax($0) },
+                onEditGranularity: { model.numberGranularity = $0 },
                 onToggleBehavior: {
                     // Flip cumulative ↔ snapshot in place; defaulting an unset
                     // behavior to snapshot mirrors how the reveal derives it.

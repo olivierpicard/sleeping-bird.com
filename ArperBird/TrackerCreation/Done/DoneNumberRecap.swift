@@ -21,10 +21,17 @@ struct DoneNumberRecap: View {
     struct UnitOption: Hashable {
         let name: String
         let defaultMax: Double
+        /// The AI's natural step for this unit. Picking the unit re-anchors the
+        /// tracker's granularity to it, mirroring how `defaultMax` re-anchors the
+        /// bound — so switching units never leaves a stale step behind.
+        let defaultGranularity: Double
     }
 
     /// The upper bound — shown on the Max chip and used to seed its editor.
     let maxValue: Double
+    /// The step between entries — shown on the Step chip and used to seed its
+    /// picker. Re-anchored to the unit's AI default when the unit changes.
+    let granularity: Double
     /// Whether the number has a hard upper bound fixed by the metric itself (e.g. a
     /// rating out of 10). When bounded the max isn't the user's to dial, so the Max
     /// chip is hidden entirely.
@@ -40,6 +47,8 @@ struct DoneNumberRecap: View {
     let color: Color
     /// Invoked when the user commits a new maximum from the Max chip's editor.
     var onEditMax: (Double) -> Void = { _ in }
+    /// Invoked when the user picks a new step from the Step chip's picker.
+    var onEditGranularity: (Double) -> Void = { _ in }
     /// Invoked when the behavior chip is tapped — flips cumulative ↔ snapshot.
     var onToggleBehavior: () -> Void = {}
     /// Invoked when the user picks a unit from the unit chip's inline menu.
@@ -48,6 +57,9 @@ struct DoneNumberRecap: View {
     /// Whether the Max chip's editor sheet is up. Local presentation only — the
     /// committed value leaves through `onEditMax`.
     @State private var editingMax = false
+    /// Whether the Step chip's picker sheet is up. Local presentation only — the
+    /// chosen step leaves through `onEditGranularity`.
+    @State private var editingGranularity = false
 
     private var recap: LocalizedStringKey {
         switch behavior {
@@ -69,6 +81,17 @@ struct DoneNumberRecap: View {
                 unit: unit,
                 color: color,
                 onSave: onEditMax
+            )
+        }
+        // The Step chip raises this preset picker; the chosen step writes back
+        // through `onEditGranularity`, and the picker dismisses itself.
+        .sheet(isPresented: $editingGranularity) {
+            NumberGranularityEditor(
+                granularity: granularity,
+                aiGranularity: granularity,
+                maxValue: maxValue,
+                color: color,
+                onSelect: onEditGranularity
             )
         }
     }
@@ -96,6 +119,13 @@ struct DoneNumberRecap: View {
             }
 
             facetChip(
+                glyph: "plusminus",
+                label: "Step",
+                value: granularity.formatted(.number),
+                hint: "Edit the step between entries"
+            ) { editingGranularity = true }
+
+            facetChip(
                 glyph: behavior.glyph,
                 label: behavior.title,
                 value: nil,
@@ -114,11 +144,13 @@ struct DoneNumberRecap: View {
     private var unitChip: some View {
         Menu {
             ForEach(units, id: \.self) { option in
-                // Re-anchor the unit and snap the max back to that unit's AI
-                // default, so switching units never leaves a stale bound behind.
+                // Re-anchor the unit and snap the max and step back to that
+                // unit's AI defaults, so switching units never leaves a stale
+                // bound or step behind.
                 Button(action: {
                     onSelectUnit(option.name)
                     onEditMax(option.defaultMax)
+                    onEditGranularity(option.defaultGranularity)
                 }) {
                     if option.name == unit {
                         Label(option.name, systemImage: "checkmark")
@@ -203,19 +235,22 @@ extension MetricBehavior {
 
 #Preview {
     @Previewable @State var max = 12000.0
+    @Previewable @State var granularity = 100.0
     @Previewable @State var behavior: MetricBehavior = .cumulative
     @Previewable @State var unit = "steps"
     DoneNumberRecap(
         maxValue: max,
+        granularity: granularity,
         behavior: behavior,
         unit: unit,
         units: [
-            .init(name: "steps", defaultMax: 12000),
-            .init(name: "km", defaultMax: 10),
-            .init(name: "miles", defaultMax: 6),
+            .init(name: "steps", defaultMax: 12000, defaultGranularity: 100),
+            .init(name: "km", defaultMax: 10, defaultGranularity: 0.1),
+            .init(name: "miles", defaultMax: 6, defaultGranularity: 0.1),
         ],
         color: .green,
         onEditMax: { max = $0 },
+        onEditGranularity: { granularity = $0 },
         onToggleBehavior: {
             behavior = behavior == .cumulative ? .snapshot : .cumulative
         },

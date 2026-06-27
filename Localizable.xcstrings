@@ -761,6 +761,22 @@
         }
       }
     },
+    "Edit the step between entries" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Editar el paso entre entradas"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modifier le pas entre les saisies"
+          }
+        }
+      }
+    },
     "Expected maximum" : {
 
     },
@@ -853,6 +869,22 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "Goal: %1$@ %2$@ per day"
+          }
+        }
+      }
+    },
+    "Granularity" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Granularidad"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Granularité"
           }
         }
       }
@@ -2241,6 +2273,22 @@
     "Snapshot" : {
 
     },
+    "Step" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paso"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pas"
+          }
+        }
+      }
+    },
     "Step 2 of 4" : {
       "localizations" : {
         "es" : {
@@ -2285,6 +2333,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Étape 4 sur 4"
+          }
+        }
+      }
+    },
+    "Step between entries" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paso entre entradas"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pas entre les saisies"
           }
         }
       }
