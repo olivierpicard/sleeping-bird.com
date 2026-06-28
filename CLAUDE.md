@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-ArperBird is an iOS personal data tracker app. Users describe a metric they want to track (via text or voice dictation), an LLM interprets it into a typed schema, and the app renders a card with the appropriate chart type and a matching manual data-entry editor.
+ArperBird is an iOS personal data tracker app. Users create a metric — today via a guided, type-first **Tracker Creation Flow** where per-facet AI autocompletions fill in defaults (the original one-shot voice/text path still exists in code) — an LLM produces a typed schema, and the app renders a card with the appropriate chart type and a matching manual data-entry editor.
 
 > Note: the project was renamed from SleepingBird → ArperBird. Source, tests, scheme, and bundle live under `ArperBird*`; bundle identifiers use the `com.alizetech.arperbird` prefix.
 
@@ -48,9 +48,11 @@ The PostHog project token, RevenueCat API key, and Firebase config live in sourc
 
 `Metric` is the only `@Model`. The SwiftData container is built once in `ArperBirdApp` from an **explicit** `Schema(versionedSchema: SchemaV1.self)` + `migrationPlan: MetricMigrationPlan.self` (not `.modelContainer(for:)`), so user data survives App Store updates deterministically rather than via runtime-inferred lightweight migration. To evolve the persisted shape, follow the recipe in `Metric/MetricMigrationPlan.swift`: add a new `SchemaVN` `VersionedSchema`, append it to `MetricMigrationPlan.schemas`, and add a `.lightweight`/`.custom` `MigrationStage`. **Caveat:** `config`, `visual`, and `data` are `Codable` blobs to SwiftData — changes *inside* those types are invisible to the plan, so keep their `Codable` encodings backward-compatible by hand (only add cases/optional fields; never reorder or rename coding keys).
 
-### AI Metric Generation Pipeline
+### AI Metric Generation Pipeline (one-shot, voice/text)
 
-Flow: user speaks or types a description → `MetricGenerator` calls `AiMetricSuggestion` → returns a typed `MetricSchema` → a `Metric` is inserted into SwiftData. This pipeline is live (not stubbed); the old fake path remains commented out in `MetricGenerator`.
+Flow: user speaks or types a description → `MetricGenerator` calls `AiMetricSuggestion` → returns a typed `MetricSchema` → a `Metric` is inserted into SwiftData. The pipeline code is live (not stubbed); the old fake path remains commented out in `MetricGenerator`.
+
+> **Entry point caveat:** this one-shot `MetricInputSheet` is currently **not** the active add-metric UI — it's commented out in `ContentView`/`EmptyDashboardView`, superseded by the guided **Tracker Creation Flow** (below). The pipeline classes (`AiSchemaCompletion`, `AiMetricSuggestion`, `MetricGenerator`, the transcribers) are still wired and shared, so keep them working when touching the AI/audio stack.
 
 1. **`Transcriber` protocol** (`Transcriber/Transcriber.swift`) — `hasMicPermission`, `start(onText:)` (closure receives the *full* text so far), `stop()`. Implementations:
    - `DeepgramNova3Transcriber` — the default used by `MetricInputSheet`.
@@ -58,18 +60,27 @@ Flow: user speaks or types a description → `MetricGenerator` calls `AiMetricSu
    - `FakeTranscriber` (`#if DEBUG`) — for previews.
    Audio is supplied by `MicBroker` (see Audio).
 
-2. **`AiSchemaCompletion`** (`Ai/AiSchemaCompletion.swift`) — thin wrapper over the Firebase AI SDK (`FirebaseAILogic`). Opens a `generativeModelSession` on `gemini-3-flash-preview` and calls `respond(to:generating:)` with structured output via the `FoundationModels` `@Generable` macro and `ThinkingConfig(thinkingLevel: .medium)`.
+2. **`AiSchemaCompletion`** (`Ai/AiSchemaCompletion.swift`) — thin wrapper over the Firebase AI SDK (`FirebaseAILogic`). Opens a `generativeModelSession` on `gemini-3.5-flash` and calls `respond(to:generating:)` with structured output via the `FoundationModels` `@Generable` macro and `ThinkingConfig(thinkingLevel: .medium)`. It takes a `userPrompt`/`systemPrompt` pair plus a `@Generable` type — both the metric-suggestion path and the tracker-creation autocompletions go through it.
 
-3. **`AiMetricSuggestion`** (`Ai/AiMetricSuggestion.swift`) — builds system/user prompts (locale-aware) and calls `AiSchemaCompletion.generate(as: MetricSchema.self)`, returning a single `MetricSchema`.
+3. **`AiMetricSuggestion`** (`Ai/MetricSuggestion/AiMetricSuggestion.swift`) — builds system/user prompts (locale-aware) and calls `AiSchemaCompletion.generate(as: MetricSchema.self)`, returning a single `MetricSchema`.
 
 4. **`MetricGenerator`** (`Metric/MetricGenerator.swift`) — `@Observable`, injected as an environment value. Tracks `pending: [Pending]` (in-flight generations, drives placeholder cards), runs the AI call off `generate(instruction:into:locale:)`, inserts the `Metric`, and emits a `data_schema_generated` PostHog event (with duration/config/chart). Failures emit `captureException`.
 
-5. **`MetricSchema`** (`Ai/MetricSchema.swift`) — the structured-output contract. Key types:
+5. **`MetricSchema`** (`Ai/MetricSuggestion/MetricSchema.swift`) — the structured-output contract. Key types:
    - `MetricConfig` enum: `number`, `categorySingleChoice`, `categoryMultipleChoice`, `binary`, `datetime`, `duration`
    - `ChartType` enum: `line`, `bar`, `pie`, `calendar`, `dailyGauge`
    - `MetricVisual`: pairs a `ChartType` with an `AggregationConfig`
    - `MetricBehavior`: `.cumulative` (values accumulate, e.g. steps) vs `.snapshot` (independent readings, e.g. weight)
    - All types use `@Generable` / `@Guide` from `FoundationModels` to constrain LLM output
+
+### Tracker Creation Flow (guided, the active add-metric UI)
+
+`ArperBird/TrackerCreation/` — a manual, multi-step alternative to the one-shot voice sheet, and the path actually wired to the "+" button today. The user picks a **`TrackerKind`** (`number`, `duration`, `choices`, `binary`, `goal`, `date` — defined in `TrackerTypeView.swift`), names it, and per-facet AI autocompletions fill in sensible defaults the user can then edit, ending in a shared celebration "reveal" card.
+
+- **`TrackerCreationFlow`** (`TrackerCreationFlow.swift`) — coordinator: one push-based `NavigationStack` whose `path: [TrackerCreationStep]` entries are **payload-free**. Every step reads/writes the shared `model`, which is what lets data survive back-navigation. Transient loading steps swap themselves out of the path in place (`path[top] = .next`) so "back" skips the spinner. The closing `.done` step is hosted by `DoneRevealStep` (a real `View` so model edits re-render) and builds the card via `doneSchema()`/`doneMetric()`.
+- **`TrackerCreationModel`** (`TrackerCreationModel.swift`) — `@MainActor @Observable` single source of truth for the whole flow. Owns each sub-flow's state and **memoizes** every AI fetch by name (`loadedName`, `loadedNumberName`, …) so re-showing a screen after a pop is a no-op, never a re-fire. AI calls go through injectable closure seams (`generate`, `generateNumber`, …) defaulting to the real completions, so previews/tests supply data without a network round-trip.
+- **AutoCompletion AI layer** (`Ai/AutoCompletion/`) — per-facet `@Generable` completions (`GoalAiCompletion`, `NumberAiCompletion`, `CategoryAiCompletion`, `DurationAiCompletion`, `EmojiAiCompletion` — the last shared by the binary and date paths). Each wraps `AiSchemaCompletion` with the shared prompts in `AIAutoCompleteInstruction.swift`. `+Fake`/`+Debug` siblings back previews. This is distinct from the `MetricSuggestion` one-shot path — autocompletions return *one facet*, not a whole `MetricSchema`.
+- **Reveal vs. persistence:** the reveal card is seeded with `Metric.fakeData` so its chart looks alive, but the metric that lands on the dashboard (`persistMetric`) starts **empty**. Exception: the **date** and **binary** paths seed a single *real* "today" point instead of faked history — see [decision 0001](docs/decisions/0001-date-reveal-card.md).
 
 ### Manual Data Entry (`MetricEditor`)
 
@@ -84,7 +95,7 @@ Each editor takes the metric's color and an `onAdd` closure that produces the ma
 
 7. **`MetricViewFactory`** (`Metric/MetricViewFactory.swift`) — constructs a `MetricView` from a `Metric`. Computes the display value by windowing `data` to the current `TemporalBucket` and applying the `AggregationMethod`.
 
-8. **`MetricView`** (`Views/MetricView.swift`) — card UI with emoji header, value display, and a `MiniChart` slot. Takes plain value types — no direct dependency on `Metric`.
+8. **`MetricView`** (`Views/MetricView/MetricView.swift`) — card UI with emoji header, value display, and a `MiniChart` slot. Takes plain value types — no direct dependency on `Metric`.
 
 9. **`MetricAggregator`** (`Metric/MetricAggregator.swift`) — stateless enum used by `MetricDetailView`:
    - `bins(from:range:method:behavior:)` → `[ChartBin]` for numeric/duration data
@@ -97,7 +108,7 @@ Each editor takes the metric's color and an `onAdd` closure that produces the ma
 
 - **`ArperBirdApp`** — sets up `AppDelegate` (PostHog + Firebase + RevenueCat init), injects `MetricGenerator` and `Store` environments, declares the `Metric` model container, and refreshes purchases on `scenePhase == .active`.
 - **`RootView`** — gates on `@AppStorage("hasCompletedOnboarding")`: shows `OnboardingFlow` (StartView → language → mic authorization → guided animation) or `ContentView`. **Free-tier limit**: the app presents `PaywallView` as a non-dismissible sheet once `metrics.count >= 1 && !store.isPremium` — but only after `store.hasLoadedEntitlements`, to avoid a paywall flash for premium users on launch.
-- **`ContentView`** — `NavigationStack` showing `EmptyDashboardView` or `DashboardView` (`@Query`-driven cards + pending placeholders), with `MetricInputSheet` as the add-metric sheet.
+- **`ContentView`** — `NavigationStack` showing `EmptyDashboardView` or `DashboardView` (`@Query`-driven cards + pending placeholders). The add-metric "+" now presents `TrackerCreationFlow` as a sheet; the old `MetricInputSheet` presentation is commented out here and in `EmptyDashboardView`.
 - **Onboarding tip (TipKit)** — `Tips/AddEntryTip.swift` points the user at a card's "+" button after they create their first metric. `TipKit` is configured in `ArperBirdApp`; the tip is gated by `@Parameter` flags (`hasSettled`, `isPaywallPresented`) set from `RootView`/`MetricView` so it animates in only after the card settles and never over the paywall, and is invalidated once the button is tapped.
 
 ### Payments (`Store`)
@@ -117,7 +128,7 @@ Each editor takes the metric's color and an `onAdd` closure that produces the ma
 
 ### Fakes / Previews
 
-`Ai/FakeMetricSchema.swift` and `Metric/FakeMetric.swift` (`#if DEBUG`) provide `MetricSchema.Fake.*` factories and `Metric.fakeData(for:days:)` synthetic `DataPoint` arrays. `FakeTranscriber` and `FakeSpectrumViewModel` let `MetricInputSheet`/views preview without hitting real APIs. Use these in previews instead of the real AI/audio stack.
+`Ai/MetricSuggestion/FakeMetricSchema.swift` and `Metric/FakeMetric.swift` (`#if DEBUG`) provide `MetricSchema.Fake.*` factories and `Metric.fakeData(for:days:)` synthetic `DataPoint` arrays. `FakeTranscriber` and `FakeSpectrumViewModel` let `MetricInputSheet`/views preview without hitting real APIs, and the `+Fake` AutoCompletion siblings (`Ai/AutoCompletion/TrackerCreation/`) feed the creation-flow previews. Use these in previews instead of the real AI/audio stack.
 
 ## Localization
 
@@ -136,3 +147,4 @@ UI strings live in `Localizable.xcstrings` (String Catalog) and are referenced b
 - Fake/preview data comes from `Metric.fakeData(for:days:)` and `MetricSchema.Fake.*`, not inline in views.
 - Sub-editor files prefixed with `_` (e.g. `_SliderEditor`) are private implementations of a public `MetricEditor` type — don't use them directly; go through `MetricInputFactory` / `MetricEditor`.
 - Commit style is Conventional Commits (see the `commit` skill).
+- **Decision log** (`docs/decisions/`) — append-only ADRs (`NNNN-short-slug.md`) capturing reasoning that doesn't survive in code or commits (the decision, the options, why the others lost). Add a new entry to supersede an old one rather than editing history; reference renders go in `assets/`.
