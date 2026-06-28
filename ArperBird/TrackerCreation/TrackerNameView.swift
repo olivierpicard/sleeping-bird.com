@@ -13,6 +13,7 @@ struct TrackerNameView: View {
     var onNext: (String) -> Void = { _ in }
 
     @State private var name = ""
+    @State private var chart = NoDataMiniChart()
     @FocusState private var isNameFocused: Bool
 
     private var isNameValid: Bool {
@@ -32,7 +33,7 @@ struct TrackerNameView: View {
                         focus: $isNameFocused
                     )
                 },
-                chart: { NoDataMiniChart() }
+                chart: { chart }
             )
             .padding()
             Spacer()
