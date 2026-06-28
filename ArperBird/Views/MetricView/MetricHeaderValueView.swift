@@ -7,6 +7,7 @@
 
 import SwiftUI
 import TipKit
+internal import Combine
 
 /// The standard, read-only metric header: emoji + title/value + an "add entry" button.
 struct MetricHeaderValueView: View {
@@ -33,6 +34,8 @@ struct MetricHeaderValueView: View {
                 Text(value)
                     .font(.title2)
                     .fontWeight(.semibold)
+                    .contentTransition(.numericText())
+                    .animation(.snappy, value: value)
             }
 
             Spacer()
@@ -68,5 +71,22 @@ struct MetricHeaderValueView: View {
         value: "8,432",
         mainColor: .green
     )
+    .padding()
+}
+
+#Preview("Animated updates") {
+    @Previewable @State var value = 8_432
+
+    VStack(spacing: 24) {
+        MetricHeaderValueView(
+            title: "Daily Steps",
+            emoji: "👟",
+            value: value.formatted(),
+            mainColor: .green
+        )
+
+        Button("Update value") { value += .random(in: 100...2_000) }
+            .buttonStyle(.borderedProminent)
+    }
     .padding()
 }
