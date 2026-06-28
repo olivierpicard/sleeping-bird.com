@@ -143,13 +143,11 @@ struct TrackerDoneView<Recap: View>: View {
                 MetricHeaderTextView(
                     title: metric.name,
                     emoji: metric.emoji,
-                    value: MetricViewFactory.value(for: metric),
-                    mainColor: color,
-                    showAddButton: false
+                    mainColor: color
                 )
             },
             chart: {
-                AnyView(MiniChartFactory.make(from: metric))
+                AnyView(MiniChartFactory.make(from: metric, colorOverride: .gray))
                     .padding(.horizontal)
             }
         )

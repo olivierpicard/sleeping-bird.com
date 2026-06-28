@@ -81,7 +81,7 @@ struct MetricView<Header: View, Chart: View>: View {
 
 // MARK: - Convenience: standard read-only card
 
-extension MetricView where Header == MetricHeaderTextView, Chart == AnyView {
+extension MetricView where Header == MetricHeaderValueView, Chart == AnyView {
     /// The standard card: a text header and an optional `MiniChart`
     /// (falling back to `NoDataMiniChart`). Keeps every existing call site unchanged.
     init(
@@ -97,7 +97,7 @@ extension MetricView where Header == MetricHeaderTextView, Chart == AnyView {
             mainColor: mainColor,
             onCardTapped: onCardTapped,
             header: {
-                MetricHeaderTextView(
+                MetricHeaderValueView(
                     title: title,
                     emoji: emoji,
                     value: value,

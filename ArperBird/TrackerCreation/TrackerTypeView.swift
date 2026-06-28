@@ -92,7 +92,7 @@ struct TrackerTypeView: View {
             MetricView(
                 mainColor: color,
                 header: {
-                    MetricHeaderTextView(
+                    MetricHeaderValueView(
                         title: name,
                         emoji: emoji,
                         value: "",

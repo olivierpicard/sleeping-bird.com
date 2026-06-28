@@ -112,7 +112,7 @@ struct TrackerGoalSuggestionsView: View {
             MetricView(
                 mainColor: color,
                 header: {
-                    MetricHeaderTextView(
+                    MetricHeaderValueView(
                         title: model.name,
                         emoji: suggestion.schema.emoji,
                         value: valueText(for: suggestion.schema),
