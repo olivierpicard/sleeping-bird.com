@@ -14,8 +14,8 @@ struct GoalAiCompletionSchema {
     let unit: String
     @Guide(description: "The goal to reach daily")
     let dailyGoal: Double
-    @Guide(description: "A single emoji that fit the metric")
-    let emoji: String
+    @Guide(description: "Incremental step used by UI to ease user log")
+    let granularity: Double
 }
 
 @Generable(description: "A list of goal metric configurations")
@@ -25,6 +25,9 @@ struct GoalAiCompletionListSchema {
         .count(1...3)
     )
     let goals: [GoalAiCompletionSchema]
+    
+    @Guide(description: "A single emoji that fit the metric")
+    let emoji: String
 }
 
 struct GoalAiCompletion {
@@ -35,9 +38,9 @@ struct GoalAiCompletion {
     }
 
     func generate(for instruction: String) async throws
-        -> [GoalAiCompletionSchema]
+        -> GoalAiCompletionListSchema
     {
-        let goals = try await AiSchemaCompletion(
+        try await AiSchemaCompletion(
             userPrompt: AIAutoCompleteInstruction.userPrompt(
                 for: instruction,
                 locale: locale
@@ -45,8 +48,5 @@ struct GoalAiCompletion {
             systemPrompt: AIAutoCompleteInstruction.systemPrompt
         )
         .generate(as: GoalAiCompletionListSchema.self)
-        .goals
-        
-        return goals
     }
 }

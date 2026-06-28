@@ -9,9 +9,10 @@ import SwiftUI
 
 /// The step that follows naming on the `goal` path. It hands the tracker name to
 /// `GoalAiCompletion` (via the shared `TrackerCreationModel`), which proposes a
-/// few units — each with a daily target and emoji — then advances to the unit
-/// list. The model memoizes the fetch, so reappearing after a pop reuses the
-/// result instead of re-triggering the AI. Mirrors `TrackerNumberLoadingView`.
+/// few units — each with a daily target and step — plus a shared emoji, then
+/// advances to the unit list. The model memoizes the fetch, so reappearing after
+/// a pop reuses the result instead of re-triggering the AI. Mirrors
+/// `TrackerNumberLoadingView`.
 struct TrackerGoalLoadingView: View {
     /// The flow's shared state. The view asks it to load and reads `phase` to
     /// decide between the spinner, the retry state, and advancing.

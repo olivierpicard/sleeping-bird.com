@@ -22,8 +22,8 @@ enum TrackerCreationStep: Hashable {
     case categoryReclassify
     case name
     /// Transient spinner on the goal path: fetches the unit suggestions (each
-    /// with a daily target + emoji), seeds the first, then hands off to the unit
-    /// list. Mirrors `.numberLoading`.
+    /// with a daily target + step) plus a shared emoji, seeds the first, then
+    /// hands off to the unit list. Mirrors `.numberLoading`.
     case goalLoading
     case goalUnit
     case goalValue

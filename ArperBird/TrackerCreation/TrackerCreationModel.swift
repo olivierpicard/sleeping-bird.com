@@ -36,27 +36,30 @@ final class TrackerCreationModel {
     /// the unit screen whether the user tapped "Next" or "Edit".
     private(set) var suggestions: [GoalAiCompletionSchema] = []
 
-    /// The unit, daily target and emoji assembled across the goal edit pages.
-    /// Seeded from the chosen suggestion, then refined on the value page.
+    /// The unit and daily target assembled across the goal edit pages, seeded from
+    /// the chosen suggestion and refined on the value page.
     var selectedUnit = ""
     var goalValue: Double = 0
+    /// A single emoji for the whole goal. The AI proposes it at the suggestion-list
+    /// level (not per unit), so it's seeded once at load and stays put when the unit
+    /// changes — mirroring how the number path keeps `numberEmoji` list-level.
     var goalEmoji = ""
-    /// The step between goal entries, dialed in on the reveal's Step chip. The goal
-    /// AI completion proposes no granularity, so it starts at the neutral `1` (which
-    /// divides any goal) and re-anchors back to `1` when an AI unit is picked — see
-    /// `selectGoalUnit`.
+    /// The step between goal entries, seeded from the chosen suggestion and dialed
+    /// in on the reveal's Step chip. AI units carry their own step; a custom unit has
+    /// none, so it re-anchors to the neutral `1` and the granularity loading step
+    /// then fetches one tuned to that unit — see `loadGoalGranularityIfNeeded`.
     var goalGranularity: Double = 1
 
     /// The custom unit the user typed (the one the AI didn't propose), remembered
     /// so the reveal's unit menu keeps offering it after they switch to an AI unit.
     /// Captured the moment they switch *away* from a custom unit; nil until then.
     private(set) var goalCustomUnit: String?
-    /// The target, step and emoji the user had dialed for `goalCustomUnit`, stashed
+    /// The target and step the user had dialed for `goalCustomUnit`, stashed
     /// alongside it so re-picking the custom unit restores its figures rather than
-    /// the AI default.
+    /// the AI default. The emoji isn't stashed — it's list-level, shared across
+    /// every unit.
     private var goalCustomValue: Double = 0
     private var goalCustomGranularity: Double = 1
-    private var goalCustomEmoji = ""
 
     /// Whether the goal's current unit is one the user typed rather than an AI
     /// suggestion.
@@ -73,7 +76,7 @@ final class TrackerCreationModel {
 
     /// Seam over the AI call so previews/tests supply suggestions without a
     /// network round-trip. Takes the tracker name.
-    private let generate: (String) async throws -> [GoalAiCompletionSchema]
+    private let generate: (String) async throws -> GoalAiCompletionListSchema
     /// The name the current `suggestions` were loaded for. Guards the fetch so it
     /// runs once per name and never re-fires on back-navigation.
     private var loadedName: String?
@@ -189,7 +192,7 @@ final class TrackerCreationModel {
     private var loadedDateName: String?
 
     init(
-        generate: @escaping (String) async throws -> [GoalAiCompletionSchema] = {
+        generate: @escaping (String) async throws -> GoalAiCompletionListSchema = {
             try await GoalAiCompletion().generate(for: "- Tracker name: \($0)")
         },
         generateDuration: @escaping (String) async throws -> DurationAiCompletionSchema = {
@@ -226,18 +229,22 @@ final class TrackerCreationModel {
         guard loadedName != name || phase == .failed else { return }
         phase = .loading
         do {
-            let goals = try await generate(name)
-            suggestions = goals
+            let schema = try await generate(name)
+            suggestions = schema.goals
+            // The emoji is list-level, so seed it once here — it stays put as the
+            // user switches units, mirroring how `loadNumberIfNeeded` handles
+            // `numberEmoji`.
+            goalEmoji = schema.emoji
             // Seed the selection with the first suggestion so the unit list and
-            // value page have a unit, target and emoji to show before the user
+            // value page have a unit, target and step to show before the user
             // picks — mirroring how `loadNumberIfNeeded` seeds the number path.
-            if let first = goals.first {
+            if let first = schema.goals.first {
                 selectedUnit = first.unit
                 goalValue = first.dailyGoal
-                goalEmoji = first.emoji
+                goalGranularity = first.granularity
             }
-            loadedName = goals.isEmpty ? nil : name
-            phase = goals.isEmpty ? .failed : .loaded
+            loadedName = schema.goals.isEmpty ? nil : name
+            phase = schema.goals.isEmpty ? .failed : .loaded
         } catch {
             phase = .failed
         }
@@ -439,24 +446,27 @@ final class TrackerCreationModel {
 
     // MARK: - Goal selection
 
-    /// Commit the unit chosen on the unit list, re-anchoring the suggested value
-    /// and emoji when the unit matches a suggestion; a custom unit has no AI-anchored
+    /// Commit the unit chosen on the unit list, re-anchoring the suggested target
+    /// and step when the unit matches a suggestion; a custom unit has no AI-anchored
     /// target, so clear the value to 0 — the value page then shows a placeholder
-    /// rather than the carried-over suggestion, and the user types their own.
+    /// rather than the carried-over suggestion, and the user types their own — and
+    /// reset the step to neutral `1` so the granularity loading step can fetch one
+    /// tuned to it. The emoji is list-level, so it stays put regardless of the unit.
     func chooseUnit(_ unit: String) {
         selectedUnit = unit
         if let match = suggestions.first(where: { $0.unit == unit }) {
             goalValue = match.dailyGoal
-            goalEmoji = match.emoji
+            goalGranularity = match.granularity
         } else {
             goalValue = 0
+            goalGranularity = 1
         }
     }
 
     /// Switch the goal's unit from the reveal's unit menu. Picking an AI unit
-    /// re-anchors the target and emoji to that suggestion and resets the step to
-    /// the neutral default; picking the user's own custom unit restores the target,
-    /// step and emoji they had dialed for it. Whichever custom unit we leave is
+    /// re-anchors the target and step to that suggestion; picking the user's own
+    /// custom unit restores the target and step they had dialed for it. The emoji is
+    /// list-level, so it stays put either way. Whichever custom unit we leave is
     /// remembered (with its figures) so the menu keeps offering it — this is what
     /// lets the user switch from their custom unit to an AI one and back without
     /// losing what they entered.
@@ -468,18 +478,15 @@ final class TrackerCreationModel {
             goalCustomUnit = selectedUnit
             goalCustomValue = goalValue
             goalCustomGranularity = goalGranularity
-            goalCustomEmoji = goalEmoji
         }
         selectedUnit = unit
         if let match = suggestions.first(where: { $0.unit == unit }) {
             goalValue = match.dailyGoal
-            goalEmoji = match.emoji
-            goalGranularity = 1
+            goalGranularity = match.granularity
         } else {
             // Back to the custom unit: restore the figures stashed for it.
             goalValue = goalCustomValue
             goalGranularity = goalCustomGranularity
-            goalEmoji = goalCustomEmoji
         }
     }
 }

@@ -13,7 +13,7 @@ import SwiftUI
 /// in the Xcode console (and on screen). Runs the real Firebase AI call, so it
 /// configures Firebase itself since the AppDelegate doesn't run in previews.
 private struct GoalAiCompletionDebugView: View {
-    @State private var instruction = "Drink more water"
+    @State private var instruction = "Water"
     @State private var output = ""
     @State private var isLoading = false
 
@@ -42,15 +42,16 @@ private struct GoalAiCompletionDebugView: View {
         Task {
             defer { isLoading = false }
             do {
-                let goals = try await GoalAiCompletion()
+                let result = try await GoalAiCompletion()
                     .generate(for: instruction)
-                let text = goals.enumerated()
+                let text = result.goals.enumerated()
                     .map { i, g in
-                        "[\(i)] \(g.emoji) \(g.dailyGoal) \(g.unit)"
+                        "[\(i)] \(g.dailyGoal) \(g.unit) (step \(g.granularity))"
                     }
                     .joined(separator: "\n")
-                print("GoalAiCompletion(\(instruction)):\n\(text)")
-                output = text
+                let summary = "\(result.emoji)\n\(text)"
+                print("GoalAiCompletion(\(instruction)):\n\(summary)")
+                output = summary
             } catch {
                 print("GoalAiCompletion error: \(error)")
                 output = "Error: \(error)"
