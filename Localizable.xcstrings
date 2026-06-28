@@ -153,9 +153,6 @@
         }
       }
     },
-    "Adds up over the day" : {
-
-    },
     "Advanced Charts" : {
       "localizations" : {
         "es" : {
@@ -354,6 +351,9 @@
     "Can be represented by numbers" : {
 
     },
+    "Cancel" : {
+
+    },
     "Category" : {
       "localizations" : {
         "es" : {
@@ -385,6 +385,9 @@
           }
         }
       }
+    },
+    "Choose the tracker's unit" : {
+
     },
     "Close" : {
       "localizations" : {
@@ -449,6 +452,9 @@
           }
         }
       }
+    },
+    "Confirm" : {
+
     },
     "Contact" : {
       "localizations" : {
@@ -762,6 +768,7 @@
       }
     },
     "Edit the step between entries" : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -1074,9 +1081,6 @@
         }
       }
     },
-    "Like steps, water intake, or time spent..." : {
-
-    },
     "Like took meds, went to the gym, ate healthy..." : {
       "localizations" : {
         "es" : {
@@ -1092,9 +1096,6 @@
           }
         }
       }
-    },
-    "Like weight, temperature, or heart rate..." : {
-
     },
     "Like workouts, reading, screen time..." : {
       "localizations" : {
@@ -1132,6 +1133,7 @@
 
     },
     "Maximum" : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -2236,9 +2238,6 @@
     "Set the duration" : {
 
     },
-    "Set the range" : {
-
-    },
     "Set your goal" : {
 
     },
@@ -2556,6 +2555,7 @@
       }
     },
     "Tap to change" : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -3333,9 +3333,6 @@
         }
       }
     },
-    "What is the number type ?" : {
-
-    },
     "What is the tracker name ?" : {
 
     },
@@ -3359,9 +3356,6 @@
       }
     },
     "What's the longest “%@” usually lasts?" : {
-
-    },
-    "What's the most “%@” you'd usually log?" : {
 
     },
     "What's your daily target for “%@”?" : {
