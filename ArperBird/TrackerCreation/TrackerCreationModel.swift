@@ -41,6 +41,35 @@ final class TrackerCreationModel {
     var selectedUnit = ""
     var goalValue: Double = 0
     var goalEmoji = ""
+    /// The step between goal entries, dialed in on the reveal's Step chip. The goal
+    /// AI completion proposes no granularity, so it starts at the neutral `1` (which
+    /// divides any goal) and re-anchors back to `1` when an AI unit is picked — see
+    /// `selectGoalUnit`.
+    var goalGranularity: Double = 1
+
+    /// The custom unit the user typed (the one the AI didn't propose), remembered
+    /// so the reveal's unit menu keeps offering it after they switch to an AI unit.
+    /// Captured the moment they switch *away* from a custom unit; nil until then.
+    private(set) var goalCustomUnit: String?
+    /// The target, step and emoji the user had dialed for `goalCustomUnit`, stashed
+    /// alongside it so re-picking the custom unit restores its figures rather than
+    /// the AI default.
+    private var goalCustomValue: Double = 0
+    private var goalCustomGranularity: Double = 1
+    private var goalCustomEmoji = ""
+
+    /// Whether the goal's current unit is one the user typed rather than an AI
+    /// suggestion.
+    var isGoalUnitCustom: Bool {
+        !selectedUnit.isEmpty && !suggestions.contains { $0.unit == selectedUnit }
+    }
+
+    /// The custom unit the reveal's unit menu should still offer: the current
+    /// selection when it's custom, otherwise the one the user previously dialed and
+    /// switched away from. Nil when no custom unit was ever made.
+    var goalMenuCustomUnit: String? {
+        isGoalUnitCustom ? selectedUnit : goalCustomUnit
+    }
 
     /// Seam over the AI call so previews/tests supply suggestions without a
     /// network round-trip. Takes the tracker name.
@@ -384,6 +413,36 @@ final class TrackerCreationModel {
             goalEmoji = match.emoji
         } else {
             goalValue = 0
+        }
+    }
+
+    /// Switch the goal's unit from the reveal's unit menu. Picking an AI unit
+    /// re-anchors the target and emoji to that suggestion and resets the step to
+    /// the neutral default; picking the user's own custom unit restores the target,
+    /// step and emoji they had dialed for it. Whichever custom unit we leave is
+    /// remembered (with its figures) so the menu keeps offering it — this is what
+    /// lets the user switch from their custom unit to an AI one and back without
+    /// losing what they entered.
+    func selectGoalUnit(_ unit: String) {
+        guard unit != selectedUnit else { return }
+        // Stash the custom unit we're leaving so it stays in the menu, capturing
+        // whatever the user dialed for it (including edits made via the chips).
+        if isGoalUnitCustom {
+            goalCustomUnit = selectedUnit
+            goalCustomValue = goalValue
+            goalCustomGranularity = goalGranularity
+            goalCustomEmoji = goalEmoji
+        }
+        selectedUnit = unit
+        if let match = suggestions.first(where: { $0.unit == unit }) {
+            goalValue = match.dailyGoal
+            goalEmoji = match.emoji
+            goalGranularity = 1
+        } else {
+            // Back to the custom unit: restore the figures stashed for it.
+            goalValue = goalCustomValue
+            goalGranularity = goalCustomGranularity
+            goalEmoji = goalCustomEmoji
         }
     }
 }

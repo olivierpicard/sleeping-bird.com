@@ -851,6 +851,9 @@
         }
       }
     },
+    "Goal" : {
+
+    },
     "Goal: %@" : {
       "localizations" : {
         "es" : {
@@ -863,16 +866,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Objectif : %@"
-          }
-        }
-      }
-    },
-    "Goal: %@ %@ per day" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Goal: %1$@ %2$@ per day"
           }
         }
       }
@@ -1109,6 +1102,9 @@
           }
         }
       }
+    },
+    "Log your progress toward the daily goal" : {
+
     },
     "Maintenance 💰🚗" : {
       "localizations" : {

@@ -209,14 +209,20 @@ private struct SparkleBurst: View {
 }
 
 #Preview("Goal gauge") {
+    // Drive the goal, step and unit from state so editing the Goal/Step chips and
+    // picking a unit re-derive the gauge *and* the chips in place — mirroring
+    // `DoneRevealStep` in the real flow.
+    @Previewable @State var goal = 8.0
+    @Previewable @State var granularity = 1.0
+    @Previewable @State var unit = "glasses"
     let schema = MetricSchema.Fake.number(
         title: "Drink more water",
         emoji: "💧",
-        unit: "glasses",
-        min: 2,
-        max: 8,
-        granularity: 1,
-        goal: 8,
+        unit: unit,
+        min: goal * 0.2,
+        max: goal,
+        granularity: granularity,
+        goal: goal,
         chart: .dailyGauge
     )
     NavigationStack {
@@ -224,7 +230,17 @@ private struct SparkleBurst: View {
             metric: Metric(from: schema, color: .blue, data: Metric.fakeData(for: schema.config)),
             color: .blue
         ) {
-            DoneGoalRecap(goalValue: 8, unit: "glasses")
+            DoneGoalRecap(
+                goalValue: goal,
+                granularity: granularity,
+                unit: unit,
+                units: ["glasses", "ml", "liters"],
+                color: .blue,
+                onSelectUnit: { unit = $0 },
+                onEditGoal: { goal = $0 },
+                onEditGranularity: { granularity = $0 }
+            )
+            // No custom unit in this preview — `customUnit` defaults to nil.
         }
     }
 }

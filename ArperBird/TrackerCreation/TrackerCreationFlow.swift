@@ -358,7 +358,7 @@ struct TrackerCreationFlow: View {
                 unit: model.selectedUnit,
                 min: model.goalValue * 0.2,
                 max: model.goalValue,
-                granularity: 1,
+                granularity: model.goalGranularity > 0 ? model.goalGranularity : 1,
                 goal: model.goalValue,
                 chart: .dailyGauge
             )
@@ -437,7 +437,19 @@ private struct DoneRevealStep: View {
         case .duration:
             DoneDurationRecap(maxSeconds: model.durationMaxSeconds)
         case .goal:
-            DoneGoalRecap(goalValue: model.goalValue, unit: model.selectedUnit)
+            DoneGoalRecap(
+                goalValue: model.goalValue,
+                granularity: model.goalGranularity,
+                unit: model.selectedUnit,
+                units: model.suggestions.map(\.unit),
+                // The user's own unit, kept in the menu so they can switch back to
+                // it (and its target) after trying an AI one.
+                customUnit: model.goalMenuCustomUnit,
+                color: color,
+                onSelectUnit: { model.selectGoalUnit($0) },
+                onEditGoal: { model.goalValue = max(0, $0) },
+                onEditGranularity: { model.goalGranularity = $0 }
+            )
         case nil:
             EmptyView() // unreachable: kind is set before any later step.
         }
