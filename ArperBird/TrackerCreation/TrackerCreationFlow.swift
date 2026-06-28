@@ -27,6 +27,12 @@ enum TrackerCreationStep: Hashable {
     case goalLoading
     case goalUnit
     case goalValue
+    /// Transient spinner on the goal path, shown only when the chosen unit is the
+    /// user's own (no AI-anchored step): fetches a granularity tuned to that unit
+    /// + name, then hands off to the reveal. A failed fetch falls through to the
+    /// default step of 1. Swapped out of the path so "back" returns to the value
+    /// page, not the spinner.
+    case goalGranularityLoading
     case durationLoading
     case durationConfig
     /// Transient spinner on the binary path: fetches the emoji, then hands
@@ -183,11 +189,24 @@ struct TrackerCreationFlow: View {
                 suggestedGoal: model.goalValue,
                 // A unit the AI didn't propose has no sensible step or seed value,
                 // so the value page drops the steppers and goes keyboard-only.
-                isCustomUnit: !model.suggestions.contains { $0.unit == model.selectedUnit },
+                isCustomUnit: !model.suggestions.contains {
+                    $0.unit == model.selectedUnit
+                },
                 color: color
             ) { value in
                 model.goalValue = value
-                path.append(.done)
+                // A custom unit has no AI-anchored step, so fetch one tuned to the
+                // unit before the reveal; AI units already carry the neutral default.
+                path.append(model.isGoalUnitCustom ? .goalGranularityLoading : .done)
+            }
+        case .goalGranularityLoading:
+            TrackerGoalGranularityLoadingView(model: model) {
+                // Swap this transient spinner out of the path for the reveal, so
+                // tapping "back" from the reveal returns to the value page rather
+                // than re-showing the loading screen. Mirrors `.goalLoading`.
+                if let top = path.indices.last {
+                    path[top] = .done
+                }
             }
         case .durationLoading:
             TrackerDurationLoadingView(model: model) {
@@ -231,7 +250,12 @@ struct TrackerCreationFlow: View {
             // model in place (max, choice), and only a real `body` that *reads*
             // the model re-renders on those writes. Deriving the reveal inside
             // `destination(for:)` instead would leave the pushed card stale.
-            DoneRevealStep(model: model, metric: { doneMetric() }, color: color, onDone: complete)
+            DoneRevealStep(
+                model: model,
+                metric: { doneMetric() },
+                color: color,
+                onDone: complete
+            )
         }
     }
 
@@ -284,7 +308,14 @@ struct TrackerCreationFlow: View {
     /// both the reveal card and the persisted metric are built from, so what the
     /// user sees in the celebration is exactly what lands on the dashboard.
     private func doneSchema() -> MetricSchema {
-        switch model.kind {
+        // Unreachable: kind is set on the type-picker before any step that can
+        // reach the reveal. Bail to a harmless default rather than crash.
+        guard let kind = model.kind else {
+            dismiss()
+            return MetricSchema.Fake.number(title: model.name)
+        }
+        
+        switch kind {
         case .duration:
             return MetricSchema.Fake.duration(
                 title: model.name,
@@ -339,16 +370,15 @@ struct TrackerCreationFlow: View {
                 emoji: model.numberEmoji,
                 unit: model.numberUnit.isEmpty ? nil : model.numberUnit,
                 min: 0,
-                max: max(1, model.numberMax),
-                granularity: model.numberGranularity > 0
-                    ? model.numberGranularity : 1,
+                max: model.numberMax,
+                granularity: model.numberGranularity,
                 goal: nil,
                 behavior: behavior,
                 chart: behavior == .cumulative ? .bar : .line,
                 method: behavior == .cumulative
-                ? .numerical(.sum) : .numerical(.latest)
+                    ? .numerical(.sum) : .numerical(.latest)
             )
-        default:
+        case .goal:
             // The goal path: a daily-gauge number whose sample always lands
             // above zero (min is a fifth of the goal) so the gauge reads as a
             // partial fill rather than collapsing to a line chart.
@@ -356,9 +386,9 @@ struct TrackerCreationFlow: View {
                 title: model.name,
                 emoji: model.goalEmoji,
                 unit: model.selectedUnit,
-                min: model.goalValue * 0.2,
+                min: 0,
                 max: model.goalValue,
-                granularity: model.goalGranularity > 0 ? model.goalGranularity : 1,
+                granularity: model.goalGranularity,
                 goal: model.goalValue,
                 chart: .dailyGauge
             )
@@ -451,7 +481,7 @@ private struct DoneRevealStep: View {
                 onEditGranularity: { model.goalGranularity = $0 }
             )
         case nil:
-            EmptyView() // unreachable: kind is set before any later step.
+            EmptyView()  // unreachable: kind is set before any later step.
         }
     }
 }

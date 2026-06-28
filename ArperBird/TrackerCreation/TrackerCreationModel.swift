@@ -78,6 +78,17 @@ final class TrackerCreationModel {
     /// runs once per name and never re-fires on back-navigation.
     private var loadedName: String?
 
+    /// Loading state of the goal-granularity request — fetched on the custom-unit
+    /// path only, after the daily target is set.
+    private(set) var goalGranularityPhase: Phase = .idle
+    /// Seam over the granularity AI call, mirroring `generate`. Takes a built
+    /// instruction carrying the tracker name and the custom unit.
+    private let generateGranularity: (String) async throws -> GranularityAiCompletionSchema
+    /// The name+unit `goalGranularity` was loaded for. Granularity depends on the
+    /// unit, so the key combines both: picking a different custom unit re-fetches,
+    /// while re-showing the screen for the same one is a no-op.
+    private var loadedGranularityKey: String?
+
     // MARK: - Duration sub-flow
 
     /// Loading state of the duration auto-completion request.
@@ -192,6 +203,9 @@ final class TrackerCreationModel {
         },
         generateNumber: @escaping (String) async throws -> NumberAiCompletionListSchema = {
             try await NumberAiCompletion().generate(for: "- Tracker name: \($0)")
+        },
+        generateGranularity: @escaping (String) async throws -> GranularityAiCompletionSchema = {
+            try await GranularityAiCompletion().generate(for: $0)
         }
     ) {
         self.generate = generate
@@ -199,6 +213,7 @@ final class TrackerCreationModel {
         self.generateCategory = generateCategory
         self.generateEmoji = generateEmoji
         self.generateNumber = generateNumber
+        self.generateGranularity = generateGranularity
     }
 
     // MARK: - Goal suggestions
@@ -225,6 +240,28 @@ final class TrackerCreationModel {
             phase = goals.isEmpty ? .failed : .loaded
         } catch {
             phase = .failed
+        }
+    }
+
+    /// Fetches a step natural to a *custom* goal unit (one the AI didn't propose),
+    /// keyed on name+unit so it runs once per unit and never re-fires on
+    /// back-navigation. The step is non-essential: a failure leaves
+    /// `goalGranularity` at its neutral default (the user can still dial it on the
+    /// reveal's Step chip), so the loading screen advances either way.
+    func loadGoalGranularityIfNeeded(for unit: String) async {
+        let key = "\(name)\n\(unit)"
+        guard loadedGranularityKey != key || goalGranularityPhase == .failed
+        else { return }
+        goalGranularityPhase = .loading
+        do {
+            let schema = try await generateGranularity(
+                "- Tracker name: \(name)\n- Unit: \(unit)"
+            )
+            if schema.granularity > 0 { goalGranularity = schema.granularity }
+            loadedGranularityKey = key
+            goalGranularityPhase = .loaded
+        } catch {
+            goalGranularityPhase = .failed
         }
     }
 
