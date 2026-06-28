@@ -326,3 +326,42 @@ private func categoryRevealMetric(multiple: Bool) -> Metric {
         }
     }
 }
+
+#Preview("Date") {
+    // Seeded with a single real point — today — not `Metric.fakeData`, so the
+    // calendar reveals five dashed empty slots leading into one filled "today"
+    // cell, mirroring how `TrackerCreationFlow.doneMetric()` seeds the date path.
+    let schema = MetricSchema.Fake.datetime(
+        title: "Anniversary",
+        emoji: "📅",
+        chart: .calendar
+    )
+    NavigationStack {
+        TrackerDoneView(
+            metric: Metric(from: schema, color: .indigo, data: [.datetime(.now)]),
+            color: .indigo
+        ) {
+            DoneDateRecap()
+        }
+    }
+}
+
+#Preview("Binary") {
+    // Seeded with a single real point — today — not `Metric.fakeData`, so the
+    // trailing calendar reveals six dashed empty days leading into one filled
+    // "today" cell, mirroring how `TrackerCreationFlow.doneMetric()` seeds the
+    // binary path. Avoids inventing "yes" days the user never logged.
+    let schema = MetricSchema.Fake.binary(
+        title: "Quit smoking",
+        emoji: "🚭",
+        chart: .calendar
+    )
+    NavigationStack {
+        TrackerDoneView(
+            metric: Metric(from: schema, color: .teal, data: [.binary(.now, true)]),
+            color: .teal
+        ) {
+            DoneBinaryRecap()
+        }
+    }
+}

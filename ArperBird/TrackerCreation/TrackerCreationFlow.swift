@@ -260,13 +260,24 @@ struct TrackerCreationFlow: View {
     /// looks alive in the reveal — mirroring the type-picker carousel — even
     /// though the metric that lands on the dashboard (see `persistMetric`) starts
     /// empty.
+    ///
+    /// The date and binary paths are the exception: their calendars have no value
+    /// to fake, so a row of invented past entries would read as days the user never
+    /// logged. Instead each is seeded with a single *real* point — today — so the
+    /// reveal shows dashed empty slots leading into one filled "today" cell, exactly
+    /// where the user's first entry will land. Honest, and it previews the affordance.
     private func doneMetric() -> Metric {
         let schema = doneSchema()
-        return Metric(
-            from: schema,
-            color: color,
-            data: Metric.fakeData(for: schema.config)
-        )
+        let data: [DataPoint]
+        switch model.kind {
+        case .date:
+            data = [.datetime(.now)]
+        case .binary:
+            data = [.binary(.now, true)]
+        default:
+            data = Metric.fakeData(for: schema.config)
+        }
+        return Metric(from: schema, color: color, data: data)
     }
 
     /// The structured tracker the finished flow describes — the single source

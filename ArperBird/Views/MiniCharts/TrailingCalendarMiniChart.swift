@@ -72,7 +72,13 @@ struct TrailingCalendarMiniChart: MiniChart {
                             .overlay(
                                 Circle().strokeBorder(
                                     color.opacity(isDark ? 0.8 : 0.5),
-                                    lineWidth: 1
+                                    style: StrokeStyle(
+                                        lineWidth: 1,
+                                        // Empty days read as "waiting for an
+                                        // entry" via a dashed ring; logged days
+                                        // get a solid filled circle.
+                                        dash: active ? [] : [3, 3]
+                                    )
                                 )
                             )
                             .overlay(

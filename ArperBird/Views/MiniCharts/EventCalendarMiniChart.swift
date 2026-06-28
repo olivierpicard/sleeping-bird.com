@@ -35,7 +35,6 @@ struct EventCalendarMiniChart: MiniChart {
     }
 
     var body: some View {
-//        EmptyCell(color: color, cornerRadius: cornerRadius)
         HStack(spacing: cellSpacing) {
             ForEach(slots.indices, id: \.self) { index in
                 if let date = slots[index] {
