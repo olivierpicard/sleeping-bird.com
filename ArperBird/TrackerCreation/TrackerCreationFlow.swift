@@ -21,7 +21,10 @@ enum TrackerCreationStep: Hashable {
     /// `TrackerCreationModel.reclassifyChoice(for:)`.
     case categoryReclassify
     case name
-    case goalSuggestions
+    /// Transient spinner on the goal path: fetches the unit suggestions (each
+    /// with a daily target + emoji), seeds the first, then hands off to the unit
+    /// list. Mirrors `.numberLoading`.
+    case goalLoading
     case goalUnit
     case goalValue
     case durationLoading
@@ -137,7 +140,7 @@ struct TrackerCreationFlow: View {
                 // remaining kinds aren't wired up to the reveal yet.
                 switch model.kind {
                 case .goal:
-                    path.append(.goalSuggestions)
+                    path.append(.goalLoading)
                 case .duration:
                     path.append(.durationLoading)
                 case .choices:
@@ -152,21 +155,15 @@ struct TrackerCreationFlow: View {
                     break
                 }
             })
-        case .goalSuggestions:
-            TrackerGoalSuggestionsView(
-                model: model,
-                color: color,
-                onNext: { schema in
-                    // Card accepted as-is: skip the edit pages and jump straight
-                    // to the reveal.
-                    model.select(schema)
-                    path.append(.done)
-                },
-                onEdit: { schema in
-                    model.select(schema)
-                    path.append(.goalUnit)
+        case .goalLoading:
+            TrackerGoalLoadingView(model: model) {
+                // Swap this transient spinner out of the path for the unit list,
+                // so tapping "back" from the unit list returns to naming rather
+                // than re-showing the loading screen. Mirrors `.numberLoading`.
+                if let top = path.indices.last {
+                    path[top] = .goalUnit
                 }
-            )
+            }
         case .goalUnit:
             TrackerGoalUnitListView(
                 name: model.name,
@@ -184,6 +181,9 @@ struct TrackerCreationFlow: View {
                 name: model.name,
                 unit: model.selectedUnit,
                 suggestedGoal: model.goalValue,
+                // A unit the AI didn't propose has no sensible step or seed value,
+                // so the value page drops the steppers and goes keyboard-only.
+                isCustomUnit: !model.suggestions.contains { $0.unit == model.selectedUnit },
                 color: color
             ) { value in
                 model.goalValue = value

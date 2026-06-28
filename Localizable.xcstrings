@@ -36,6 +36,9 @@
     "💬" : {
 
     },
+    "0" : {
+
+    },
     "A goal to reach per day" : {
 
     },
@@ -507,9 +510,6 @@
     "Couldn't set up your tracker" : {
 
     },
-    "Couldn't suggest goals" : {
-
-    },
     "Create metrics and log entries just by speaking" : {
       "localizations" : {
         "es" : {
@@ -802,9 +802,6 @@
           }
         }
       }
-    },
-    "Finding goals…" : {
-
     },
     "Fuel Spend ⛽️" : {
       "localizations" : {
@@ -2040,9 +2037,6 @@
           }
         }
       }
-    },
-    "Pick a goal to track" : {
-
     },
     "Pick a unit" : {
 

@@ -184,6 +184,14 @@ final class TrackerCreationModel {
         do {
             let goals = try await generate(name)
             suggestions = goals
+            // Seed the selection with the first suggestion so the unit list and
+            // value page have a unit, target and emoji to show before the user
+            // picks — mirroring how `loadNumberIfNeeded` seeds the number path.
+            if let first = goals.first {
+                selectedUnit = first.unit
+                goalValue = first.dailyGoal
+                goalEmoji = first.emoji
+            }
             loadedName = goals.isEmpty ? nil : name
             phase = goals.isEmpty ? .failed : .loaded
         } catch {
@@ -365,22 +373,17 @@ final class TrackerCreationModel {
 
     // MARK: - Goal selection
 
-    /// Adopt a suggestion wholesale — the entry point for both "Next" (accept as
-    /// is) and "Edit" (then refine on the following pages).
-    func select(_ schema: GoalAiCompletionSchema) {
-        selectedUnit = schema.unit
-        goalValue = schema.dailyGoal
-        goalEmoji = schema.emoji
-    }
-
     /// Commit the unit chosen on the unit list, re-anchoring the suggested value
-    /// and emoji when the unit matches a suggestion; a custom unit keeps whatever
-    /// value was carried in.
+    /// and emoji when the unit matches a suggestion; a custom unit has no AI-anchored
+    /// target, so clear the value to 0 — the value page then shows a placeholder
+    /// rather than the carried-over suggestion, and the user types their own.
     func chooseUnit(_ unit: String) {
         selectedUnit = unit
         if let match = suggestions.first(where: { $0.unit == unit }) {
             goalValue = match.dailyGoal
             goalEmoji = match.emoji
+        } else {
+            goalValue = 0
         }
     }
 }
