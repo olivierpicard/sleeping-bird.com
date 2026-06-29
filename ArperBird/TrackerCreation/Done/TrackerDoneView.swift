@@ -258,7 +258,7 @@ private struct SparkleBurst: View {
             metric: Metric(from: schema, color: .orange, data: Metric.fakeData(for: schema.config)),
             color: .orange
         ) {
-            DoneDurationRecap(maxSeconds: 2 * 3600)
+            DoneDurationRecap(maxSeconds: 2 * 3600, color: .orange, onUpdate: { _ in })
         }
     }
 }

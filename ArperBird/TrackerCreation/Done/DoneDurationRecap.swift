@@ -7,24 +7,39 @@
 
 import SwiftUI
 
-/// The duration path's reveal recap: a single line stating the upper bound the
-/// user dialed in, formatted in hours and minutes. No chips — the bound is set on
-/// the earlier config step. A dumb view: it owns the formatting of its own line.
 struct DoneDurationRecap: View {
-    /// The tracker's upper bound in seconds, as set on the duration config step.
     let maxSeconds: Int
+    let color: Color
+    let onUpdate: (Int) -> Void
+
+    @State private var isEditing = false
+
+    private var formatted: String {
+        Duration.seconds(max(0, maxSeconds))
+            .formatted(.units(allowed: [.hours, .minutes, .seconds], width: .abbreviated))
+    }
 
     var body: some View {
-        DoneRecapText(
-            "Tracks up to \(Duration.seconds(max(0, maxSeconds)).formatted(.units(allowed: [.hours, .minutes], width: .abbreviated)))"
-        )
+        Button(action: { isEditing = true }) {
+            DoneChip(color: color) {
+                Image(systemName: "clock")
+                    .foregroundStyle(color)
+                Text("Max")
+                Text(formatted)
+                    .foregroundStyle(.primary)
+            }
+        }
+        .buttonStyle(.plain)
+        .sheet(isPresented: $isEditing) {
+            DurationMaxEditor(maxSeconds: maxSeconds, color: color) { newSeconds in
+                onUpdate(newSeconds)
+                isEditing = false
+            }
+        }
     }
 }
 
 #Preview {
-    VStack(spacing: 16) {
-        DoneDurationRecap(maxSeconds: 2 * 3600)
-        DoneDurationRecap(maxSeconds: 90 * 60)
-        DoneDurationRecap(maxSeconds: 45 * 60)
-    }
+    @Previewable @State var maxSeconds = 2 * 3600
+    DoneDurationRecap(maxSeconds: maxSeconds, color: .teal, onUpdate: { maxSeconds = $0 })
 }

@@ -476,7 +476,11 @@ private struct DoneRevealStep: View {
         case .date:
             DoneDateRecap()
         case .duration:
-            DoneDurationRecap(maxSeconds: model.durationMaxSeconds)
+            DoneDurationRecap(
+                maxSeconds: model.durationMaxSeconds,
+                color: color,
+                onUpdate: { model.setDurationMax($0) }
+            )
         case .goal:
             DoneGoalRecap(
                 goalValue: model.goalValue,
