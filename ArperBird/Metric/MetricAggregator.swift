@@ -48,8 +48,21 @@ enum MetricAggregator {
         method: NumericMethod,
         behavior: MetricBehavior
     ) -> [ChartBin] {
+        bins(
+            from: points,
+            component: range.bucketComponent,
+            method: method,
+            behavior: behavior
+        )
+    }
+
+    static func bins(
+        from points: [DataPoint],
+        component: Calendar.Component,
+        method: NumericMethod,
+        behavior: MetricBehavior
+    ) -> [ChartBin] {
         let calendar = Calendar.current
-        let component = range.bucketComponent
 
         let raw: [(Date, Double)] = points.compactMap { point in
             switch point {

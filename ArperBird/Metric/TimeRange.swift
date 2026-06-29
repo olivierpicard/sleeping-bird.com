@@ -38,3 +38,18 @@ enum TimeRange: String, CaseIterable, Identifiable {
         }
     }
 }
+
+extension TemporalBucket {
+    /// The calendar component a bucket groups by — lets aggregation key off a
+    /// metric's own period (daily, weekly, …) the same way `TimeRange` keys off
+    /// its 1M/6M/1Y window.
+    var bucketComponent: Calendar.Component {
+        switch self {
+        case .hourly: return .hour
+        case .daily: return .day
+        case .weekly: return .weekOfYear
+        case .monthly: return .month
+        case .yearly: return .year
+        }
+    }
+}

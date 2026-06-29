@@ -154,7 +154,11 @@ struct TrackerTypeView: View {
             label: LocalizedStringResource,
             sublabel: LocalizedStringKey,
             examples: LocalizedStringKey,
-            schema: MetricSchema
+            schema: MetricSchema,
+            // Bar charts drop older values to fit the card width, so seed enough
+            // days to fill it. Passed per-call so each option owns its sample
+            // size, insulated from `fakeData`'s default changing under us.
+            days: Int = 14
         ) -> TrackerTypeOption {
             TrackerTypeOption(
                 kind: kind,
@@ -164,7 +168,7 @@ struct TrackerTypeView: View {
                 metric: Metric(
                     from: schema,
                     color: color,
-                    data: Metric.fakeData(for: schema.config)
+                    data: Metric.fakeData(for: schema.config, days: days)
                 )
             )
         }
@@ -175,7 +179,8 @@ struct TrackerTypeView: View {
                 label: "tracker_type.duration.label",
                 sublabel: "Time spent on an activity",
                 examples: "Like workouts, reading, screen time...",
-                schema: MetricSchema.Fake.duration(chart: .bar)
+                schema: MetricSchema.Fake.duration(chart: .bar),
+                days: 40
             ),
             option(
                 .binary,
@@ -215,7 +220,8 @@ struct TrackerTypeView: View {
                 label: "Other",
                 sublabel: "Can be represented by numbers",
                 examples: "",
-                schema: MetricSchema.Fake.number(goal: nil, chart: .line)
+                schema: MetricSchema.Fake.number(goal: nil, chart: .line),
+                days: 22
             ),
         ]
     }

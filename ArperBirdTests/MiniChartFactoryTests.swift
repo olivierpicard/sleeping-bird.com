@@ -31,17 +31,38 @@ final class MiniChartFactoryTests: XCTestCase {
         XCTAssertEqual(chart?.data, [42, 80])
     }
 
-    func test_number_bar_returnsBarMiniChart_withCorrectData() {
+    func test_number_bar_snapshot_returnsRawPerPointBars() {
         let data: [DataPoint] = [.number(Date(), 10), .number(Date(), 20)]
-        let m = metric(schema: .Fake.number(goal: nil, chart: .bar), data: data)
+        let m = metric(
+            schema: .Fake.number(goal: nil, behavior: .snapshot, chart: .bar),
+            data: data
+        )
         let chart = MiniChartFactory.make(from: m) as? BarMiniChart
         XCTAssertNotNil(chart)
         XCTAssertEqual(chart?.data, [10, 20])
     }
 
+    func test_number_bar_cumulative_collapsesSamePeriodIntoOneBar() {
+        // Two values logged the same day on a daily cumulative metric should
+        // sum into a single in-progress bar rather than two.
+        let data: [DataPoint] = [.number(Date(), 10), .number(Date(), 20)]
+        let m = metric(
+            schema: .Fake.number(
+                goal: nil,
+                behavior: .cumulative,
+                chart: .bar,
+                bucket: .daily
+            ),
+            data: data
+        )
+        let chart = MiniChartFactory.make(from: m) as? BarMiniChart
+        XCTAssertNotNil(chart)
+        XCTAssertEqual(chart?.data, [30])
+    }
+
     func test_number_gauge_returnsLinearGauge_withCurrentAndGoal() {
         let data: [DataPoint] = [.number(Date(), 60)]
-        let m = metric(schema: .Fake.number(goal: 80, chart: .gauge), data: data)
+        let m = metric(schema: .Fake.number(goal: 80, chart: .dailyGauge), data: data)
         let chart = MiniChartFactory.make(from: m) as? LinearGaugeMiniChart
         XCTAssertNotNil(chart)
         XCTAssertEqual(chart?.current, 60)
@@ -72,12 +93,12 @@ final class MiniChartFactoryTests: XCTestCase {
 
     // MARK: - Binary
 
-    func test_binary_returnsDotMiniChart_withBoolMappedToDouble() {
+    func test_binary_returnsTrailingCalendar_withTrueDates() {
         let data: [DataPoint] = [.binary(Date(), true), .binary(Date(), false), .binary(Date(), true)]
         let m = metric(schema: .Fake.binary(), data: data)
-        let chart = MiniChartFactory.make(from: m) as? DotMiniChart
+        let chart = MiniChartFactory.make(from: m) as? TrailingCalendarMiniChart
         XCTAssertNotNil(chart)
-        XCTAssertEqual(chart?.data, [1.0, 0.0, 1.0])
+        XCTAssertEqual(chart?.data.count, 2) // only the two `true` entries
     }
 
     // MARK: - Duration

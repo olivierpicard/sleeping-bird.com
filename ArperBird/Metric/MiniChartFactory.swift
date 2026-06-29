@@ -38,7 +38,10 @@ enum MiniChartFactory {
             let values = metric.data.compactMap(\.numberValue?.value)
             switch metric.visual.chart {
             case .bar:
-                return BarMiniChart(data: values, color: color)
+                let bars =
+                    cfg.behavior == .cumulative
+                    ? cumulativeBarValues(for: metric) : values
+                return BarMiniChart(data: bars, color: color)
             default:
                 return LineMiniChart(data: values, color: color)
             }
@@ -66,10 +69,13 @@ enum MiniChartFactory {
             }
             return TrailingCalendarMiniChart(data: dates, color: color)
 
-        case .duration:
+        case .duration(let cfg):
             let values = metric.data.compactMap(\.durationValue?.interval)
             if metric.visual.chart == .bar {
-                return BarMiniChart(data: values, color: color)
+                let bars =
+                    cfg.behavior == .cumulative
+                    ? cumulativeBarValues(for: metric) : values
+                return BarMiniChart(data: bars, color: color)
             }
             return LineMiniChart(data: values, color: color)
 
@@ -77,5 +83,24 @@ enum MiniChartFactory {
             let dates = metric.data.compactMap(\.datetimeValue)
             return EventCalendarMiniChart(data: dates, color: color)
         }
+    }
+
+    /// Bars for a cumulative number/duration metric: one bar per `aggregation`
+    /// period (daily when unset), reducing by the metric's method. The
+    /// in-progress period is the last bin, which keeps growing as new points
+    /// land in it rather than spawning a new bar.
+    private static func cumulativeBarValues(for metric: Metric) -> [Double] {
+        let agg = metric.visual.aggregation
+        let method: NumericMethod = {
+            if case .numerical(let m) = agg.method { return m }
+            return .sum
+        }()
+        let bins = MetricAggregator.bins(
+            from: metric.data,
+            component: (agg.bucket ?? .daily).bucketComponent,
+            method: method,
+            behavior: .cumulative
+        )
+        return bins.map(\.value)
     }
 }

@@ -298,6 +298,17 @@ struct TrackerCreationFlow: View {
             data = [.datetime(.now)]
         case .binary:
             data = [.binary(.now, true)]
+        case .duration, .number where model.behavior == .cumulative:
+            // Both reveal as a bar chart, which drops older values to fit the
+            // card width — seed enough days to fill it. Days passed explicitly so
+            // this stays put if `fakeData`'s default changes.
+            data = Metric.fakeData(for: schema.config, days: 40)
+        case .number:
+            // The snapshot number reveals as a line chart, which also drops
+            // older points to fit — seed more days than the default so it reads
+            // as a real trend. Days passed explicitly so this stays put if
+            // `fakeData`'s default changes.
+            data = Metric.fakeData(for: schema.config, days: 22)
         default:
             data = Metric.fakeData(for: schema.config)
         }

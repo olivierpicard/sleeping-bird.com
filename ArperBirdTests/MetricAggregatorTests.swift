@@ -190,4 +190,22 @@ struct MetricAggregatorTests {
         #expect(result.count == 1)
         #expect(result.first?.value == 300)
     }
+
+    // MARK: - Bucketing by Calendar.Component (mini-chart period bars)
+
+    @Test("Same-day points collapse into one bin when bucketed by .day")
+    func bucketsByDayComponent() {
+        let result = MetricAggregator.bins(
+            from: [
+                .number(Self.day(2026, 1, 5, hour: 8), 10),
+                .number(Self.day(2026, 1, 5, hour: 21), 20),
+            ],
+            component: .day,
+            method: .sum,
+            behavior: .cumulative
+        )
+
+        #expect(result.count == 1)
+        #expect(result.first?.value == 30)
+    }
 }
