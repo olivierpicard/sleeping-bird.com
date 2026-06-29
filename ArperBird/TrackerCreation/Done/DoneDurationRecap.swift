@@ -14,21 +14,10 @@ struct DoneDurationRecap: View {
     /// The tracker's upper bound in seconds, as set on the duration config step.
     let maxSeconds: Int
 
-    /// Formats the bound as e.g. "Tracks up to 2h" / "1h 30m" / "45m" — hours
-    /// once the bound clears an hour, minutes otherwise.
-    private var recap: LocalizedStringKey {
-        let seconds = max(0, maxSeconds)
-        let hours = seconds / 3600
-        let minutes = (seconds % 3600) / 60
-        let text =
-            hours > 0
-            ? (minutes > 0 ? "\(hours)h \(minutes)m" : "\(hours)h")
-            : "\(minutes)m"
-        return "Tracks up to \(text)"
-    }
-
     var body: some View {
-        DoneRecapText(recap)
+        DoneRecapText(
+            "Tracks up to \(Duration.seconds(max(0, maxSeconds)).formatted(.units(allowed: [.hours, .minutes], width: .abbreviated)))"
+        )
     }
 }
 

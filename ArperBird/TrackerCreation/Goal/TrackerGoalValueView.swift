@@ -65,8 +65,7 @@ struct TrackerGoalValueView: View {
     /// to commit through, so otherwise "Next" would stay disabled mid-typing.
     private var effectiveValue: Double {
         guard isFieldFocused else { return value }
-        let normalized = draft.replacingOccurrences(of: ",", with: ".")
-        return Double(normalized) ?? value
+        return Decimal(string: draft, locale: .current).map { ($0 as NSDecimalNumber).doubleValue } ?? value
     }
 
     var body: some View {
@@ -262,9 +261,9 @@ struct TrackerGoalValueView: View {
     /// Parse the typed value when the keypad dismisses, clamping to a positive
     /// number and falling back to the last good value on garbage input.
     private func commitDraft() {
-        let normalized = draft.replacingOccurrences(of: ",", with: ".")
-        if let parsed = Double(normalized), parsed > 0 {
-            withAnimation(.snappy(duration: 0.25)) { value = parsed }
+        if let decimal = Decimal(string: draft, locale: .current) {
+            let parsed = (decimal as NSDecimalNumber).doubleValue
+            if parsed > 0 { withAnimation(.snappy(duration: 0.25)) { value = parsed } }
         }
         draft = ""
     }
