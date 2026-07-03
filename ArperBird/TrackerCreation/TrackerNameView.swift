@@ -12,8 +12,18 @@ struct TrackerNameView: View {
 
     var onNext: (String) -> Void = { _ in }
 
-    @State private var name = ""
+    @State private var name: String
     @State private var chart = NoDataMiniChart()
+
+    /// `initialName` pre-fills the field — non-empty when the flow was seeded
+    /// from a suggestion chip, or when the step is re-shown after a pop.
+    init(
+        initialName: String = "",
+        onNext: @escaping (String) -> Void = { _ in }
+    ) {
+        _name = State(initialValue: initialName)
+        self.onNext = onNext
+    }
     @FocusState private var isNameFocused: Bool
 
     private var isNameValid: Bool {

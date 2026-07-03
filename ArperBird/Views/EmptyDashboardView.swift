@@ -9,8 +9,12 @@ import SwiftData
 import SwiftUI
 
 struct EmptyDashboardView: View {
-    let onAddMetric: () -> Void
+    /// Opens the creation flow — seeded with the tapped suggestion, or from
+    /// scratch (`nil`) via the "+" button and the "Ask anything…" chip.
+    let onAddMetric: (TrackerSuggestion?) -> Void
     @Environment(\.colorScheme) private var colorScheme
+
+    private let suggestions = TrackerSuggestion.defaults
 
     var body: some View {
         VStack(spacing: 28) {
@@ -69,19 +73,16 @@ struct EmptyDashboardView: View {
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             BadgesStackView(
-                badges: [
-                    "Water 💧",
-                    "Maintenance 💰🚗",
-                    "Sleeps 💤",
-                    "Pain 😖",
-                    "Mood 😁",
-                    "Proteins 🥩🌱",
-                    "Meditation ⏱️🧘",
-                    "Coffee ☕️",
-                    "Fuel Spend ⛽️",
-                    "Ask anything...",
-                ],
-                borderThickness: 0.5
+                badges: suggestions.map(\.label)
+                    + [String(localized: "Ask anything...")],
+                borderThickness: 0.5,
+                onTap: { index in
+                    // The trailing "Ask anything…" chip has no suggestion behind
+                    // it — it opens the flow from scratch, like the "+" button.
+                    let suggestion =
+                        index < suggestions.count ? suggestions[index] : nil
+                    onAddMetric(suggestion)
+                }
             )
             .padding(.top, 10)
             //            Spacer()
@@ -105,7 +106,7 @@ struct EmptyDashboardView: View {
             .foregroundStyle(.secondary)
             .padding(.bottom, -20)
             .padding(.leading, 30)
-            Button(action: onAddMetric) {
+            Button(action: { onAddMetric(nil) }) {
                 Label("Add a tracker", systemImage: "plus")
                 .font(.largeTitle)
                 .labelStyle(.iconOnly)
@@ -157,7 +158,7 @@ private struct HandDrawnArrow: Shape {
 }
 
 #Preview {
-    EmptyDashboardView(onAddMetric: {})
+    EmptyDashboardView(onAddMetric: { _ in })
         .environment(\.locale, Locale(identifier: "fr"))
         .environment(MetricGenerator())
         .modelContainer(for: Metric.self, inMemory: true)

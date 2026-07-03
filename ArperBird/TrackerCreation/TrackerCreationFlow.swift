@@ -64,6 +64,32 @@ struct TrackerCreationFlow: View {
     /// gauge card share the app accent.
     private let color: Color = .accent
 
+    /// A seed skips the type and name steps: the suggestion's kind and localized
+    /// name land in the model up front, and the path opens directly on the kind's
+    /// loading step. `.name` stays underneath it so "back" from the reveal walks
+    /// through the usual naming (pre-filled) and type screens.
+    init(seed: TrackerSuggestion? = nil) {
+        guard let seed else { return }
+        let model = TrackerCreationModel()
+        model.kind = seed.kind
+        model.name = seed.localizedName
+        _model = State(initialValue: model)
+        _path = State(initialValue: [.name, Self.firstStep(for: seed.kind)])
+    }
+
+    /// The step each kind branches into after naming — shared by the name step's
+    /// "Next" and the seeded entry path.
+    private static func firstStep(for kind: TrackerKind) -> TrackerCreationStep {
+        switch kind {
+        case .goal: .goalLoading
+        case .duration: .durationLoading
+        case .choices: .categoryLoading
+        case .binary: .binaryLoading
+        case .date: .dateLoading
+        case .number: .numberLoading
+        }
+    }
+
     var body: some View {
         NavigationStack(path: $path) {
             TrackerTypeView { selectedKind in
@@ -140,25 +166,12 @@ struct TrackerCreationFlow: View {
                 }
             }
         case .name:
-            TrackerNameView(onNext: { enteredName in
+            // Seeding the field from the model keeps the typed (or seeded) name
+            // visible when the step is re-shown after a pop.
+            TrackerNameView(initialName: model.name, onNext: { enteredName in
                 model.name = enteredName
-                // The goal and duration paths branch into AI-driven steps; the
-                // remaining kinds aren't wired up to the reveal yet.
-                switch model.kind {
-                case .goal:
-                    path.append(.goalLoading)
-                case .duration:
-                    path.append(.durationLoading)
-                case .choices:
-                    path.append(.categoryLoading)
-                case .binary:
-                    path.append(.binaryLoading)
-                case .date:
-                    path.append(.dateLoading)
-                case .number:
-                    path.append(.numberLoading)
-                default:
-                    break
+                if let kind = model.kind {
+                    path.append(Self.firstStep(for: kind))
                 }
             })
         case .goalLoading:

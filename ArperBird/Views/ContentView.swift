@@ -5,6 +5,9 @@ struct ContentView: View {
     @Query private var metrics: [Metric]
     @Environment(MetricGenerator.self) private var generator
     @State private var showModal = false
+    /// The suggestion chip the user tapped on the empty dashboard, seeding the
+    /// creation flow past the type and name steps. Nil for a from-scratch open.
+    @State private var seed: TrackerSuggestion?
     private var isDashboardEmpty: Bool {
         metrics.isEmpty && generator.pending.isEmpty
     }
@@ -13,9 +16,15 @@ struct ContentView: View {
         NavigationStack {
             VStack {
                 if isDashboardEmpty {
-                    EmptyDashboardView(onAddMetric: { showModal = true })
+                    EmptyDashboardView(onAddMetric: { suggestion in
+                        seed = suggestion
+                        showModal = true
+                    })
                 } else {
-                    DashboardView(onAddMetric: { showModal = true })
+                    DashboardView(onAddMetric: {
+                        seed = nil
+                        showModal = true
+                    })
                 }
             }
             .background {
@@ -26,11 +35,14 @@ struct ContentView: View {
         }
         .sheet(
             isPresented: $showModal,
-            onDismiss: { showModal = false }
+            onDismiss: {
+                showModal = false
+                seed = nil
+            }
         ) {
 //            MetricInputSheet()
 //                .presentationDetents([.large])
-            TrackerCreationFlow()
+            TrackerCreationFlow(seed: seed)
                 .presentationDetents([.large])
         }
     }

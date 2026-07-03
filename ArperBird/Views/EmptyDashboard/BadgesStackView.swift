@@ -9,39 +9,47 @@ import SwiftUI
 
 struct BadgesStackView: View {
     @Environment(\.colorScheme) private var colorScheme
-    
-    let badges: [LocalizedStringKey]
+
+    /// Already-localized labels — resolved `String`s rather than
+    /// `LocalizedStringKey`, since suggestion chips compose theirs from a
+    /// localized name plus an emoji.
+    let badges: [String]
     let innerPadding: Double
     let borderThickness: Double
     let borderColor: Color
     let cornerRadius: Double
+    let onTap: (Int) -> Void
 
     init(
-        badges: [LocalizedStringKey],
+        badges: [String],
         innerPadding: Double = 8,
         borderThickness: Double = 1,
         borderColor: Color = Color.gray,
-        cornerRadius: Double = 16
+        cornerRadius: Double = 16,
+        onTap: @escaping (Int) -> Void
     ) {
         self.badges = badges
         self.innerPadding = innerPadding
         self.borderThickness = borderThickness
         self.borderColor = borderColor
         self.cornerRadius = cornerRadius
+        self.onTap = onTap
     }
 
     var body: some View {
         WrappingHStack(hSpacing: 13, vSpacing: 13) {
             ForEach(badges.indices, id: \.self) { index in
-                Text(badges[index])
-                    .padding(.all, innerPadding)
-                    .padding(.horizontal, 5)
-                    .background {
-                        RoundedRectangle(cornerRadius: cornerRadius)
-                            .fill(fillColor)
-                            .stroke(borderColor, lineWidth: borderThickness)
-                    }
-
+                Button(action: { onTap(index) }) {
+                    Text(badges[index])
+                        .padding(.all, innerPadding)
+                        .padding(.horizontal, 5)
+                        .background {
+                            RoundedRectangle(cornerRadius: cornerRadius)
+                                .fill(fillColor)
+                                .stroke(borderColor, lineWidth: borderThickness)
+                        }
+                }
+                .buttonStyle(.plain)
             }
         }
 
@@ -62,8 +70,10 @@ struct BadgesStackView: View {
             "Pain",
             "Mood",
             "Relax Time",
-            "Coffee ☕️", // Translated
+            "Coffee ☕️",
             "Meat ate",
             "Car cost",
-        ])
+        ],
+        onTap: { _ in }
+    )
 }
