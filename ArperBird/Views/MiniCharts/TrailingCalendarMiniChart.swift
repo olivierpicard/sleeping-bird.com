@@ -9,8 +9,11 @@ import SwiftUI
 
 struct TrailingCalendarMiniChart: MiniChart {
     let data: [Date]
+    var falseData: [Date] = []
     let color: Color
     var visibleDays: Int = 7
+
+    private enum DayState { case filled, negative, empty }
 
     private let maxDotSize: Double = 36
     private let dotSpacing: Double = 6
@@ -28,9 +31,15 @@ struct TrailingCalendarMiniChart: MiniChart {
         }
     }
 
-    private func hasEntry(on day: Date) -> Bool {
+    private func dayState(on day: Date) -> DayState {
         let target = calendar.startOfDay(for: day)
-        return data.contains { calendar.startOfDay(for: $0) == target }
+        if data.contains(where: { calendar.startOfDay(for: $0) == target }) {
+            return .filled
+        }
+        if falseData.contains(where: { calendar.startOfDay(for: $0) == target }) {
+            return .negative
+        }
+        return .empty
     }
 
     private func weekdayLabel(for date: Date) -> String {
@@ -44,11 +53,10 @@ struct TrailingCalendarMiniChart: MiniChart {
             let totalSpacing = dotSpacing * Double(slots - 1)
             let availableWidth = max(geo.size.width - totalSpacing, 0)
             let dotSize = min(maxDotSize, availableWidth / Double(slots))
-            let today = calendar.startOfDay(for: .now)
 
             HStack(spacing: dotSpacing) {
                 ForEach(days, id: \.self) { day in
-                    let active = hasEntry(on: day)
+                    let state = dayState(on: day)
                     let dayNumber = calendar.component(.day, from: day)
 
                     VStack(spacing: labelSpacing) {
@@ -64,20 +72,28 @@ struct TrailingCalendarMiniChart: MiniChart {
 
                         Circle()
                             .fill(
-                                active
-                                    ? color.opacity(
-                                        isDark ? 0.4 : 0.2
-                                    ) : Color.clear
+                                {
+                                    switch state {
+                                    case .filled:
+                                        return color.opacity(isDark ? 0.4 : 0.2)
+                                    case .negative:
+                                        return Color.secondary.opacity(0.35)
+                                    case .empty:
+                                        return Color.clear
+                                    }
+                                }()
                             )
                             .overlay(
                                 Circle().strokeBorder(
-                                    color.opacity(isDark ? 0.8 : 0.5),
+                                    // A logged "false" reads as a solid gray
+                                    // fill; true keeps the tinted ring; empty
+                                    // days stay a dashed "waiting" ring.
+                                    state == .negative
+                                        ? Color.secondary.opacity(0.5)
+                                        : color.opacity(isDark ? 0.8 : 0.5),
                                     style: StrokeStyle(
                                         lineWidth: 1,
-                                        // Empty days read as "waiting for an
-                                        // entry" via a dashed ring; logged days
-                                        // get a solid filled circle.
-                                        dash: active ? [] : [3, 3]
+                                        dash: state == .empty ? [3, 3] : []
                                     )
                                 )
                             )
@@ -110,8 +126,12 @@ struct TrailingCalendarMiniChart: MiniChart {
         cal.date(byAdding: .day, value: -3, to: today)!,
         today,
     ]
+    let falseData: [Date] = [
+        cal.date(byAdding: .day, value: -2, to: today)!,
+        cal.date(byAdding: .day, value: -5, to: today)!,
+    ]
 
-    TrailingCalendarMiniChart(data: data, color: .pink)
+    TrailingCalendarMiniChart(data: data, falseData: falseData, color: .pink)
         .frame(height: 80)
         .padding()
 }

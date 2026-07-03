@@ -63,11 +63,21 @@ enum MiniChartFactory {
             return DividerBarMiniChart(entries: entries)
 
         case .binary:
-            let dates = metric.data.compactMap { dp -> Date? in
-                guard let b = dp.binaryValue, b.value else { return nil }
-                return b.date
+            var trueDates: [Date] = []
+            var falseDates: [Date] = []
+            for dp in metric.data {
+                guard let b = dp.binaryValue else { continue }
+                if b.value {
+                    trueDates.append(b.date)
+                } else {
+                    falseDates.append(b.date)
+                }
             }
-            return TrailingCalendarMiniChart(data: dates, color: color)
+            return TrailingCalendarMiniChart(
+                data: trueDates,
+                falseData: falseDates,
+                color: color
+            )
 
         case .duration(let cfg):
             let values = metric.data.compactMap(\.durationValue?.interval)

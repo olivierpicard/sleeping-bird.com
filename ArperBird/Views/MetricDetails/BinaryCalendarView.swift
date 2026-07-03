@@ -9,6 +9,7 @@ import SwiftUI
 
 struct BinaryCalendarView: View {
     let filledDays: Set<Date>
+    var falseDays: Set<Date> = []
     let startMonth: Date
     let endMonth: Date
     let tint: Color
@@ -44,6 +45,7 @@ struct BinaryCalendarView: View {
                         MonthGridView(
                             month: month,
                             filledDays: filledDays,
+                            falseDays: falseDays,
                             tint: tint,
                             selectedDate: $selectedDate
                         )
@@ -74,7 +76,7 @@ struct BinaryCalendarView: View {
                 if filled {
                     Circle().fill(tint)
                 } else {
-                    Circle().strokeBorder(Color.secondary.opacity(0.4), lineWidth: 1)
+                    Circle().fill(Color.secondary.opacity(0.35))
                 }
             }
             .frame(width: 10, height: 10)
@@ -97,6 +99,7 @@ private let weekdaySymbols: [String] = {
 private struct MonthGridView: View {
     let month: Date
     let filledDays: Set<Date>
+    let falseDays: Set<Date>
     let tint: Color
     @Binding var selectedDate: Date?
 
@@ -143,6 +146,7 @@ private struct MonthGridView: View {
                         DayCell(
                             date: date,
                             isFilled: filledDays.contains(Calendar.current.startOfDay(for: date)),
+                            isFalse: falseDays.contains(Calendar.current.startOfDay(for: date)),
                             isSelected: isSelected(date),
                             isToday: Calendar.current.isDateInToday(date),
                             isFuture: isFuture,
@@ -166,6 +170,7 @@ private struct MonthGridView: View {
 private struct DayCell: View {
     let date: Date
     let isFilled: Bool
+    let isFalse: Bool
     let isSelected: Bool
     let isToday: Bool
     let isFuture: Bool
@@ -179,6 +184,8 @@ private struct DayCell: View {
             Group {
                 if isFilled {
                     Circle().fill(tint)
+                } else if isFalse {
+                    Circle().fill(Color.secondary.opacity(0.35))
                 } else {
                     Circle().strokeBorder(Color.secondary.opacity(0.3), lineWidth: 1)
                 }
@@ -187,8 +194,8 @@ private struct DayCell: View {
 
             Text("\(Calendar.current.component(.day, from: date))")
                 .font(.caption)
-                .fontWeight(isFilled || isToday ? .semibold : .regular)
-                .foregroundStyle(isFilled ? Color.white : .primary)
+                .fontWeight(isFilled || isFalse || isToday ? .semibold : .regular)
+                .foregroundStyle(isFilled || isFalse ? Color.white : .primary)
         }
         .opacity(isFuture ? 0.15 : 1)
         .aspectRatio(1, contentMode: .fit)
@@ -203,15 +210,15 @@ private struct DayCell: View {
         var body: some View {
             let cal = Calendar.current
             let today = Date()
-            let filled: Set<Date> = Set(
-                (0..<60)
-                    .compactMap { cal.date(byAdding: .day, value: -$0, to: today) }
-                    .filter { _ in Bool.random() }
-                    .map { cal.startOfDay(for: $0) }
-            )
+            let days = (0..<60)
+                .compactMap { cal.date(byAdding: .day, value: -$0, to: today) }
+                .map { cal.startOfDay(for: $0) }
+            let filled = Set(days.filter { _ in Bool.random() })
+            let falseDays = Set(days.filter { !filled.contains($0) && Bool.random() })
             let start = cal.date(byAdding: .month, value: -5, to: today) ?? today
             return BinaryCalendarView(
                 filledDays: filled,
+                falseDays: falseDays,
                 startMonth: start,
                 endMonth: today,
                 tint: .teal,

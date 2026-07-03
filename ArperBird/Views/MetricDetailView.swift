@@ -16,6 +16,7 @@ struct MetricDetailView: View {
     @State private var selectedDate: Date?
     @State private var bins: [ChartBin] = []
     @State private var filledDays: Set<Date> = []
+    @State private var falseDays: Set<Date> = []
     @State private var categoryEntries: [StackedBarChartView.Entry] = []
     @State private var datetimeFilledDays: Set<Date> = []
     @State private var isEditing: Bool = false
@@ -39,13 +40,19 @@ struct MetricDetailView: View {
 
     private func recomputeFilledDays() {
         let cal = Calendar.current
-        var set: Set<Date> = []
+        var trueSet: Set<Date> = []
+        var falseSet: Set<Date> = []
         for point in metric.data {
-            if case .binary(let date, true) = point {
-                set.insert(cal.startOfDay(for: date))
+            if case .binary(let date, let value) = point {
+                if value {
+                    trueSet.insert(cal.startOfDay(for: date))
+                } else {
+                    falseSet.insert(cal.startOfDay(for: date))
+                }
             }
         }
-        filledDays = set
+        filledDays = trueSet
+        falseDays = falseSet
     }
 
     private func recomputeDatetimeFilledDays() {
@@ -484,6 +491,7 @@ struct MetricDetailView: View {
         let cfg = binaryConfig
         return BinaryCalendarView(
             filledDays: filledDays,
+            falseDays: falseDays,
             startMonth: startMonth,
             endMonth: endMonth,
             tint: metric.color,
