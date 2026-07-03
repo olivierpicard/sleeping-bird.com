@@ -73,10 +73,10 @@ struct TrackerSuggestion: Identifiable {
         case .choices:
             [
                 .init(name: "Mood", emoji: "😁", kind: .choices),
+                .init(name: "Sleep Quality", emoji: "😴", kind: .choices),
+                .init(name: "Social Contact", emoji: "👥", kind: .choices),
                 .init(name: "Meal Type", emoji: "🍽️", kind: .choices),
-                .init(name: "Symptoms", emoji: "🤒", kind: .choices),
-                .init(name: "Workout Type", emoji: "🏃", kind: .choices),
-                .init(name: "Acne Trigger", emoji: "🧖", kind: .choices),
+                .init(name: "Cravings", emoji: "🍫", kind: .choices),
             ]
         case .date:
             [
@@ -84,7 +84,6 @@ struct TrackerSuggestion: Identifiable {
                 .init(name: "Haircut", emoji: "💇", kind: .date),
                 .init(name: "Allergy", emoji: "🤧", kind: .date),
                 .init(name: "Watered Plants", emoji: "🪴", kind: .date),
-                .init(name: "Sheets Changed", emoji: "🛏️", kind: .date),
                 .init(name: "Migraine", emoji: "🤕", kind: .date),
             ]
         case .goal:
@@ -93,7 +92,6 @@ struct TrackerSuggestion: Identifiable {
                 .init(name: "Pushups", emoji: "💪", kind: .goal),
                 .init(name: "Veggies", emoji: "🥦", kind: .goal),
                 .init(name: "New Words", emoji: "🗣️", kind: .goal),
-                .init(name: "Gratitudes", emoji: "✨", kind: .goal),
                 .init(name: "Chores", emoji: "🧹", kind: .goal),
             ]
         case .number:

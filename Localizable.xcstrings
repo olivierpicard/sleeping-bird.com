@@ -58,22 +58,6 @@
         }
       }
     },
-    "Acne Trigger" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Desencadenante de acné"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Déclencheur d'acné"
-          }
-        }
-      }
-    },
     "Add a tracker" : {
       "localizations" : {
         "es" : {
@@ -236,6 +220,22 @@
         }
       }
     },
+    "Allergy" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alergia"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Allergie"
+          }
+        }
+      }
+    },
     "An idea? A bug?" : {
       "localizations" : {
         "es" : {
@@ -372,22 +372,6 @@
     },
     "Cancel" : {
 
-    },
-    "Allergy" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Alergia"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Allergie"
-          }
-        }
-      }
     },
     "Category" : {
       "localizations" : {
@@ -590,6 +574,22 @@
     },
     "Couldn't set up your tracker" : {
 
+    },
+    "Cravings" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Antojos"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Envies"
+          }
+        }
+      }
     },
     "Create metrics and log entries just by speaking" : {
       "localizations" : {
@@ -1033,6 +1033,7 @@
       }
     },
     "Gratitudes" : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -1059,7 +1060,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Salle de sport"
+            "value" : "Gym"
           }
         }
       }
@@ -2565,6 +2566,7 @@
 
     },
     "Sheets Changed" : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -2586,6 +2588,22 @@
     "Single or multiple choice" : {
 
     },
+    "Sleep Quality" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Calidad del sueño"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Qualité du sommeil"
+          }
+        }
+      }
+    },
     "Sleeps 💤" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -2605,6 +2623,22 @@
     },
     "Snapshot" : {
 
+    },
+    "Social Contact" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Contacto social"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Contact social"
+          }
+        }
+      }
     },
     "Step" : {
       "localizations" : {
@@ -2888,22 +2922,6 @@
         }
       }
     },
-    "Symptoms" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Síntomas"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Symptômes"
-          }
-        }
-      }
-    },
     "Tap to change" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -3073,13 +3091,13 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Medicinas tomadas"
+            "value" : "Medicamento"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Médicaments pris"
+            "value" : "Médicament"
           }
         }
       }
@@ -3829,22 +3847,6 @@
     },
     "y" : {
 
-    },
-    "Workout Type" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tipo de ejercicio"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Type d'entraînement"
-          }
-        }
-      }
     },
     "Yearly" : {
       "localizations" : {
