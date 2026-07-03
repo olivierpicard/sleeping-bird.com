@@ -64,12 +64,14 @@ struct TrackerTypeView: View {
                 ForEach(options) { option in
                     cardPage(for: option)
                         .tag(option.kind)
+                        .padding(.top, 36)
                 }
             }
             .tabViewStyle(.page(indexDisplayMode: .never))
-            .frame(height: 320)
+            .frame(height: 380)
 
             pageIndicator
+//                .padding(.bottom, 100)
 
             Spacer()
 
@@ -121,6 +123,7 @@ struct TrackerTypeView: View {
                     innerPadding: 5,
                     borderThickness: 0.5,
                     alignment: .center,
+                    maxRows: 2,
                     onTap: { index in
                         onSuggestion(option.suggestions[index])
                     }
@@ -130,6 +133,7 @@ struct TrackerTypeView: View {
             }
             .multilineTextAlignment(.center)
         }
+        .frame(maxHeight: .infinity, alignment: .top)
         .padding(.horizontal)
     }
 
@@ -242,6 +246,7 @@ struct TrackerTypeView: View {
         NavigationStack {
             TrackerTypeView()
         }
+        .environment(\.locale, Locale(identifier: "en_US"))
     }
     .presentationDetents([.large])
 }

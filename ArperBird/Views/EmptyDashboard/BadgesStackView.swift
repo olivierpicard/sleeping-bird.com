@@ -21,6 +21,9 @@ struct BadgesStackView: View {
     /// How wrapped rows sit in the available width — passed through to the
     /// underlying `WrappingHStack` (see its `alignment` doc).
     let alignment: HorizontalAlignment
+    /// Hard cap on rows; chips that would spill past it are hidden entirely.
+    /// `nil` means unbounded.
+    let maxRows: Int?
     let onTap: (Int) -> Void
 
     init(
@@ -30,6 +33,7 @@ struct BadgesStackView: View {
         borderColor: Color = Color.gray,
         cornerRadius: Double = 16,
         alignment: HorizontalAlignment = .leading,
+        maxRows: Int? = nil,
         onTap: @escaping (Int) -> Void
     ) {
         self.badges = badges
@@ -38,11 +42,12 @@ struct BadgesStackView: View {
         self.borderColor = borderColor
         self.cornerRadius = cornerRadius
         self.alignment = alignment
+        self.maxRows = maxRows
         self.onTap = onTap
     }
 
     var body: some View {
-        WrappingHStack(alignment: alignment, hSpacing: 13, vSpacing: 13) {
+        WrappingHStack(alignment: alignment, hSpacing: 13, vSpacing: 13, maxRows: maxRows) {
             ForEach(badges.indices, id: \.self) { index in
                 Button(action: { onTap(index) }) {
                     Text(badges[index])
