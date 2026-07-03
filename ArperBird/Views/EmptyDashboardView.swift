@@ -10,7 +10,7 @@ import SwiftUI
 
 struct EmptyDashboardView: View {
     /// Opens the creation flow — seeded with the tapped suggestion, or from
-    /// scratch (`nil`) via the "+" button and the "Ask anything…" chip.
+    /// scratch (`nil`) via the "+" button.
     let onAddMetric: (TrackerSuggestion?) -> Void
     @Environment(\.colorScheme) private var colorScheme
 
@@ -73,15 +73,10 @@ struct EmptyDashboardView: View {
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             BadgesStackView(
-                badges: suggestions.map(\.label)
-                    + [String(localized: "Ask anything...")],
+                badges: suggestions.map(\.label),
                 borderThickness: 0.5,
                 onTap: { index in
-                    // The trailing "Ask anything…" chip has no suggestion behind
-                    // it — it opens the flow from scratch, like the "+" button.
-                    let suggestion =
-                        index < suggestions.count ? suggestions[index] : nil
-                    onAddMetric(suggestion)
+                    onAddMetric(suggestions[index])
                 }
             )
             .padding(.top, 10)

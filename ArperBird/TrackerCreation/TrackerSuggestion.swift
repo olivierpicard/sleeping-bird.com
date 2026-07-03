@@ -36,13 +36,14 @@ struct TrackerSuggestion: Identifiable {
     static let defaults: [TrackerSuggestion] = [
         .init(name: "Water", emoji: "💧", kind: .number),
         .init(name: "Maintenance", emoji: "💰🚗", kind: .number),
-        .init(name: "Sleep", emoji: "💤", kind: .duration),
+        .init(name: "Practice", emoji: "⏱️🎸", kind: .duration),
         .init(name: "Pain", emoji: "😖", kind: .number),
         .init(name: "Mood", emoji: "😁", kind: .choices),
         .init(name: "Proteins", emoji: "🥩🌱", kind: .number),
         .init(name: "Meditation", emoji: "⏱️🧘", kind: .duration),
         .init(name: "Coffee", emoji: "☕️", kind: .number),
         .init(name: "Fuel Spend", emoji: "⛽️", kind: .number),
+        .init(name: "Time Outside", emoji: "🌳", kind: .duration),
     ]
 
     /// Curated ideas for one tracker type, shown as tappable chips on that
@@ -55,37 +56,51 @@ struct TrackerSuggestion: Identifiable {
         switch kind {
         case .duration:
             [
-                .init(name: "Sleep", emoji: "💤", kind: .duration),
+                .init(name: "Time Outside", emoji: "🌳", kind: .duration),
+                .init(name: "Practice", emoji: "🎸", kind: .duration),
                 .init(name: "Reading", emoji: "📖", kind: .duration),
-                .init(name: "Screen Time", emoji: "📱", kind: .duration),
+                .init(name: "Focus Work", emoji: "🧑‍💻", kind: .duration),
+                .init(name: "Gaming", emoji: "🎮", kind: .duration),
             ]
         case .binary:
             [
                 .init(name: "Took Meds", emoji: "💊", kind: .binary),
                 .init(name: "Gym", emoji: "🏋️", kind: .binary),
                 .init(name: "Ate Healthy", emoji: "🥗", kind: .binary),
+                .init(name: "Flossed", emoji: "🦷", kind: .binary),
+                .init(name: "No Alcohol", emoji: "🚫🍺", kind: .binary),
             ]
         case .choices:
             [
                 .init(name: "Mood", emoji: "😁", kind: .choices),
                 .init(name: "Meal Type", emoji: "🍽️", kind: .choices),
                 .init(name: "Symptoms", emoji: "🤒", kind: .choices),
+                .init(name: "Workout Type", emoji: "🏃", kind: .choices),
+                .init(name: "Acne Trigger", emoji: "🧖", kind: .choices),
             ]
         case .date:
             [
                 .init(name: "Period", emoji: "🩸", kind: .date),
                 .init(name: "Haircut", emoji: "💇", kind: .date),
-                .init(name: "Car Service", emoji: "🔧🚗", kind: .date),
+                .init(name: "Allergy", emoji: "🤧", kind: .date),
+                .init(name: "Watered Plants", emoji: "🪴", kind: .date),
+                .init(name: "Sheets Changed", emoji: "🛏️", kind: .date),
+                .init(name: "Migraine", emoji: "🤕", kind: .date),
             ]
         case .goal:
             [
-                .init(name: "Steps", emoji: "👟", kind: .goal),
                 .init(name: "Water", emoji: "💧", kind: .goal),
-                .init(name: "Calories", emoji: "🔥", kind: .goal),
+                .init(name: "Pushups", emoji: "💪", kind: .goal),
+                .init(name: "Veggies", emoji: "🥦", kind: .goal),
+                .init(name: "New Words", emoji: "🗣️", kind: .goal),
+                .init(name: "Gratitudes", emoji: "✨", kind: .goal),
+                .init(name: "Chores", emoji: "🧹", kind: .goal),
             ]
         case .number:
             [
-                .init(name: "Weight", emoji: "⚖️", kind: .number),
+                .init(name: "Fuel Spend", emoji: "⛽️", kind: .number),
+                .init(name: "Waist", emoji: "📏", kind: .number),
+                .init(name: "Cigarettes", emoji: "🚬", kind: .number),
                 .init(name: "Coffee", emoji: "☕️", kind: .number),
                 .init(name: "Pain", emoji: "😖", kind: .number),
             ]

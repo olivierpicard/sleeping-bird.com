@@ -58,6 +58,22 @@
         }
       }
     },
+    "Acne Trigger" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Desencadenante de acné"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Déclencheur d'acné"
+          }
+        }
+      }
+    },
     "Add a tracker" : {
       "localizations" : {
         "es" : {
@@ -300,22 +316,6 @@
         }
       }
     },
-    "Ask anything..." : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pregunta lo que quieras..."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Demandez n'importe quoi..."
-          }
-        }
-      }
-    },
     "Ate Healthy" : {
       "localizations" : {
         "es" : {
@@ -367,40 +367,24 @@
         }
       }
     },
-    "Calories" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Calorías"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Calories"
-          }
-        }
-      }
-    },
     "Can be represented by numbers" : {
 
     },
     "Cancel" : {
 
     },
-    "Car Service" : {
+    "Allergy" : {
       "localizations" : {
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Revisión del coche"
+            "value" : "Alergia"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Révision auto"
+            "value" : "Allergie"
           }
         }
       }
@@ -439,6 +423,38 @@
     },
     "Choose the tracker's unit" : {
 
+    },
+    "Chores" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quehaceres"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Corvées"
+          }
+        }
+      }
+    },
+    "Cigarettes" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cigarrillos"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cigarettes"
+          }
+        }
+      }
     },
     "Close" : {
       "localizations" : {
@@ -868,6 +884,38 @@
         }
       }
     },
+    "Flossed" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hilo dental"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fil dentaire"
+          }
+        }
+      }
+    },
+    "Focus Work" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Concentración"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Concentration"
+          }
+        }
+      }
+    },
     "Fuel Spend" : {
       "localizations" : {
         "es" : {
@@ -897,6 +945,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Carburant ⛽️"
+          }
+        }
+      }
+    },
+    "Gaming" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Videojuegos"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jeux vidéo"
           }
         }
       }
@@ -964,6 +1028,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Granularité"
+          }
+        }
+      }
+    },
+    "Gratitudes" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Agradecimientos"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gratitudes"
           }
         }
       }
@@ -1742,6 +1822,22 @@
         }
       }
     },
+    "Migraine" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Migraña"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Migraine"
+          }
+        }
+      }
+    },
     "Monthly" : {
       "localizations" : {
         "es" : {
@@ -1826,6 +1922,22 @@
         }
       }
     },
+    "New Words" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Palabras nuevas"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nouveaux mots"
+          }
+        }
+      }
+    },
     "Next" : {
       "localizations" : {
         "es" : {
@@ -1854,6 +1966,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Sans publicité, vie privée garantie"
+          }
+        }
+      }
+    },
+    "No Alcohol" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sin alcohol"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sans alcool"
           }
         }
       }
@@ -2180,6 +2308,22 @@
     "Placeholder" : {
 
     },
+    "Practice" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Práctica"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pratique"
+          }
+        }
+      }
+    },
     "Premium" : {
       "localizations" : {
         "es" : {
@@ -2273,6 +2417,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Protéines 🥩🌱"
+          }
+        }
+      }
+    },
+    "Pushups" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Flexiones"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pompes"
           }
         }
       }
@@ -2392,22 +2552,6 @@
     "Save a date on calendar" : {
 
     },
-    "Screen Time" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tiempo de pantalla"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Temps d'écran"
-          }
-        }
-      }
-    },
     "Set the duration" : {
 
     },
@@ -2420,27 +2564,27 @@
     "Setting up your tracker…" : {
 
     },
-    "Single choice" : {
-
-    },
-    "Single or multiple choice" : {
-
-    },
-    "Sleep" : {
+    "Sheets Changed" : {
       "localizations" : {
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Sueño"
+            "value" : "Cambio de sábanas"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Sommeil"
+            "value" : "Changement de draps"
           }
         }
       }
+    },
+    "Single choice" : {
+
+    },
+    "Single or multiple choice" : {
+
     },
     "Sleeps 💤" : {
       "extractionState" : "stale",
@@ -2538,22 +2682,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Pas entre les saisies"
-          }
-        }
-      }
-    },
-    "Steps" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pasos"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pas"
           }
         }
       }
@@ -2901,6 +3029,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Les valeurs que vous enregistrez, les noms de vos mesures et vos descriptions sont stockés localement sur votre appareil à l'aide de la base de données intégrée d'Apple. Ils ne quittent jamais votre appareil et nous n'en recevons jamais de copie."
+          }
+        }
+      }
+    },
+    "Time Outside" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tiempo al aire libre"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Temps dehors"
           }
         }
       }
@@ -3389,6 +3533,22 @@
     "Value" : {
 
     },
+    "Veggies" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verduras"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Légumes"
+          }
+        }
+      }
+    },
     "View details" : {
       "localizations" : {
         "es" : {
@@ -3417,6 +3577,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Transcription vocale (Deepgram)"
+          }
+        }
+      }
+    },
+    "Waist" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cintura"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tour de taille"
           }
         }
       }
@@ -3466,6 +3642,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Eau 💧"
+          }
+        }
+      }
+    },
+    "Watered Plants" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Riego de plantas"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Arrosage des plantes"
           }
         }
       }
@@ -3530,22 +3722,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Nous utiliserons votre langue pour comprendre votre voix avec plus de précision."
-          }
-        }
-      }
-    },
-    "Weight" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Peso"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Poids"
           }
         }
       }
@@ -3653,6 +3829,22 @@
     },
     "y" : {
 
+    },
+    "Workout Type" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tipo de ejercicio"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Type d'entraînement"
+          }
+        }
+      }
     },
     "Yearly" : {
       "localizations" : {
