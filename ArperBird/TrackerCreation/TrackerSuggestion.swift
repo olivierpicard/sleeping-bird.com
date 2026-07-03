@@ -44,4 +44,51 @@ struct TrackerSuggestion: Identifiable {
         .init(name: "Coffee", emoji: "☕️", kind: .number),
         .init(name: "Fuel Spend", emoji: "⛽️", kind: .number),
     ]
+
+    /// Curated ideas for one tracker type, shown as tappable chips on that
+    /// type's page in the type-picker carousel — the interactive counterpart
+    /// of the static examples caption they replace. Each list is hand-picked
+    /// for its kind (unlike `defaults`, which skews `.number` for the
+    /// dashboard), so a tap both teaches what the type is for and shortcuts
+    /// straight into its flow.
+    static func examples(for kind: TrackerKind) -> [TrackerSuggestion] {
+        switch kind {
+        case .duration:
+            [
+                .init(name: "Sleep", emoji: "💤", kind: .duration),
+                .init(name: "Reading", emoji: "📖", kind: .duration),
+                .init(name: "Screen Time", emoji: "📱", kind: .duration),
+            ]
+        case .binary:
+            [
+                .init(name: "Took Meds", emoji: "💊", kind: .binary),
+                .init(name: "Gym", emoji: "🏋️", kind: .binary),
+                .init(name: "Ate Healthy", emoji: "🥗", kind: .binary),
+            ]
+        case .choices:
+            [
+                .init(name: "Mood", emoji: "😁", kind: .choices),
+                .init(name: "Meal Type", emoji: "🍽️", kind: .choices),
+                .init(name: "Symptoms", emoji: "🤒", kind: .choices),
+            ]
+        case .date:
+            [
+                .init(name: "Period", emoji: "🩸", kind: .date),
+                .init(name: "Haircut", emoji: "💇", kind: .date),
+                .init(name: "Car Service", emoji: "🔧🚗", kind: .date),
+            ]
+        case .goal:
+            [
+                .init(name: "Steps", emoji: "👟", kind: .goal),
+                .init(name: "Water", emoji: "💧", kind: .goal),
+                .init(name: "Calories", emoji: "🔥", kind: .goal),
+            ]
+        case .number:
+            [
+                .init(name: "Weight", emoji: "⚖️", kind: .number),
+                .init(name: "Coffee", emoji: "☕️", kind: .number),
+                .init(name: "Pain", emoji: "😖", kind: .number),
+            ]
+        }
+    }
 }

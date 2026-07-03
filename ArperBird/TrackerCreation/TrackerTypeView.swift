@@ -18,6 +18,9 @@ struct TrackerTypeView: View {
     let color: Color
     let emoji: String
     var onNext: (TrackerKind) -> Void
+    /// A tap on one of a page's example chips — a shortcut that seeds the flow
+    /// with the suggestion's name and kind, skipping the naming step.
+    var onSuggestion: (TrackerSuggestion) -> Void
 
     private let options: [TrackerTypeOption]
     @State private var selection: TrackerKind
@@ -26,12 +29,14 @@ struct TrackerTypeView: View {
         name: String = String(localized: "Your tracker name"),
         color: Color = .gray,
         emoji: String = "🫥",
-        onNext: @escaping (TrackerKind) -> Void = { _ in }
+        onNext: @escaping (TrackerKind) -> Void = { _ in },
+        onSuggestion: @escaping (TrackerSuggestion) -> Void = { _ in }
     ) {
         self.name = name
         self.color = color
         self.emoji = emoji
         self.onNext = onNext
+        self.onSuggestion = onSuggestion
         let options = Self.makeOptions(color: color)
         self.options = options
         _selection = State(initialValue: options.first?.kind ?? .number)
@@ -109,10 +114,19 @@ struct TrackerTypeView: View {
                 Text(option.sublabel)
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
-                Text(option.examples)
-                    .font(.caption)
-                    .foregroundStyle(.tertiary)
-                    .padding(.top, 6)
+                // Tappable counterparts of the examples caption this replaces:
+                // each chip seeds the flow with its name + this page's kind.
+                BadgesStackView(
+                    badges: option.suggestions.map(\.label),
+                    innerPadding: 5,
+                    borderThickness: 0.5,
+                    alignment: .center,
+                    onTap: { index in
+                        onSuggestion(option.suggestions[index])
+                    }
+                )
+                .font(.footnote)
+                .padding(.top, 8)
             }
             .multilineTextAlignment(.center)
         }
@@ -142,9 +156,9 @@ struct TrackerTypeView: View {
         let kind: TrackerKind
         let label: LocalizedStringResource
         let sublabel: LocalizedStringKey
-        /// Concrete real-world examples that make the abstract type tangible,
-        /// e.g. "Like workouts, reading, or screen time".
-        let examples: LocalizedStringKey
+        /// Concrete real-world ideas that make the abstract type tangible,
+        /// shown as tappable chips that shortcut into the kind's flow.
+        let suggestions: [TrackerSuggestion]
         let metric: Metric
     }
 
@@ -153,7 +167,6 @@ struct TrackerTypeView: View {
             _ kind: TrackerKind,
             label: LocalizedStringResource,
             sublabel: LocalizedStringKey,
-            examples: LocalizedStringKey,
             schema: MetricSchema,
             // Bar charts drop older values to fit the card width, so seed enough
             // days to fill it. Passed per-call so each option owns its sample
@@ -164,7 +177,7 @@ struct TrackerTypeView: View {
                 kind: kind,
                 label: label,
                 sublabel: sublabel,
-                examples: examples,
+                suggestions: TrackerSuggestion.examples(for: kind),
                 metric: Metric(
                     from: schema,
                     color: color,
@@ -178,7 +191,6 @@ struct TrackerTypeView: View {
                 .duration,
                 label: "tracker_type.duration.label",
                 sublabel: "Time spent on an activity",
-                examples: "Like workouts, reading, screen time...",
                 schema: MetricSchema.Fake.duration(chart: .bar),
                 days: 40
             ),
@@ -186,28 +198,24 @@ struct TrackerTypeView: View {
                 .binary,
                 label: "Binary",
                 sublabel: "Yes/No choices",
-                examples: "Like took meds, went to the gym, ate healthy...",
                 schema: MetricSchema.Fake.binary(chart: .calendar)
             ),
             option(
                 .choices,
                 label: "Category",
                 sublabel: "Single or multiple choice",
-                examples: "Like mood, meal type, symptoms...",
                 schema: MetricSchema.Fake.categorySingle(chart: .pie)
             ),
             option(
                 .date,
                 label: "tracker_type.date.label",
                 sublabel: "Save a date on calendar",
-                examples: "Like a period start, last haircut, car service...",
                 schema: MetricSchema.Fake.datetime(chart: .calendar)
             ),
             option(
                 .goal,
                 label: "tracker_type.goal.label",
                 sublabel: "A goal to reach per day",
-                examples: "Like steps, water intake, or calories",
                 schema: MetricSchema.Fake.number(
                     min: 3_000,
                     max: 8_000,
@@ -219,7 +227,6 @@ struct TrackerTypeView: View {
                 .number,
                 label: "Other",
                 sublabel: "Can be represented by numbers",
-                examples: "",
                 schema: MetricSchema.Fake.number(goal: nil, chart: .line),
                 days: 22
             ),

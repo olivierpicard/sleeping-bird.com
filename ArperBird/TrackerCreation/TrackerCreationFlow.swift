@@ -92,12 +92,24 @@ struct TrackerCreationFlow: View {
 
     var body: some View {
         NavigationStack(path: $path) {
-            TrackerTypeView { selectedKind in
-                model.kind = selectedKind
-                // Every kind names first — the name is what each path's AI-driven
-                // steps key off of, the number ("Other") path included.
-                path.append(.name)
-            }
+            TrackerTypeView(
+                onNext: { selectedKind in
+                    model.kind = selectedKind
+                    // Every kind names first — the name is what each path's
+                    // AI-driven steps key off of, the number ("Other") path
+                    // included.
+                    path.append(.name)
+                },
+                onSuggestion: { suggestion in
+                    // A chip is a pre-named pick: seed the model and jump past
+                    // naming into the kind's loading step, exactly like the
+                    // seeded `init` — `.name` stays underneath so "back" walks
+                    // through the pre-filled naming screen.
+                    model.kind = suggestion.kind
+                    model.name = suggestion.localizedName
+                    path = [.name, Self.firstStep(for: suggestion.kind)]
+                }
+            )
             .navigationDestination(
                 for: TrackerCreationStep.self,
                 destination: destination

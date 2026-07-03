@@ -18,6 +18,9 @@ struct BadgesStackView: View {
     let borderThickness: Double
     let borderColor: Color
     let cornerRadius: Double
+    /// How wrapped rows sit in the available width — passed through to the
+    /// underlying `WrappingHStack` (see its `alignment` doc).
+    let alignment: HorizontalAlignment
     let onTap: (Int) -> Void
 
     init(
@@ -26,6 +29,7 @@ struct BadgesStackView: View {
         borderThickness: Double = 1,
         borderColor: Color = Color.gray,
         cornerRadius: Double = 16,
+        alignment: HorizontalAlignment = .leading,
         onTap: @escaping (Int) -> Void
     ) {
         self.badges = badges
@@ -33,11 +37,12 @@ struct BadgesStackView: View {
         self.borderThickness = borderThickness
         self.borderColor = borderColor
         self.cornerRadius = cornerRadius
+        self.alignment = alignment
         self.onTap = onTap
     }
 
     var body: some View {
-        WrappingHStack(hSpacing: 13, vSpacing: 13) {
+        WrappingHStack(alignment: alignment, hSpacing: 13, vSpacing: 13) {
             ForEach(badges.indices, id: \.self) { index in
                 Button(action: { onTap(index) }) {
                     Text(badges[index])

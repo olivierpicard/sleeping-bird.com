@@ -316,6 +316,22 @@
         }
       }
     },
+    "Ate Healthy" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comí saludable"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mangé sainement"
+          }
+        }
+      }
+    },
     "Binary" : {
 
     },
@@ -351,11 +367,43 @@
         }
       }
     },
+    "Calories" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Calorías"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Calories"
+          }
+        }
+      }
+    },
     "Can be represented by numbers" : {
 
     },
     "Cancel" : {
 
+    },
+    "Car Service" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Revisión del coche"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Révision auto"
+          }
+        }
+      }
     },
     "Category" : {
       "localizations" : {
@@ -920,6 +968,38 @@
         }
       }
     },
+    "Gym" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gimnasio"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Salle de sport"
+          }
+        }
+      }
+    },
+    "Haircut" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Corte de pelo"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Coupe de cheveux"
+          }
+        }
+      }
+    },
     "Happy" : {
       "localizations" : {
         "es" : {
@@ -1057,86 +1137,6 @@
         }
       }
     },
-    "Like a period start, last haircut, car service..." : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Como el inicio del periodo, el último corte de pelo, la revisión del coche..."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Comme le début des règles, la dernière coupe de cheveux, la révision de la voiture..."
-          }
-        }
-      }
-    },
-    "Like mood, meal type, symptoms..." : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Como el estado de ánimo, el tipo de comida, los síntomas..."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Comme l'humeur, le type de repas, les symptômes..."
-          }
-        }
-      }
-    },
-    "Like steps, water intake, or calories" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Como los pasos, el consumo de agua o las calorías"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Comme les pas, la consommation d'eau ou les calories"
-          }
-        }
-      }
-    },
-    "Like took meds, went to the gym, ate healthy..." : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Como tomar la medicación, ir al gimnasio, comer sano..."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Comme prendre ses médicaments, aller à la salle, manger sainement..."
-          }
-        }
-      }
-    },
-    "Like workouts, reading, screen time..." : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Como entrenamientos, lectura, tiempo de pantalla..."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Comme le sport, la lecture, le temps d'écran..."
-          }
-        }
-      }
-    },
     "Log your progress toward the daily goal" : {
 
     },
@@ -1189,6 +1189,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Maximum"
+          }
+        }
+      }
+    },
+    "Meal Type" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tipo de comida"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Type de repas"
           }
         }
       }
@@ -2136,6 +2152,22 @@
         }
       }
     },
+    "Period" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Regla"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Règles"
+          }
+        }
+      }
+    },
     "Pick a unit" : {
 
     },
@@ -2277,6 +2309,22 @@
         }
       }
     },
+    "Reading" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lectura"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lecture"
+          }
+        }
+      }
+    },
     "RECENT ENTRIES" : {
       "localizations" : {
         "es" : {
@@ -2343,6 +2391,22 @@
     },
     "Save a date on calendar" : {
 
+    },
+    "Screen Time" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tiempo de pantalla"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Temps d'écran"
+          }
+        }
+      }
     },
     "Set the duration" : {
 
@@ -2474,6 +2538,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Pas entre les saisies"
+          }
+        }
+      }
+    },
+    "Steps" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pasos"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pas"
           }
         }
       }
@@ -2680,6 +2760,22 @@
         }
       }
     },
+    "Symptoms" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Síntomas"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Symptômes"
+          }
+        }
+      }
+    },
     "Tap to change" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -2824,6 +2920,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Pour assurer la cohérence des analyses et des abonnements après une réinstallation, nous stockons un identifiant aléatoire dans le trousseau (Keychain) de votre appareil. Il ne contient aucune information personnelle et n'est jamais associé à votre identité réelle."
+          }
+        }
+      }
+    },
+    "Took Meds" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Medicinas tomadas"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Médicaments pris"
           }
         }
       }
@@ -3418,6 +3530,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Nous utiliserons votre langue pour comprendre votre voix avec plus de précision."
+          }
+        }
+      }
+    },
+    "Weight" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Peso"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Poids"
           }
         }
       }
