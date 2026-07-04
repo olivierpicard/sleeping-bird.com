@@ -7,10 +7,10 @@
 
 import SwiftUI
 
-/// UI-only mockup of the intent-based creation screen: one live preview card,
-/// hardcoded suggestion chips that morph it, format pills to re-shape it, and
-/// a free-text field. No AI, no navigation, no persistence — built to evaluate
-/// the design before committing to it.
+/// UI-only mockup of the intent-based creation screen, prompt-first: a free-text
+/// "describe it" field on top with hardcoded quick-fill chips, and the live
+/// preview card below as the response, re-shaped by format pills. No AI, no
+/// navigation, no persistence — built to evaluate the design before committing.
 struct TrackerIntentView: View {
     @State private var suggestions: [IntentSuggestion]
     @State private var placeholder: Metric
@@ -47,29 +47,12 @@ struct TrackerIntentView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            previewCard
-                .padding(.horizontal)
-                .padding(.top, 24)
-
-            Text("You, three weeks from now")
-                .font(.caption)
-                .italic()
-                .foregroundStyle(.secondary)
-                .padding(.top, 10)
-                .opacity(selected != nil && !isLoading ? 1 : 0)
-
-            formatPills
-                .padding(.top, 14)
-
             inputField
                 .padding(.horizontal)
-                .padding(.top, 20)
+                .padding(.top, 16)
 
-            Text("Need inspiration?")
-                .font(.footnote)
-                .foregroundStyle(.secondary)
-                .padding(.top, 20)
-
+            // Quick-fill examples for the field: a tap fills the prompt, then
+            // the card below resolves — teaching the field→card causality.
             BadgesStackView(
                 badges: suggestions.map { "\($0.name) \($0.emoji)" },
                 innerPadding: 5,
@@ -80,7 +63,25 @@ struct TrackerIntentView: View {
             )
             .font(.footnote)
             .padding(.horizontal)
-            .padding(.top, 12)
+            .padding(.top, 14)
+
+            Divider()
+                .padding(.horizontal, 48)
+                .padding(.top, 20)
+
+            previewCard
+                .padding(.horizontal)
+                .padding(.top, 20)
+
+            Text("You, three weeks from now")
+                .font(.caption)
+                .italic()
+                .foregroundStyle(.secondary)
+                .padding(.top, 10)
+                .opacity(selected != nil && !isLoading ? 1 : 0)
+
+            formatPills
+                .padding(.top, 14)
 
             Spacer()
 
@@ -147,15 +148,19 @@ struct TrackerIntentView: View {
     }
 
     private var inputField: some View {
-        TextField("What do you want to track?", text: $text)
-            .textFieldStyle(.plain)
-            .submitLabel(.done)
-            .onSubmit { resolveCustom() }
-            .padding(12)
-            .background(
-                RoundedRectangle(cornerRadius: 12)
-                    .fill(Color(.tertiarySystemFill))
-            )
+        HStack(spacing: 8) {
+            Image(systemName: "pencil.line")
+                .foregroundStyle(.secondary)
+            TextField("Describe what you want to track…", text: $text)
+                .textFieldStyle(.plain)
+                .submitLabel(.done)
+                .onSubmit { resolveCustom() }
+        }
+        .padding(12)
+        .background(
+            RoundedRectangle(cornerRadius: 12)
+                .fill(Color(.tertiarySystemFill))
+        )
     }
 
     // MARK: - Fake resolution (stands in for the AI classify call)
