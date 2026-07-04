@@ -102,10 +102,10 @@ struct EmptyDashboardView: View {
             .padding(.bottom, -20)
             .padding(.leading, 30)
             Button(action: { onAddMetric(nil) }) {
-                Label("Add a tracker", systemImage: "plus")
-                .font(.largeTitle)
-                .labelStyle(.iconOnly)
-                .frame(width: 40, height: 40)
+                Label("Add a tracker", systemImage: "square.and.pencil")
+                    .font(.title)
+                    .labelStyle(.iconOnly)
+                    .frame(width: 40, height: 40)
             }
             .controlSize(.extraLarge)
             .buttonStyle(.glassProminent)
