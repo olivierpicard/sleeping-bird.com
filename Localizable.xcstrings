@@ -1221,6 +1221,38 @@
     "Log your progress toward the daily goal" : {
 
     },
+    "Car Maintenance" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mantenimiento del coche"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Entretien voiture"
+          }
+        }
+      }
+    },
+    "Music Practice" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Práctica musical"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pratique musicale"
+          }
+        }
+      }
+    },
     "Maintenance" : {
       "localizations" : {
         "es" : {
@@ -3551,6 +3583,22 @@
     "Value" : {
 
     },
+    "Veggie Servings" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Porciones de verdura"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Portions de légumes"
+          }
+        }
+      }
+    },
     "Veggies" : {
       "localizations" : {
         "es" : {
@@ -3643,6 +3691,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Eau"
+          }
+        }
+      }
+    },
+    "Water Intake" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Consumo de agua"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Consommation d’eau"
           }
         }
       }

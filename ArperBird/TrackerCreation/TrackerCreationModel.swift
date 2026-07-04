@@ -26,7 +26,14 @@ final class TrackerCreationModel {
 
     var kind: TrackerKind?
     var behavior: MetricBehavior?
-    var name = ""
+    var name = "" {
+        // The hint described the suggestion chip, not whatever the user typed —
+        // editing the name invalidates it.
+        didSet { if name != oldValue { aiHint = nil } }
+    }
+    /// English-only context seeded from a suggestion chip, appended to the AI
+    /// instruction alongside the name. Nil for typed names.
+    var aiHint: String?
 
     // MARK: - Goal sub-flow
 
@@ -72,6 +79,13 @@ final class TrackerCreationModel {
     /// switched away from. Nil when no custom unit was ever made.
     var goalMenuCustomUnit: String? {
         isGoalUnitCustom ? selectedUnit : goalCustomUnit
+    }
+
+    /// What the AI seams receive in place of the bare name. The default closures
+    /// prefix "- Tracker name: ", so the hint rides along as a second bullet line.
+    private var nameInstruction: String {
+        guard let aiHint else { return name }
+        return "\(name)\n- Context: \(aiHint)"
     }
 
     /// Seam over the AI call so previews/tests supply suggestions without a
@@ -229,7 +243,7 @@ final class TrackerCreationModel {
         guard loadedName != name || phase == .failed else { return }
         phase = .loading
         do {
-            let schema = try await generate(name)
+            let schema = try await generate(nameInstruction)
             suggestions = schema.goals
             // The emoji is list-level, so seed it once here — it stays put as the
             // user switches units, mirroring how `loadNumberIfNeeded` handles
@@ -262,7 +276,7 @@ final class TrackerCreationModel {
         goalGranularityPhase = .loading
         do {
             let schema = try await generateGranularity(
-                "- Tracker name: \(name)\n- Unit: \(unit)"
+                "- Tracker name: \(nameInstruction)\n- Unit: \(unit)"
             )
             if schema.granularity > 0 { goalGranularity = schema.granularity }
             loadedGranularityKey = key
@@ -282,7 +296,7 @@ final class TrackerCreationModel {
         guard loadedDurationName != name || durationPhase == .failed else { return }
         durationPhase = .loading
         do {
-            let schema = try await generateDuration(name)
+            let schema = try await generateDuration(nameInstruction)
             durationMaxSeconds = schema.maxInSeconds
             durationEmoji = schema.emoji
             loadedDurationName = name
@@ -309,7 +323,7 @@ final class TrackerCreationModel {
         guard loadedBinaryName != name || binaryPhase == .failed else { return }
         binaryPhase = .loading
         do {
-            let schema = try await generateEmoji(name)
+            let schema = try await generateEmoji(nameInstruction)
             binaryEmoji = schema.emoji
             loadedBinaryName = name
             binaryPhase = .loaded
@@ -328,7 +342,7 @@ final class TrackerCreationModel {
         guard loadedDateName != name || datePhase == .failed else { return }
         datePhase = .loading
         do {
-            let schema = try await generateEmoji(name)
+            let schema = try await generateEmoji(nameInstruction)
             dateEmoji = schema.emoji
             loadedDateName = name
             datePhase = .loaded
@@ -349,7 +363,7 @@ final class TrackerCreationModel {
         guard loadedNumberName != name || numberPhase == .failed else { return }
         numberPhase = .loading
         do {
-            let schema = try await generateNumber(name)
+            let schema = try await generateNumber(nameInstruction)
             numberSuggestions = schema.constraints
             behavior = schema.isCumulative ? .cumulative : .snapshot
             numberEmoji = schema.emoji
@@ -399,7 +413,7 @@ final class TrackerCreationModel {
         guard loadedCategoryName != name || categoryPhase == .failed else { return }
         categoryPhase = .loading
         do {
-            let schema = try await generateCategory(name)
+            let schema = try await generateCategory(nameInstruction)
             categoryLabels = schema.categories
             categorySuggestedLabels = schema.categories
             categoryAllowsMultiple = schema.allowsMultipleSelection
@@ -435,7 +449,7 @@ final class TrackerCreationModel {
         categoryPhase = .loading
         do {
             let schema = try await generateCategory(
-                "\(name)\n- Categories: \(labels.joined(separator: ", "))"
+                "\(nameInstruction)\n- Categories: \(labels.joined(separator: ", "))"
             )
             categoryAllowsMultiple = schema.allowsMultipleSelection
             categoryPhase = .loaded

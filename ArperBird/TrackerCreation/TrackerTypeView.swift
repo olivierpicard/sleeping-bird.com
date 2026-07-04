@@ -119,7 +119,7 @@ struct TrackerTypeView: View {
                 // Tappable counterparts of the examples caption this replaces:
                 // each chip seeds the flow with its name + this page's kind.
                 BadgesStackView(
-                    badges: option.suggestions.map(\.label),
+                    badges: option.suggestions.map(\.chipText),
                     innerPadding: 5,
                     borderThickness: 0.5,
                     alignment: .center,

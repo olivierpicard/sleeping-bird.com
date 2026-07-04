@@ -73,7 +73,7 @@ struct EmptyDashboardView: View {
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             BadgesStackView(
-                badges: suggestions.map(\.label),
+                badges: suggestions.map(\.chipText),
                 borderThickness: 0.5,
                 onTap: { index in
                     onAddMetric(suggestions[index])

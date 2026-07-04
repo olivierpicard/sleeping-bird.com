@@ -23,7 +23,7 @@ enum AIAutoCompleteInstruction {
         **User Locale**: "\(locale.identifier)"
         **Instructions**: Analyze the input above.
             Generate a list of most probable and pragmatic ways to track this metric.
-            The metric should match the metric infot.
+            The metric should match the metric info.
             Use the most natural and common way of tracking this.
             Get the most clue from the tracker name
             Ensure the config values are realistic for the activity described.
