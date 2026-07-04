@@ -43,7 +43,7 @@ struct TrackerNameView: View {
                         focus: $isNameFocused
                     )
                 },
-                chart: { chart }
+                chart: chart
             )
             .padding()
             Spacer()

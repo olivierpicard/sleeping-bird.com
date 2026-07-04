@@ -10,6 +10,8 @@ import SwiftUI
 struct NoDataMiniChart: MiniChart {
     @Environment(\.colorScheme) private var colorScheme
     let color: Color = Color.gray
+
+    var usesCardInset: Bool { false }
     
     private let totalDays = 15
     private let data: [Double]

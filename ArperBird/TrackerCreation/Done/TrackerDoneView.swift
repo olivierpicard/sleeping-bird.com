@@ -146,10 +146,7 @@ struct TrackerDoneView<Recap: View>: View {
                     mainColor: color
                 )
             },
-            chart: {
-                AnyView(MiniChartFactory.make(from: metric, colorOverride: .gray))
-                    .padding(.horizontal)
-            }
+            chart: MiniChartFactory.make(from: metric, colorOverride: .gray)
         )
     }
 }

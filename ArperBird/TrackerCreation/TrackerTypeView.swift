@@ -107,9 +107,9 @@ struct TrackerTypeView: View {
                         showAddButton: false
                     )
                 },
-                chart: { AnyView(MiniChartFactory.make(from: option.metric)) }
+                chart: MiniChartFactory.make(from: option.metric)
             )
-
+            
             VStack(spacing: 2) {
                 Text(option.label)
                     .font(.headline)

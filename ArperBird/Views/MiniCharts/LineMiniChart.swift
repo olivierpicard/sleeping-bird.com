@@ -12,6 +12,8 @@ struct LineMiniChart: MiniChart {
     let data: [Double]
     let color: Color
 
+    var usesCardInset: Bool { false }
+
     /// Max horizontal distance between two points. Points squeeze below this
     /// when data is dense, but never spread wider — keeping sparse data from
     /// looking stretched.

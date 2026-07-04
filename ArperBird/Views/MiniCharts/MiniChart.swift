@@ -8,4 +8,12 @@
 import Foundation
 import SwiftUI
 
-protocol MiniChart: View {}
+protocol MiniChart: View {
+    /// Whether the card should inset this chart from its horizontal edges.
+    /// Edge-to-edge charts (line, no-data) return false to run flush.
+    var usesCardInset: Bool { get }
+}
+
+extension MiniChart {
+    var usesCardInset: Bool { true }   // safe default: padded
+}

@@ -11,19 +11,19 @@ import TipKit
 /// A metric card. The header and chart are injected, so the same card chrome
 /// (background, border, shadow, tap handling) is reused for read-only cards and
 /// for the editable "create a tracker" flow.
-struct MetricView<Header: View, Chart: View>: View {
+struct MetricView<Header: View>: View {
     @Environment(\.colorScheme) private var colorScheme
 
     let mainColor: Color
     let onCardTapped: () -> Void
     @ViewBuilder let header: () -> Header
-    @ViewBuilder let chart: () -> Chart
+    let chart: any MiniChart
 
     init(
         mainColor: Color,
         onCardTapped: @escaping () -> Void = {},
         @ViewBuilder header: @escaping () -> Header,
-        @ViewBuilder chart: @escaping () -> Chart
+        chart: any MiniChart
     ) {
         self.mainColor = mainColor
         self.onCardTapped = onCardTapped
@@ -37,7 +37,8 @@ struct MetricView<Header: View, Chart: View>: View {
                 .padding(.horizontal)
                 .padding(.top, 23)
 
-            chart()
+            AnyView(chart)
+                .padding(.horizontal, chart.usesCardInset ? nil : 0)
                 .frame(height: 100)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -81,7 +82,7 @@ struct MetricView<Header: View, Chart: View>: View {
 
 // MARK: - Convenience: standard read-only card
 
-extension MetricView where Header == MetricHeaderValueView, Chart == AnyView {
+extension MetricView where Header == MetricHeaderValueView {
     /// The standard card: a text header and an optional `MiniChart`
     /// (falling back to `NoDataMiniChart`). Keeps every existing call site unchanged.
     init(
@@ -105,18 +106,7 @@ extension MetricView where Header == MetricHeaderValueView, Chart == AnyView {
                     onAddTapped: onAddTapped
                 )
             },
-            chart: {
-                AnyView(
-                    Group {
-                        if let chart {
-                            AnyView(chart)
-                                .padding(.horizontal)
-                        } else {
-                            NoDataMiniChart()
-                        }
-                    }
-                )
-            }
+            chart: chart ?? NoDataMiniChart()
         )
     }
 }
@@ -225,7 +215,7 @@ extension MetricView where Header == MetricHeaderValueView, Chart == AnyView {
                 placeholder: "Tracker name"
             )
         },
-        chart: { NoDataMiniChart() }
+        chart: NoDataMiniChart()
     )
     .padding()
 }
