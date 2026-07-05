@@ -11,7 +11,7 @@ import SwiftUI
 /// "describe it" field on top with hardcoded quick-fill chips, and the live
 /// preview card below as the response, re-shaped by format pills. No AI, no
 /// navigation, no persistence — built to evaluate the design before committing.
-struct TrackerIntentView: View {
+struct TrackerIntentView2: View {
     @State private var suggestions: [IntentSuggestion]
     @State private var placeholder: Metric
     @State private var selected: IntentSuggestion?
@@ -47,7 +47,7 @@ struct TrackerIntentView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            
+            Spacer()
             inputField
                 .padding(.horizontal)
                 .padding(.top, 20)
@@ -66,21 +66,25 @@ struct TrackerIntentView: View {
             .padding(.horizontal)
             .padding(.top, 14)
 
-            // The response zone, anchored to the prompt cluster above: a label
-            // that names the zone (and explains the ghost card), the card, and
-            // its format pills directly beneath it. The remaining slack lives
-            // between the pills and the CTA.
+//            Spacer()
+
+//            // The response zone, centered in the leftover space: a label that
+//            // names the zone (and explains the ghost card), the card, and its
+//            // format pills directly beneath it.
             Text(responseZoneLabel)
                 .font(.caption)
                 .foregroundStyle(.secondary)
                 .padding(.top, 40)
 
+//            Divider()
+            
             previewCard
                 .padding(.horizontal)
                 .padding(.top, 10)
-
+                .foregroundStyle(.secondary)
             formatPills
                 .padding(.top, 14)
+                .padding(.bottom, 30)
 
             Spacer()
 
@@ -106,7 +110,7 @@ struct TrackerIntentView: View {
         if isLoading { return "Creating your tracker…" }
         return selected == nil
             ? "Your tracker will appear here"
-            : "You, three weeks from now" 
+            : "You, three weeks from now"
     }
 
     private var previewCard: some View {
@@ -506,7 +510,7 @@ struct TrackerIntentView: View {
     }
     .sheet(isPresented: $showSheet) {
         NavigationStack {
-            TrackerIntentView()
+            TrackerIntentView2()
         }
         .environment(\.locale, Locale(identifier: "en_US"))
     }
