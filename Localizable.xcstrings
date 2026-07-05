@@ -39,7 +39,16 @@
     "0" : {
 
     },
+    "8 glasses of water a day" : {
+
+    },
+    "A date" : {
+
+    },
     "A goal to reach per day" : {
+
+    },
+    "A number" : {
 
     },
     "Acceptable use" : {
@@ -373,6 +382,22 @@
     "Cancel" : {
 
     },
+    "Car Maintenance" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mantenimiento del coche"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Entretien voiture"
+          }
+        }
+      }
+    },
     "Category" : {
       "localizations" : {
         "es" : {
@@ -556,6 +581,9 @@
         }
       }
     },
+    "Continue" : {
+
+    },
     "Copy" : {
       "localizations" : {
         "es" : {
@@ -623,7 +651,13 @@
         }
       }
     },
+    "Creating your tracker…" : {
+
+    },
     "Cumulative" : {
+
+    },
+    "cups" : {
 
     },
     "Current: %@" : {
@@ -695,6 +729,12 @@
           }
         }
       }
+    },
+    "Describe what you want to track" : {
+
+    },
+    "Describe what you want to track…" : {
+
     },
     "Disclaimer" : {
       "localizations" : {
@@ -1148,6 +1188,12 @@
     "How do you measure “%@”?" : {
 
     },
+    "how many coffees I drink" : {
+
+    },
+    "if I stretched today" : {
+
+    },
     "If you subscribe, your purchase is processed by Apple's App Store and validated through RevenueCat. They handle billing; we don't see your payment details." : {
       "localizations" : {
         "es" : {
@@ -1220,38 +1266,6 @@
     },
     "Log your progress toward the daily goal" : {
 
-    },
-    "Car Maintenance" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mantenimiento del coche"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Entretien voiture"
-          }
-        }
-      }
-    },
-    "Music Practice" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Práctica musical"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pratique musicale"
-          }
-        }
-      }
     },
     "Maintenance" : {
       "localizations" : {
@@ -1923,6 +1937,25 @@
     "Multiple choice" : {
 
     },
+    "Music Practice" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Práctica musical"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pratique musicale"
+          }
+        }
+      }
+    },
+    "my mood today" : {
+
+    },
     "My Trackers" : {
       "localizations" : {
         "es" : {
@@ -2332,10 +2365,16 @@
     "Pick a unit" : {
 
     },
+    "Pick from a list" : {
+
+    },
     "Pick one of %lld categories" : {
 
     },
     "Pick several from %lld categories" : {
+
+    },
+    "placeholder" : {
 
     },
     "Placeholder" : {
@@ -2620,6 +2659,9 @@
     "Single or multiple choice" : {
 
     },
+    "Sleep" : {
+
+    },
     "Sleep Quality" : {
       "localizations" : {
         "es" : {
@@ -2751,6 +2793,9 @@
           }
         }
       }
+    },
+    "Steps" : {
+
     },
     "store.error.dismiss" : {
       "localizations" : {
@@ -3099,7 +3144,13 @@
         }
       }
     },
+    "Time spent" : {
+
+    },
     "Time spent on an activity" : {
+
+    },
+    "time spent reading" : {
 
     },
     "To keep analytics and subscriptions consistent across reinstalls, we store a random identifier in your device's Keychain. It contains no personal information and is never linked to your real identity." : {
@@ -3133,6 +3184,9 @@
           }
         }
       }
+    },
+    "Track" : {
+
     },
     "Track anything you want.\nJust say it out loud." : {
       "localizations" : {
@@ -3695,22 +3749,6 @@
         }
       }
     },
-    "Water Intake" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Consumo de agua"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Consommation d’eau"
-          }
-        }
-      }
-    },
     "Water 💧" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -3724,6 +3762,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Eau 💧"
+          }
+        }
+      }
+    },
+    "Water Intake" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Consumo de agua"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Consommation d’eau"
           }
         }
       }
@@ -3843,6 +3897,9 @@
         }
       }
     },
+    "What do you want to track ?" : {
+
+    },
     "What I liked:\n\n\nWhat's buggy / bothered me:\n\n\nAn idea:\n\n\n---\nVersion: %1$@ (%2$@)\nDevice: %3$@ — iOS %4$@\nLocale: %5$@\nVoice: %6$@\nID: %7$@" : {
       "localizations" : {
         "es" : {
@@ -3887,6 +3944,9 @@
     "What's your daily target for “%@”?" : {
 
     },
+    "when I last watered the plants" : {
+
+    },
     "When you dictate a metric, your microphone audio is streamed in real time to Deepgram, our transcription provider, and turned into text. The audio is not stored by our services after it is transcribed." : {
       "localizations" : {
         "es" : {
@@ -3928,6 +3988,9 @@
         }
       }
     },
+    "Yes / No" : {
+
+    },
     "Yes/No choices" : {
 
     },
@@ -3946,6 +4009,9 @@
           }
         }
       }
+    },
+    "You, three weeks from now" : {
+
     },
     "You're all set!" : {
 
@@ -4034,6 +4100,9 @@
 
     },
     "Your tracker name" : {
+
+    },
+    "Your tracker will appear here" : {
 
     }
   },

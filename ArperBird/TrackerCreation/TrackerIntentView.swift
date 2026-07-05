@@ -19,6 +19,21 @@ struct TrackerIntentView: View {
     @State private var formatIndex = 0
     @State private var isLoading = false
     @State private var text = ""
+    @State private var promptIndex = 0
+    @FocusState private var isFieldFocused: Bool
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+    /// Rotating placeholder examples, each completing the fixed "Track" prefix
+    /// — and each quietly demoing a different answer shape (number, duration,
+    /// yes/no, choices, goal, date).
+    private static let examplePrompts: [LocalizedStringKey] = [
+        "how many coffees I drink",
+        "time spent reading",
+        "if I stretched today",
+        "my mood today",
+        "8 glasses of water a day",
+        "when I last watered the plants",
+    ]
 
     init() {
         _suggestions = State(initialValue: Self.makeSuggestions())
@@ -96,6 +111,8 @@ struct TrackerIntentView: View {
             .disabled(selected == nil || isLoading)
             .padding()
         }
+        .contentShape(Rectangle())
+        .onTapGesture { isFieldFocused = false }
         .navigationTitle("Add a tracker")
         .navigationSubtitle("What do you want to track ?")
         .navigationBarTitleDisplayMode(.large)
@@ -107,7 +124,7 @@ struct TrackerIntentView: View {
         if isLoading { return "Creating your tracker…" }
         return selected == nil
             ? "Your tracker will appear here"
-            : "You, three weeks from now"
+            : "You, three weeks from now" 
     }
  
     private var previewCard: some View {
@@ -159,16 +176,43 @@ struct TrackerIntentView: View {
         HStack(spacing: 8) {
             Image(systemName: "pencil.line")
                 .foregroundStyle(.secondary)
-            TextField("Describe what you want to track…", text: $text)
+            TextField("", text: $text)
                 .textFieldStyle(.plain)
+                .focused($isFieldFocused)
                 .submitLabel(.done)
                 .onSubmit { resolveCustom() }
+                .accessibilityLabel("Describe what you want to track")
+                .overlay(alignment: .leading) {
+                    if text.isEmpty {
+                        HStack(spacing: 4) {
+                            Text("Track")
+                            Text(Self.examplePrompts[promptIndex])
+                                .id(promptIndex)
+                                .transition(
+                                    reduceMotion
+                                        ? .opacity : .push(from: .bottom)
+                                )
+                        }
+                        .foregroundStyle(Color(.placeholderText))
+                        .allowsHitTesting(false)
+                    }
+                }
+                .clipped()
         }
         .padding(12)
         .background(
             RoundedRectangle(cornerRadius: 12)
                 .fill(Color(.tertiarySystemFill))
         )
+        .task {
+            while !Task.isCancelled {
+                try? await Task.sleep(for: .seconds(3))
+                guard text.isEmpty, !isFieldFocused else { continue }
+                withAnimation(.snappy) {
+                    promptIndex = (promptIndex + 1) % Self.examplePrompts.count
+                }
+            }
+        }
     }
 
     // MARK: - Fake resolution (stands in for the AI classify call)
