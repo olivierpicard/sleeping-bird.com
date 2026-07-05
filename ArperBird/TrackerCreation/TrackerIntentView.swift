@@ -8,9 +8,10 @@
 import SwiftUI
 
 /// UI-only mockup of the intent-based creation screen, prompt-first: a free-text
-/// "describe it" field on top with hardcoded quick-fill chips, and the live
-/// preview card below as the response, re-shaped by format pills. No AI, no
-/// navigation, no persistence — built to evaluate the design before committing.
+/// "describe it" field on top with quick-fill chips (a fresh per-visit sample of
+/// the curated suggestions, one per kind), and the live preview card below as
+/// the response, re-shaped by format pills. No AI, no navigation, no
+/// persistence — built to evaluate the design before committing.
 struct TrackerIntentView: View {
     @State private var suggestions: [IntentSuggestion]
     @State private var placeholder: Metric
@@ -50,12 +51,12 @@ struct TrackerIntentView: View {
             
             inputField
                 .padding(.horizontal)
-                .padding(.top, 20)
+                .padding(.top, 30)
 
             // Quick-fill examples for the field: a tap fills the prompt, then
             // the card below resolves — teaching the field→card causality.
             BadgesStackView(
-                badges: suggestions.map { "\($0.name) \($0.emoji)" },
+                badges: suggestions.map(\.chipLabel),
                 innerPadding: 5,
                 borderThickness: 0.5,
                 alignment: .center,
@@ -106,19 +107,17 @@ struct TrackerIntentView: View {
         if isLoading { return "Creating your tracker…" }
         return selected == nil
             ? "Your tracker will appear here"
-            : "You, three weeks from now" 
+            : "You, three weeks from now"
     }
-
+ 
     private var previewCard: some View {
         MetricView(
             mainColor: mainColor,
             header: {
-                MetricHeaderValueView(
+                MetricHeaderTextView(
                     title: displayedMetric.name,
                     emoji: displayedMetric.emoji,
-                    value: "",
                     mainColor: mainColor,
-                    showAddButton: false
                 )
             },
             chart: MiniChartFactory.make(from: displayedMetric)
@@ -203,6 +202,9 @@ struct TrackerIntentView: View {
         let id = UUID()
         let name: String
         let emoji: String
+        /// Short chip text — may be shorter than `name` (e.g. "Practice" vs
+        /// "Music Practice").
+        let chipLabel: String
         let color: Color
         let formats: [IntentFormat]
     }
@@ -230,234 +232,154 @@ struct TrackerIntentView: View {
         )
     }
 
+    /// One random curated example per kind (drawn from the type-picker's
+    /// pools), in shuffled order — a fresh set each visit that always spans
+    /// every tracker kind.
     private static func makeSuggestions() -> [IntentSuggestion] {
-        [
-            IntentSuggestion(
-                name: String(localized: "Meditation"),
-                emoji: "🧘",
-                color: .purple,
-                formats: [
-                    IntentFormat(
-                        label: String(localized: "Time spent"),
-                        icon: "clock",
-                        metric: metric(
-                            MetricSchema.Fake.duration(
-                                title: String(localized: "Meditation"),
-                                emoji: "🧘",
-                                chart: .bar
-                            ),
-                            color: .purple,
-                            days: 40
-                        )
+        TrackerKind.allCases
+            .compactMap { TrackerSuggestion.examples(for: $0).randomElement() }
+            .shuffled()
+            .map(intentSuggestion(from:))
+    }
+
+    /// Card tint per kind, standing in for the color the AI would pick.
+    private static func color(for kind: TrackerKind) -> Color {
+        switch kind {
+        case .number: .teal
+        case .duration: .purple
+        case .choices: .yellow
+        case .binary: .green
+        case .goal: .orange
+        case .date: .pink
+        }
+    }
+
+    /// Fake resolution for a curated suggestion: the formats the AI would
+    /// offer for its kind, seeded with the suggestion's name and emoji.
+    private static func intentSuggestion(
+        from suggestion: TrackerSuggestion
+    ) -> IntentSuggestion {
+        let color = color(for: suggestion.kind)
+        return IntentSuggestion(
+            name: suggestion.localizedName,
+            emoji: suggestion.emoji,
+            chipLabel: suggestion.chipText,
+            color: color,
+            formats: formats(
+                for: suggestion.kind,
+                name: suggestion.localizedName,
+                emoji: suggestion.emoji,
+                color: color
+            )
+        )
+    }
+
+    private static func formats(
+        for kind: TrackerKind,
+        name: String,
+        emoji: String,
+        color: Color
+    ) -> [IntentFormat] {
+        func timeSpent() -> IntentFormat {
+            IntentFormat(
+                label: String(localized: "Time spent"),
+                icon: "clock",
+                metric: metric(
+                    MetricSchema.Fake.duration(
+                        title: name,
+                        emoji: emoji,
+                        chart: .bar
                     ),
-                    IntentFormat(
-                        label: String(localized: "Yes / No"),
-                        icon: "checkmark.circle",
-                        metric: metric(
-                            MetricSchema.Fake.binary(
-                                title: String(localized: "Meditation"),
-                                emoji: "🧘",
-                                chart: .calendar
-                            ),
-                            color: .purple
-                        )
+                    color: color,
+                    days: 40
+                )
+            )
+        }
+        func yesNo() -> IntentFormat {
+            IntentFormat(
+                label: String(localized: "Yes / No"),
+                icon: "checkmark.circle",
+                metric: metric(
+                    MetricSchema.Fake.binary(
+                        title: name,
+                        emoji: emoji,
+                        chart: .calendar
                     ),
-                    IntentFormat(
-                        label: String(localized: "Daily goal"),
-                        icon: "target",
-                        metric: metric(
-                            MetricSchema.Fake.number(
-                                title: String(localized: "Meditation"),
-                                emoji: "🧘",
-                                unit: "min",
-                                min: 0,
-                                max: 30,
-                                granularity: 5,
-                                goal: 20,
-                                chart: .dailyGauge
-                            ),
-                            color: .purple
-                        )
+                    color: color
+                )
+            )
+        }
+        func number() -> IntentFormat {
+            IntentFormat(
+                label: String(localized: "A number"),
+                icon: "number",
+                metric: metric(
+                    MetricSchema.Fake.number(
+                        title: name,
+                        emoji: emoji,
+                        goal: nil,
+                        chart: .bar
                     ),
-                ]
-            ),
-            IntentSuggestion(
-                name: String(localized: "Coffee"),
-                emoji: "☕️",
-                color: .brown,
-                formats: [
-                    IntentFormat(
-                        label: String(localized: "A number"),
-                        icon: "number",
-                        metric: metric(
-                            MetricSchema.Fake.number(
-                                title: String(localized: "Coffee"),
-                                emoji: "☕️",
-                                unit: String(localized: "cups"),
-                                min: 0,
-                                max: 8,
-                                granularity: 1,
-                                goal: nil,
-                                chart: .bar
-                            ),
-                            color: .brown,
-                            days: 40
-                        )
+                    color: color,
+                    days: 40
+                )
+            )
+        }
+        func dailyGoal() -> IntentFormat {
+            IntentFormat(
+                label: String(localized: "Daily goal"),
+                icon: "target",
+                metric: metric(
+                    MetricSchema.Fake.number(
+                        title: name,
+                        emoji: emoji,
+                        min: 0,
+                        max: 10,
+                        granularity: 1,
+                        goal: 8,
+                        chart: .dailyGauge
                     ),
-                    IntentFormat(
-                        label: String(localized: "Yes / No"),
-                        icon: "checkmark.circle",
-                        metric: metric(
-                            MetricSchema.Fake.binary(
-                                title: String(localized: "Coffee"),
-                                emoji: "☕️",
-                                chart: .calendar
-                            ),
-                            color: .brown
-                        )
+                    color: color
+                )
+            )
+        }
+        func pickFromList() -> IntentFormat {
+            IntentFormat(
+                label: String(localized: "Pick from a list"),
+                icon: "list.bullet",
+                metric: metric(
+                    MetricSchema.Fake.categorySingle(
+                        title: name,
+                        emoji: emoji,
+                        chart: .pie
                     ),
-                ]
-            ),
-            IntentSuggestion(
-                name: String(localized: "Mood"),
-                emoji: "🙂",
-                color: .yellow,
-                formats: [
-                    IntentFormat(
-                        label: String(localized: "Pick from a list"),
-                        icon: "list.bullet",
-                        metric: metric(
-                            MetricSchema.Fake.categorySingle(
-                                title: String(localized: "Mood"),
-                                emoji: "🙂",
-                                chart: .pie
-                            ),
-                            color: .yellow
-                        )
+                    color: color
+                )
+            )
+        }
+        func date() -> IntentFormat {
+            IntentFormat(
+                label: String(localized: "A date"),
+                icon: "calendar",
+                metric: metric(
+                    MetricSchema.Fake.datetime(
+                        title: name,
+                        emoji: emoji,
+                        chart: .calendar
                     ),
-                ]
-            ),
-            IntentSuggestion(
-                name: String(localized: "Sleep"),
-                emoji: "😴",
-                color: .indigo,
-                formats: [
-                    IntentFormat(
-                        label: String(localized: "Time spent"),
-                        icon: "clock",
-                        metric: metric(
-                            MetricSchema.Fake.duration(
-                                title: String(localized: "Sleep"),
-                                emoji: "😴",
-                                maxInSeconds: 32_400,
-                                chart: .bar
-                            ),
-                            color: .indigo,
-                            days: 40
-                        )
-                    ),
-                    IntentFormat(
-                        label: String(localized: "Yes / No"),
-                        icon: "checkmark.circle",
-                        metric: metric(
-                            MetricSchema.Fake.binary(
-                                title: String(localized: "Sleep"),
-                                emoji: "😴",
-                                chart: .calendar
-                            ),
-                            color: .indigo
-                        )
-                    ),
-                ]
-            ),
-            IntentSuggestion(
-                name: String(localized: "Steps"),
-                emoji: "👟",
-                color: .green,
-                formats: [
-                    IntentFormat(
-                        label: String(localized: "Daily goal"),
-                        icon: "target",
-                        metric: metric(
-                            MetricSchema.Fake.number(
-                                title: String(localized: "Steps"),
-                                emoji: "👟",
-                                min: 3_000,
-                                max: 8_000,
-                                goal: 10_000,
-                                chart: .dailyGauge
-                            ),
-                            color: .green
-                        )
-                    ),
-                    IntentFormat(
-                        label: String(localized: "A number"),
-                        icon: "number",
-                        metric: metric(
-                            MetricSchema.Fake.number(
-                                title: String(localized: "Steps"),
-                                emoji: "👟",
-                                goal: nil,
-                                chart: .bar
-                            ),
-                            color: .green,
-                            days: 40
-                        )
-                    ),
-                ]
-            ),
-            IntentSuggestion(
-                name: String(localized: "Haircut"),
-                emoji: "💇",
-                color: .pink,
-                formats: [
-                    IntentFormat(
-                        label: String(localized: "A date"),
-                        icon: "calendar",
-                        metric: metric(
-                            MetricSchema.Fake.datetime(
-                                title: String(localized: "Haircut"),
-                                emoji: "💇",
-                                chart: .calendar
-                            ),
-                            color: .pink
-                        )
-                    ),
-                ]
-            ),
-            IntentSuggestion(
-                name: String(localized: "Reading"),
-                emoji: "📚",
-                color: .orange,
-                formats: [
-                    IntentFormat(
-                        label: String(localized: "Time spent"),
-                        icon: "clock",
-                        metric: metric(
-                            MetricSchema.Fake.duration(
-                                title: String(localized: "Reading"),
-                                emoji: "📚",
-                                chart: .bar
-                            ),
-                            color: .orange,
-                            days: 40
-                        )
-                    ),
-                    IntentFormat(
-                        label: String(localized: "Yes / No"),
-                        icon: "checkmark.circle",
-                        metric: metric(
-                            MetricSchema.Fake.binary(
-                                title: String(localized: "Reading"),
-                                emoji: "📚",
-                                chart: .calendar
-                            ),
-                            color: .orange
-                        )
-                    ),
-                ]
-            ),
-        ]
+                    color: color
+                )
+            )
+        }
+
+        return switch kind {
+        case .duration: [timeSpent(), yesNo()]
+        case .binary: [yesNo()]
+        case .choices: [pickFromList()]
+        case .date: [date()]
+        case .goal: [dailyGoal(), number()]
+        case .number: [number(), yesNo()]
+        }
     }
 
     /// Stand-in for what the AI would return for free text: same name the user
@@ -466,6 +388,7 @@ struct TrackerIntentView: View {
         IntentSuggestion(
             name: name,
             emoji: "📊",
+            chipLabel: "\(name) 📊",
             color: .teal,
             formats: [
                 IntentFormat(
