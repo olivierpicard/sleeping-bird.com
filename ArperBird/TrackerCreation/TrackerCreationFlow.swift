@@ -34,7 +34,6 @@ enum TrackerCreationStep: Hashable {
     /// page, not the spinner.
     case goalGranularityLoading
     case durationLoading
-    case durationConfig
     /// Transient spinner on the binary path: fetches the emoji, then hands
     /// straight off to the reveal — binary needs nothing else from the user.
     case binaryLoading
@@ -239,19 +238,10 @@ struct TrackerCreationFlow: View {
                 // rather than re-showing the loading screen. The duration path
                 // skips its config screen — the suggested max is editable on the
                 // reveal's recap chip, so it needs no further input. Mirrors
-                // `.binaryLoading`. (`.durationConfig` is now unreached.)
+                // `.binaryLoading`.
                 if let top = path.indices.last {
                     path[top] = .done
                 }
-            }
-        case .durationConfig:
-            TrackerDurationConfigView(
-                name: model.name,
-                suggestedMaxSeconds: model.durationMaxSeconds,
-                color: color
-            ) { seconds in
-                model.setDurationMax(seconds)
-                path.append(.done)
             }
         case .binaryLoading:
             TrackerBinaryLoadingView(model: model) {
