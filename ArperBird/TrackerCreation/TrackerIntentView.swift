@@ -31,6 +31,11 @@ struct TrackerIntentView: View {
     /// Injected so previews drive the fake without a network round-trip.
     private let generateIntent: (String) async throws -> IntentCompletion
 
+    /// Hands the resolved pick to the creation flow: the chosen format's kind,
+    /// the intent name, and the per-kind color the preview showed. The flow
+    /// routes into the kind's step machinery from here.
+    private let onContinue: (TrackerKind, String, Color) -> Void
+
     /// Rotating placeholder examples, each completing the fixed "Track" prefix
     /// — and each quietly demoing a different answer shape (number, duration,
     /// yes/no, choices, goal, date).
@@ -46,9 +51,11 @@ struct TrackerIntentView: View {
     init(
         generateIntent: @escaping (String) async throws -> IntentCompletion = {
             try await IntentAiCompletion().generate(for: $0)
-        }
+        },
+        onContinue: @escaping (TrackerKind, String, Color) -> Void = { _, _, _ in }
     ) {
         self.generateIntent = generateIntent
+        self.onContinue = onContinue
         _suggestions = State(initialValue: Self.makeSuggestions())
         _placeholder = State(
             initialValue: Metric(
@@ -119,7 +126,7 @@ struct TrackerIntentView: View {
 
             Spacer()
 
-            Button(action: {}) {
+            Button(action: continueWithSelection) {
                 Text("Continue")
                     .font(.headline)
                     .frame(maxWidth: .infinity)
@@ -273,6 +280,14 @@ struct TrackerIntentView: View {
         }
     }
 
+    /// Hands the current pick off to the creation flow: the selected format's
+    /// kind (which path to route into), the intent name, and its color.
+    private func continueWithSelection() {
+        guard let selected, !isLoading, !isFailed else { return }
+        let format = selected.formats[formatIndex]
+        onContinue(format.kind, selected.name, selected.color)
+    }
+
     // MARK: - Fake resolution (stands in for the AI classify call)
 
     private func resolve(_ suggestion: IntentSuggestion) {
@@ -335,6 +350,9 @@ struct TrackerIntentView: View {
     private struct IntentFormat {
         let label: String
         let icon: String
+        /// The tracker kind this format resolves to — handed to `onContinue` so
+        /// the creation flow knows which path to route into.
+        let kind: TrackerKind
         let metric: Metric
     }
 
@@ -450,6 +468,7 @@ struct TrackerIntentView: View {
             IntentFormat(
                 label: String(localized: "Time spent"),
                 icon: "clock",
+                kind: type.kind,
                 metric: metric(
                     MetricSchema.Fake.duration(
                         title: name,
@@ -464,6 +483,7 @@ struct TrackerIntentView: View {
             IntentFormat(
                 label: String(localized: "Yes / No"),
                 icon: "checkmark.circle",
+                kind: type.kind,
                 metric: metric(
                     MetricSchema.Fake.binary(
                         title: name,
@@ -477,6 +497,7 @@ struct TrackerIntentView: View {
             IntentFormat(
                 label: String(localized: "A number"),
                 icon: "number",
+                kind: type.kind,
                 metric: metric(
                     MetricSchema.Fake.number(
                         title: name,
@@ -492,6 +513,7 @@ struct TrackerIntentView: View {
             IntentFormat(
                 label: String(localized: "Daily goal"),
                 icon: "target",
+                kind: type.kind,
                 metric: metric(
                     MetricSchema.Fake.number(
                         title: name,
@@ -509,6 +531,7 @@ struct TrackerIntentView: View {
             IntentFormat(
                 label: String(localized: "Pick from a list"),
                 icon: "list.bullet",
+                kind: type.kind,
                 metric: metric(
                     MetricSchema.Fake.categorySingle(
                         title: name,
@@ -522,6 +545,7 @@ struct TrackerIntentView: View {
             IntentFormat(
                 label: String(localized: "A date"),
                 icon: "calendar",
+                kind: type.kind,
                 metric: metric(
                     MetricSchema.Fake.datetime(
                         title: name,
