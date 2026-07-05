@@ -6,6 +6,9 @@
 //
 
 import SwiftUI
+#if DEBUG
+import FirebaseCore
+#endif
 
 /// UI-only mockup of the intent-based creation screen, prompt-first: a free-text
 /// "describe it" field on top with quick-fill chips (a fresh per-visit sample of
@@ -23,6 +26,10 @@ struct TrackerIntentView: View {
     @FocusState private var isFieldFocused: Bool
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
+    /// AI seam: interprets the free-text field into a titled intent + formats.
+    /// Injected so previews drive the fake without a network round-trip.
+    private let generateIntent: (String) async throws -> IntentCompletion
+
     /// Rotating placeholder examples, each completing the fixed "Track" prefix
     /// — and each quietly demoing a different answer shape (number, duration,
     /// yes/no, choices, goal, date).
@@ -35,7 +42,12 @@ struct TrackerIntentView: View {
         "when I last watered the plants",
     ]
 
-    init() {
+    init(
+        generateIntent: @escaping (String) async throws -> IntentCompletion = {
+            try await IntentAiCompletion().generate(for: $0)
+        }
+    ) {
+        self.generateIntent = generateIntent
         _suggestions = State(initialValue: Self.makeSuggestions())
         _placeholder = State(
             initialValue: Metric(
@@ -120,7 +132,7 @@ struct TrackerIntentView: View {
 
     // MARK: - Subviews
 
-    private var responseZoneLabel: LocalizedStringKey {
+    private var responseZoneLabel: LocalizedStringKey { 
         if isLoading { return "Creating your tracker…" }
         return selected == nil
             ? "Your tracker will appear here"
@@ -228,10 +240,44 @@ struct TrackerIntentView: View {
         }
     }
 
+    /// Free-text resolution: hands the typed prompt to the AI, which returns a
+    /// title, emoji, and the formats that best fit it. Falls back to the
+    /// generic number/yes-no card if the call fails.
     private func resolveCustom() {
         let name = text.trimmingCharacters(in: .whitespaces)
         guard !name.isEmpty else { return }
-        resolve(Self.customSuggestion(named: name))
+        isFieldFocused = false
+        isLoading = true
+        Task {
+            do {
+                let completion = try await generateIntent(name)
+                formatIndex = 0
+                selected = intentSuggestion(from: completion)
+            } catch {
+                selected = Self.customSuggestion(named: name)
+            }
+            isLoading = false
+        }
+    }
+
+    /// Turns the AI's interpreted intent into the local `IntentSuggestion` the
+    /// preview card and format pills already render.
+    private func intentSuggestion(from completion: IntentCompletion) -> IntentSuggestion {
+        let color = Self.color(for: completion.formats.first?.kind ?? .number)
+        return IntentSuggestion(
+            name: completion.title,
+            emoji: completion.emoji,
+            chipLabel: "\(completion.title) \(completion.emoji)",
+            color: color,
+            formats: completion.formats.map {
+                Self.intentFormat(
+                    for: $0,
+                    name: completion.title,
+                    emoji: completion.emoji,
+                    color: color
+                )
+            }
+        )
     }
 
     // MARK: - Hardcoded suggestions
@@ -318,13 +364,38 @@ struct TrackerIntentView: View {
         )
     }
 
+    /// The formats offered per curated (chip) kind — a small combo of the ways
+    /// that kind is naturally logged.
     private static func formats(
         for kind: TrackerKind,
         name: String,
         emoji: String,
         color: Color
     ) -> [IntentFormat] {
-        func timeSpent() -> IntentFormat {
+        let types: [IntentFormatType] = switch kind {
+        case .duration: [.duration, .binary]
+        case .binary: [.binary]
+        case .choices: [.choices]
+        case .date: [.date]
+        case .goal: [.goal, .number]
+        case .number: [.number, .binary]
+        }
+        return types.map {
+            intentFormat(for: $0, name: name, emoji: emoji, color: color)
+        }
+    }
+
+    /// Builds a single pill + preview card for one logging format. Shared by
+    /// the curated chip path (`formats(for:)`) and the AI free-text path
+    /// (`intentSuggestion(from:)`).
+    private static func intentFormat(
+        for type: IntentFormatType,
+        name: String,
+        emoji: String,
+        color: Color
+    ) -> IntentFormat {
+        switch type {
+        case .duration:
             IntentFormat(
                 label: String(localized: "Time spent"),
                 icon: "clock",
@@ -338,8 +409,7 @@ struct TrackerIntentView: View {
                     days: 40
                 )
             )
-        }
-        func yesNo() -> IntentFormat {
+        case .binary:
             IntentFormat(
                 label: String(localized: "Yes / No"),
                 icon: "checkmark.circle",
@@ -352,8 +422,7 @@ struct TrackerIntentView: View {
                     color: color
                 )
             )
-        }
-        func number() -> IntentFormat {
+        case .number:
             IntentFormat(
                 label: String(localized: "A number"),
                 icon: "number",
@@ -368,8 +437,7 @@ struct TrackerIntentView: View {
                     days: 40
                 )
             )
-        }
-        func dailyGoal() -> IntentFormat {
+        case .goal:
             IntentFormat(
                 label: String(localized: "Daily goal"),
                 icon: "target",
@@ -386,8 +454,7 @@ struct TrackerIntentView: View {
                     color: color
                 )
             )
-        }
-        func pickFromList() -> IntentFormat {
+        case .choices:
             IntentFormat(
                 label: String(localized: "Pick from a list"),
                 icon: "list.bullet",
@@ -400,8 +467,7 @@ struct TrackerIntentView: View {
                     color: color
                 )
             )
-        }
-        func date() -> IntentFormat {
+        case .date:
             IntentFormat(
                 label: String(localized: "A date"),
                 icon: "calendar",
@@ -414,15 +480,6 @@ struct TrackerIntentView: View {
                     color: color
                 )
             )
-        }
-
-        return switch kind {
-        case .duration: [timeSpent(), yesNo()]
-        case .binary: [yesNo()]
-        case .choices: [pickFromList()]
-        case .date: [date()]
-        case .goal: [dailyGoal(), number()]
-        case .number: [number(), yesNo()]
         }
     }
 
@@ -467,15 +524,43 @@ struct TrackerIntentView: View {
     }
 }
 
-#Preview {
+private extension IntentFormatType {
+    /// The tracker kind this format belongs to — used to tint the card.
+    var kind: TrackerKind {
+        switch self {
+        case .number: .number
+        case .duration: .duration
+        case .binary: .binary
+        case .goal: .goal
+        case .choices: .choices
+        case .date: .date
+        }
+    }
+}
+
+#Preview("Fake AI") {
     @Previewable @State var showSheet = true
     NavigationStack {
     }
     .sheet(isPresented: $showSheet) {
         NavigationStack {
-            TrackerIntentView()
+            TrackerIntentView(
+                generateIntent: { try await IntentAiCompletion().generateFake(for: $0) }
+            )
         }
         .environment(\.locale, Locale(identifier: "en_US"))
     }
     .presentationDetents([.large])
 }
+
+#if DEBUG
+/// Drives the real Firebase AI completion on submit. Configures Firebase
+/// itself since the AppDelegate doesn't run in previews.
+#Preview("Real AI") {
+    if FirebaseApp.app() == nil { FirebaseApp.configure() }
+    return NavigationStack {
+        TrackerIntentView()
+    }
+    .environment(\.locale, Locale(identifier: "en_US"))
+}
+#endif
