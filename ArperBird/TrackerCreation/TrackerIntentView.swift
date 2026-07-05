@@ -21,6 +21,7 @@ struct TrackerIntentView: View {
     @State private var selected: IntentSuggestion?
     @State private var formatIndex = 0
     @State private var isLoading = false
+    @State private var isFailed = false
     @State private var text = ""
     @State private var promptIndex = 0
     @FocusState private var isFieldFocused: Bool
@@ -103,9 +104,15 @@ struct TrackerIntentView: View {
                 .foregroundStyle(.secondary)
                 .padding(.top, 40)
 
-            previewCard
-                .padding(.horizontal)
-                .padding(.top, 10)
+            Group {
+                if isFailed {
+                    failureCard
+                } else {
+                    previewCard
+                }
+            }
+            .padding(.horizontal)
+            .padding(.top, 10)
 
             formatPills
                 .padding(.top, 14)
@@ -120,7 +127,7 @@ struct TrackerIntentView: View {
             }
             .controlSize(.extraLarge)
             .buttonStyle(.glassProminent)
-            .disabled(selected == nil || isLoading)
+            .disabled(selected == nil || isLoading || isFailed)
             .padding()
         }
         .contentShape(Rectangle())
@@ -132,11 +139,12 @@ struct TrackerIntentView: View {
 
     // MARK: - Subviews
 
-    private var responseZoneLabel: LocalizedStringKey { 
+    private var responseZoneLabel: LocalizedStringKey {
         if isLoading { return "Creating your tracker…" }
+        if isFailed { return "Hmm, that didn't go through" }
         return selected == nil
             ? "Your tracker will appear here"
-            : "You, three weeks from now" 
+            : "You, three weeks from now"
     }
  
     private var previewCard: some View {
@@ -157,11 +165,49 @@ struct TrackerIntentView: View {
         .animation(.snappy, value: isLoading)
     }
 
+    /// Dedicated failure state for the card slot: replaces the preview card in
+    /// the exact same footprint (a hidden preview card reserves the frame) so
+    /// the response zone never jumps. Muted on purpose — a hiccup, not a loss.
+    private var failureCard: some View {
+        previewCard
+            .hidden()
+            .overlay {
+                VStack(spacing: 4) {
+                    Image(systemName: "wifi.exclamationmark")
+                        .font(.title2)
+                        .foregroundStyle(.secondary)
+                        .padding(.bottom, 4)
+
+                    Text("Couldn't reach the AI")
+                        .font(.headline)
+                    Text("Check your connection and try again")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+
+                    Button(action: { resolveCustom() }) {
+                        Label("Try again", systemImage: "arrow.clockwise")
+                            .font(.footnote.weight(.medium))
+                    }
+                    .buttonStyle(.bordered)
+                    .buttonBorderShape(.capsule)
+                    .tint(.gray)
+                    .padding(.top, 8)
+                }
+                .multilineTextAlignment(.center)
+                .padding(.horizontal)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .background(Color(.secondarySystemGroupedBackground))
+                .clipShape(RoundedRectangle(cornerRadius: 12))
+            }
+            .accessibilityElement(children: .contain)
+            .accessibilityLabel("Couldn't reach the AI. Check your connection and try again.")
+    }
+
     /// One pill per way this suggestion can be logged; tapping re-shapes the
     /// preview instantly (in the real flow this is a local morph, no AI).
     private var formatPills: some View {
         HStack(spacing: 8) {
-            if let selected, !isLoading {
+            if let selected, !isLoading, !isFailed {
                 ForEach(selected.formats.indices, id: \.self) { index in
                     let format = selected.formats[index]
                     Button(action: { formatIndex = index }) {
@@ -231,6 +277,7 @@ struct TrackerIntentView: View {
 
     private func resolve(_ suggestion: IntentSuggestion) {
         text = suggestion.name
+        isFailed = false
         isLoading = true
         Task {
             try? await Task.sleep(for: .seconds(0.7))
@@ -241,12 +288,14 @@ struct TrackerIntentView: View {
     }
 
     /// Free-text resolution: hands the typed prompt to the AI, which returns a
-    /// title, emoji, and the formats that best fit it. Falls back to the
-    /// generic number/yes-no card if the call fails.
+    /// title, emoji, and the formats that best fit it. On failure the card slot
+    /// shows the dedicated failure card; the prompt stays in the field, so
+    /// "Try again" (or return) re-submits it.
     private func resolveCustom() {
         let name = text.trimmingCharacters(in: .whitespaces)
         guard !name.isEmpty else { return }
         isFieldFocused = false
+        isFailed = false
         isLoading = true
         Task {
             do {
@@ -254,7 +303,8 @@ struct TrackerIntentView: View {
                 formatIndex = 0
                 selected = intentSuggestion(from: completion)
             } catch {
-                selected = Self.customSuggestion(named: name)
+                selected = nil
+                isFailed = true
             }
             isLoading = false
         }
@@ -305,7 +355,8 @@ struct TrackerIntentView: View {
         let calendar = Calendar.current
         return (0..<days).map { day in
             let date = calendar.date(byAdding: .day, value: -day, to: .now) ?? .now
-            let value = 50 + 8 * sin(Double(day) / 3.5)
+            let phase =  Double.pi
+            let value = 50 + 8 * sin(Double(day) / 2.5 + phase)
             return .number(date, value)
         }
     }
@@ -483,45 +534,6 @@ struct TrackerIntentView: View {
         }
     }
 
-    /// Stand-in for what the AI would return for free text: same name the user
-    /// typed, generic number shape.
-    private static func customSuggestion(named name: String) -> IntentSuggestion {
-        IntentSuggestion(
-            name: name,
-            emoji: "📊",
-            chipLabel: "\(name) 📊",
-            color: .teal,
-            formats: [
-                IntentFormat(
-                    label: String(localized: "A number"),
-                    icon: "number",
-                    metric: metric(
-                        MetricSchema.Fake.number(
-                            title: name,
-                            emoji: "📊",
-                            unit: nil,
-                            goal: nil,
-                            chart: .line
-                        ),
-                        color: .teal,
-                        days: 22
-                    )
-                ),
-                IntentFormat(
-                    label: String(localized: "Yes / No"),
-                    icon: "checkmark.circle",
-                    metric: metric(
-                        MetricSchema.Fake.binary(
-                            title: name,
-                            emoji: "📊",
-                            chart: .calendar
-                        ),
-                        color: .teal
-                    )
-                ),
-            ]
-        )
-    }
 }
 
 private extension IntentFormatType {
@@ -536,6 +548,20 @@ private extension IntentFormatType {
         case .date: .date
         }
     }
+}
+
+/// Every submit fails after the usual "thinking" beat — type anything and hit
+/// return to land on the failure card.
+#Preview("Failure") {
+    NavigationStack {
+        TrackerIntentView(
+            generateIntent: { _ in
+                try await Task.sleep(for: .seconds(0.7))
+                throw URLError(.notConnectedToInternet)
+            }
+        )
+    }
+    .environment(\.locale, Locale(identifier: "en_US"))
 }
 
 #Preview("Fake AI") {

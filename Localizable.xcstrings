@@ -430,6 +430,9 @@
         }
       }
     },
+    "Check your connection and try again" : {
+
+    },
     "Choose the tracker's unit" : {
 
     },
@@ -599,6 +602,12 @@
           }
         }
       }
+    },
+    "Couldn't reach the AI" : {
+
+    },
+    "Couldn't reach the AI. Check your connection and try again." : {
+
     },
     "Couldn't set up your tracker" : {
 
@@ -1184,6 +1193,9 @@
           }
         }
       }
+    },
+    "Hmm, that didn't go through" : {
+
     },
     "How do you measure “%@”?" : {
 
