@@ -73,7 +73,7 @@ struct TrackerCreationFlow: View {
         let model = TrackerCreationModel()
         model.kind = seed.kind
         model.name = seed.localizedName
-        model.aiHint = seed.hint
+        model.aiHint = seed.localizedName
         _model = State(initialValue: model)
         _path = State(initialValue: [.name, Self.firstStep(for: seed.kind)])
     }

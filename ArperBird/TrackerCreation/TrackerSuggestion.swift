@@ -16,12 +16,10 @@ struct TrackerSuggestion: Identifiable {
     /// Short chip text, localized (e.g. "Maintenance").
     let label: LocalizedStringResource
     /// The tracker name seeded into `TrackerCreationModel.name` and shown on
-    /// the card — may be more specific than the chip (e.g. "Car Maintenance").
+    /// the card — may be more specific than the chip (e.g. "Car Maintenance
+    /// Cost"). Kept explicit enough that the name alone steers the AI, since
+    /// there's no separate hint.
     let name: LocalizedStringResource
-    /// English-only context appended to the AI instruction when the name alone
-    /// is ambiguous. Nil for most chips. Not localized — the system prompt
-    /// already steers output to the user's locale.
-    let hint: String?
     /// Chip decoration only — the flow's loading step fetches the metric's
     /// real emoji from the AI, same as a typed name.
     let emoji: String
@@ -30,13 +28,11 @@ struct TrackerSuggestion: Identifiable {
     init(
         label: LocalizedStringResource,
         name: LocalizedStringResource? = nil,
-        hint: String? = nil,
         emoji: String,
         kind: TrackerKind
     ) {
         self.label = label
         self.name = name ?? label
-        self.hint = hint
         self.emoji = emoji
         self.kind = kind
     }
@@ -55,48 +51,45 @@ struct TrackerSuggestion: Identifiable {
     static let defaults: [TrackerSuggestion] = [
         .init(
             label: "Water",
-            name: "Water Intake",
-            hint: "water drunk per day. List many units",
+            name: "Glasses of Water",
             emoji: "💧",
             kind: .number
         ),
         .init(
             label: "Maintenance",
-            name: "Car Maintenance",
-            hint: "money spent on car maintenance and repairs",
+            name: "Car Maintenance Cost",
             emoji: "💰🚗",
             kind: .number
         ),
         .init(
             label: "Practice",
             name: "Music Practice",
-            hint: "time spent practicing a musical instrument",
             emoji: "⏱️🎸",
             kind: .duration
         ),
         .init(
             label: "Pain",
-            hint: "pain intensity self-rating on a 0-10 scale",
+            name: "Pain Level",
             emoji: "😖",
             kind: .number
         ),
         .init(label: "Mood", emoji: "😁", kind: .choices),
         .init(
             label: "Proteins",
-            hint: "grams of protein eaten per day",
+            name: "Grams of Protein",
             emoji: "🥩🌱",
             kind: .number
         ),
         .init(label: "Meditation", emoji: "⏱️🧘", kind: .duration),
         .init(
             label: "Coffee",
-            hint: "cups of coffee drunk per day",
+            name: "Cups of Coffee",
             emoji: "☕️",
             kind: .number
         ),
         .init(
             label: "Fuel Spend",
-            hint: "money spent refueling the car",
+            name: "Fuel Cost",
             emoji: "⛽️",
             kind: .number
         ),
@@ -117,7 +110,6 @@ struct TrackerSuggestion: Identifiable {
                 .init(
                     label: "Practice",
                     name: "Music Practice",
-                    hint: "time spent practicing a musical instrument",
                     emoji: "🎸",
                     kind: .duration
                 ),
@@ -153,8 +145,7 @@ struct TrackerSuggestion: Identifiable {
             [
                 .init(
                     label: "Water",
-                    name: "Water Intake",
-                    hint: "glasses of water drunk per day",
+                    name: "Glasses of Water",
                     emoji: "💧",
                     kind: .goal
                 ),
@@ -162,52 +153,31 @@ struct TrackerSuggestion: Identifiable {
                 .init(
                     label: "Veggies",
                     name: "Veggie Servings",
-                    hint: "servings of vegetables eaten per day",
                     emoji: "🥦",
                     kind: .goal
                 ),
-                .init(
-                    label: "New Words",
-                    hint: "new foreign-language vocabulary words learned",
-                    emoji: "🗣️",
-                    kind: .goal
-                ),
-                .init(
-                    label: "Chores",
-                    hint: "household chores completed per day",
-                    emoji: "🧹",
-                    kind: .goal
-                ),
+                .init(label: "New Words", emoji: "🗣️", kind: .goal),
+                .init(label: "Chores", emoji: "🧹", kind: .goal),
             ]
         case .number:
             [
                 .init(
                     label: "Fuel Spend",
-                    hint: "money spent refueling the car",
+                    name: "Fuel Cost",
                     emoji: "⛽️",
                     kind: .number
                 ),
-                .init(
-                    label: "Waist",
-                    hint: "waist circumference measurement",
-                    emoji: "📏",
-                    kind: .number
-                ),
-                .init(
-                    label: "Cigarettes",
-                    hint: "cigarettes smoked per day",
-                    emoji: "🚬",
-                    kind: .number
-                ),
+                .init(label: "Waist", emoji: "📏", kind: .number),
+                .init(label: "Cigarettes", emoji: "🚬", kind: .number),
                 .init(
                     label: "Coffee",
-                    hint: "cups of coffee drunk per day",
+                    name: "Cups of Coffee",
                     emoji: "☕️",
                     kind: .number
                 ),
                 .init(
                     label: "Pain",
-                    hint: "pain intensity self-rating on a 0-10 scale",
+                    name: "Pain Level",
                     emoji: "😖",
                     kind: .number
                 ),
