@@ -64,18 +64,15 @@ struct TrackerCreationFlow: View {
     /// persisted metric. Defaults to the app accent for the seeded `init` path.
     @State private var color: Color = .accent
 
-    /// A seed skips the type and name steps: the suggestion's kind and localized
-    /// name land in the model up front, and the path opens directly on the kind's
-    /// loading step. `.name` stays underneath it so "back" from the reveal walks
-    /// through the usual naming (pre-filled) and type screens.
+    /// A dashboard badge tap arrives as a `seed`: rather than skipping the intent
+    /// screen, it's handed to `TrackerIntentView` as a pre-resolved selection, so
+    /// the flow opens on the same intent screen the "+" button reaches — just with
+    /// the card already showing. The user still taps "Continue", which routes
+    /// through the shared `onContinue` seeding path like a typed prompt.
+    private let seed: TrackerSuggestion?
+
     init(seed: TrackerSuggestion? = nil) {
-        guard let seed else { return }
-        let model = TrackerCreationModel()
-        model.kind = seed.kind
-        model.name = seed.localizedName
-        model.aiHint = seed.localizedName
-        _model = State(initialValue: model)
-        _path = State(initialValue: [.name, Self.firstStep(for: seed.kind)])
+        self.seed = seed
     }
 
     /// The step each kind branches into after naming — shared by the name step's
@@ -94,6 +91,7 @@ struct TrackerCreationFlow: View {
     var body: some View {
         NavigationStack(path: $path) {
             TrackerIntentView(
+                preselected: seed,
                 onContinue: { kind, name, intentColor in
                     // The intent screen already captured the name and picked a
                     // format (kind), so seed the model and jump straight into the

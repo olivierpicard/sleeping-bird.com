@@ -49,6 +49,7 @@ struct TrackerIntentView: View {
     ]
 
     init(
+        preselected: TrackerSuggestion? = nil,
         generateIntent: @escaping (String) async throws -> IntentCompletion = {
             try await IntentAiCompletion().generate(for: $0)
         },
@@ -56,6 +57,12 @@ struct TrackerIntentView: View {
     ) {
         self.generateIntent = generateIntent
         self.onContinue = onContinue
+        // A dashboard badge tap arrives pre-resolved: build the curated
+        // suggestion up front (no AI) so the card and format pills show on open,
+        // exactly as if the user had tapped an in-screen chip and it settled.
+        let preresolved = preselected.map(Self.intentSuggestion(from:))
+        _selected = State(initialValue: preresolved)
+        _text = State(initialValue: preresolved?.name ?? "")
         _suggestions = State(initialValue: Self.makeSuggestions())
         _placeholder = State(
             initialValue: Metric(
@@ -413,45 +420,28 @@ struct TrackerIntentView: View {
         }
     }
 
-    /// Fake resolution for a curated suggestion: the formats the AI would
-    /// offer for its kind, seeded with the suggestion's name and emoji.
+    /// Fake resolution for a curated suggestion: builds a pill + preview card
+    /// for each of the suggestion's own `formats`, seeded with its name and
+    /// emoji. The card tint follows the first (best-fit) format so a goal-led
+    /// idea like water opens tinted as a goal, not its underlying number.
     private static func intentSuggestion(
         from suggestion: TrackerSuggestion
     ) -> IntentSuggestion {
-        let color = color(for: suggestion.kind)
+        let color = color(for: suggestion.formats.first?.kind ?? .number)
         return IntentSuggestion(
             name: suggestion.localizedName,
             emoji: suggestion.emoji,
             chipLabel: suggestion.chipText,
             color: color,
-            formats: formats(
-                for: suggestion.kind,
-                name: suggestion.localizedName,
-                emoji: suggestion.emoji,
-                color: color
-            )
+            formats: suggestion.formats.map {
+                intentFormat(
+                    for: $0,
+                    name: suggestion.localizedName,
+                    emoji: suggestion.emoji,
+                    color: color
+                )
+            }
         )
-    }
-
-    /// The formats offered per curated (chip) kind — a small combo of the ways
-    /// that kind is naturally logged.
-    private static func formats(
-        for kind: TrackerKind,
-        name: String,
-        emoji: String,
-        color: Color
-    ) -> [IntentFormat] {
-        let types: [IntentFormatType] = switch kind {
-        case .duration: [.duration, .binary]
-        case .binary: [.binary]
-        case .choices: [.choices]
-        case .date: [.date]
-        case .goal: [.goal, .number]
-        case .number: [.number, .binary]
-        }
-        return types.map {
-            intentFormat(for: $0, name: name, emoji: emoji, color: color)
-        }
     }
 
     /// Builds a single pill + preview card for one logging format. Shared by
@@ -583,6 +573,25 @@ private extension IntentFormatType {
                 try await Task.sleep(for: .seconds(0.7))
                 throw URLError(.notConnectedToInternet)
             }
+        )
+    }
+    .environment(\.locale, Locale(identifier: "en_US"))
+}
+
+/// Arrives pre-resolved, as if opened from a tapped dashboard badge: the field
+/// is filled and the preview card + format pills show immediately, no loading.
+#Preview("Preselected") {
+    NavigationStack {
+        // A goal-led badge: opens on "Daily goal" (its first format), tinted as
+        // a goal, with "A number" as the sensible alternate.
+        TrackerIntentView(
+            preselected: .init(
+                label: "Water",
+                name: "Glasses of Water",
+                emoji: "💧",
+                kind: .number,
+                formats: [.goal, .number]
+            )
         )
     }
     .environment(\.locale, Locale(identifier: "en_US"))
