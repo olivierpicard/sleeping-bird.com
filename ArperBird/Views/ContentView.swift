@@ -4,10 +4,33 @@ import SwiftUI
 struct ContentView: View {
     @Query private var metrics: [Metric]
     @Environment(MetricGenerator.self) private var generator
-    @State private var showModal = false
-    /// The suggestion chip the user tapped on the empty dashboard, seeding the
-    /// creation flow past the type and name steps. Nil for a from-scratch open.
-    @State private var seed: TrackerSuggestion?
+    /// The active creation-flow presentation. Driven via `sheet(item:)` so the
+    /// seed is captured atomically with the presentation — setting a separate
+    /// `isPresented` flag in the same tick would build the sheet before the
+    /// seed state propagated, opening unseeded on the first tap.
+    @State private var route: CreationRoute?
+
+    /// A creation-flow open. `.scratch` for the "+" button, `.seeded` for a
+    /// tapped suggestion chip.
+    private enum CreationRoute: Identifiable {
+        case scratch
+        case seeded(TrackerSuggestion)
+
+        var id: String {
+            switch self {
+            case .scratch: "scratch"
+            case .seeded(let suggestion): suggestion.id
+            }
+        }
+
+        var seed: TrackerSuggestion? {
+            switch self {
+            case .scratch: nil
+            case .seeded(let suggestion): suggestion
+            }
+        }
+    }
+
     private var isDashboardEmpty: Bool {
         metrics.isEmpty && generator.pending.isEmpty
     }
@@ -17,13 +40,11 @@ struct ContentView: View {
             VStack {
                 if isDashboardEmpty {
                     EmptyDashboardView(onAddMetric: { suggestion in
-                        seed = suggestion
-                        showModal = true
+                        route = suggestion.map(CreationRoute.seeded) ?? .scratch
                     })
                 } else {
                     DashboardView(onAddMetric: {
-                        seed = nil
-                        showModal = true
+                        route = .scratch
                     })
                 }
             }
@@ -33,16 +54,10 @@ struct ContentView: View {
                     : EmptyDashboardBackground(intensity: 0.5)
             }
         }
-        .sheet(
-            isPresented: $showModal,
-            onDismiss: {
-                showModal = false
-                seed = nil
-            }
-        ) {
+        .sheet(item: $route) { route in
 //            MetricInputSheet()
 //                .presentationDetents([.large])
-            TrackerCreationFlow(seed: seed)
+            TrackerCreationFlow(seed: route.seed)
                 .presentationDetents([.large])
         }
     }
