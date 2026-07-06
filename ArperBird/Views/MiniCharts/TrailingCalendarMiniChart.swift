@@ -12,12 +12,20 @@ struct TrailingCalendarMiniChart: MiniChart {
     var falseData: [Date] = []
     let color: Color
     var visibleDays: Int = 7
+    /// Opt-in reveal: when set, every day cell scales in one by one,
+    /// leading→trailing — logged days and the dashed empty "waiting" slots alike
+    /// ride the same wave. Off by default so the dashboard is untouched.
+    var animate: Bool = false
 
     private enum DayState { case filled, negative, empty }
 
     private let maxDotSize: Double = 36
     private let dotSpacing: Double = 6
     private let labelSpacing: Double = 6
+
+    /// The wave driver, 0→1. `didStart` makes the reveal one-shot per instance.
+    @State private var progress: CGFloat = 0
+    @State private var didStart = false
 
     @Environment(\.colorScheme) private var colorScheme
     private var isDark: Bool {colorScheme == .dark}
@@ -55,9 +63,14 @@ struct TrailingCalendarMiniChart: MiniChart {
             let dotSize = min(maxDotSize, availableWidth / Double(slots))
 
             HStack(spacing: dotSpacing) {
-                ForEach(days, id: \.self) { day in
+                ForEach(Array(days.enumerated()), id: \.element) { index, day in
                     let state = dayState(on: day)
                     let dayNumber = calendar.component(.day, from: day)
+                    // Every cell rides one wave, leading→trailing — logged days
+                    // and empty "waiting" slots alike scale in on their beat.
+                    let reveal = didStart
+                        ? ChartReveal.local(progress, index: index, count: slots)
+                        : 1
 
                     VStack(spacing: labelSpacing) {
                         Text(weekdayLabel(for: day))
@@ -111,9 +124,20 @@ struct TrailingCalendarMiniChart: MiniChart {
                             )
                             .frame(width: dotSize, height: dotSize)
                     }
+                    // A zoom-in as the wave reaches each cell: it arrives close to
+                    // the screen (larger + out of focus) and recedes into its
+                    // resting size, sharpening as it lands — depth, not a 2D grow.
+                    .opacity(reveal)
+                    .scaleEffect(1.22 - 0.22 * reveal)
+                    .blur(radius: 5 * (1 - reveal))
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
+        }
+        .onAppear {
+            guard animate, !didStart else { return }
+            didStart = true
+            withAnimation(ChartReveal.calendarAnimation) { progress = 1 }
         }
     }
 }

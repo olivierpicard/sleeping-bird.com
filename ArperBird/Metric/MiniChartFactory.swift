@@ -13,7 +13,15 @@ enum MiniChartFactory {
     /// `colorOverride` lets a caller render the chart in a color other than the
     /// metric's own — e.g. the tracker-creation reveal, which shows the chart in
     /// gray so the card chrome carries the color instead.
-    static func make(from metric: Metric, colorOverride: Color? = nil) -> any MiniChart {
+    ///
+    /// `animate` opts the chart into the tracker-creation "done" reveal, where it
+    /// performs on entry (bars/line rise, calendar cells scale in). Defaults off
+    /// so every other call site — the dashboard, detail view — renders static.
+    static func make(
+        from metric: Metric,
+        colorOverride: Color? = nil,
+        animate: Bool = false
+    ) -> any MiniChart {
         guard !metric.data.isEmpty else {
             return NoDataMiniChart()
         }
@@ -31,7 +39,8 @@ enum MiniChartFactory {
                     return LinearGaugeMiniChart(
                         current: current,
                         goal: goal,
-                        color: color
+                        color: color,
+                        animate: animate
                     )
                 }
             }
@@ -41,9 +50,9 @@ enum MiniChartFactory {
                 let bars =
                     cfg.behavior == .cumulative
                     ? cumulativeBarValues(for: metric) : values
-                return BarMiniChart(data: bars, color: color)
+                return BarMiniChart(data: bars, color: color, animate: animate)
             default:
-                return LineMiniChart(data: values, color: color)
+                return LineMiniChart(data: values, color: color, animate: animate)
             }
 
         case .categorySingleChoice(let cfg), .categoryMultipleChoice(let cfg):
@@ -60,7 +69,7 @@ enum MiniChartFactory {
             guard !entries.isEmpty else {
                 return NoDataMiniChart()
             }
-            return DividerBarMiniChart(entries: entries)
+            return DividerBarMiniChart(entries: entries, animate: animate)
 
         case .binary:
             var trueDates: [Date] = []
@@ -76,7 +85,8 @@ enum MiniChartFactory {
             return TrailingCalendarMiniChart(
                 data: trueDates,
                 falseData: falseDates,
-                color: color
+                color: color,
+                animate: animate
             )
 
         case .duration(let cfg):
@@ -85,13 +95,13 @@ enum MiniChartFactory {
                 let bars =
                     cfg.behavior == .cumulative
                     ? cumulativeBarValues(for: metric) : values
-                return BarMiniChart(data: bars, color: color)
+                return BarMiniChart(data: bars, color: color, animate: animate)
             }
-            return LineMiniChart(data: values, color: color)
+            return LineMiniChart(data: values, color: color, animate: animate)
 
         case .datetime:
             let dates = metric.data.compactMap(\.datetimeValue)
-            return EventCalendarMiniChart(data: dates, color: color)
+            return EventCalendarMiniChart(data: dates, color: color, animate: animate)
         }
     }
 

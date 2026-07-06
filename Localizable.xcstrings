@@ -951,6 +951,9 @@
         }
       }
     },
+    "Fine-tune it" : {
+
+    },
     "Flossed" : {
       "localizations" : {
         "es" : {
@@ -3095,6 +3098,9 @@
         }
       }
     },
+    "Tap to edit" : {
+
+    },
     "tap to start" : {
       "localizations" : {
         "es" : {
@@ -4085,6 +4091,9 @@
     "You, three weeks from now" : {
 
     },
+    "You're all set" : {
+
+    },
     "You're all set!" : {
 
     },
@@ -4167,6 +4176,9 @@
           }
         }
       }
+    },
+    "Your tracker is ready to go" : {
+
     },
     "Your tracker is ready to go." : {
 

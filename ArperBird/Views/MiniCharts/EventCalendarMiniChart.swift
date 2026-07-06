@@ -11,10 +11,18 @@ struct EventCalendarMiniChart: MiniChart {
     let data: [Date]
     let color: Color
     var cellCount: Int = 6
+    /// Opt-in reveal: when set, every cell scales in one by one, leading→trailing
+    /// — filled date cells and the dashed empty slots alike ride the same wave.
+    /// Off by default so the dashboard is untouched.
+    var animate: Bool = false
 
     private let cellHeight: Double = 56
     private let cellSpacing: Double = 6
     private let cornerRadius: Double = 10
+
+    /// The wave driver, 0→1. `didStart` makes the reveal one-shot per instance.
+    @State private var progress: CGFloat = 0
+    @State private var didStart = false
 
     private var calendar: Calendar { .current }
 
@@ -37,19 +45,37 @@ struct EventCalendarMiniChart: MiniChart {
     var body: some View {
         HStack(spacing: cellSpacing) {
             ForEach(slots.indices, id: \.self) { index in
-                if let date = slots[index] {
-                    FilledCell(
-                        color: color,
-                        cornerRadius: cornerRadius,
-                        monthLabel: monthLabel(for: date),
-                        dayLabel: dayLabel(for: date)
-                    )
-                } else {
-                    EmptyCell(color: color, cornerRadius: cornerRadius)
+                // Every cell rides one wave, leading→trailing — filled dates and
+                // empty slots alike scale in on their beat.
+                let reveal = didStart
+                    ? ChartReveal.local(progress, index: index, count: slots.count)
+                    : 1
+                Group {
+                    if let date = slots[index] {
+                        FilledCell(
+                            color: color,
+                            cornerRadius: cornerRadius,
+                            monthLabel: monthLabel(for: date),
+                            dayLabel: dayLabel(for: date)
+                        )
+                    } else {
+                        EmptyCell(color: color, cornerRadius: cornerRadius)
+                    }
                 }
+                // A zoom-in as the wave reaches each cell: it arrives close to the
+                // screen (larger + out of focus) and recedes into its resting size,
+                // sharpening as it lands — depth, not a 2D grow.
+                .opacity(reveal)
+                .scaleEffect(1.22 - 0.22 * reveal)
+                .blur(radius: 5 * (1 - reveal))
             }
         }
         .frame(height: cellHeight)
+        .onAppear {
+            guard animate, !didStart else { return }
+            didStart = true
+            withAnimation(ChartReveal.calendarAnimation) { progress = 1 }
+        }
     }
 }
 

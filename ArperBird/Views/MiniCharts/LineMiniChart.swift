@@ -11,6 +11,15 @@ import SwiftUI
 struct LineMiniChart: MiniChart {
     let data: [Double]
     let color: Color
+    /// Opt-in reveal: when set, the whole line fades in and settles up from near
+    /// its final shape (all points rise together, no wave). Off by default so the
+    /// dashboard is untouched.
+    var animate: Bool = false
+
+    /// The fill driver, 0→1. `didStart` makes the reveal one-shot per instance so
+    /// the Done view flipping the flag off afterwards never reverts it.
+    @State private var progress: CGFloat = 0
+    @State private var didStart = false
 
     var usesCardInset: Bool { false }
 
@@ -36,7 +45,7 @@ struct LineMiniChart: MiniChart {
                 : min(geometry.size.width, maxWidth)
             Group {
                 if visible.count == 1 {
-                    FlatLineSinglePoint(value: visible[0], color: color)
+                    FlatLineSinglePoint(value: visible[0], color: color, animate: animate)
                 } else {
                     chart(for: visible)
                 }
@@ -44,20 +53,38 @@ struct LineMiniChart: MiniChart {
             .frame(width: chartWidth)
             .frame(maxWidth: .infinity, alignment: .trailing)
         }
+        .onAppear {
+            guard animate, !didStart else { return }
+            didStart = true
+            // A single gentle fill: the whole line eases up and fades in together.
+            withAnimation(ChartReveal.fillAnimation) { progress = 1 }
+        }
     }
 
     private func chart(for data: [Double]) -> some View {
-        Chart(data.enumerated(), id: \.offset) { index, value in
+        // The whole line rises together (no wave): every point starts near its
+        // final value (`riseFloor`) and settles the last sliver up, while the
+        // chart fades in — mirroring the bar chart's fade-and-settle. A resting
+        // chart (`animate == false`) draws at full directly.
+        let p = animate ? progress : 1
+        let rise = ChartReveal.riseFloor + (1 - ChartReveal.riseFloor) * p
+        // Pin the y-domain to the final shape so the `rise` scaling is actually
+        // visible — an auto-domain would rescale with the values and hold the line
+        // visually static. Matches the resting auto-domain (AreaMark anchors at 0,
+        // tallest point reaches the top), so a later swap to a static chart is seamless.
+        let maxValue = max(data.max() ?? 1, 0.0001)
+        return Chart(data.enumerated(), id: \.offset) { index, value in
+            let shown = value * rise
             LineMark(
                 x: .value("", index),
-                y: .value("y", value)
+                y: .value("y", shown)
             )
             .interpolationMethod(.catmullRom)
             .foregroundStyle(color.opacity(0.55))
 
             AreaMark(
                 x: .value("", index),
-                y: .value("y", value)
+                y: .value("y", shown)
             )
             .foregroundStyle(
                 LinearGradient(
@@ -71,8 +98,10 @@ struct LineMiniChart: MiniChart {
             )
             .interpolationMethod(.catmullRom)
         }
+        .chartYScale(domain: 0...maxValue)
         .chartXAxis(.hidden)
         .chartYAxis(.hidden)
+        .opacity(animate ? Double(progress) : 1)
     }
 }
 
@@ -90,14 +119,27 @@ private func singlePointDomain(for value: Double) -> ClosedRange<Double> {
 private struct FlatLineSinglePoint: View {
     let value: Double
     let color: Color
+    /// Opt-in reveal: rises from the floor and fades in on entry.
+    var animate: Bool = false
+
+    @State private var fill: CGFloat = 0
+    @State private var didStart = false
+
+    /// The single reading settles up from near its value (`riseFloor`) and fades
+    /// in, rather than rising the full way from zero; a resting render sits at full.
+    private var shown: Double {
+        guard didStart else { return value }
+        let rise = ChartReveal.riseFloor + (1 - ChartReveal.riseFloor) * fill
+        return value * Double(rise)
+    }
 
     var body: some View {
         Chart {
             ForEach([0, 1], id: \.self) { index in
-                LineMark(x: .value("", index), y: .value("y", value))
+                LineMark(x: .value("", index), y: .value("y", shown))
                     .foregroundStyle(color.opacity(0.55))
 
-                AreaMark(x: .value("", index), y: .value("y", value))
+                AreaMark(x: .value("", index), y: .value("y", shown))
                     .foregroundStyle(
                         LinearGradient(
                             stops: [
@@ -110,13 +152,21 @@ private struct FlatLineSinglePoint: View {
                     )
             }
 
-            PointMark(x: .value("", 1), y: .value("y", value))
+            PointMark(x: .value("", 1), y: .value("y", shown))
                 .foregroundStyle(color)
                 .symbolSize(60)
         }
+        // Pin to the final value's domain so the point rises within a stable
+        // frame rather than the auto-domain collapsing at fill 0.
         .chartYScale(domain: singlePointDomain(for: value))
         .chartXAxis(.hidden)
         .chartYAxis(.hidden)
+        .opacity(didStart ? Double(fill) : 1)
+        .onAppear {
+            guard animate, !didStart else { return }
+            didStart = true
+            withAnimation(ChartReveal.fillAnimation) { fill = 1 }
+        }
     }
 }
 
