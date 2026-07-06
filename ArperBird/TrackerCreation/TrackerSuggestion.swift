@@ -8,95 +8,130 @@
 import Foundation
 
 /// A curated tracker idea offered as a tappable chip (today on the empty
-/// dashboard). Unlike the free-form name the user types in the flow, a
-/// suggestion also carries its `TrackerKind` — that's what lets a tap seed
-/// `TrackerCreationFlow` past the type and name steps, straight into the
-/// kind's AI loading step.
+/// dashboard). Beyond its name, a suggestion carries the ordered logging
+/// `formats` the intent screen offers when it's tapped — so "Cups of Coffee"
+/// can offer just a number while "Music Practice" offers time-or-yes/no,
+/// instead of every idea inheriting the same generic per-kind pair.
 struct TrackerSuggestion: Identifiable {
     /// Short chip text, localized (e.g. "Maintenance").
     let label: LocalizedStringResource
     /// The tracker name seeded into `TrackerCreationModel.name` and shown on
-    /// the card — may be more specific than the chip (e.g. "Car Maintenance").
+    /// the card — may be more specific than the chip (e.g. "Car Maintenance
+    /// Cost"). Kept explicit enough that the name alone steers the AI, since
+    /// there's no separate hint.
     let name: LocalizedStringResource
-    /// English-only context appended to the AI instruction when the name alone
-    /// is ambiguous. Nil for most chips. Not localized — the system prompt
-    /// already steers output to the user's locale.
-    let hint: String?
-    /// Chip decoration only — the flow's loading step fetches the metric's
-    /// real emoji from the AI, same as a typed name.
+    /// The single emoji shown on the intent preview card. Kept to one glyph so
+    /// the card header's fixed emoji box never overflows to "…" (the final
+    /// persisted metric still gets its emoji from the AI loading step).
     let emoji: String
+    /// Chip decoration, which may pair a second emoji for richness (e.g.
+    /// "⏱️🎸" — a duration hint beside the subject). Defaults to `emoji`, and
+    /// never reaches the card. Distinct from `emoji` for the same reason `name`
+    /// is distinct from `label`.
+    let chipEmoji: String
+    /// The tracker's underlying kind. Seeds the default `formats` and, for the
+    /// examples list, groups ideas per type.
     let kind: TrackerKind
+    /// The logging formats the intent screen offers for this idea, best-fit
+    /// first (the first is the variant shown on open). Defaults to a sensible
+    /// per-kind list (`defaultFormats(for:)`); override when the name warrants
+    /// richer or narrower options — e.g. a countable with a natural target
+    /// leads with `.goal`, a pure cost offers only `.number`.
+    let formats: [IntentFormatType]
 
     init(
         label: LocalizedStringResource,
         name: LocalizedStringResource? = nil,
-        hint: String? = nil,
         emoji: String,
-        kind: TrackerKind
+        chipEmoji: String? = nil,
+        kind: TrackerKind,
+        formats: [IntentFormatType]? = nil
     ) {
         self.label = label
         self.name = name ?? label
-        self.hint = hint
         self.emoji = emoji
+        self.chipEmoji = chipEmoji ?? emoji
         self.kind = kind
+        self.formats = formats ?? Self.defaultFormats(for: kind)
+    }
+
+    /// The logging formats offered for a kind when a suggestion doesn't spell
+    /// its own out. Keyed per kind, each pairing chosen so the alternate always
+    /// makes sense: a duration reads as "how long / did I", a goal as
+    /// "target / plain number"; a bare number offers no yes/no it can't honor.
+    static func defaultFormats(for kind: TrackerKind) -> [IntentFormatType] {
+        switch kind {
+        case .number: [.number]
+        case .duration: [.duration, .binary]
+        case .choices: [.choices]
+        case .binary: [.binary]
+        case .date: [.date]
+        case .goal: [.goal, .number]
+        }
     }
 
     var id: String { label.key }
 
     var localizedName: String { String(localized: name) }
 
-    /// The chip text: short label plus emoji.
-    var chipText: String { "\(String(localized: label)) \(emoji)" }
+    /// The chip text: short label plus the (possibly two-emoji) chip decoration.
+    var chipText: String { "\(String(localized: label)) \(chipEmoji)" }
 
-    /// The curated list shown on the empty dashboard. Quantity-style ideas use
-    /// `.number` rather than `.goal` — the number path runs straight from the
-    /// loading step to the reveal (unit, max, and behavior stay editable via
-    /// the recap chips), keeping a seeded creation at two taps.
+    /// The curated list shown on the empty dashboard. Most ideas take their
+    /// kind's default formats; the ones with a natural daily target (water,
+    /// protein) lead with `.goal` so the intent card opens on the gauge.
     static let defaults: [TrackerSuggestion] = [
         .init(
             label: "Water",
-            name: "Water Intake",
-            hint: "water drunk per day. List many units",
+            name: "Glasses of Water",
             emoji: "💧",
-            kind: .number
+            kind: .number,
+            formats: [.goal, .number]
         ),
         .init(
             label: "Maintenance",
-            name: "Car Maintenance",
-            hint: "money spent on car maintenance and repairs",
-            emoji: "💰🚗",
+            name: "Car Maintenance Cost",
+            emoji: "💰",
+            chipEmoji: "💰🚗",
             kind: .number
         ),
         .init(
             label: "Practice",
             name: "Music Practice",
-            hint: "time spent practicing a musical instrument",
-            emoji: "⏱️🎸",
+            emoji: "🎸",
+            chipEmoji: "⏱️🎸",
             kind: .duration
         ),
         .init(
             label: "Pain",
-            hint: "pain intensity self-rating on a 0-10 scale",
+            name: "Pain Level",
             emoji: "😖",
             kind: .number
         ),
         .init(label: "Mood", emoji: "😁", kind: .choices),
         .init(
             label: "Proteins",
-            hint: "grams of protein eaten per day",
-            emoji: "🥩🌱",
-            kind: .number
+            name: "Grams of Protein",
+            emoji: "🥩",
+            chipEmoji: "🥩🌱",
+            kind: .number,
+            formats: [.goal, .number]
         ),
-        .init(label: "Meditation", emoji: "⏱️🧘", kind: .duration),
+        .init(
+            label: "Meditation",
+            emoji: "🧘",
+            chipEmoji: "⏱️🧘",
+            kind: .duration
+        ),
         .init(
             label: "Coffee",
-            hint: "cups of coffee drunk per day",
+            name: "Cups of Coffee",
             emoji: "☕️",
             kind: .number
         ),
         .init(
             label: "Fuel Spend",
-            hint: "money spent refueling the car",
+            name: "Fuel Cost",
             emoji: "⛽️",
             kind: .number
         ),
@@ -117,7 +152,6 @@ struct TrackerSuggestion: Identifiable {
                 .init(
                     label: "Practice",
                     name: "Music Practice",
-                    hint: "time spent practicing a musical instrument",
                     emoji: "🎸",
                     kind: .duration
                 ),
@@ -131,7 +165,12 @@ struct TrackerSuggestion: Identifiable {
                 .init(label: "Gym", emoji: "🏋️", kind: .binary),
                 .init(label: "Ate Healthy", emoji: "🥗", kind: .binary),
                 .init(label: "Flossed", emoji: "🦷", kind: .binary),
-                .init(label: "No Alcohol", emoji: "🚫🍺", kind: .binary),
+                .init(
+                    label: "No Alcohol",
+                    emoji: "🍺",
+                    chipEmoji: "🚫🍺",
+                    kind: .binary
+                ),
             ]
         case .choices:
             [
@@ -153,8 +192,7 @@ struct TrackerSuggestion: Identifiable {
             [
                 .init(
                     label: "Water",
-                    name: "Water Intake",
-                    hint: "glasses of water drunk per day",
+                    name: "Glasses of Water",
                     emoji: "💧",
                     kind: .goal
                 ),
@@ -162,52 +200,31 @@ struct TrackerSuggestion: Identifiable {
                 .init(
                     label: "Veggies",
                     name: "Veggie Servings",
-                    hint: "servings of vegetables eaten per day",
                     emoji: "🥦",
                     kind: .goal
                 ),
-                .init(
-                    label: "New Words",
-                    hint: "new foreign-language vocabulary words learned",
-                    emoji: "🗣️",
-                    kind: .goal
-                ),
-                .init(
-                    label: "Chores",
-                    hint: "household chores completed per day",
-                    emoji: "🧹",
-                    kind: .goal
-                ),
+                .init(label: "New Words", emoji: "🗣️", kind: .goal),
+                .init(label: "Chores", emoji: "🧹", kind: .goal),
             ]
         case .number:
             [
                 .init(
                     label: "Fuel Spend",
-                    hint: "money spent refueling the car",
+                    name: "Fuel Cost",
                     emoji: "⛽️",
                     kind: .number
                 ),
-                .init(
-                    label: "Waist",
-                    hint: "waist circumference measurement",
-                    emoji: "📏",
-                    kind: .number
-                ),
-                .init(
-                    label: "Cigarettes",
-                    hint: "cigarettes smoked per day",
-                    emoji: "🚬",
-                    kind: .number
-                ),
+                .init(label: "Waist", emoji: "📏", kind: .number),
+                .init(label: "Cigarettes", emoji: "🚬", kind: .number),
                 .init(
                     label: "Coffee",
-                    hint: "cups of coffee drunk per day",
+                    name: "Cups of Coffee",
                     emoji: "☕️",
                     kind: .number
                 ),
                 .init(
                     label: "Pain",
-                    hint: "pain intensity self-rating on a 0-10 scale",
+                    name: "Pain Level",
                     emoji: "😖",
                     kind: .number
                 ),

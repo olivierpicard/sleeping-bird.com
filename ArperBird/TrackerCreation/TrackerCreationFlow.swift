@@ -34,7 +34,6 @@ enum TrackerCreationStep: Hashable {
     /// page, not the spinner.
     case goalGranularityLoading
     case durationLoading
-    case durationConfig
     /// Transient spinner on the binary path: fetches the emoji, then hands
     /// straight off to the reveal — binary needs nothing else from the user.
     case binaryLoading
@@ -60,22 +59,20 @@ struct TrackerCreationFlow: View {
     /// lets data survive back-navigation; see `TrackerCreationModel`.
     @State private var model = TrackerCreationModel()
 
-    /// The goal path has no color-picker step yet, so previews and the assembled
-    /// gauge card share the app accent.
-    private let color: Color = .accent
+    /// The card tint, seeded from the intent screen's per-kind color when the
+    /// user continues and then threaded through every step, the reveal, and the
+    /// persisted metric. Defaults to the app accent for the seeded `init` path.
+    @State private var color: Color = .accent
 
-    /// A seed skips the type and name steps: the suggestion's kind and localized
-    /// name land in the model up front, and the path opens directly on the kind's
-    /// loading step. `.name` stays underneath it so "back" from the reveal walks
-    /// through the usual naming (pre-filled) and type screens.
+    /// A dashboard badge tap arrives as a `seed`: rather than skipping the intent
+    /// screen, it's handed to `TrackerIntentView` as a pre-resolved selection, so
+    /// the flow opens on the same intent screen the "+" button reaches — just with
+    /// the card already showing. The user still taps "Continue", which routes
+    /// through the shared `onContinue` seeding path like a typed prompt.
+    private let seed: TrackerSuggestion?
+
     init(seed: TrackerSuggestion? = nil) {
-        guard let seed else { return }
-        let model = TrackerCreationModel()
-        model.kind = seed.kind
-        model.name = seed.localizedName
-        model.aiHint = seed.hint
-        _model = State(initialValue: model)
-        _path = State(initialValue: [.name, Self.firstStep(for: seed.kind)])
+        self.seed = seed
     }
 
     /// The step each kind branches into after naming — shared by the name step's
@@ -93,23 +90,20 @@ struct TrackerCreationFlow: View {
 
     var body: some View {
         NavigationStack(path: $path) {
-            TrackerTypeView(
-                onNext: { selectedKind in
-                    model.kind = selectedKind
-                    // Every kind names first — the name is what each path's
-                    // AI-driven steps key off of, the number ("Other") path
-                    // included.
-                    path.append(.name)
-                },
-                onSuggestion: { suggestion in
-                    // A chip is a pre-named pick: seed the model and jump past
-                    // naming into the kind's loading step, exactly like the
-                    // seeded `init` — `.name` stays underneath so "back" walks
-                    // through the pre-filled naming screen.
-                    model.kind = suggestion.kind
-                    model.name = suggestion.localizedName
-                    model.aiHint = suggestion.hint
-                    path = [.name, Self.firstStep(for: suggestion.kind)]
+            TrackerIntentView(
+                preselected: seed,
+                onContinue: { kind, name, intentColor in
+                    // The intent screen already captured the name and picked a
+                    // format (kind), so seed the model and jump straight into the
+                    // kind's step machinery — no `.name` step. The typed prompt /
+                    // chip name rides along as `aiHint` for the loading steps, and
+                    // the per-kind preview color threads through the reveal and the
+                    // persisted metric.
+                    model.kind = kind
+                    model.name = name
+                    model.aiHint = name
+                    color = intentColor
+                    path = [Self.firstStep(for: kind)]
                 }
             )
             .navigationDestination(
@@ -237,22 +231,15 @@ struct TrackerCreationFlow: View {
             }
         case .durationLoading:
             TrackerDurationLoadingView(model: model) {
-                // Swap this transient spinner out of the path for the result, so
-                // tapping "back" from the result returns to naming rather than
-                // re-showing the loading screen. Mutating the top entry in place
-                // animates as a normal push.
+                // Swap this transient spinner out of the path for the reveal, so
+                // tapping "back" from the reveal returns to the intent screen
+                // rather than re-showing the loading screen. The duration path
+                // skips its config screen — the suggested max is editable on the
+                // reveal's recap chip, so it needs no further input. Mirrors
+                // `.binaryLoading`.
                 if let top = path.indices.last {
-                    path[top] = .durationConfig
+                    path[top] = .done
                 }
-            }
-        case .durationConfig:
-            TrackerDurationConfigView(
-                name: model.name,
-                suggestedMaxSeconds: model.durationMaxSeconds,
-                color: color
-            ) { seconds in
-                model.setDurationMax(seconds)
-                path.append(.done)
             }
         case .binaryLoading:
             TrackerBinaryLoadingView(model: model) {
@@ -538,3 +525,6 @@ private struct DoneRevealStep: View {
     .presentationDetents([.large])
     .modelContainer(for: Metric.self, inMemory: true)
 }
+
+ 
+ 

@@ -39,7 +39,13 @@
     "0" : {
 
     },
-    "A goal to reach per day" : {
+    "8 glasses of water a day" : {
+
+    },
+    "A date" : {
+
+    },
+    "A number" : {
 
     },
     "Acceptable use" : {
@@ -332,9 +338,6 @@
         }
       }
     },
-    "Binary" : {
-
-    },
     "By continuing, you agree to our [Terms and Privacy Policy](arperbird://legal)." : {
       "localizations" : {
         "es" : {
@@ -367,11 +370,41 @@
         }
       }
     },
-    "Can be represented by numbers" : {
-
-    },
     "Cancel" : {
 
+    },
+    "Car Maintenance" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mantenimiento del coche"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Entretien voiture"
+          }
+        }
+      }
+    },
+    "Car Maintenance Cost" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Coste de mantenimiento del coche"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Coût d’entretien voiture"
+          }
+        }
+      }
     },
     "Category" : {
       "localizations" : {
@@ -404,6 +437,9 @@
           }
         }
       }
+    },
+    "Check your connection and try again" : {
+
     },
     "Choose the tracker's unit" : {
 
@@ -556,6 +592,9 @@
         }
       }
     },
+    "Continue" : {
+
+    },
     "Copy" : {
       "localizations" : {
         "es" : {
@@ -571,6 +610,12 @@
           }
         }
       }
+    },
+    "Couldn't reach the AI" : {
+
+    },
+    "Couldn't reach the AI. Check your connection and try again." : {
+
     },
     "Couldn't set up your tracker" : {
 
@@ -623,8 +668,27 @@
         }
       }
     },
+    "Creating your tracker…" : {
+
+    },
     "Cumulative" : {
 
+    },
+    "Cups of Coffee" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tazas de café"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tasses de café"
+          }
+        }
+      }
     },
     "Current: %@" : {
       "localizations" : {
@@ -695,6 +759,9 @@
           }
         }
       }
+    },
+    "Describe what you want to track" : {
+
     },
     "Disclaimer" : {
       "localizations" : {
@@ -916,6 +983,22 @@
         }
       }
     },
+    "Fuel Cost" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Coste de combustible"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Coût du carburant"
+          }
+        }
+      }
+    },
     "Fuel Spend" : {
       "localizations" : {
         "es" : {
@@ -997,6 +1080,22 @@
         }
       }
     },
+    "Glasses of Water" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vasos de agua"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verres d’eau"
+          }
+        }
+      }
+    },
     "Goal" : {
 
     },
@@ -1012,6 +1111,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Objectif : %@"
+          }
+        }
+      }
+    },
+    "Grams of Protein" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gramos de proteína"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Grammes de protéines"
           }
         }
       }
@@ -1145,7 +1260,16 @@
         }
       }
     },
+    "Hmm, that didn't go through" : {
+
+    },
     "How do you measure “%@”?" : {
+
+    },
+    "how many coffees I drink" : {
+
+    },
+    "if I stretched today" : {
 
     },
     "If you subscribe, your purchase is processed by Apple's App Store and validated through RevenueCat. They handle billing; we don't see your payment details." : {
@@ -1220,38 +1344,6 @@
     },
     "Log your progress toward the daily goal" : {
 
-    },
-    "Car Maintenance" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mantenimiento del coche"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Entretien voiture"
-          }
-        }
-      }
-    },
-    "Music Practice" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Práctica musical"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pratique musicale"
-          }
-        }
-      }
     },
     "Maintenance" : {
       "localizations" : {
@@ -1923,6 +2015,25 @@
     "Multiple choice" : {
 
     },
+    "Music Practice" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Práctica musical"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pratique musicale"
+          }
+        }
+      }
+    },
+    "my mood today" : {
+
+    },
     "My Trackers" : {
       "localizations" : {
         "es" : {
@@ -2099,9 +2210,6 @@
         }
       }
     },
-    "Other" : {
-
-    },
     "Pain" : {
       "localizations" : {
         "es" : {
@@ -2131,6 +2239,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Douleur 😖"
+          }
+        }
+      }
+    },
+    "Pain Level" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nivel de dolor"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Niveau de douleur"
           }
         }
       }
@@ -2332,10 +2456,16 @@
     "Pick a unit" : {
 
     },
+    "Pick from a list" : {
+
+    },
     "Pick one of %lld categories" : {
 
     },
     "Pick several from %lld categories" : {
+
+    },
+    "placeholder" : {
 
     },
     "Placeholder" : {
@@ -2585,9 +2715,6 @@
     "Save a date on calendar" : {
 
     },
-    "Set the duration" : {
-
-    },
     "Set your goal" : {
 
     },
@@ -2615,9 +2742,6 @@
       }
     },
     "Single choice" : {
-
-    },
-    "Single or multiple choice" : {
 
     },
     "Sleep Quality" : {
@@ -3099,7 +3223,10 @@
         }
       }
     },
-    "Time spent on an activity" : {
+    "Time spent" : {
+
+    },
+    "time spent reading" : {
 
     },
     "To keep analytics and subscriptions consistent across reinstalls, we store a random identifier in your device's Keychain. It contains no personal information and is never linked to your real identity." : {
@@ -3133,6 +3260,9 @@
           }
         }
       }
+    },
+    "Track" : {
+
     },
     "Track anything you want.\nJust say it out loud." : {
       "localizations" : {
@@ -3310,6 +3440,7 @@
       }
     },
     "tracker_type.cta" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -3332,6 +3463,7 @@
       }
     },
     "tracker_type.date.label" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -3377,6 +3509,7 @@
       }
     },
     "tracker_type.duration.label" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -3422,6 +3555,7 @@
       }
     },
     "tracker_type.goal.label" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -3695,22 +3829,6 @@
         }
       }
     },
-    "Water Intake" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Consumo de agua"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Consommation d’eau"
-          }
-        }
-      }
-    },
     "Water 💧" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -3724,6 +3842,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Eau 💧"
+          }
+        }
+      }
+    },
+    "Water Intake" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Consumo de agua"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Consommation d’eau"
           }
         }
       }
@@ -3843,6 +3978,9 @@
         }
       }
     },
+    "What do you want to track ?" : {
+
+    },
     "What I liked:\n\n\nWhat's buggy / bothered me:\n\n\nAn idea:\n\n\n---\nVersion: %1$@ (%2$@)\nDevice: %3$@ — iOS %4$@\nLocale: %5$@\nVoice: %6$@\nID: %7$@" : {
       "localizations" : {
         "es" : {
@@ -3862,9 +4000,6 @@
     "What is the tracker name ?" : {
 
     },
-    "What is the tracker type ?" : {
-
-    },
     "What we don't do" : {
       "localizations" : {
         "es" : {
@@ -3881,10 +4016,10 @@
         }
       }
     },
-    "What's the longest “%@” usually lasts?" : {
+    "What's your daily target for “%@”?" : {
 
     },
-    "What's your daily target for “%@”?" : {
+    "when I last watered the plants" : {
 
     },
     "When you dictate a metric, your microphone audio is streamed in real time to Deepgram, our transcription provider, and turned into text. The audio is not stored by our services after it is transcribed." : {
@@ -3928,7 +4063,7 @@
         }
       }
     },
-    "Yes/No choices" : {
+    "Yes / No" : {
 
     },
     "You are responsible for the content you create. Don't use the app to store unlawful material or to infringe the rights of others." : {
@@ -3946,6 +4081,9 @@
           }
         }
       }
+    },
+    "You, three weeks from now" : {
+
     },
     "You're all set!" : {
 
@@ -4034,6 +4172,9 @@
 
     },
     "Your tracker name" : {
+
+    },
+    "Your tracker will appear here" : {
 
     }
   },

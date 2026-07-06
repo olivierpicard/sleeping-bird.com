@@ -20,7 +20,8 @@ struct MetricHeaderTextView: View {
             MetricHeaderEmoji(emoji: emoji, mainColor: mainColor)
 
             Text(title)
-                .font(.title2)
+                .font(.headline)
+                .foregroundStyle(.secondary)
                 .fontWeight(.semibold)
 
             Spacer()
