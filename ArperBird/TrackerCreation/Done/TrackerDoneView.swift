@@ -27,6 +27,12 @@ struct TrackerDoneView<Recap: View>: View {
     /// `@Bindable` so the editable header can write the renamed title straight
     /// back into the model, re-rendering the card in place.
     @Bindable var metric: Metric
+    /// Where the editable header writes the name/emoji. In the real flow these
+    /// point at the `TrackerCreationModel` — the source of truth that
+    /// `persistMetric` rebuilds the dashboard card from — so edits actually stick.
+    /// When nil (previews) they fall back to the transient `metric`.
+    var nameBinding: Binding<String>? = nil
+    var emojiBinding: Binding<String>? = nil
     let color: Color
     var onDone: () -> Void
     /// The recap content stacked beneath the card: the path's own recap line and
@@ -53,11 +59,15 @@ struct TrackerDoneView<Recap: View>: View {
 
     init(
         metric: Metric,
+        name: Binding<String>? = nil,
+        emoji: Binding<String>? = nil,
         color: Color = .accent,
         onDone: @escaping () -> Void = {},
         @ViewBuilder recap: @escaping () -> Recap
     ) {
         self.metric = metric
+        self.nameBinding = name
+        self.emojiBinding = emoji
         self.color = color
         self.onDone = onDone
         self.recap = recap
@@ -98,6 +108,14 @@ struct TrackerDoneView<Recap: View>: View {
             .buttonStyle(.glassProminent)
             .tint(displayColor)
             .padding()
+        }
+        // Tap anywhere off the fields to dismiss the keyboard — the emoji
+        // keyboard has no return key, so this is the only way out.
+        .contentShape(Rectangle())
+        .onTapGesture {
+            UIApplication.shared.sendAction(
+                #selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil
+            )
         }
         // A scattered sparkle burst behind everything, sized to the celebration.
         .background(alignment: .top) { SparkleBurst(color: displayColor, active: hasAppeared) }
@@ -154,11 +172,15 @@ struct TrackerDoneView<Recap: View>: View {
             header: {
                 // No `focus` binding — the field is editable but never
                 // auto-focuses, so the reveal isn't hijacked by the keyboard.
+                // Edits flow to `nameBinding`/`emojiBinding` (the model in the
+                // real flow) so they survive `persistMetric`; previews fall back
+                // to the transient `metric`.
                 MetricHeaderEditingView(
-                    emoji: metric.emoji,
+                    emoji: emojiBinding?.wrappedValue ?? metric.emoji,
                     mainColor: displayColor,
-                    title: $metric.name,
-                    placeholder: "Tracker name"
+                    title: nameBinding ?? $metric.name,
+                    placeholder: "Tracker name",
+                    editableEmoji: emojiBinding ?? $metric.emoji
                 )
             },
             chart: MiniChartFactory.make(from: metric, colorOverride: displayColor)

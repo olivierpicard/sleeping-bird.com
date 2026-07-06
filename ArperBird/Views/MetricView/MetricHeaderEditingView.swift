@@ -15,10 +15,17 @@ struct MetricHeaderEditingView: View {
     @Binding var title: String
     var placeholder: String = ""
     var focus: FocusState<Bool>.Binding? = nil
+    /// When supplied, the emoji chip becomes editable and taps open the emoji
+    /// keyboard, writing the selection back through this binding.
+    var editableEmoji: Binding<String>? = nil
 
     var body: some View {
         HStack {
-            MetricHeaderEmoji(emoji: emoji, mainColor: mainColor)
+            MetricHeaderEmoji(
+                emoji: emoji,
+                mainColor: mainColor,
+                editable: editableEmoji
+            )
 
             titleField
 
@@ -43,11 +50,13 @@ struct MetricHeaderEditingView: View {
 
 #Preview {
     @Previewable @State var title = ""
+    @Previewable @State var emoji = ""
     MetricHeaderEditingView(
         emoji: "🫥",
         mainColor: .gray,
         title: $title,
-        placeholder: "Tracker name"
+        placeholder: "Tracker name",
+        editableEmoji: $emoji
     )
     .padding()
 }

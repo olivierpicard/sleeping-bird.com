@@ -35,6 +35,35 @@ final class TrackerCreationModel {
     /// instruction alongside the name. Nil for typed names.
     var aiHint: String?
 
+    /// The tracker's emoji, routed to whichever per-kind field backs the active
+    /// `kind` — the same field `TrackerCreationFlow.doneSchema()` reads. Lets the
+    /// reveal edit "the emoji" without caring which path it came from, so the edit
+    /// lands on the metric that's actually persisted.
+    var emoji: String {
+        get {
+            switch kind {
+            case .goal: goalEmoji
+            case .duration: durationEmoji
+            case .choices: categoryEmoji
+            case .binary: binaryEmoji
+            case .date: dateEmoji
+            case .number: numberEmoji
+            case nil: ""
+            }
+        }
+        set {
+            switch kind {
+            case .goal: goalEmoji = newValue
+            case .duration: durationEmoji = newValue
+            case .choices: categoryEmoji = newValue
+            case .binary: binaryEmoji = newValue
+            case .date: dateEmoji = newValue
+            case .number: numberEmoji = newValue
+            case nil: break
+            }
+        }
+    }
+
     // MARK: - Goal sub-flow
 
     private(set) var phase: Phase = .idle

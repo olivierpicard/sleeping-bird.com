@@ -457,7 +457,7 @@ struct TrackerCreationFlow: View {
 /// it picks the right dumb recap view for `model.kind` and injects the closures
 /// that write back to the model.
 private struct DoneRevealStep: View {
-    let model: TrackerCreationModel
+    @Bindable var model: TrackerCreationModel
     let metric: () -> Metric
     /// The tracker's raw color — the card fill, bloom, and sparkles.
     let color: Color
@@ -466,10 +466,44 @@ private struct DoneRevealStep: View {
     let controlColor: Color
     let onDone: () -> Void
 
+    /// The reveal card, built once and memoized so editing the name or emoji
+    /// doesn't reshuffle the (randomly seeded) sample chart on every keystroke.
+    /// Only a chip that changes the chart's shape/scale rebuilds it — see
+    /// `chartSignature`. The header's edits go to the model, not this card, so
+    /// the card's own name/emoji stay unused here.
+    @State private var card: Metric?
+
     var body: some View {
-        TrackerDoneView(metric: metric(), color: color, onDone: onDone) {
+        let displayed = card ?? metric()
+        return TrackerDoneView(
+            metric: displayed,
+            name: $model.name,
+            emoji: $model.emoji,
+            color: color,
+            onDone: onDone
+        ) {
             recap
         }
+        .onAppear { if card == nil { card = displayed } }
+        .onChange(of: chartSignature) { card = metric() }
+    }
+
+    /// The model facets the sample chart is derived from — the recap chips edit
+    /// these, so a change means the card must rebuild. Name and emoji are absent
+    /// on purpose: they don't touch the chart, so editing them leaves it untouched.
+    private var chartSignature: String {
+        [
+            String(model.numberMax),
+            String(model.numberGranularity),
+            model.numberUnit,
+            String(describing: model.behavior),
+            String(model.categoryAllowsMultiple),
+            String(model.categoryLabels.count),
+            String(model.durationMaxSeconds),
+            String(model.goalValue),
+            String(model.goalGranularity),
+            model.selectedUnit,
+        ].joined(separator: "|")
     }
 
     /// The path's recap line and chips, picked from `model.kind`. Each branch is a
