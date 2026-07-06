@@ -29,8 +29,10 @@ struct MetricHeaderEditingView: View {
     @ViewBuilder
     private var titleField: some View {
         let field = TextField(placeholder, text: $title)
-            .font(.title2)
+            .font(.headline)
             .fontWeight(.semibold)
+            .foregroundStyle(.secondary)
+            .submitLabel(.done)
         if let focus {
             field.focused(focus)
         } else {

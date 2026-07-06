@@ -24,7 +24,9 @@ import SwiftUI
 struct TrackerDoneView<Recap: View>: View {
     /// The fully assembled tracker, ready to render as a real card. Seeded with
     /// sample data by the caller so the chart looks alive in the reveal.
-    let metric: Metric
+    /// `@Bindable` so the editable header can write the renamed title straight
+    /// back into the model, re-rendering the card in place.
+    @Bindable var metric: Metric
     let color: Color
     var onDone: () -> Void
     /// The recap content stacked beneath the card: the path's own recap line and
@@ -150,10 +152,13 @@ struct TrackerDoneView<Recap: View>: View {
         MetricView(
             mainColor: displayColor,
             header: {
-                MetricHeaderTextView(
-                    title: metric.name,
+                // No `focus` binding — the field is editable but never
+                // auto-focuses, so the reveal isn't hijacked by the keyboard.
+                MetricHeaderEditingView(
                     emoji: metric.emoji,
-                    mainColor: displayColor
+                    mainColor: displayColor,
+                    title: $metric.name,
+                    placeholder: "Tracker name"
                 )
             },
             chart: MiniChartFactory.make(from: metric, colorOverride: displayColor)
