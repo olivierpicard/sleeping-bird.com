@@ -49,6 +49,15 @@ class Metric: Identifiable {
         set { colorHex = newValue.hexString }
     }
 
+    /// The stored color passed through the readability filter, so the card glow,
+    /// chart, editor controls, and detail view all share the same corrected
+    /// shade the tracker-creation flow settled on. Scheme-dependent (the filter
+    /// lifts near-black colors in dark mode), so it takes the environment's
+    /// `ColorScheme`. Idempotent — safe to apply to an already-corrected color.
+    func displayColor(in scheme: ColorScheme) -> Color {
+        color.readableControlTint(in: scheme)
+    }
+
     init(
         from schema: MetricSchema,
         id: UUID = UUID(),

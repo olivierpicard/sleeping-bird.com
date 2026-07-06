@@ -43,7 +43,7 @@ extension Color {
     /// carries headline-weight labels and glyphs, not body copy.
     func readableControlTint(
         in scheme: ColorScheme,
-        ratio: Double = 3.0
+        ratio: Double = 2.5
     ) -> Color {
         var r: CGFloat = 0, g: CGFloat = 0, b: CGFloat = 0, a: CGFloat = 0
         // System colors are dynamic; resolve against the scheme we're asked

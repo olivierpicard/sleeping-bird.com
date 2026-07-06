@@ -7,6 +7,7 @@ struct DashboardView: View {
         [Metric]
     @Environment(MetricGenerator.self) private var generator
     @Environment(\.modelContext) private var modelContext
+    @Environment(\.colorScheme) private var colorScheme
     let onAddMetric: () -> Void
     @State private var editingMetric: Metric? = nil
     @State private var selectedMetric: Metric? = nil
@@ -29,6 +30,7 @@ struct DashboardView: View {
             ForEach(metrics) { metric in
                 MetricViewFactory.make(
                     from: metric,
+                    in: colorScheme,
                     onAddTapped: { editingMetric = metric },
                     onCardTapped: { selectedMetric = metric }
                 )
@@ -78,7 +80,7 @@ struct DashboardView: View {
             MetricDetailView(metric: metric)
         }
         .sheet(item: $editingMetric) { metric in
-            MetricInputFactory.make(from: metric) { point in
+            MetricInputFactory.make(from: metric, in: colorScheme) { point in
                 try? metric.append(point)
                 editingMetric = nil
                 PostHogSDK.shared.capture(

@@ -12,17 +12,21 @@ enum MetricViewFactory {
 
     static func make(
         from metric: Metric,
+        in scheme: ColorScheme,
         onAddTapped: @escaping () -> Void,
         onCardTapped: @escaping () -> Void = {}
     ) -> some View {
-        MetricView(
+        // Correct once and carry the same shade across the card chrome, header,
+        // and chart — matching the tracker-creation reveal.
+        let color = metric.displayColor(in: scheme)
+        return MetricView(
             title: metric.name,
             emoji: metric.emoji,
             value: value(for: metric),
-            mainColor: metric.color,
+            mainColor: color,
             onAddTapped: onAddTapped,
             onCardTapped: onCardTapped,
-            chart: MiniChartFactory.make(from: metric),
+            chart: MiniChartFactory.make(from: metric, colorOverride: color),
         )
     }
 

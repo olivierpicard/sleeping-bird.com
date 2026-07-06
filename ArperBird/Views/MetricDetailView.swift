@@ -12,6 +12,15 @@ import SwiftUI
 struct MetricDetailView: View {
     let metric: Metric
 
+    @Environment(\.colorScheme) private var colorScheme
+
+    /// The metric's color corrected for readability — the single shade the glow,
+    /// chart, calendar tints, and value labels all draw from, matching the card
+    /// on the dashboard and the tracker-creation reveal.
+    private var tint: Color {
+        metric.displayColor(in: colorScheme)
+    }
+
     @State private var range: TimeRange = .month
     @State private var selectedDate: Date?
     @State private var bins: [ChartBin] = []
@@ -164,20 +173,20 @@ struct MetricDetailView: View {
                 } label: {
                     Label("Add entry", systemImage: "plus")
                 }
-                .tint(metric.color)
+                .tint(tint)
             }
             ToolbarItem(placement: .topBarTrailing) {
                 Button(action: { isEditing = true }) {
                     Label("Edit", systemImage: "slider.horizontal.3")
                 }
-                    .tint(metric.color)
+                    .tint(tint)
             }
         }
         .sheet(isPresented: $isEditing) {
             MetricEditSheet(metric: metric)
         }
         .sheet(isPresented: $isAddingEntry) {
-            MetricInputFactory.make(from: metric) { point in
+            MetricInputFactory.make(from: metric, in: colorScheme) { point in
                 try? metric.append(point)
                 isAddingEntry = false
                 PostHogSDK.shared.capture(
@@ -265,7 +274,7 @@ struct MetricDetailView: View {
             localized: "metric_detail.empty.subtitle"
         )
         if let range = string.range(of: "+") {
-            string[range].foregroundColor = metric.color
+            string[range].foregroundColor = tint
             string[range].font = .body.weight(.bold)
         }
         return string
@@ -282,12 +291,12 @@ struct MetricDetailView: View {
 
             VStack(spacing: 20) {
                 RoundedRectangle(cornerRadius: 24, style: .continuous)
-                    .fill(metric.color.opacity(0.12))
+                    .fill(tint.opacity(0.12))
                     .frame(width: 96, height: 96)
                     .overlay {
                         Image(systemName: emptyStateSymbol)
                             .font(.system(size: 38, weight: .semibold))
-                            .foregroundStyle(metric.color)
+                            .foregroundStyle(tint)
                     }
 
                 VStack(spacing: 8) {
@@ -394,7 +403,7 @@ struct MetricDetailView: View {
                 .font(.caption)
                 .fontWeight(.semibold)
                 .tracking(1.2)
-                .foregroundStyle(metric.color)
+                .foregroundStyle(tint)
         }
     }
 
@@ -415,7 +424,7 @@ struct MetricDetailView: View {
                     Text(displayedUnitText)
                         .font(.title2)
                         .fontWeight(.medium)
-                        .foregroundStyle(metric.color)
+                        .foregroundStyle(tint)
                 }
             }
             .padding(.bottom, -10)
@@ -494,7 +503,7 @@ struct MetricDetailView: View {
             falseDays: falseDays,
             startMonth: startMonth,
             endMonth: endMonth,
-            tint: metric.color,
+            tint: tint,
             trueLabel: cfg?.trueLabel ?? "Yes",
             falseLabel: cfg?.falseLabel ?? "No",
             selectedDate: $selectedDate
@@ -513,7 +522,7 @@ struct MetricDetailView: View {
             filledDays: datetimeFilledDays,
             startMonth: startMonth,
             endMonth: endMonth,
-            tint: metric.color,
+            tint: tint,
             trueLabel: "Event",
             falseLabel: "No event",
             selectedDate: $selectedDate
@@ -542,8 +551,8 @@ struct MetricDetailView: View {
                     toGranularity: range.bucketComponent
                 )
             } ?? false
-        let top = metric.color.opacity(isSelected ? 1.0 : 0.45)
-        let bottom = metric.color.opacity(isSelected ? 0.6 : 0.15)
+        let top = tint.opacity(isSelected ? 1.0 : 0.45)
+        let bottom = tint.opacity(isSelected ? 0.6 : 0.15)
         return LinearGradient(
             colors: [top, bottom],
             startPoint: .top,
@@ -600,11 +609,11 @@ struct MetricDetailView: View {
                 Text(entryDisplayText(for: point))
                     .font(.body)
                     .fontWeight(.semibold)
-                    .foregroundStyle(metric.color)
+                    .foregroundStyle(tint)
                 if !isBinary, !unitText.isEmpty {
                     Text(unitText)
                         .font(.caption)
-                        .foregroundStyle(metric.color.opacity(0.7))
+                        .foregroundStyle(tint.opacity(0.7))
                 }
             }
         }

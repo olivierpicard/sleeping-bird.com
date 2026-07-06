@@ -3,9 +3,12 @@ import SwiftUI
 enum MetricInputFactory {
 
     @ViewBuilder
-    static func make(from metric: Metric, onAdd: @escaping (DataPoint) -> Void)
-        -> some View
-    {
+    static func make(
+        from metric: Metric,
+        in scheme: ColorScheme,
+        onAdd: @escaping (DataPoint) -> Void
+    ) -> some View {
+        let mainColor = metric.displayColor(in: scheme)
         switch metric.config {
         case .number(let cfg):
             MetricEditor.Number(
@@ -14,7 +17,7 @@ enum MetricInputFactory {
                 defaultValue: cfg.min,
                 step: cfg.granularity,
                 unit: cfg.unit,
-                mainColor: metric.color,
+                mainColor: mainColor,
                 onAdd: { onAdd(.number(Date(), $0)) }
             )
             .style(numberStyle(for: cfg))
@@ -22,7 +25,7 @@ enum MetricInputFactory {
         case .categorySingleChoice(let cfg):
             MetricEditor.Category(
                 labels: cfg.labels,
-                mainColor: metric.color,
+                mainColor: mainColor,
                 onAdd: { onAdd(.category(Date(), $0)) }
             )
             .style(.single)
@@ -30,7 +33,7 @@ enum MetricInputFactory {
         case .categoryMultipleChoice(let cfg):
             MetricEditor.Category(
                 labels: cfg.labels,
-                mainColor: metric.color,
+                mainColor: mainColor,
                 onAdd: { onAdd(.category(Date(), $0)) }
             )
             .style(.multiple)
@@ -39,7 +42,7 @@ enum MetricInputFactory {
             MetricEditor.Binary(
                 trueLabel: cfg.trueLabel,
                 falseLabel: cfg.falseLabel,
-                mainColor: metric.color,
+                mainColor: mainColor,
                 onAdd: { onAdd(.binary(Date(), $0)) }
             )
 
@@ -47,14 +50,14 @@ enum MetricInputFactory {
             MetricEditor.Duration(
                 granularity: cfg.granularity,
                 maxInSeconds: cfg.maxInSeconds,
-                mainColor: metric.color,
+                mainColor: mainColor,
                 onAdd: { onAdd(.duration(Date(), $0)) }
             )
         
         case .datetime(_):
             MetricEditor.Datetime(
                 defaultValue: Date.now,
-                mainColor: metric.color,
+                mainColor: mainColor,
                 onAdd: { onAdd(.datetime( $0 )) }
             )
             
