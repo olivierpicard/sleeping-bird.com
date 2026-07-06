@@ -156,7 +156,7 @@ struct TrackerDoneView<Recap: View>: View {
                     mainColor: displayColor
                 )
             },
-            chart: MiniChartFactory.make(from: metric, colorOverride: .gray)
+            chart: MiniChartFactory.make(from: metric, colorOverride: displayColor)
         )
     }
 }
