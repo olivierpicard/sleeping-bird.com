@@ -13,3 +13,4 @@ and link back — don't edit history.
 
 - [0001 — Date reveal card: dashed empties over a faked history](0001-date-reveal-card.md)
 - [0002 — Mini-charts show the latest, not all](0002-mini-chart-truncation.md)
+- [0003 — Tracker creation: intent-first over type-first](0003-intent-based-creation.md)
