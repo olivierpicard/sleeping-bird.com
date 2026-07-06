@@ -26,6 +26,7 @@ struct TrackerIntentView: View {
     @State private var promptIndex = 0
     @FocusState private var isFieldFocused: Bool
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.colorScheme) private var colorScheme
 
     /// AI seam: interprets the free-text field into a titled intent + formats.
     /// Injected so previews drive the fake without a network round-trip.
@@ -83,9 +84,19 @@ struct TrackerIntentView: View {
         return selected.formats[formatIndex].metric
     }
 
+    /// The preview card's color — the resolved suggestion's, passed through the
+    /// readability filter so the card, its chart, and the controls all share
+    /// the same corrected shade. Gray while the card is still the ghost.
     private var mainColor: Color {
-        guard selected != nil, !isLoading else { return .gray }
-        return selected?.color ?? .gray
+        guard let selected, !isLoading else { return .gray }
+        return selected.color.readableControlTint(in: colorScheme)
+    }
+
+    /// The resolved suggestion's color, or `nil` while the card is still the
+    /// gray ghost (unresolved, loading, or failed).
+    private var resolvedColor: Color? {
+        guard let selected, !isLoading else { return nil }
+        return selected.color
     }
 
     var body: some View {
@@ -141,6 +152,14 @@ struct TrackerIntentView: View {
             }
             .controlSize(.extraLarge)
             .buttonStyle(.glassProminent)
+            // The tracker's color owns the accent from the moment the card
+            // resolves: the CTA picks up the card's corrected shade alongside
+            // the preview, and the flow carries it on. Neutral app accent until
+            // then — and always, under the accent-controls comparison variant.
+            .tint(
+                TrackerCreationFlow.colorfulControls && resolvedColor != nil
+                    ? mainColor : .accent
+            )
             .disabled(selected == nil || isLoading || isFailed)
             .padding()
         }
@@ -171,7 +190,12 @@ struct TrackerIntentView: View {
                     mainColor: mainColor,
                 )
             },
-            chart: MiniChartFactory.make(from: displayedMetric)
+            // Override the metric's stored raw color so the chart renders in
+            // the same corrected shade as the rest of the card.
+            chart: MiniChartFactory.make(
+                from: displayedMetric,
+                colorOverride: mainColor
+            )
         )
         // The ghost is a promise, not a dead widget — keep it quiet.
         .opacity(selected == nil || isLoading ? 0.55 : 1)
@@ -230,7 +254,8 @@ struct TrackerIntentView: View {
                     }
                     .buttonStyle(.bordered)
                     .buttonBorderShape(.capsule)
-                    .tint(index == formatIndex ? selected.color : .gray)
+                    // The selected pill shares the card's corrected shade.
+                    .tint(index == formatIndex ? mainColor : .gray)
                 }
             } else {
                 // Reserve the row's height so the layout doesn't jump.

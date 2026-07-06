@@ -50,8 +50,17 @@ enum TrackerCreationStep: Hashable {
 /// `NavigationStack`, mirroring the flexible pattern of `OnboardingFlow`. Each
 /// step view takes an `onNext` closure rather than owning its own navigation.
 struct TrackerCreationFlow: View {
+    /// Comparison switch for the flow's control tinting, while the design is
+    /// being decided. `true`: controls (CTAs, nav chrome, toggles) tint with a
+    /// contrast-corrected variant of the tracker color, so the color owns the
+    /// whole flow. `false`: controls stay on the app accent and the tracker
+    /// color appears only on the cards and selection pills. Flip to compare;
+    /// delete once one wins. Card fills always use the raw color either way.
+    static let colorfulControls = true
+
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var context
+    @Environment(\.colorScheme) private var colorScheme
     @State private var path: [TrackerCreationStep] = []
 
     /// The single source of truth for the whole flow. Owning the state here —
@@ -63,6 +72,16 @@ struct TrackerCreationFlow: View {
     /// user continues and then threaded through every step, the reveal, and the
     /// persisted metric. Defaults to the app accent for the seeded `init` path.
     @State private var color: Color = .accent
+
+    /// What the step views' controls actually paint with. The raw per-kind
+    /// colors are card fills first — too bright to carry white labels or read
+    /// as text — so text-bearing controls (chips, selected rows, keypads,
+    /// steppers, nav chrome) get the contrast-corrected variant, or the app
+    /// accent under the comparison flag. Card fills always use `color` raw.
+    private var controlColor: Color {
+        Self.colorfulControls
+            ? color.readableControlTint(in: colorScheme) : .accent
+    }
 
     /// A dashboard badge tap arrives as a `seed`: rather than skipping the intent
     /// screen, it's handed to `TrackerIntentView` as a pre-resolved selection, so
@@ -106,10 +125,9 @@ struct TrackerCreationFlow: View {
                     path = [Self.firstStep(for: kind)]
                 }
             )
-            .navigationDestination(
-                for: TrackerCreationStep.self,
-                destination: destination
-            )
+            .navigationDestination(for: TrackerCreationStep.self) { step in
+                destination(for: step)
+            }
         }
         .toolbar {
             ToolbarItem(placement: .cancellationAction) {
@@ -118,6 +136,14 @@ struct TrackerCreationFlow: View {
                 }
             }
         }
+        // Ambient tint: every pushed step, its loading spinner, the reveal, and
+        // the nav-bar chrome (back chevron, close button) inherit the tracker's
+        // color, so config chrome reads as "shaping the card you just saw"
+        // rather than the generic app accent. Applied to the whole stack — not
+        // per destination — so the bar buttons follow too. Before `onContinue`
+        // seeds `color` it *is* the app accent, so the root intent screen stays
+        // neutral pre-resolution.
+        .tint(controlColor)
     }
 
     /// Builds each pushed step. Every destination reads from / writes to `model`,
@@ -148,7 +174,7 @@ struct TrackerCreationFlow: View {
             }
         case .categoryLabels:
             TrackerCategoryLabelsView(
-                color: color,
+                color: controlColor,
                 initialLabels: model.categoryLabels
             ) { labels in
                 // Trust the AI's single/multiple guess unless the user replaced or
@@ -198,7 +224,7 @@ struct TrackerCreationFlow: View {
                     .init(unit: $0.unit, dailyGoal: $0.dailyGoal)
                 },
                 selectedUnit: model.selectedUnit,
-                color: color
+                color: controlColor
             ) { unit in
                 model.chooseUnit(unit)
                 path.append(.goalValue)
@@ -213,7 +239,7 @@ struct TrackerCreationFlow: View {
                 isCustomUnit: !model.suggestions.contains {
                     $0.unit == model.selectedUnit
                 },
-                color: color
+                color: controlColor
             ) { value in
                 model.goalValue = value
                 // A custom unit has no AI-anchored step, so fetch one tuned to the
@@ -268,6 +294,7 @@ struct TrackerCreationFlow: View {
                 model: model,
                 metric: { doneMetric() },
                 color: color,
+                controlColor: controlColor,
                 onDone: complete
             )
         }
@@ -432,7 +459,11 @@ struct TrackerCreationFlow: View {
 private struct DoneRevealStep: View {
     let model: TrackerCreationModel
     let metric: () -> Metric
+    /// The tracker's raw color — the card fill, bloom, and sparkles.
     let color: Color
+    /// The contrast-corrected variant for text-bearing chrome: the recap chips'
+    /// colored text and strokes.
+    let controlColor: Color
     let onDone: () -> Void
 
     var body: some View {
@@ -466,7 +497,7 @@ private struct DoneRevealStep: View {
                         )
                     }
                 },
-                color: color,
+                color: controlColor,
                 onEditMax: { model.setNumberMax($0) },
                 onEditGranularity: { model.numberGranularity = $0 },
                 onToggleBehavior: {
@@ -482,7 +513,7 @@ private struct DoneRevealStep: View {
             DoneCategoryRecap(
                 allowsMultiple: model.categoryAllowsMultiple,
                 count: model.categoryLabels.count,
-                color: color,
+                color: controlColor,
                 onToggleChoice: { model.categoryAllowsMultiple.toggle() }
             )
         case .binary:
@@ -492,7 +523,7 @@ private struct DoneRevealStep: View {
         case .duration:
             DoneDurationRecap(
                 maxSeconds: model.durationMaxSeconds,
-                color: color,
+                color: controlColor,
                 onUpdate: { model.setDurationMax($0) }
             )
         case .goal:
@@ -504,7 +535,7 @@ private struct DoneRevealStep: View {
                 // The user's own unit, kept in the menu so they can switch back to
                 // it (and its target) after trying an AI one.
                 customUnit: model.goalMenuCustomUnit,
-                color: color,
+                color: controlColor,
                 onSelectUnit: { model.selectGoalUnit($0) },
                 onEditGoal: { model.goalValue = max(0, $0) },
                 onEditGranularity: { model.goalGranularity = $0 }

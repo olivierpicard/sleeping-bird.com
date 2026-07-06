@@ -32,6 +32,16 @@ struct TrackerDoneView<Recap: View>: View {
     /// drops it into place.
     @ViewBuilder var recap: () -> Recap
 
+    @Environment(\.colorScheme) private var colorScheme
+
+    /// The tracker's color passed through the readability filter — every
+    /// colored element of the reveal (glow, sparkles, card, CTA) shares this
+    /// one corrected shade, so the celebration matches the flow's controls
+    /// instead of flashing the brighter raw fill next to them.
+    private var displayColor: Color {
+        color.readableControlTint(in: colorScheme)
+    }
+
     /// Drives the entrance: the card springs up from small and translucent once
     /// the view appears.
     @State private var hasAppeared = false
@@ -62,7 +72,7 @@ struct TrackerDoneView<Recap: View>: View {
                 // A bloom of the tracker's color behind the card that flashes
                 // bright as it lands, then settles — the punch of the reveal.
                 .shadow(
-                    color: color.opacity(glow ? 0.9 : 0.35),
+                    color: displayColor.opacity(glow ? 0.9 : 0.35),
                     radius: glow ? 36 : 10
                 )
                 // Launch small from below and overshoot into place so the card
@@ -84,11 +94,11 @@ struct TrackerDoneView<Recap: View>: View {
             }
             .controlSize(.extraLarge)
             .buttonStyle(.glassProminent)
-            .tint(color)
+            .tint(displayColor)
             .padding()
         }
         // A scattered sparkle burst behind everything, sized to the celebration.
-        .background(alignment: .top) { SparkleBurst(color: color, active: hasAppeared) }
+        .background(alignment: .top) { SparkleBurst(color: displayColor, active: hasAppeared) }
         // A success cue the moment the card lands.
         .sensoryFeedback(.success, trigger: hasAppeared)
         .onAppear {
@@ -138,12 +148,12 @@ struct TrackerDoneView<Recap: View>: View {
     /// up here exactly as it will on the dashboard, just with sample data.
     private var card: some View {
         MetricView(
-            mainColor: color,
+            mainColor: displayColor,
             header: {
                 MetricHeaderTextView(
                     title: metric.name,
                     emoji: metric.emoji,
-                    mainColor: color
+                    mainColor: displayColor
                 )
             },
             chart: MiniChartFactory.make(from: metric, colorOverride: .gray)
