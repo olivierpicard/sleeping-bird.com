@@ -149,3 +149,4 @@ UI strings live in `Localizable.xcstrings` (String Catalog) and are referenced b
 - Sub-editor files prefixed with `_` (e.g. `_SliderEditor`) are private implementations of a public `MetricEditor` type — don't use them directly; go through `MetricInputFactory` / `MetricEditor`.
 - Commit style is Conventional Commits (see the `commit` skill).
 - **Decision log** (`docs/decisions/`) — append-only ADRs (`NNNN-short-slug.md`) capturing reasoning that doesn't survive in code or commits (the decision, the options, why the others lost). Add a new entry to supersede an old one rather than editing history; reference renders go in `assets/`.
+- **Proposals** (`docs/proposals/`) — "for later" design directions not yet implemented (e.g. the metric-detail redesign). When a slice ships, record the actual decision as a new ADR and link back to the proposal.
