@@ -284,9 +284,11 @@ struct MetricDetailView: View {
             recomputeNumberFilledDays()
             recomputeCategoryEntries()
             recomputeCategoryDays()
-            // Seed the legend with every choice shown, once.
+            // Seed the legend with every choice shown, once. Category metrics
+            // also open on the calendar rather than the chart.
             if isCategory, !hasSeededCategory {
                 activeCategoryLabels = Set(orderedCategoryChoices)
+                chartMode = .calendar
                 hasSeededCategory = true
             }
             // Calendar opens anchored to the latest (trailing) month.
