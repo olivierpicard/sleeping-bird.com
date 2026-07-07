@@ -209,7 +209,7 @@ struct MetricDetailView: View {
             }
         }
         .sheet(isPresented: $isEditing) {
-            MetricEditSheet(metric: metric)
+            MetricEditSheet(metric: metric) 
         }
         .sheet(isPresented: $isAddingEntry) {
             MetricInputFactory.make(from: metric, in: colorScheme) { point in
@@ -353,17 +353,6 @@ struct MetricDetailView: View {
                         .fixedSize(horizontal: false, vertical: true)
                 }
                 .padding(.horizontal, 20)
-
-//                Button(action: { isAddingEntry = true }) {
-//                    Label("metric_detail.empty.cta", systemImage: "plus")
-//                        .font(.headline)
-//                        .padding(.horizontal, 8)
-//                        .padding(.vertical, 4)
-//                }
-//                .controlSize(.large)
-//                .buttonStyle(.glassProminent)
-//                .tint(metric.color)
-//                .padding(.top, 15)
             }
 
             Spacer()
@@ -371,67 +360,6 @@ struct MetricDetailView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
-
-    // MARK: - Empty State (card variant)
-
-//    private var emptyStateCard: some View {
-//        VStack(spacing: 0) {
-//            metricLabel
-//                .frame(maxWidth: .infinity, alignment: .leading)
-//                .padding(.horizontal, 20)
-//                .padding(.top, 8)
-//
-//            Spacer()
-//
-//            VStack(spacing: 20) {
-//                RoundedRectangle(cornerRadius: 20, style: .continuous)
-//                    .fill(metric.color.opacity(0.12))
-//                    .frame(width: 88, height: 88)
-//                    .overlay {
-//                        Image(systemName: emptyStateSymbol)
-//                            .font(.system(size: 34, weight: .semibold))
-//                            .foregroundStyle(metric.color)
-//                    }
-//
-//                VStack(spacing: 8) {
-//                    Text("metric_detail.empty.card.title")
-//                        .font(.title2)
-//                        .fontWeight(.bold)
-//                        .foregroundStyle(.primary)
-//                        .multilineTextAlignment(.center)
-//
-//                    Text("metric_detail.empty.card.subtitle")
-//                        .font(.body)
-//                        .foregroundStyle(.secondary)
-//                        .multilineTextAlignment(.center)
-//                        .fixedSize(horizontal: false, vertical: true)
-//                }
-//
-//                Button(action: { isAddingEntry = true }) {
-//                    Label("metric_detail.empty.card.cta", systemImage: "plus")
-//                        .font(.headline)
-//                        .frame(maxWidth: .infinity)
-//                        .padding(.vertical, 4)
-//                }
-//                .controlSize(.large)
-//                .buttonStyle(.glassProminent)
-//                .tint(metric.color)
-//                .padding(.top, 4)
-//            }
-//            .padding(28)
-//            .frame(maxWidth: .infinity)
-//            .background(
-//                RoundedRectangle(cornerRadius: 28, style: .continuous)
-//                    .fill(Color(.secondarySystemGroupedBackground))
-//            )
-//            .padding(.horizontal, 16)
-//            .padding(.bottom, 24)
-//            
-//            Spacer()
-//        }
-//        .frame(maxWidth: .infinity, maxHeight: .infinity)
-//        .background(Color(.systemGroupedBackground))
-//    }
 
     // MARK: - Header
 
@@ -501,7 +429,7 @@ struct MetricDetailView: View {
     // MARK: - Month Selector
 
     /// The months visible in the calendar, oldest → newest. Mirrors
-    /// `BinaryCalendarView.months` so index math stays aligned.
+    /// `CalendarScrollView.months` so index math stays aligned.
     private var calendarMonths: [Date] {
         let cal = Calendar.current
         var result: [Date] = []
@@ -653,17 +581,28 @@ struct MetricDetailView: View {
         let endMonth = cal.dateInterval(of: .month, for: now)?.start ?? now
         let startMonth =
             cal.date(byAdding: .month, value: -11, to: endMonth) ?? endMonth
-        let cfg = binaryConfig
-        return BinaryCalendarView(
-            filledDays: filledDays,
-            falseDays: falseDays,
+        return CalendarScrollView(
             startMonth: startMonth,
             endMonth: endMonth,
-            tint: tint,
-            trueLabel: cfg?.trueLabel ?? "Yes",
-            falseLabel: cfg?.falseLabel ?? "No",
             selectedDate: $selectedDate
-        )
+        ) { ctx in
+            let day = cal.startOfDay(for: ctx.date)
+            let isTrue = filledDays.contains(day)
+            let isFalse = falseDays.contains(day)
+            CalendarDayCell(
+                date: ctx.date,
+                isSelected: ctx.isSelected,
+                isToday: ctx.isToday,
+                isFuture: ctx.isFuture,
+                tint: tint,
+                hasData: isTrue || isFalse
+            ) {
+                DayDotFill(
+                    style: isTrue ? .filled : (isFalse ? .muted : .empty),
+                    tint: tint
+                )
+            }
+        }
     }
 
     // MARK: - Datetime Calendar
@@ -674,15 +613,25 @@ struct MetricDetailView: View {
         let endMonth = cal.dateInterval(of: .month, for: now)?.start ?? now
         let startMonth =
             cal.date(byAdding: .month, value: -11, to: endMonth) ?? endMonth
-        return BinaryCalendarView(
-            filledDays: datetimeFilledDays,
+        return CalendarScrollView(
             startMonth: startMonth,
             endMonth: endMonth,
-            tint: tint,
-            trueLabel: "Event",
-            falseLabel: "No event",
             selectedDate: $selectedDate
-        )
+        ) { ctx in
+            let hasEvent = datetimeFilledDays.contains(
+                cal.startOfDay(for: ctx.date)
+            )
+            CalendarDayCell(
+                date: ctx.date,
+                isSelected: ctx.isSelected,
+                isToday: ctx.isToday,
+                isFuture: ctx.isFuture,
+                tint: tint,
+                hasData: hasEvent
+            ) {
+                DayDotFill(style: hasEvent ? .filled : .empty, tint: tint)
+            }
+        }
     }
 
     // MARK: - Number / Duration Calendar
@@ -704,17 +653,28 @@ struct MetricDetailView: View {
     /// Calendar view for number/duration metrics. Toggled from the chart via
     /// `chartModeToggle`. Marks each day that has at least one logged entry.
     private var numberCalendarSection: some View {
-        BinaryCalendarView(
-            filledDays: numberFilledDays,
+        let cal = Calendar.current
+        return CalendarScrollView(
             startMonth: calendarStartMonth,
             endMonth: calendarEndMonth,
-            tint: tint,
-            trueLabel: "Logged",
-            falseLabel: "",
             selectedDate: $selectedDate,
             scrolledMonth: $displayedMonth,
             onMonthProgress: { monthProgress = $0 }
-        )
+        ) { ctx in
+            let isLogged = numberFilledDays.contains(
+                cal.startOfDay(for: ctx.date)
+            )
+            CalendarDayCell(
+                date: ctx.date,
+                isSelected: ctx.isSelected,
+                isToday: ctx.isToday,
+                isFuture: ctx.isFuture,
+                tint: tint,
+                hasData: isLogged
+            ) {
+                DayDotFill(style: isLogged ? .filled : .empty, tint: tint)
+            }
+        }
     }
 
     private var displayedDatetimeCount: Int? {
