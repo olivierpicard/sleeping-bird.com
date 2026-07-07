@@ -676,7 +676,7 @@ struct MetricDetailView: View {
                 tint: tint,
                 hasData: !colors.isEmpty
             ) {
-                DayPieFill(colors: colors)
+                DayPieFillView(colors: colors)
             }
         }
     }
@@ -705,7 +705,7 @@ struct MetricDetailView: View {
                 tint: tint,
                 hasData: isTrue || isFalse
             ) {
-                DayDotFill(
+                DaySolidFillView(
                     style: isTrue ? .filled : (isFalse ? .muted : .empty),
                     tint: tint
                 )
@@ -737,7 +737,7 @@ struct MetricDetailView: View {
                 tint: tint,
                 hasData: hasEvent
             ) {
-                DayDotFill(style: hasEvent ? .filled : .empty, tint: tint)
+                DaySolidFillView(style: hasEvent ? .filled : .empty, tint: tint)
             }
         }
     }
@@ -780,7 +780,7 @@ struct MetricDetailView: View {
                 tint: tint,
                 hasData: isLogged
             ) {
-                DayDotFill(style: isLogged ? .filled : .empty, tint: tint)
+                DaySolidFillView(style: isLogged ? .filled : .empty, tint: tint)
             }
         }
     }

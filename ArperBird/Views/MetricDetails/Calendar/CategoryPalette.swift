@@ -3,7 +3,7 @@
 //  ArperBird
 //
 //  The stable choice → color assignment shared by the category calendar's pies
-//  (`DayPieFill`) and its legend (`CategoryLegend`). A choice's color is fixed by
+//  (`DayPieFillView`) and its legend (`CategoryLegend`). A choice's color is fixed by
 //  its position in the metric's declared label list, so it never re-maps as the
 //  user filters others — color memory holds. Colors are drawn from the Okabe–Ito
 //  colorblind-safe palette and **cycle** past its length, so a metric with more

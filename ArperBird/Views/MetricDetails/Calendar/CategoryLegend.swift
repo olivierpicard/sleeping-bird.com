@@ -9,7 +9,7 @@
 //  the calendar and the legend read the same source of truth (held by the
 //  enclosing detail view) and can never disagree about what's shown.
 //
-//  Pair with the category `CalendarScrollView` / `DayPieFill`, which paint the
+//  Pair with the category `CalendarScrollView` / `DayPieFillView`, which paint the
 //  same colors for the same active choices.
 //
 

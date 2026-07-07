@@ -1,5 +1,5 @@
 //
-//  DayDotFill.swift
+//  DaySolidFillView.swift
 //  ArperBird
 //
 //  The interior fill shared by every non-category calendar — binary, date,
@@ -15,7 +15,7 @@
 
 import SwiftUI
 
-struct DayDotFill: View {
+struct DaySolidFillView: View {
     enum Style {
         /// Solid tint — a logged day, or a binary "true".
         case filled
@@ -47,13 +47,13 @@ struct DayDotFill: View {
         spacing: 8
     ) {
         CalendarDayCell(date: Date(), tint: tint, hasData: true) {
-            DayDotFill(style: .filled, tint: tint)
+            DaySolidFillView(style: .filled, tint: tint)
         }
         CalendarDayCell(date: Date(), tint: tint, hasData: true) {
-            DayDotFill(style: .muted, tint: tint)
+            DaySolidFillView(style: .muted, tint: tint)
         }
         CalendarDayCell(date: Date(), tint: tint) {
-            DayDotFill(style: .empty, tint: tint)
+            DaySolidFillView(style: .empty, tint: tint)
         }
         CalendarDayCell(
             date: Date(),
@@ -61,22 +61,22 @@ struct DayDotFill: View {
             tint: tint,
             hasData: false
         ) {
-            DayDotFill(style: .filled, tint: tint)
+            DaySolidFillView(style: .filled, tint: tint)
         }
         
         // Future — no data
         CalendarDayCell(date: Date(), isFuture: true, tint: tint) {
-            DayDotFill(style: .empty, tint: tint)
+            DaySolidFillView(style: .empty, tint: tint)
         }
         // Today — no data
         CalendarDayCell(date: Date(), isToday: true, tint: tint) {
-            DayDotFill(style: .empty, tint: tint)
+            DaySolidFillView(style: .empty, tint: tint)
         }
         // Selected today — no data
         CalendarDayCell(
             date: Date(), isSelected: true, isToday: true, tint: tint
         ) {
-            DayDotFill(style: .empty, tint: tint)
+            DaySolidFillView(style: .empty, tint: tint)
         }
     }
     .padding()

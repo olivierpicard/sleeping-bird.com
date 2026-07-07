@@ -1,11 +1,11 @@
 //
-//  DayPieFill.swift
+//  DayPieFillView.swift
 //  ArperBird
 //
 //  The interior fill for a *category* calendar — a day's active choices painted
 //  as an equal-wedge pie clipped to a circle. One color renders as a full disc,
 //  2+ as equal wedges, and a day with no colors renders nothing (its "no entry"
-//  outline is drawn by the enclosing `CalendarDayCell`, like `DayDotFill.empty`).
+//  outline is drawn by the enclosing `CalendarDayCell`, like `DaySolidFillView.empty`).
 //  A hairline traces the disc and the wedge seams so pale fills read against the
 //  background without altering the color itself.
 //
@@ -15,7 +15,7 @@
 
 import SwiftUI
 
-struct DayPieFill: View {
+struct DayPieFillView: View {
     /// The day's active choice colors, in stable list order. Empty = no entry.
     let colors: [Color]
 
@@ -93,34 +93,34 @@ struct DayPieFill: View {
     ) {
         // Single choice — full disc
         CalendarDayCell(date: Date(), tint: tint, hasData: true) {
-            DayPieFill(colors: [palette[0]])
+            DayPieFillView(colors: [palette[0]])
         }
         // Two choices
         CalendarDayCell(date: Date(), tint: tint, hasData: true) {
-            DayPieFill(colors: Array(palette.prefix(2)))
+            DayPieFillView(colors: Array(palette.prefix(2)))
         }
         // Four choices
         CalendarDayCell(date: Date(), tint: tint, hasData: true) {
-            DayPieFill(colors: palette)
+            DayPieFillView(colors: palette)
         }
         // No entry
         CalendarDayCell(date: Date(), tint: tint) {
-            DayPieFill(colors: [])
+            DayPieFillView(colors: [])
         }
 
         // Selected — pie shrinks inside the ring
         CalendarDayCell(
             date: Date(), isSelected: true, tint: tint, hasData: true
         ) {
-            DayPieFill(colors: Array(palette.prefix(3)))
+            DayPieFillView(colors: Array(palette.prefix(3)))
         }
         // Future — no data
         CalendarDayCell(date: Date(), isFuture: true, tint: tint) {
-            DayPieFill(colors: [])
+            DayPieFillView(colors: [])
         }
         // Today — no data
         CalendarDayCell(date: Date(), isToday: true, tint: tint) {
-            DayPieFill(colors: [])
+            DayPieFillView(colors: [])
         }
     }
     .padding()
