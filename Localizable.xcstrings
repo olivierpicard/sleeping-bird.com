@@ -1260,6 +1260,9 @@
         }
       }
     },
+    "Hidden" : {
+
+    },
     "Hmm, that didn't go through" : {
 
     },
@@ -2747,6 +2750,19 @@
         }
       }
     },
+    "SHOWING %lld OF %lld" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "SHOWING %1$lld OF %2$lld"
+          }
+        }
+      }
+    },
+    "Shown" : {
+
+    },
     "Single choice" : {
 
     },
@@ -3250,6 +3266,9 @@
           }
         }
       }
+    },
+    "Toggles whether this choice appears in the calendar" : {
+
     },
     "Took Meds" : {
       "localizations" : {

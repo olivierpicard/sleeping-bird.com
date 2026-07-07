@@ -27,6 +27,16 @@ struct MetricDetailView: View {
     @State private var filledDays: Set<Date> = []
     @State private var falseDays: Set<Date> = []
     @State private var categoryEntries: [StackedBarChartView.Entry] = []
+    /// Day (start-of-day) → the choice labels logged that day, for the category
+    /// calendar's pies. Recomputed alongside the other derived render state.
+    @State private var categoryDayLabels: [Date: [String]] = [:]
+    /// Choice labels currently shown in the category calendar. Seeded to all,
+    /// then toggled by the legend. The single source of truth both the calendar
+    /// and the legend read, so they can't disagree about what's shown.
+    @State private var activeCategoryLabels: Set<String> = []
+    /// Guards the one-time seed of `activeCategoryLabels` so a re-appear never
+    /// wipes the user's toggles.
+    @State private var hasSeededCategory = false
     @State private var datetimeFilledDays: Set<Date> = []
     @State private var numberFilledDays: Set<Date> = []
     /// Programmatic scroll target for the calendar — written by the chevrons to
@@ -39,7 +49,7 @@ struct MetricDetailView: View {
     @State private var isEditing: Bool = false
     @State private var isAddingEntry: Bool = false
 
-    /// Chart vs. calendar view for number/duration metrics. UI-only for now.
+    /// Chart vs. calendar view for number, duration, and category metrics.
     private enum ChartMode { case chart, calendar }
     @State private var chartMode: ChartMode = .chart
 
@@ -57,6 +67,19 @@ struct MetricDetailView: View {
             from: metric.data,
             range: range
         )
+    }
+
+    /// Groups category entries by day into the union of their labels — the
+    /// per-day choice set the calendar's pies draw from.
+    private func recomputeCategoryDays() {
+        let cal = Calendar.current
+        var map: [Date: Set<String>] = [:]
+        for point in metric.data {
+            if case .category(let date, let labels) = point {
+                map[cal.startOfDay(for: date), default: []].formUnion(labels)
+            }
+        }
+        categoryDayLabels = map.mapValues { Array($0) }
     }
 
     private func recomputeFilledDays() {
@@ -115,6 +138,38 @@ struct MetricDetailView: View {
         switch metric.config {
         case .categorySingleChoice, .categoryMultipleChoice: return true
         default: return false
+        }
+    }
+
+    /// The metric's declared choice labels in stable order — the basis for both
+    /// color assignment and the legend. Empty for non-category metrics.
+    private var orderedCategoryChoices: [String] {
+        switch metric.config {
+        case .categorySingleChoice(let cfg), .categoryMultipleChoice(let cfg):
+            return cfg.labels
+        default:
+            return []
+        }
+    }
+
+    /// Stable label → color, shared identically by the calendar pies and the
+    /// legend so a wedge always matches its chip.
+    private var categoryColorMap: [String: Color] {
+        CategoryPalette.colors(for: orderedCategoryChoices)
+    }
+
+    /// The legend's rows: every choice paired with its stable color.
+    private var categoryLegendItems: [CategoryLegend.Item] {
+        orderedCategoryChoices.map {
+            .init(label: $0, color: categoryColorMap[$0] ?? .gray)
+        }
+    }
+
+    /// Toggles a choice's visibility in the calendar. No cap — every choice is
+    /// independently on/off.
+    private func toggleCategory(_ label: String) {
+        withAnimation(.snappy) {
+            activeCategoryLabels.formSymmetricDifference([label])
         }
     }
 
@@ -228,6 +283,12 @@ struct MetricDetailView: View {
             recomputeDatetimeFilledDays()
             recomputeNumberFilledDays()
             recomputeCategoryEntries()
+            recomputeCategoryDays()
+            // Seed the legend with every choice shown, once.
+            if isCategory, !hasSeededCategory {
+                activeCategoryLabels = Set(orderedCategoryChoices)
+                hasSeededCategory = true
+            }
             // Calendar opens anchored to the latest (trailing) month.
             monthProgress = Double(max(calendarMonths.count - 1, 0))
         }
@@ -242,6 +303,7 @@ struct MetricDetailView: View {
             recomputeDatetimeFilledDays()
             recomputeNumberFilledDays()
             recomputeCategoryEntries()
+            recomputeCategoryDays()
         }
         .trackScreen(
             "MetricDetail",
@@ -265,9 +327,24 @@ struct MetricDetailView: View {
                             datetimeCalendarSection
                                 .padding(.top)
                         } else if isCategory {
-                            rangePicker
-                                .frame(maxWidth: 280)
-                            categoryChartSection
+                            HStack(spacing: 12) {
+                                if chartMode == .calendar {
+                                    monthSelector
+                                } else {
+                                    rangePicker
+                                }
+                                chartModeToggle
+                            }
+                            if chartMode == .calendar {
+                                categoryCalendarSection
+                                CategoryLegend(
+                                    items: categoryLegendItems,
+                                    active: activeCategoryLabels,
+                                    onToggle: toggleCategory
+                                )
+                            } else {
+                                categoryChartSection
+                            }
                         } else {
                             HStack(spacing: 12) {
                                 if chartMode == .calendar {
@@ -571,6 +648,37 @@ struct MetricDetailView: View {
             range: range,
             selectedDate: $selectedDate
         )
+    }
+
+    /// Calendar view for category metrics. Each day is an equal-wedge pie of its
+    /// active choices, in stable list order; a day whose choices are all filtered
+    /// out falls back to the empty "no entry" outline.
+    private var categoryCalendarSection: some View {
+        let cal = Calendar.current
+        return CalendarScrollView(
+            startMonth: calendarStartMonth,
+            endMonth: calendarEndMonth,
+            selectedDate: $selectedDate,
+            scrolledMonth: $displayedMonth,
+            onMonthProgress: { monthProgress = $0 }
+        ) { ctx in
+            let dayLabels = categoryDayLabels[cal.startOfDay(for: ctx.date)] ?? []
+            let colors = orderedCategoryChoices
+                .filter {
+                    dayLabels.contains($0) && activeCategoryLabels.contains($0)
+                }
+                .compactMap { categoryColorMap[$0] }
+            CalendarDayCell(
+                date: ctx.date,
+                isSelected: ctx.isSelected,
+                isToday: ctx.isToday,
+                isFuture: ctx.isFuture,
+                tint: tint,
+                hasData: !colors.isEmpty
+            ) {
+                DayPieFill(colors: colors)
+            }
+        }
     }
 
     // MARK: - Binary Calendar
