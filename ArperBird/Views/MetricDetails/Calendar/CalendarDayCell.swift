@@ -51,7 +51,7 @@ struct CalendarDayCell<Fill: View>: View {
                 numeral(cell: geo.size.width)
             }
         }
-        .opacity(isFuture ? 0.15 : 1)
+        .opacity(isFuture ? 0.35 : 1)
         .aspectRatio(1, contentMode: .fit)
         .contentShape(Circle())
         .animation(.snappy(duration: 0.2), value: isSelected)

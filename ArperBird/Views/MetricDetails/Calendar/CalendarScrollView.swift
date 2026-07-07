@@ -73,6 +73,7 @@ struct CalendarScrollView<Cell: View>: View {
                     MonthGridView(
                         month: month,
                         selectedDate: $selectedDate,
+                        showsMonthTitle: scrolledMonth == nil,
                         cell: cell
                     )
                     .frame(width: cellSize)
@@ -126,6 +127,9 @@ private let calendarWeekdaySymbols: [String] = {
 private struct MonthGridView<Cell: View>: View {
     let month: Date
     @Binding var selectedDate: Date?
+    /// Whether the grid shows its own month name. Off when an external month
+    /// selector (driven by `scrolledMonth`) already displays it.
+    let showsMonthTitle: Bool
     @ViewBuilder let cell: (CalendarDayContext) -> Cell
 
     private var cells: [Date?] {
@@ -147,17 +151,22 @@ private struct MonthGridView<Cell: View>: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text(month.formatted(.dateTime.month(.abbreviated)).uppercased())
+            if showsMonthTitle {
+                Text(
+                    month.formatted(.dateTime.month(.abbreviated)).uppercased()
+                )
                 .font(.caption)
                 .fontWeight(.semibold)
                 .tracking(1.2)
                 .foregroundStyle(.secondary)
+            }
 
             HStack(spacing: 0) {
                 ForEach(calendarWeekdaySymbols.indices, id: \.self) { i in
                     Text(calendarWeekdaySymbols[i])
                         .font(.caption2)
-                        .foregroundStyle(.tertiary)
+                        .foregroundStyle(.secondary)
+                        .fontWeight(.semibold)
                         .frame(maxWidth: .infinity)
                 }
             }

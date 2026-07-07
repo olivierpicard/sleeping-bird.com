@@ -552,24 +552,23 @@ struct MetricDetailView: View {
             }
             .labelStyle(.iconOnly)
             .buttonStyle(.borderless)
+            .foregroundStyle(tint)
             .disabled(currentMonthIndex <= 0)
 
             monthLabelStrip
+                .foregroundStyle(.primary)
 
             Button(action: { stepMonth(by: 1) }) {
                 Label("Next month", systemImage: "chevron.right")
             }
             .labelStyle(.iconOnly)
             .buttonStyle(.borderless)
+            .foregroundStyle(tint)
             .disabled(currentMonthIndex >= calendarMonths.count - 1)
         }
-        .foregroundStyle(tint)
-        .padding(.horizontal, 12)
-        .padding(.vertical, 6)
-        .background(
-            RoundedRectangle(cornerRadius: 8, style: .continuous)
-                .fill(Color(.tertiarySystemFill))
-        )
+        // Extra gap so the trailing chevron doesn't read as part of the
+        // adjacent mode toggle.
+        .padding(.trailing, 30)
     }
 
     /// Horizontal strip of month labels positioned by the continuous
