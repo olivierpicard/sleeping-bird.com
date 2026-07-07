@@ -2098,6 +2098,9 @@
         }
       }
     },
+    "Next month" : {
+
+    },
     "No Ads, Full Privacy" : {
       "localizations" : {
         "es" : {
@@ -2518,6 +2521,9 @@
           }
         }
       }
+    },
+    "Previous month" : {
+
     },
     "Priority Support" : {
       "localizations" : {
@@ -3748,6 +3754,9 @@
           }
         }
       }
+    },
+    "View" : {
+
     },
     "View details" : {
       "localizations" : {

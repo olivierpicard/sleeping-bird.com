@@ -19,6 +19,18 @@ struct BinaryCalendarView: View {
     let monthPadding: Double = 40
     let displayLegend: Bool = false
     @Binding var selectedDate: Date?
+    /// Optional two-way binding to the month currently aligned in the scroll
+    /// view. When provided, drives an external month selector.
+    var scrolledMonth: Binding<Date?>? = nil
+    /// Reports live scroll progress in month units (0 = first month, N-1 =
+    /// last), updating continuously during a swipe so an external selector can
+    /// follow the drag rather than only snapping at rest.
+    var onMonthProgress: ((Double) -> Void)? = nil
+
+    /// Horizontal distance between the leading edges of two adjacent months.
+    private var monthStride: Double { cellSize + monthPadding }
+    /// Leading inset applied to the scroll content (`.padding(.horizontal, 4)`).
+    private let leadingPadding: Double = 4
 
     private var months: [Date] {
         let cal = Calendar.current
@@ -58,6 +70,15 @@ struct BinaryCalendarView: View {
             .scrollTargetBehavior(.viewAligned)
             .defaultScrollAnchor(.trailing)
             .contentMargins(.trailing, 32, for: .scrollContent)
+            .scrollPositionIfAvailable(scrolledMonth)
+            .onScrollGeometryChange(for: CGFloat.self) { geometry in
+                geometry.contentOffset.x
+            } action: { _, offsetX in
+                guard let onMonthProgress, !months.isEmpty else { return }
+                let raw = (Double(offsetX) - leadingPadding) / monthStride
+                let clamped = min(max(raw, 0), Double(months.count - 1))
+                onMonthProgress(clamped)
+            }
         }
         .sensoryFeedback(.selection, trigger: selectedDate)
     }
@@ -83,6 +104,23 @@ struct BinaryCalendarView: View {
             Text(label)
                 .font(.caption)
                 .foregroundStyle(.secondary)
+        }
+    }
+}
+
+// MARK: - Scroll position helper
+
+extension View {
+    /// Applies `.scrollPosition(id:)` only when a binding is supplied, so
+    /// callers that don't track the aligned month keep their default anchor.
+    @ViewBuilder
+    fileprivate func scrollPositionIfAvailable(
+        _ binding: Binding<Date?>?
+    ) -> some View {
+        if let binding {
+            self.scrollPosition(id: binding)
+        } else {
+            self
         }
     }
 }

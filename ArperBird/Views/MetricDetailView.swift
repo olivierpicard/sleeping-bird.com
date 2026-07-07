@@ -28,8 +28,20 @@ struct MetricDetailView: View {
     @State private var falseDays: Set<Date> = []
     @State private var categoryEntries: [StackedBarChartView.Entry] = []
     @State private var datetimeFilledDays: Set<Date> = []
+    @State private var numberFilledDays: Set<Date> = []
+    /// Programmatic scroll target for the calendar — written by the chevrons to
+    /// scroll to a specific month.
+    @State private var displayedMonth: Date?
+    /// Live position of the calendar in month units (0 = first month), updated
+    /// continuously as the calendar is swiped. Single source of truth the month
+    /// selector renders from, so a mid-swipe shows a mid-slide.
+    @State private var monthProgress: Double = 0
     @State private var isEditing: Bool = false
     @State private var isAddingEntry: Bool = false
+
+    /// Chart vs. calendar view for number/duration metrics. UI-only for now.
+    private enum ChartMode { case chart, calendar }
+    @State private var chartMode: ChartMode = .chart
 
     private func recomputeBins() {
         bins = MetricAggregator.bins(
@@ -73,6 +85,20 @@ struct MetricDetailView: View {
             }
         }
         datetimeFilledDays = set
+    }
+
+    private func recomputeNumberFilledDays() {
+        let cal = Calendar.current
+        var set: Set<Date> = []
+        for point in metric.data {
+            switch point {
+            case .number(let date, _), .duration(let date, _):
+                set.insert(cal.startOfDay(for: date))
+            default:
+                break
+            }
+        }
+        numberFilledDays = set
     }
 
     private var isBinary: Bool {
@@ -200,7 +226,10 @@ struct MetricDetailView: View {
             recomputeBins()
             recomputeFilledDays()
             recomputeDatetimeFilledDays()
+            recomputeNumberFilledDays()
             recomputeCategoryEntries()
+            // Calendar opens anchored to the latest (trailing) month.
+            monthProgress = Double(max(calendarMonths.count - 1, 0))
         }
         .onChange(of: range) { _, _ in
             selectedDate = nil
@@ -211,6 +240,7 @@ struct MetricDetailView: View {
             recomputeBins()
             recomputeFilledDays()
             recomputeDatetimeFilledDays()
+            recomputeNumberFilledDays()
             recomputeCategoryEntries()
         }
         .trackScreen(
@@ -221,7 +251,7 @@ struct MetricDetailView: View {
 
     // MARK: - Populated List
 
-    private var populatedList: some View {
+    private var populatedList: some View { 
         List {
             Section {
                 VStack(spacing: 24) {
@@ -239,9 +269,19 @@ struct MetricDetailView: View {
                                 .frame(maxWidth: 280)
                             categoryChartSection
                         } else {
-                            rangePicker
-                                .frame(maxWidth: 280)
-                            chartSection
+                            HStack(spacing: 12) {
+                                if chartMode == .calendar {
+                                    monthSelector
+                                } else {
+                                    rangePicker
+                                }
+                                chartModeToggle
+                            }
+                            if chartMode == .calendar {
+                                numberCalendarSection
+                            } else {
+                                chartSection
+                            }
                         }
                     }
                 }
@@ -447,6 +487,122 @@ struct MetricDetailView: View {
         .pickerStyle(.segmented)
     }
 
+    // MARK: - Chart Mode Toggle
+
+    private var chartModeToggle: some View {
+        Picker("View", selection: $chartMode) {
+            Image(systemName: "chart.bar.fill").tag(ChartMode.chart)
+            Image(systemName: "calendar").tag(ChartMode.calendar)
+        }
+        .pickerStyle(.segmented)
+        .fixedSize()
+    }
+
+    // MARK: - Month Selector
+
+    /// The months visible in the calendar, oldest → newest. Mirrors
+    /// `BinaryCalendarView.months` so index math stays aligned.
+    private var calendarMonths: [Date] {
+        let cal = Calendar.current
+        var result: [Date] = []
+        var cursor = calendarStartMonth
+        while cursor <= calendarEndMonth {
+            result.append(cursor)
+            guard
+                let next = cal.date(byAdding: .month, value: 1, to: cursor)
+            else { break }
+            cursor = next
+        }
+        return result
+    }
+
+    /// The settled month index (nearest whole month to the live progress).
+    private var currentMonthIndex: Int {
+        guard !calendarMonths.isEmpty else { return 0 }
+        return min(max(Int(monthProgress.rounded()), 0), calendarMonths.count - 1)
+    }
+
+    private func monthLabel(for date: Date) -> String {
+        date.formatted(.dateTime.month(.wide).year()).capitalized
+    }
+
+    /// Scrolls the calendar `value` months, clamped to range. Writing
+    /// `displayedMonth` animates the calendar's `scrollPosition`; the resulting
+    /// scroll feeds `monthProgress` back, so the label slides in step.
+    private func stepMonth(by value: Int) {
+        guard !calendarMonths.isEmpty else { return }
+        let target = min(
+            max(currentMonthIndex + value, 0),
+            calendarMonths.count - 1
+        )
+        withAnimation(.snappy) { displayedMonth = calendarMonths[target] }
+    }
+
+    private var monthSelector: some View {
+        HStack(spacing: 12) {
+            Button(action: { stepMonth(by: -1) }) {
+                Label("Previous month", systemImage: "chevron.left")
+            }
+            .labelStyle(.iconOnly)
+            .buttonStyle(.borderless)
+            .disabled(currentMonthIndex <= 0)
+
+            monthLabelStrip
+
+            Button(action: { stepMonth(by: 1) }) {
+                Label("Next month", systemImage: "chevron.right")
+            }
+            .labelStyle(.iconOnly)
+            .buttonStyle(.borderless)
+            .disabled(currentMonthIndex >= calendarMonths.count - 1)
+        }
+        .foregroundStyle(tint)
+        .padding(.horizontal, 12)
+        .padding(.vertical, 6)
+        .background(
+            RoundedRectangle(cornerRadius: 8, style: .continuous)
+                .fill(Color(.tertiarySystemFill))
+        )
+    }
+
+    /// Horizontal strip of month labels positioned by the continuous
+    /// `monthProgress`. As the calendar is swiped, the current label slides out
+    /// and the neighbour slides in — partially, in step with the drag.
+    private var monthLabelStrip: some View {
+        GeometryReader { geometry in
+            let slot = geometry.size.width
+            ZStack {
+                ForEach(stripIndices, id: \.self) { index in
+                    let distance = Double(index) - monthProgress
+                    Text(monthLabel(for: calendarMonths[index]))
+                        .font(.subheadline)
+                        .fontWeight(.semibold)
+                        .lineLimit(1)
+                        .frame(width: slot)
+                        .offset(x: CGFloat(distance) * slot)
+                        .opacity(max(0, 1 - abs(distance)))
+                }
+            }
+            .frame(width: slot, height: geometry.size.height)
+        }
+        .frame(height: 22)
+        .frame(maxWidth: .infinity)
+        .clipped()
+    }
+
+    /// The window of month indices worth rendering around the current
+    /// position: the settled month and its immediate neighbours.
+    private var stripIndices: [Int] {
+        guard !calendarMonths.isEmpty else { return [] }
+        let lower = max(Int(monthProgress.rounded(.down)) - 1, 0)
+        let upper = min(
+            Int(monthProgress.rounded(.up)) + 1,
+            calendarMonths.count - 1
+        )
+        guard lower <= upper else { return [] }
+        return Array(lower...upper)
+    }
+
     // MARK: - Chart
 
     private var chartSection: some View {
@@ -526,6 +682,38 @@ struct MetricDetailView: View {
             trueLabel: "Event",
             falseLabel: "No event",
             selectedDate: $selectedDate
+        )
+    }
+
+    // MARK: - Number / Duration Calendar
+
+    /// Latest month shown by the calendar (the current month).
+    private var calendarEndMonth: Date {
+        let cal = Calendar.current
+        let now = Date()
+        return cal.dateInterval(of: .month, for: now)?.start ?? now
+    }
+
+    /// Earliest month shown by the calendar (11 months back).
+    private var calendarStartMonth: Date {
+        let cal = Calendar.current
+        return cal.date(byAdding: .month, value: -11, to: calendarEndMonth)
+            ?? calendarEndMonth
+    }
+
+    /// Calendar view for number/duration metrics. Toggled from the chart via
+    /// `chartModeToggle`. Marks each day that has at least one logged entry.
+    private var numberCalendarSection: some View {
+        BinaryCalendarView(
+            filledDays: numberFilledDays,
+            startMonth: calendarStartMonth,
+            endMonth: calendarEndMonth,
+            tint: tint,
+            trueLabel: "Logged",
+            falseLabel: "",
+            selectedDate: $selectedDate,
+            scrolledMonth: $displayedMonth,
+            onMonthProgress: { monthProgress = $0 }
         )
     }
 
