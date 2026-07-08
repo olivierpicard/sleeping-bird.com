@@ -68,7 +68,6 @@ struct FeedbackCardView: View {
         let appVersion = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "—"
         let build = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? "—"
         let osVersion = ProcessInfo.processInfo.operatingSystemVersionString
-        let voiceLanguage = VoiceLanguageOption.saved.id
 
         let subject = String(format: String(localized: "Feedback Arper Bird version %@"), appVersion)
         let body = String(
@@ -86,15 +85,13 @@ struct FeedbackCardView: View {
             Version: %1$@ (%2$@)
             Device: %3$@ — iOS %4$@
             Locale: %5$@
-            Voice: %6$@
-            ID: %7$@
+            ID: %6$@
             """),
             appVersion,
             build,
             deviceModel,
             osVersion,
             Locale.current.identifier,
-            voiceLanguage,
             userId
         )
 

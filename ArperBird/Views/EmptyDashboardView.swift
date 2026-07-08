@@ -65,7 +65,7 @@ struct EmptyDashboardView: View {
                         )
                     )
                     .padding(.bottom, 5)
-                Text("Track anything you want.\nJust say it out loud.")
+                Text("Track anything you want.")
                     .font(.subheadline)
                     .multilineTextAlignment(.leading)
                     .fixedSize(horizontal: false, vertical: true)

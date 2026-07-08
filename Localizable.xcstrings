@@ -3289,7 +3289,24 @@
     "Track" : {
 
     },
+    "Track anything you want." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Registra lo que quieras."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Suivez tout ce que vous voulez."
+          }
+        }
+      }
+    },
     "Track anything you want.\nJust say it out loud." : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -3320,6 +3337,9 @@
           }
         }
       }
+    },
+    "Track how long it lasts" : {
+
     },
     "Track how tired I feel after **working out**" : {
       "localizations" : {
@@ -4009,18 +4029,18 @@
     "What do you want to track ?" : {
 
     },
-    "What I liked:\n\n\nWhat's buggy / bothered me:\n\n\nAn idea:\n\n\n---\nVersion: %1$@ (%2$@)\nDevice: %3$@ — iOS %4$@\nLocale: %5$@\nVoice: %6$@\nID: %7$@" : {
+    "What I liked:\n\n\nWhat's buggy / bothered me:\n\n\nAn idea:\n\n\n---\nVersion: %1$@ (%2$@)\nDevice: %3$@ — iOS %4$@\nLocale: %5$@\nID: %6$@" : {
       "localizations" : {
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Lo que me gustó:\n\n\nLo que falla / me molestó:\n\n\nUna idea:\n\n\n---\nVersión: %1$@ (%2$@)\nDispositivo: %3$@ — iOS %4$@\nIdioma: %5$@\nVoz: %6$@\nID: %7$@"
+            "value" : "Lo que me gustó:\n\n\nLo que falla / me molestó:\n\n\nUna idea:\n\n\n---\nVersión: %1$@ (%2$@)\nDispositivo: %3$@ — iOS %4$@\nIdioma: %5$@\nID: %6$@"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ce qui m'a plu :\n\n\nCe qui bug / m'a gêné :\n\n\nUne idée :\n\n\n---\nVersion : %1$@ (%2$@)\nAppareil : %3$@ — iOS %4$@\nLangue : %5$@\nVoix : %6$@\nID : %7$@"
+            "value" : "Ce qui m'a plu :\n\n\nCe qui bug / m'a gêné :\n\n\nUne idée :\n\n\n---\nVersion : %1$@ (%2$@)\nAppareil : %3$@ — iOS %4$@\nLangue : %5$@\nID : %6$@"
           }
         }
       }
