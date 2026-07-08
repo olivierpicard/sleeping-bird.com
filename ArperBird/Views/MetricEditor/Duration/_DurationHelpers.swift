@@ -33,34 +33,25 @@ enum _DurationGranularity: String {
     }
 }
 
-/// Returns the ordered list of units to display, from largest to smallest,
-/// derived from the smallest granularity and the largest expected duration.
-func _durationUnits(granularity: _DurationGranularity, maxInSeconds: Int) -> [_DurationGranularity] {
-    let smallest = granularity
-    let largest: _DurationGranularity = {
-        if maxInSeconds >= 3600 { return .h }
-        if maxInSeconds >= 60 { return .m }
-        if maxInSeconds >= 1 { return .s }
-        return .ms
-    }()
-    let top = max(largest.order, smallest.order)
-    let bottom = smallest.order
-    return [.h, .m, .s, .ms].filter { $0.order >= bottom && $0.order <= top }
+/// The units the wheel displays, largest to smallest. Always hours + minutes +
+/// seconds: every duration a user tracks in this app (sleep, workouts, reading,
+/// meditation) falls inside that range, so a fixed set covers all of them without
+/// the floor/ceiling ever collapsing the wheel to a single unit. Sub-second (ms)
+/// precision is intentionally out of scope.
+func _durationUnits() -> [_DurationGranularity] {
+    [.h, .m, .s]
 }
 
-/// Returns the upper bound (exclusive for non-top, inclusive cap for top) for a unit
-/// given the overall maxInSeconds and whether it's the largest displayed unit.
-func _durationUnitMax(_ unit: _DurationGranularity, maxInSeconds: Int, isTop: Bool) -> Int {
-    if isTop {
-        switch unit {
-        case .h: return Swift.max(1, maxInSeconds / 3600)
-        case .m: return Swift.max(1, maxInSeconds / 60)
-        case .s: return Swift.max(1, maxInSeconds)
-        case .ms: return Swift.max(1, maxInSeconds * 1000)
-        }
-    }
+/// The fixed upper bound of the hours wheel. Every duration this app tracks
+/// (sleep, workouts, reading, meditation) fits inside a day, so the wheel caps
+/// at 24h rather than deriving a per-metric max.
+let _durationMaxHours = 24
+
+/// The upper bound (inclusive) for a wheel unit. Hours cap at `_durationMaxHours`;
+/// the smaller units roll over at their natural boundaries.
+func _durationUnitMax(_ unit: _DurationGranularity) -> Int {
     switch unit {
-    case .h: return 23
+    case .h: return _durationMaxHours
     case .m: return 59
     case .s: return 59
     case .ms: return 999

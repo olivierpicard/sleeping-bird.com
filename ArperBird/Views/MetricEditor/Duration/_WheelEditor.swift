@@ -8,8 +8,6 @@
 import SwiftUI
 
 struct _WheelEditor: View {
-    let granularity: _DurationGranularity
-    let maxInSeconds: Int
     let mainColor: Color
     let onAdd: (TimeInterval) -> Void
 
@@ -18,18 +16,14 @@ struct _WheelEditor: View {
     private let units: [_DurationGranularity]
 
     init(
-        granularity: _DurationGranularity,
-        maxInSeconds: Int,
         defaultValue: TimeInterval,
         mainColor: Color,
         onAdd: @escaping (TimeInterval) -> Void
     ) {
-        self.granularity = granularity
-        self.maxInSeconds = maxInSeconds
         self.mainColor = mainColor
         self.onAdd = onAdd
 
-        let units = _durationUnits(granularity: granularity, maxInSeconds: maxInSeconds)
+        let units = _durationUnits()
         self.units = units
         let totalMs = Int((defaultValue * 1000).rounded())
         _components = State(initialValue: _durationComponents(from: totalMs, units: units))
@@ -38,8 +32,8 @@ struct _WheelEditor: View {
     var body: some View {
         VStack(spacing: 24) {
             HStack(spacing: 0) {
-                ForEach(Array(units.enumerated()), id: \.element) { index, unit in
-                    wheel(for: unit, isTop: index == 0)
+                ForEach(units, id: \.self) { unit in
+                    wheel(for: unit)
                 }
             }
             .frame(maxWidth: .infinity)
@@ -56,8 +50,8 @@ struct _WheelEditor: View {
     }
 
     @ViewBuilder
-    private func wheel(for unit: _DurationGranularity, isTop: Bool) -> some View {
-        let upper = _durationUnitMax(unit, maxInSeconds: maxInSeconds, isTop: isTop)
+    private func wheel(for unit: _DurationGranularity) -> some View {
+        let upper = _durationUnitMax(unit)
         let binding = Binding<Int>(
             get: { components[unit] ?? 0 },
             set: { components[unit] = $0 }
@@ -82,13 +76,11 @@ struct _WheelEditor: View {
     }
 }
 
-#Preview("Sleep (h, m)") {
+#Preview("Sleep") {
     @Previewable @State var isSheetPresented = true
     NavigationStack { Text("") }
         .sheet(isPresented: $isSheetPresented) {
             _WheelEditor(
-                granularity: .m,
-                maxInSeconds: 12 * 3600,
                 defaultValue: 7.5 * 3600,
                 mainColor: .indigo,
                 onAdd: { _ in }
@@ -96,29 +88,13 @@ struct _WheelEditor: View {
         }
 }
 
-#Preview("Workout (m, s)") {
+#Preview("Workout") {
     @Previewable @State var isSheetPresented = true
     NavigationStack { Text("") }
         .sheet(isPresented: $isSheetPresented) {
             _WheelEditor(
-                granularity: .s,
-                maxInSeconds: 90 * 60,
                 defaultValue: 30 * 60,
                 mainColor: .orange,
-                onAdd: { _ in }
-            )
-        }
-}
-
-#Preview("Reaction (s, ms)") {
-    @Previewable @State var isSheetPresented = true
-    NavigationStack { Text("") }
-        .sheet(isPresented: $isSheetPresented) {
-            _WheelEditor(
-                granularity: .ms,
-                maxInSeconds: 5,
-                defaultValue: 0.42,
-                mainColor: .pink,
                 onAdd: { _ in }
             )
         }

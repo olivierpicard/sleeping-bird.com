@@ -139,8 +139,6 @@
             static func duration(
                 title: String = "Meditation Session",
                 emoji: String = "🧘",
-                granularity: String = "m",
-                maxInSeconds: Int = 3600,
                 chart: ChartType = .bar,
                 bucket: TemporalBucket? = .daily,
                 method: AggregationMethod = .numerical(.sum),
@@ -151,11 +149,7 @@
                     emoji: emoji,
                     fitPercentage: 0.78,
                     config: .duration(
-                        DurationConfig(
-                            granularity: granularity,
-                            maxInSeconds: maxInSeconds,
-                            behavior: behavior
-                        )
+                        DurationConfig(behavior: behavior)
                     ),
                     visual: MetricVisual(
                         chart: chart,

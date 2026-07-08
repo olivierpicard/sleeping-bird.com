@@ -7,39 +7,15 @@
 
 import SwiftUI
 
+/// The duration path's reveal recap: the wheel logs a fixed h/m/s, so there's
+/// nothing to tune from the reveal — a single static line and no chips. A dumb
+/// view — it owns its own wording and nothing else. Mirrors `DoneBinaryRecap`.
 struct DoneDurationRecap: View {
-    let maxSeconds: Int
-    let color: Color
-    let onUpdate: (Int) -> Void
-
-    @State private var isEditing = false
-
-    private var formatted: String {
-        Duration.seconds(max(0, maxSeconds))
-            .formatted(.units(allowed: [.hours, .minutes, .seconds], width: .abbreviated))
-    }
-
     var body: some View {
-        Button(action: { isEditing = true }) {
-            DoneChip(color: color) {
-                Image(systemName: "clock")
-                    .foregroundStyle(color)
-                Text("Max")
-                Text(formatted)
-                    .foregroundStyle(.primary)
-            }
-        }
-        .buttonStyle(.plain)
-        .sheet(isPresented: $isEditing) {
-            DurationMaxEditor(maxSeconds: maxSeconds, color: color) { newSeconds in
-                onUpdate(newSeconds)
-                isEditing = false
-            }
-        }
+        DoneRecapText("Track how long it lasts")
     }
 }
 
 #Preview {
-    @Previewable @State var maxSeconds = 2 * 3600
-    DoneDurationRecap(maxSeconds: maxSeconds, color: .teal, onUpdate: { maxSeconds = $0 })
+    DoneDurationRecap()
 }

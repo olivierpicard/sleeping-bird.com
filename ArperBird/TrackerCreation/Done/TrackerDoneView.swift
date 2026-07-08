@@ -283,8 +283,6 @@ private struct SparkleBurst: View {
     let schema = MetricSchema.Fake.duration(
         title: "Workout",
         emoji: "🏋️",
-        granularity: "h",
-        maxInSeconds: 2 * 3600,
         chart: .bar
     )
     NavigationStack {
@@ -292,7 +290,7 @@ private struct SparkleBurst: View {
             metric: Metric(from: schema, color: .orange, data: Metric.fakeData(for: schema.config)),
             color: .orange
         ) {
-            DoneDurationRecap(maxSeconds: 2 * 3600, color: .orange, onUpdate: { _ in })
+            DoneDurationRecap()
         }
     }
 }

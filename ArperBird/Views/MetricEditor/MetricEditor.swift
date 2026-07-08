@@ -135,21 +135,15 @@ extension MetricEditor {
     }
 
     struct Duration: View {
-        let granularity: String
-        let maxInSeconds: Int
         let defaultValue: TimeInterval
         let mainColor: Color
         let onAdd: (TimeInterval) -> Void
 
         init(
-            granularity: String,
-            maxInSeconds: Int,
             defaultValue: TimeInterval = 0,
             mainColor: Color = .accentColor,
             onAdd: @escaping (TimeInterval) -> Void = { _ in }
         ) {
-            self.granularity = granularity
-            self.maxInSeconds = maxInSeconds
             self.defaultValue = defaultValue
             self.mainColor = mainColor
             self.onAdd = onAdd
@@ -157,8 +151,6 @@ extension MetricEditor {
 
         var body: some View {
             _WheelEditor(
-                granularity: _DurationGranularity(granularity),
-                maxInSeconds: maxInSeconds,
                 defaultValue: defaultValue,
                 mainColor: mainColor,
                 onAdd: onAdd

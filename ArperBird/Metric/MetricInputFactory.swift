@@ -46,10 +46,8 @@ enum MetricInputFactory {
                 onAdd: { onAdd(.binary(Date(), $0)) }
             )
 
-        case .duration(let cfg):
+        case .duration:
             MetricEditor.Duration(
-                granularity: cfg.granularity,
-                maxInSeconds: cfg.maxInSeconds,
                 mainColor: mainColor,
                 onAdd: { onAdd(.duration(Date(), $0)) }
             )

@@ -59,7 +59,7 @@ enum MetricViewFactory {
                 cfg: cfg
             )
 
-        case .duration(let cfg):
+        case .duration:
             let points = metric.data.compactMap { $0.durationValue }.filter {
                 $0.date >= start
             }
@@ -67,14 +67,10 @@ enum MetricViewFactory {
                 return placeholder(for: metric.config)
             }
             guard case .numerical(let method) = agg.method else {
-                return format(
-                    duration: Int(points.last!.interval),
-                    granularity: cfg.granularity
-                )
+                return format(duration: Int(points.last!.interval))
             }
             return format(
-                duration: Int(aggregate(points.map { $0.interval }, method)),
-                granularity: cfg.granularity
+                duration: Int(aggregate(points.map { $0.interval }, method))
             )
 
         case .categorySingleChoice, .categoryMultipleChoice:
@@ -139,8 +135,8 @@ enum MetricViewFactory {
         case .categorySingleChoice(_), .categoryMultipleChoice(_):
             return "—"
         case .binary: return "—"
-        case .duration(let cfg):
-            return format(duration: 0, granularity: cfg.granularity)
+        case .duration:
+            return format(duration: 0)
         case .datetime:
             return "—"
         }
@@ -175,14 +171,13 @@ enum MetricViewFactory {
         return "\(text) \(unit)".trimmingCharacters(in: .whitespaces)
     }
 
-    private static func format(duration seconds: Int, granularity: String)
-        -> String
-    {
-        switch granularity {
-        case "h": return "\(seconds / 3600)h \((seconds % 3600) / 60)m"
-        case "m": return "\(seconds / 60)m \(seconds % 60)s"
-        case "ms": return "\(seconds * 1000)ms"
-        default: return "\(seconds)s"
-        }
+    private static func format(duration seconds: Int) -> String {
+        Duration.seconds(max(0, seconds))
+            .formatted(
+                .units(
+                    allowed: [.hours, .minutes, .seconds],
+                    width: .abbreviated
+                )
+            )
     }
 }

@@ -8,10 +8,11 @@
 import SwiftUI
 
 /// The step that follows naming on the `duration` path. It hands the tracker name
-/// to `DurationAiCompletion` (via the shared `TrackerCreationModel`), which fills
-/// in the wheel's upper bound and a matching emoji, then advances. The model
-/// memoizes the fetch, so reappearing after a pop reuses the result instead of
-/// re-triggering the AI.
+/// to `EmojiAiCompletion` (via the shared `TrackerCreationModel`), which fills in
+/// a matching emoji, then advances straight to the reveal — the duration wheel
+/// logs a fixed h/m/s, so it needs nothing else from the AI. The model memoizes
+/// the fetch, so reappearing after a pop reuses the result instead of
+/// re-triggering the AI. Mirrors `TrackerBinaryLoadingView`.
 struct TrackerDurationLoadingView: View {
     /// The flow's shared state. The view asks it to load and reads `durationPhase`
     /// to decide between the spinner, the retry state, and advancing.
@@ -49,7 +50,7 @@ struct TrackerDurationLoadingView: View {
     /// re-triggers the AI), then advances if it succeeded.
     @MainActor
     private func load() async {
-        await model.loadDurationIfNeeded()
+        await model.loadDurationEmojiIfNeeded()
         if model.durationPhase == .loaded {
             onLoaded()
         }
@@ -60,7 +61,7 @@ struct TrackerDurationLoadingView: View {
     @Previewable @State var showSheet = true
     @Previewable @State var model: TrackerCreationModel = {
         let model = TrackerCreationModel(
-            generateDuration: { try await DurationAiCompletion().generateFake(for: $0) }
+            generateEmoji: { try await EmojiAiCompletion().generateFake(for: $0) }
         )
         model.name = "Workout"
         return model

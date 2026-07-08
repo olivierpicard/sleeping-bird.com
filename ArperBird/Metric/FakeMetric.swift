@@ -33,8 +33,10 @@ import Foundation
                     return .category(date, picked)
                 case .binary:
                     return .binary(date, Double.random(in: 0...1) > 0.3)
-                case .duration(let cfg):
-                    let max = TimeInterval(cfg.maxInSeconds)
+                case .duration:
+                    // No per-metric max any more; sample a plausible activity
+                    // length (~40min–2h) so the reveal chart looks alive.
+                    let max: TimeInterval = 2 * 3600
                     return .duration(
                         date,
                         TimeInterval.random(in: max * 0.3...max)

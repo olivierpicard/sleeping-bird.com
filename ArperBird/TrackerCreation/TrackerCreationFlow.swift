@@ -372,10 +372,6 @@ struct TrackerCreationFlow: View {
             return MetricSchema.Fake.duration(
                 title: model.name,
                 emoji: model.durationEmoji,
-                // No sub-minute granularity on the wheel, so format the sample in
-                // hours once the bound clears an hour, minutes otherwise.
-                granularity: model.durationMaxSeconds >= 3600 ? "h" : "m",
-                maxInSeconds: max(1, model.durationMaxSeconds),
                 chart: .bar
             )
         case .choices:
@@ -499,7 +495,6 @@ private struct DoneRevealStep: View {
             String(describing: model.behavior),
             String(model.categoryAllowsMultiple),
             String(model.categoryLabels.count),
-            String(model.durationMaxSeconds),
             String(model.goalValue),
             String(model.goalGranularity),
             model.selectedUnit,
@@ -555,11 +550,7 @@ private struct DoneRevealStep: View {
         case .date:
             DoneDateRecap()
         case .duration:
-            DoneDurationRecap(
-                maxSeconds: model.durationMaxSeconds,
-                color: controlColor,
-                onUpdate: { model.setDurationMax($0) }
-            )
+            DoneDurationRecap()
         case .goal:
             DoneGoalRecap(
                 goalValue: model.goalValue,

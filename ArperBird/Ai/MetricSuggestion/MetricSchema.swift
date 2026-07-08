@@ -99,18 +99,6 @@ struct BinaryConfig: Codable {
 
 @Generable(description: "Match a duration metric type")
 struct DurationConfig: Codable {
-    @Guide(
-        description: "Floor smallest granularity that best suite the metric",
-        .anyOf(["ms", "s", "m", "h"])
-    )
-    let granularity: String
-
-    @Guide(
-        description: "Expected max duration for this metric",
-        .range(0...Int.max)
-    )
-    let maxInSeconds: Int
-
     @Guide(description: "Defines how the duration behaves over time")
     let behavior: MetricBehavior
 }

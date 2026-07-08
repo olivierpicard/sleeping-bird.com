@@ -15,9 +15,9 @@ struct EmojiAiCompletionSchema {
 }
 
 /// Picks a matching emoji for a tracker from its name alone. Deliberately the
-/// smallest completion in the family — the binary and date paths need nothing
-/// from the AI *but* an emoji, so they share this instead of carrying a
-/// type-specific schema. Mirrors `DurationAiCompletion`.
+/// smallest completion in the family — the binary, date, and duration paths need
+/// nothing from the AI *but* an emoji, so they share this instead of carrying a
+/// type-specific schema.
 struct EmojiAiCompletion {
     private let locale: Locale
 

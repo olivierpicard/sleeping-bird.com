@@ -137,18 +137,15 @@ final class TrackerCreationModel {
 
     // MARK: - Duration sub-flow
 
-    /// Loading state of the duration auto-completion request.
+    /// Loading state of the duration emoji auto-completion request.
     private(set) var durationPhase: Phase = .idle
-    /// The AI-suggested upper bound for the duration wheel, in seconds, and a
-    /// matching emoji. Populated once per name from `DurationAiCompletion`.
-    private(set) var durationMaxSeconds = 0
+    /// The AI-suggested emoji for the duration tracker. The duration path needs
+    /// nothing else from the AI — the wheel logs a fixed h/m/s and goes straight
+    /// from naming to the reveal — so this is the lone result of its loading step.
+    /// Fetched through the shared `generateEmoji` seam (see the binary sub-flow).
     var durationEmoji = ""
-
-    /// Seam over the duration AI call, mirroring `generate`. Takes the tracker
-    /// name.
-    private let generateDuration: (String) async throws -> DurationAiCompletionSchema
-    /// The name `durationMaxSeconds`/`durationEmoji` were loaded for. Guards the
-    /// fetch so it runs once per name and never re-fires on back-navigation.
+    /// The name `durationEmoji` was loaded for. Guards the fetch so it runs once
+    /// per name and never re-fires on back-navigation.
     private var loadedDurationName: String?
 
     // MARK: - Category sub-flow
@@ -158,7 +155,7 @@ final class TrackerCreationModel {
     /// The AI-suggested labels, used to *seed* the editable labels screen. The
     /// user can then add, rename, or delete rows; their final list is written
     /// back here on "Next" — so this property is both the seed and the result,
-    /// mirroring how `durationMaxSeconds` works on the duration path.
+    /// mirroring how `categoryAllowsMultiple` seeds-then-confirms below.
     var categoryLabels: [String] = []
     /// The AI's *original* suggested labels, kept separately so we can tell
     /// whether the user replaced or deleted any of them — `categoryLabels` is
@@ -188,9 +185,9 @@ final class TrackerCreationModel {
     /// so this is the lone result of its loading step.
     var binaryEmoji = ""
 
-    /// Seam over the emoji AI call, mirroring `generateDuration`. Shared by the
-    /// binary and date paths — both need only an emoji from the AI. Takes the
-    /// tracker name.
+    /// Seam over the emoji AI call, mirroring `generate`. Shared by the binary,
+    /// date, and duration paths — all three need only an emoji from the AI. Takes
+    /// the tracker name.
     private let generateEmoji: (String) async throws -> EmojiAiCompletionSchema
     /// The name `binaryEmoji` was loaded for. Guards the fetch so it runs once
     /// per name and never re-fires on back-navigation.
@@ -238,9 +235,6 @@ final class TrackerCreationModel {
         generate: @escaping (String) async throws -> GoalAiCompletionListSchema = {
             try await GoalAiCompletion().generate(for: "- Tracker name: \($0)")
         },
-        generateDuration: @escaping (String) async throws -> DurationAiCompletionSchema = {
-            try await DurationAiCompletion().generate(for: "- Tracker name: \($0)")
-        },
         generateCategory: @escaping (String) async throws -> CategoryAiCompletionSchema = {
             try await CategoryAiCompletion().generate(for: "- Tracker name: \($0)")
         },
@@ -255,7 +249,6 @@ final class TrackerCreationModel {
         }
     ) {
         self.generate = generate
-        self.generateDuration = generateDuration
         self.generateCategory = generateCategory
         self.generateEmoji = generateEmoji
         self.generateNumber = generateNumber
@@ -317,29 +310,21 @@ final class TrackerCreationModel {
 
     // MARK: - Duration completion
 
-    /// Fetches the duration config (max wheel value + emoji) for `name`, but only
-    /// when it hasn't already been loaded for that name (or the previous attempt
-    /// failed). Re-entrant calls — e.g. returning to the loading screen — are
-    /// no-ops, so the AI never re-triggers on back-navigation.
-    func loadDurationIfNeeded() async {
+    /// Fetches the duration emoji for `name`, but only when it hasn't already been
+    /// loaded for that name (or the previous attempt failed). Re-entrant calls —
+    /// e.g. returning to the loading screen — are no-ops, so the AI never
+    /// re-triggers on back-navigation. Mirrors `loadBinaryEmojiIfNeeded`.
+    func loadDurationEmojiIfNeeded() async {
         guard loadedDurationName != name || durationPhase == .failed else { return }
         durationPhase = .loading
         do {
-            let schema = try await generateDuration(nameInstruction)
-            durationMaxSeconds = schema.maxInSeconds
+            let schema = try await generateEmoji(nameInstruction)
             durationEmoji = schema.emoji
             loadedDurationName = name
             durationPhase = .loaded
         } catch {
             durationPhase = .failed
         }
-    }
-
-    /// Persist the upper bound the user dialled in on the duration config wheels,
-    /// overriding the AI suggestion. A method because `durationMaxSeconds` is
-    /// otherwise `private(set)` to protect the load memoization.
-    func setDurationMax(_ seconds: Int) {
-        durationMaxSeconds = max(0, seconds)
     }
 
     // MARK: - Binary completion
