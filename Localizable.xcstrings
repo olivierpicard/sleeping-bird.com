@@ -39,7 +39,22 @@
     "0" : {
 
     },
+    "3 cups" : {
+
+    },
+    "4 this month" : {
+
+    },
+    "6-day streak" : {
+
+    },
+    "7 / 10" : {
+
+    },
     "8 glasses of water a day" : {
+
+    },
+    "45m" : {
 
     },
     "A date" : {
@@ -423,6 +438,7 @@
       }
     },
     "Change" : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -477,6 +493,7 @@
       }
     },
     "Close" : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -524,6 +541,9 @@
           }
         }
       }
+    },
+    "Coffee intake" : {
+
     },
     "COLOR" : {
       "localizations" : {
@@ -652,7 +672,11 @@
         }
       }
     },
+    "Create my first tracker" : {
+
+    },
     "Create trackers just by dictating your intentions — your voice is never stored or shared." : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -1048,6 +1072,12 @@
         }
       }
     },
+    "Gas fill-up dates" : {
+
+    },
+    "Gas fill-ups" : {
+
+    },
     "Get fast help whenever you need it" : {
       "localizations" : {
         "es" : {
@@ -1245,6 +1275,7 @@
       }
     },
     "Help us understand you better" : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -1295,6 +1326,7 @@
 
     },
     "It all starts with your %@" : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -1310,10 +1342,14 @@
         }
       }
     },
+    "Just type what you want to track." : {
+
+    },
     "Label" : {
 
     },
     "Language & Region" : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -1416,6 +1452,9 @@
           }
         }
       }
+    },
+    "Medication" : {
+
     },
     "Meditation" : {
       "localizations" : {
@@ -1935,6 +1974,7 @@
       }
     },
     "mic" : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -2014,6 +2054,9 @@
           }
         }
       }
+    },
+    "Mood today" : {
+
     },
     "Multiple choice" : {
 
@@ -2215,6 +2258,9 @@
           }
         }
       }
+    },
+    "Pages read" : {
+
     },
     "Pain" : {
       "localizations" : {
@@ -2641,6 +2687,9 @@
         }
       }
     },
+    "Read 10 pages a day" : {
+
+    },
     "Reading" : {
       "localizations" : {
         "es" : {
@@ -2835,6 +2884,7 @@
       }
     },
     "Step 2 of 4" : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -2851,6 +2901,7 @@
       }
     },
     "Step 3 of 4" : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -3251,6 +3302,9 @@
     "time spent reading" : {
 
     },
+    "Time spent reading" : {
+
+    },
     "To keep analytics and subscriptions consistent across reinstalls, we store a random identifier in your device's Keychain. It contains no personal information and is never linked to your real identity." : {
       "localizations" : {
         "es" : {
@@ -3285,6 +3339,9 @@
           }
         }
       }
+    },
+    "Took my medication" : {
+
     },
     "Track" : {
 
@@ -3975,7 +4032,11 @@
         }
       }
     },
+    "We'll build the tracker for you." : {
+
+    },
     "We'll use your language to understand your voice more accurately." : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
