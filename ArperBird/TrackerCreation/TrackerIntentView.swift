@@ -107,50 +107,57 @@ struct TrackerIntentView: View {
     }
 
     var body: some View {
-        VStack(spacing: 0) {
-            
-            inputField
+        // A scroll view (not a static VStack) so the large title collapses as
+        // content rises and keyboard avoidance scrolls *within* the content
+        // instead of shoving the field up under the title bar. The CTA is
+        // docked separately via `.safeAreaInset` so it stays pinned.
+        ScrollView {
+            VStack(spacing: 0) {
+
+                inputField
+                    .padding(.horizontal)
+                    .padding(.top, 30)
+
+                // Quick-fill examples for the field: a tap fills the prompt, then
+                // the card below resolves — teaching the field→card causality.
+                BadgesStackView(
+                    badges: suggestions.map(\.chipLabel),
+                    innerPadding: 5,
+                    borderThickness: 0.5,
+                    alignment: .center,
+                    maxRows: 2,
+                    onTap: { index in resolve(suggestions[index]) }
+                )
+                .font(.footnote)
                 .padding(.horizontal)
-                .padding(.top, 30)
-
-            // Quick-fill examples for the field: a tap fills the prompt, then
-            // the card below resolves — teaching the field→card causality.
-            BadgesStackView(
-                badges: suggestions.map(\.chipLabel),
-                innerPadding: 5,
-                borderThickness: 0.5,
-                alignment: .center,
-                maxRows: 2,
-                onTap: { index in resolve(suggestions[index]) }
-            )
-            .font(.footnote)
-            .padding(.horizontal)
-            .padding(.top, 14)
-
-            // The response zone, anchored to the prompt cluster above: a label
-            // that names the zone (and explains the ghost card), the card, and
-            // its format pills directly beneath it. The remaining slack lives
-            // between the pills and the CTA.
-            Text(responseZoneLabel)
-                .font(.caption)
-                .foregroundStyle(.secondary)
-                .padding(.top, 40)
-
-            Group {
-                if isFailed {
-                    failureCard
-                } else {
-                    previewCard
-                }
-            }
-            .padding(.horizontal)
-            .padding(.top, 10)
-
-            formatPills
                 .padding(.top, 14)
 
-            Spacer()
+                // The response zone, anchored to the prompt cluster above: a label
+                // that names the zone (and explains the ghost card), the card, and
+                // its format pills directly beneath it.
+                Text(responseZoneLabel)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .padding(.top, 40)
 
+                Group {
+                    if isFailed {
+                        failureCard
+                    } else {
+                        previewCard
+                    }
+                }
+                .padding(.horizontal)
+                .padding(.top, 10)
+
+                formatPills
+                    .padding(.top, 14)
+                    .padding(.bottom, 24)
+            }
+        }
+        // Drag down over the content to dismiss the keyboard.
+        .scrollDismissesKeyboard(.interactively)
+        .safeAreaInset(edge: .bottom) {
             Button(action: continueWithSelection) {
                 Text("Continue")
                     .font(.headline)
@@ -170,8 +177,10 @@ struct TrackerIntentView: View {
             .disabled(selected == nil || isLoading || isFailed)
             .padding()
         }
-        .contentShape(Rectangle())
-        .onTapGesture { isFieldFocused = false }
+        // Let the keyboard cover the CTA while typing: the whole layout ignores
+        // the keyboard safe area, so the docked button stays pinned to the
+        // screen bottom instead of riding up above the keyboard.
+        .ignoresSafeArea(.keyboard, edges: .bottom)
         .navigationTitle("Add a tracker")
         .navigationSubtitle("What do you want to track ?")
         .navigationBarTitleDisplayMode(.large)
