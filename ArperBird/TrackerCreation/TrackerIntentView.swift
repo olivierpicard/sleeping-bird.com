@@ -37,10 +37,15 @@ struct TrackerIntentView: View {
     /// routes into the kind's step machinery from here.
     private let onContinue: (TrackerKind, String, Color) -> Void
 
+    /// When true, raise the keyboard and focus the field as the screen appears
+    /// — used by the empty-dashboard launcher so a tap lands straight in typing.
+    /// (Focusing freezes the placeholder rotation, which is the intended trade.)
+    private let autofocusField: Bool
+
     /// Rotating placeholder examples, each completing the fixed "Track" prefix
     /// — and each quietly demoing a different answer shape (number, duration,
     /// yes/no, choices, goal, date).
-    private static let examplePrompts: [LocalizedStringKey] = [
+    static let examplePrompts: [LocalizedStringKey] = [
         "how many coffees I drink",
         "time spent reading",
         "if I stretched today",
@@ -51,11 +56,13 @@ struct TrackerIntentView: View {
 
     init(
         preselected: TrackerSuggestion? = nil,
+        autofocusField: Bool = false,
         generateIntent: @escaping (String) async throws -> IntentCompletion = {
             try await IntentAiCompletion().generate(for: $0)
         },
         onContinue: @escaping (TrackerKind, String, Color) -> Void = { _, _, _ in }
     ) {
+        self.autofocusField = autofocusField
         self.generateIntent = generateIntent
         self.onContinue = onContinue
         // A dashboard badge tap arrives pre-resolved: build the curated
@@ -168,6 +175,13 @@ struct TrackerIntentView: View {
         .navigationTitle("Add a tracker")
         .navigationSubtitle("What do you want to track ?")
         .navigationBarTitleDisplayMode(.large)
+        .task {
+            guard autofocusField else { return }
+            // A short beat lets the sheet's present transition settle; focusing
+            // mid-transition is dropped and the keyboard never rises.
+            try? await Task.sleep(for: .seconds(0.35))
+            isFieldFocused = true
+        }
     }
 
     // MARK: - Subviews

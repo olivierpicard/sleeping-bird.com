@@ -10,10 +10,12 @@ struct ContentView: View {
     /// seed state propagated, opening unseeded on the first tap.
     @State private var route: CreationRoute?
 
-    /// A creation-flow open. `.scratch` for the "+" button, `.seeded` for a
-    /// tapped suggestion chip.
+    /// A creation-flow open. `.scratch` for the "+" button / empty-dashboard
+    /// field CTA, `.seeded` for a tapped suggestion chip. `autofocus` rides on
+    /// the scratch route so only the field CTA raises the keyboard on open — the
+    /// "+" button opens the flow unfocused.
     private enum CreationRoute: Identifiable {
-        case scratch
+        case scratch(autofocus: Bool)
         case seeded(TrackerSuggestion)
 
         var id: String {
@@ -29,6 +31,13 @@ struct ContentView: View {
             case .seeded(let suggestion): suggestion
             }
         }
+
+        var autofocus: Bool {
+            switch self {
+            case .scratch(let autofocus): autofocus
+            case .seeded: false
+            }
+        }
     }
 
     private var isDashboardEmpty: Bool {
@@ -40,11 +49,15 @@ struct ContentView: View {
             VStack {
                 if isDashboardEmpty {
                     EmptyDashboardView(onAddMetric: { suggestion in
-                        route = suggestion.map(CreationRoute.seeded) ?? .scratch
+                        // Field CTA (nil) commits to typing → focus the field;
+                        // a chip arrives seeded, no keyboard.
+                        route = suggestion.map(CreationRoute.seeded)
+                            ?? .scratch(autofocus: true)
                     })
                 } else {
                     DashboardView(onAddMetric: {
-                        route = .scratch
+                        // The "+" button opens the flow unfocused.
+                        route = .scratch(autofocus: false)
                     })
                 }
             }
@@ -57,8 +70,11 @@ struct ContentView: View {
         .sheet(item: $route) { route in
 //            MetricInputSheet()
 //                .presentationDetents([.large])
-            TrackerCreationFlow(seed: route.seed)
-                .presentationDetents([.large])
+            TrackerCreationFlow(
+                seed: route.seed,
+                autofocus: route.autofocus
+            )
+            .presentationDetents([.large])
         }
     }
 }

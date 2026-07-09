@@ -90,8 +90,15 @@ struct TrackerCreationFlow: View {
     /// through the shared `onContinue` seeding path like a typed prompt.
     private let seed: TrackerSuggestion?
 
-    init(seed: TrackerSuggestion? = nil) {
+    /// When true, the root intent screen raises the keyboard and focuses its
+    /// field on appear — passed for the from-scratch (`seed == nil`) route so a
+    /// tap on the empty-dashboard field CTA lands straight in typing. A seeded
+    /// entry arrives pre-resolved, so it opts out.
+    private let autofocus: Bool
+
+    init(seed: TrackerSuggestion? = nil, autofocus: Bool = false) {
         self.seed = seed
+        self.autofocus = autofocus
     }
 
     /// The step each kind branches into after naming — shared by the name step's
@@ -111,6 +118,7 @@ struct TrackerCreationFlow: View {
         NavigationStack(path: $path) {
             TrackerIntentView(
                 preselected: seed,
+                autofocusField: autofocus,
                 onContinue: { kind, name, intentColor in
                     // The intent screen already captured the name and picked a
                     // format (kind), so seed the model and jump straight into the
