@@ -85,6 +85,21 @@ struct AiGlowBorderMockup2Style {
     /// The bloom recipe, widest/dimmest first.
     var bloomPasses: [GlowPass]
 
+    /// Dither strength for the composited glow, in 8-bit code values. Breaks the
+    /// concentric banding the blur stack leaves on a dark surface. 0 = off; ~1 is
+    /// the physically-right ±1 LSB, but the mockup defaults a touch higher so the
+    /// debanding is unmistakable while tuning.
+    var ditherAmount: Double = 1.5
+
+    /// Brightness of a big, soft, blurred fill placed *behind* the component, so
+    /// the light casts a colored halo on the surrounding surface instead of just
+    /// ringing the edge. 0 = off. Uses the same circulating gradient as the rim.
+    var backgroundWash: Double = 0.0
+
+    /// Blur radius of the background wash — much wider than any bloom pass, so it
+    /// reads as spill on the environment rather than a second rim.
+    var washBlur: CGFloat = 60
+
     /// How far (points) the effect needs to draw beyond the shape's edge so
     /// the outward bloom isn't clipped. The view modifier pads by this.
     var outwardReach: CGFloat {
@@ -117,7 +132,7 @@ struct AiGlowBorderMockup2Style {
         inwardLeak: 0.4,
         inwardIntensity: 1.0,
         inwardSaturation: 1.7,
-        edgeWidth: 2.5,
+        edgeWidth: 1,
         bloomPasses: [
             .init(lineWidth: 14, blur: 42, opacity: 0.45), // far, dim spill
             .init(lineWidth: 8,  blur: 16, opacity: 0.65), // mid halo
@@ -151,6 +166,9 @@ struct AiGlowBorderMockup2<S: InsettableShape>: View {
             // Flatten the blur stack into one GPU pass. Also the reason the
             // shape is inset: drawingGroup clips at this view's bounds.
             .drawingGroup()
+            // De-band the blurred falloff. `amount == 0` is a pass-through, so
+            // this can stay unconditional.
+            .colorEffect(ShaderLibrary.glowDither(.float(Float(style.ditherAmount))))
         }
         .allowsHitTesting(false)
         .accessibilityHidden(true)
@@ -232,15 +250,49 @@ struct AiGlowBorderMockup2<S: InsettableShape>: View {
         .compositingGroup()
     }
 
-    /// Rotation phase, wrapped to one lap. The wrap is invisible (a conic
-    /// gradient at 360° == 0°) and keeping the angle small matters: feeding the
-    /// raw clock in (billions of degrees) exceeds Float precision on the GPU —
-    /// the gradient collapses to a single color and stops moving.
+    /// This border's circulation phase (see `glowCirculationAngle`).
     private func circulationAngle(at date: Date) -> Angle {
-        guard style.period > 0 else { return .zero }
-        let phase = (date.timeIntervalSinceReferenceDate / style.period)
-            .truncatingRemainder(dividingBy: 1)
-        return .degrees(phase * 360)
+        glowCirculationAngle(at: date, period: style.period)
+    }
+}
+
+/// Rotation phase, wrapped to one lap. Shared by the border and the wash so
+/// they circulate in lockstep. The wrap is invisible (360° ≡ 0°) and keeping
+/// the angle small matters: feeding the raw clock in (billions of degrees)
+/// exceeds Float precision on the GPU — the gradient collapses to a single
+/// color and stops moving.
+private func glowCirculationAngle(at date: Date, period: TimeInterval) -> Angle {
+    guard period > 0 else { return .zero }
+    let phase = (date.timeIntervalSinceReferenceDate / period)
+        .truncatingRemainder(dividingBy: 1)
+    return .degrees(phase * 360)
+}
+
+// MARK: - Background wash
+
+/// A big, dim, heavily-blurred fill of the shape drawn *behind* the component,
+/// so the light casts a soft colored halo on the surrounding surface — the cue
+/// that an object is illuminating its environment, not just wearing a lit rim.
+/// Shares the border's circulating gradient so the two stay in sync.
+struct AiGlowWash<S: InsettableShape>: View {
+    var shape: S
+    var style: AiGlowBorderMockup2Style = .reference
+
+    var body: some View {
+        if style.backgroundWash > 0 {
+            TimelineView(.animation(paused: style.period <= 0)) { context in
+                let angle = glowCirculationAngle(at: context.date, period: style.period)
+                shape
+                    .fill(AngularGradient(stops: style.stops, center: .center, angle: angle))
+                    .blur(radius: style.washBlur)
+                    // 0.5 keeps a full-strength wash (slider at 1) from washing
+                    // the surroundings to white; the slider scales from there.
+                    .opacity(0.5 * min(style.backgroundWash, 2))
+                    .blendMode(.plusLighter)
+            }
+            .allowsHitTesting(false)
+            .accessibilityHidden(true)
+        }
     }
 }
 
@@ -253,7 +305,14 @@ extension View {
         shape: S,
         style: AiGlowBorderMockup2Style = .reference
     ) -> some View {
-        overlay {
+        // Wash sits *behind* the component (colored spill on the surroundings);
+        // the neon rim sits in front. Both are padded out so their blur isn't
+        // clipped by the host's bounds.
+        background {
+            AiGlowWash(shape: shape, style: style)
+                .padding(-style.washBlur)
+        }
+        .overlay {
             AiGlowBorderMockup2(shape: shape, style: style)
                 .padding(-style.outwardReach)
         }
@@ -271,6 +330,8 @@ struct AiGlowBorderMockup2Screen: View {
     @State private var inwardIntensity = 0.4
     @State private var edgeIntensity = 0.7
     @State private var period = 8.0
+    @State private var ditherAmount = 1.5
+    @State private var backgroundWash = 0.35
     @State private var palette: Palette = .reference
     @State private var stops: [EditableStop] = AiGlowBorderMockup2Style.reference.stops.map {
         EditableStop(color: $0.color, location: Double($0.location))
@@ -364,6 +425,8 @@ struct AiGlowBorderMockup2Screen: View {
         style.outwardIntensity = outwardIntensity
         style.inwardLeak = inwardLeak
         style.inwardIntensity = inwardIntensity
+        style.ditherAmount = ditherAmount
+        style.backgroundWash = backgroundWash
         return style
     }
 
@@ -482,6 +545,8 @@ struct AiGlowBorderMockup2Screen: View {
             sliderRow("In spread", value: $inwardLeak, in: 0...2)
             sliderRow("In intensity", value: $inwardIntensity, in: 0...2)
             sliderRow("Edge intensity", value: $edgeIntensity, in: 0...2)
+            sliderRow("Dither", value: $ditherAmount, in: 0...16)
+            sliderRow("Bg wash", value: $backgroundWash, in: 0...2)
             sliderRow("Period (s/lap)", value: $period, in: 1...20)
         }
         .padding(20)
