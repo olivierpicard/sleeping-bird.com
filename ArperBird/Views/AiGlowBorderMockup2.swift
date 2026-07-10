@@ -133,10 +133,18 @@ struct AiGlowBorderMockup2Style {
         inwardIntensity: 1.0,
         inwardSaturation: 1.7,
         edgeWidth: 1,
+        // Five octaves, blur roughly doubling each step (64 → 4). Real light
+        // falloff carries energy at every spatial scale; sampling it at more
+        // octaves — with opacity falling off steeply toward the wide end — sums
+        // to a smooth inverse-square-ish curve instead of the three visible
+        // steps a coarser stack shows. Widest/dimmest first so the hot rim
+        // lands on top.
         bloomPasses: [
-            .init(lineWidth: 14, blur: 42, opacity: 0.45), // far, dim spill
-            .init(lineWidth: 8,  blur: 16, opacity: 0.65), // mid halo
-            .init(lineWidth: 4,  blur: 5,  opacity: 0.90), // tight, saturated rim
+            .init(lineWidth: 14, blur: 64, opacity: 0.20), // widest, faintest haze
+            .init(lineWidth: 11, blur: 32, opacity: 0.32),
+            .init(lineWidth: 8,  blur: 16, opacity: 0.48), // mid halo
+            .init(lineWidth: 5,  blur: 8,  opacity: 0.66),
+            .init(lineWidth: 3,  blur: 4,  opacity: 0.90), // tightest, brightest rim
         ]
     )
 }
@@ -328,7 +336,9 @@ struct AiGlowBorderMockup2Screen: View {
     @State private var outwardIntensity = 1.1
     @State private var inwardLeak = 1.0
     @State private var inwardIntensity = 0.4
+    @State private var inwardSaturation = 1.7
     @State private var edgeIntensity = 0.7
+    @State private var edgeWidth = 1.0
     @State private var period = 8.0
     @State private var ditherAmount = 1.5
     @State private var backgroundWash = 0.35
@@ -425,6 +435,8 @@ struct AiGlowBorderMockup2Screen: View {
         style.outwardIntensity = outwardIntensity
         style.inwardLeak = inwardLeak
         style.inwardIntensity = inwardIntensity
+        style.inwardSaturation = inwardSaturation
+        style.edgeWidth = CGFloat(edgeWidth)
         style.ditherAmount = ditherAmount
         style.backgroundWash = backgroundWash
         return style
@@ -530,6 +542,18 @@ struct AiGlowBorderMockup2Screen: View {
     }
 
     private var controls: some View {
+        ScrollView {
+            controlStack
+                .padding(20)
+        }
+        // Cap the panel so the growing list of knobs scrolls inside its card
+        // instead of shoving the preview component off-screen.
+        .frame(maxHeight: 380)
+        .background(.primary.opacity(0.06), in: RoundedRectangle(cornerRadius: 20, style: .continuous))
+        .padding(16)
+    }
+
+    private var controlStack: some View {
         VStack(spacing: 14) {
             Picker("Palette", selection: $palette) {
                 ForEach(Palette.allCases) { Text($0.rawValue).tag($0) }
@@ -544,14 +568,13 @@ struct AiGlowBorderMockup2Screen: View {
             sliderRow("Out intensity", value: $outwardIntensity, in: 0...2)
             sliderRow("In spread", value: $inwardLeak, in: 0...2)
             sliderRow("In intensity", value: $inwardIntensity, in: 0...2)
+            sliderRow("In saturation", value: $inwardSaturation, in: 1...3)
             sliderRow("Edge intensity", value: $edgeIntensity, in: 0...2)
+            sliderRow("Edge width", value: $edgeWidth, in: 0...6)
             sliderRow("Dither", value: $ditherAmount, in: 0...16)
             sliderRow("Bg wash", value: $backgroundWash, in: 0...2)
             sliderRow("Period (s/lap)", value: $period, in: 1...20)
         }
-        .padding(20)
-        .background(.primary.opacity(0.06), in: RoundedRectangle(cornerRadius: 20, style: .continuous))
-        .padding(16)
     }
 
     /// Swatch strip + inline editor for the gradient's colors: tap a swatch to
