@@ -25,8 +25,11 @@ struct EmptyDashboardView: View {
     let onAddMetric: (TrackerSuggestion?) -> Void
 
     @Environment(\.colorScheme) private var colorScheme
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
-    @State private var promptIndex = 0
+
+    /// The real text the user types into the CTA field, owned here so the
+    /// full-screen dismiss gestures and the field share the same focus/draft.
+    @State private var draft = ""
+    @FocusState private var isFieldFocused: Bool
 
     /// All the spacings / sizes / copy in one place so the layout can be dialed
     /// in without hunting through the view tree.
@@ -59,6 +62,16 @@ struct EmptyDashboardView: View {
     var body: some View {
         content
             .frame(maxWidth: .infinity, maxHeight: .infinity)
+            // Dismiss the keyboard by tapping empty space or swiping down. Both
+            // hang off the full-screen frame; the field's own tap (focus) and the
+            // chips' taps are more specific, so they still win.
+            .contentShape(Rectangle())
+            .onTapGesture { isFieldFocused = false }
+            .simultaneousGesture(
+                DragGesture(minimumDistance: 20).onChanged { value in
+                    if value.translation.height > 20 { isFieldFocused = false }
+                }
+            )
             .padding()
             .trackScreen("EmptyDashboard")
     }
@@ -76,7 +89,11 @@ struct EmptyDashboardView: View {
             headline
             subcopy
             VStack(spacing: Tuning.tightGroupSpacing) {
-                inputFieldCTA
+                TrackerInputFieldCTA(
+                    draft: $draft,
+                    isFocused: $isFieldFocused,
+                    onSubmit: { onAddMetric(nil) }
+                )
                 labeledBadges(Tuning.examplesLabel)
             }
             Spacer()
@@ -107,48 +124,6 @@ struct EmptyDashboardView: View {
             .fixedSize(horizontal: false, vertical: true)
             .multilineTextAlignment(.center)
             .frame(maxWidth: .infinity)
-    }
-
-    /// THE primary CTA: a field-shaped button. Answers "what happens on tap?"
-    /// (I'll type) — and it mirrors the intent screen's field, down to the
-    /// rotating "Track …" examples (kept in sync via
-    /// `TrackerIntentView.examplePrompts`), while keeping the `sparkles` glyph.
-    /// It stays a launcher, not a real input: a tap opens the creation flow from
-    /// scratch, which auto-focuses its field, so the keyboard is up and the real
-    /// typing happens in one place.
-    private var inputFieldCTA: some View {
-        Button(action: { onAddMetric(nil) }) {
-            HStack(spacing: 8) {
-                Image(systemName: "sparkles")
-                    .foregroundStyle(.secondary)
-                HStack(spacing: 4) {
-                    Text("Track")
-                    Text(TrackerIntentView.examplePrompts[promptIndex])
-                        .id(promptIndex)
-                        .transition(
-                            reduceMotion ? .opacity : .push(from: .bottom)
-                        )
-                }
-                .foregroundStyle(Color(.placeholderText))
-                .clipped()
-                Spacer()
-            }
-            .padding(12)
-            .background(
-                RoundedRectangle(cornerRadius: 12)
-                    .fill(Color(.tertiarySystemFill))
-            )
-        }
-        .buttonStyle(.plain)
-        .task {
-            while !Task.isCancelled {
-                try? await Task.sleep(for: .seconds(3))
-                withAnimation(.snappy) {
-                    promptIndex =
-                        (promptIndex + 1) % TrackerIntentView.examplePrompts.count
-                }
-            }
-        }
     }
 
     /// A connective label + the kept chips, stacked. The label is what ties the
