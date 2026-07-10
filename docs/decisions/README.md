@@ -17,3 +17,5 @@ and link back — don't edit history.
 - [0004 — The tracker color owns the accent, from resolution onward](0004-contrast-corrected-tint.md)
 - [0005 — A calendar view in the metric detail screen](0005-calendar-in-detail.md)
 - [0006 — Empty dashboard: minimal hero, no ghost card](0006-empty-dashboard-redesign.md)
+- [0007 — Empty dashboard → intent: auto-typing handoff with an AI glow beat](0007-empty-dashboard-intent-glow-handoff.md)
+- [0008 — Neon glow border: a conic-gradient mockup, stopped at MVP depth](0008-neon-glow-conic-mockup.md)

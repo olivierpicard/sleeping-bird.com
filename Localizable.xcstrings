@@ -323,6 +323,9 @@
         }
       }
     },
+    "Ask ArperBird" : {
+
+    },
     "Ate Healthy" : {
       "localizations" : {
         "es" : {
@@ -1099,6 +1102,9 @@
           }
         }
       }
+    },
+    "Glow active" : {
+
     },
     "Goal" : {
 
@@ -4053,6 +4059,9 @@
       }
     },
     "What do you want to track ?" : {
+
+    },
+    "What do you want to track?" : {
 
     },
     "What I liked:\n\n\nWhat's buggy / bothered me:\n\n\nAn idea:\n\n\n---\nVersion: %1$@ (%2$@)\nDevice: %3$@ — iOS %4$@\nLocale: %5$@\nID: %6$@" : {
