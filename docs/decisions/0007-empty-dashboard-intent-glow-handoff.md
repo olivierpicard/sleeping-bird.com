@@ -155,3 +155,7 @@ Verified in light and dark via the `#Preview`s.
   shine reads), and "full frame". Render in Light and Dark to see the
   circulation and the light/dark blend split. Note: static snapshots don't show
   the circulation — run them live in Xcode's canvas.
+
+## See also
+
+- [Investigation — the glowing creation field snaps on keyboard dismiss](../investigations/glow-border-keyboard-snap.md) — an open follow-up bug in the shipped glow.

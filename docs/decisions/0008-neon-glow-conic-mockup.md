@@ -108,3 +108,7 @@ in Xcode's canvas (static snapshots don't show the circulation). Drive the six
 sliders + palette picker. To sanity-check the two fixes: set Period low and
 confirm the ring stays multi-color and moving (precision fix); push In intensity
 to full and confirm the interior wash stays colorful, not gray (saturation fix).
+
+## See also
+
+- [Investigation — the glowing creation field snaps on keyboard dismiss](../investigations/glow-border-keyboard-snap.md) — an open follow-up bug in the shipped glow.
