@@ -446,6 +446,9 @@
     "Check your connection and try again" : {
 
     },
+    "Choose a view" : {
+
+    },
     "Choose the tracker's unit" : {
 
     },
@@ -1283,6 +1286,9 @@
 
     },
     "how many coffees I drink" : {
+
+    },
+    "How should \"%@\" look?" : {
 
     },
     "if I stretched today" : {

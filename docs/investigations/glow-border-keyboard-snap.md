@@ -1,6 +1,6 @@
 # Investigation — the glowing creation field snaps on keyboard dismiss
 
-**Status:** open (root cause identified, no working fix yet)
+**Status:** open (failure mode narrowed; no working fix yet)
 **Area:** `ArperBird/Views/EmptyDashboard/TrackerInputFieldCTA.swift`, `ArperBird/Views/GlowBorder.swift`
 **Related:** [ADR 0007](../decisions/0007-empty-dashboard-intent-glow-handoff.md), [ADR 0008](../decisions/0008-neon-glow-conic-mockup.md)
 
@@ -50,10 +50,14 @@ In `TrackerInputFieldCTA` the glow's visibility is:
 So the two paths differ in whether the glow is active/animating during the
 descent. That framed the whole investigation.
 
-## Root cause
+## Working explanation
 
-The bug is driven by the **`TimelineView(.animation)`** that used to power the
-color circulation in both glow layers (`GlowBorder` and `GlowWash`).
+`TimelineView(.animation)` is sufficient to trigger the bug, but later tests
+show that changing its scheduling or moving it to an anchored sibling does not
+fix it. The better-supported explanation is: a continuously-updating SwiftUI
+render subtree shares a transaction/layout owner with the keyboard-avoided
+field and can settle that field at its final safe-area position during UIKit's
+keyboard animation.
 
 A `TimelineView(.animation)` re-evaluates its subtree — **layout included** —
 on **every display frame**. SwiftUI keyboard avoidance moves the field by
@@ -63,9 +67,10 @@ layout and resolves the field to its **final** (resting) position, which
 effectively *completes* the in-flight keyboard animation on that frame. The
 result: instead of interpolating down over ~0.3 s, the field teleports.
 
-When the glow is **not** ticking (paused / removed / never shown), there's no
-per-frame relayout, so the keyboard animation interpolates normally and the
-field slides.
+When the glow is **not** ticking (paused / removed / never shown), there is no
+per-frame work from the glow, so the keyboard animation interpolates normally
+and the field slides. The failed alternatives below mean this should be treated
+as a working model, not a final account of SwiftUI internals.
 
 ### Evidence
 
@@ -95,6 +100,47 @@ Reading of the table:
   `isActive` and faded opacity, yet was smooth.
 - Both glow layers cause it **independently** (either one alone snaps), and the
   one thing they share is the `TimelineView`. That's what pinned the cause.
+
+## Complete test record and the question behind each test
+
+The tests are deliberately small. Each changes one relationship so the result
+answers a design question, rather than merely producing another workaround.
+
+| Test | Result | Big-picture question answered |
+|---|---|---|
+| Original active `TimelineView` glow | Snaps | Establishes the baseline: an animated glow and keyboard avoidance coexist badly. |
+| Keep `isActive` permanently `true` | Snaps | Is the `true → false` active-state change itself the problem? No; the glow can remain active and still snap. |
+| Make `isActive` depend only on loading | Smooth | Does a static/non-ticking glow render safely? Yes. The visible glow is not inherently at fault. |
+| Force `TimelineView` to remain unpaused | Snaps | Is pausing/resuming its scheduler the cause? No; continued ticking is enough to reproduce it. |
+| Replace the time-varying angle with a static angle | Smooth | Are gradients, masks, blur, and opacity fundamentally incompatible with keyboard motion? No; removing continuous updates is the meaningful change. |
+| Remove only `drawingGroup()` | Snaps | Is the off-screen render pass the cause? No. |
+| Remove only the dither `colorEffect` shader | Snaps | Is the Metal shader the cause? No. |
+| Remove only `geometryGroup()` | Snaps | Is geometry grouping alone the cause? No. It might still amplify the issue, but it is not sufficient. |
+| Remove both glow layers | Smooth | Confirms the ordinary field layout can animate correctly. |
+| Remove either one glow layer | Snaps | Is the bug caused by the interaction of wash and rim? No; either continuously-updating layer is sufficient. |
+| Replace `TimelineView` with a repeating `rotationEffect` circulation | Snaps | Can another SwiftUI forever-animation preserve the look while avoiding layout invalidation? No; changing the animation primitive alone is insufficient. |
+| Let the timeline run through its 0.35 s opacity fade, then pause it | Snaps | Is the precise instant that the timeline pauses racing the keyboard transition? No; keeping it active longer does not help. |
+| Freeze the timeline, wait 50 ms, then clear focus | Snaps | Can the issue be solved by ordering the pause before the system keyboard animation starts? No; it is not merely a same-transaction timing race. |
+| Apply `.transaction { $0.animation = nil }` to the timeline subtree | No improvement (tested with delayed pause) | Can suppressing the timeline's implicit animation transaction isolate the keyboard layout animation? Not by itself; this was not independently tested, so it is not a conclusive result. |
+| Render wash and rim as anchor-positioned sibling layers outside `TrackerInputFieldCTA` | Snaps | Is being a direct modifier/descendant of the field the decisive coupling? No; an anchored SwiftUI sibling still shares enough of the keyboard-avoidance/render context to reproduce the problem. |
+
+### What the complete record says
+
+The stable distinction is not the color math, blur, shader, render primitive,
+or the exact instant a scheduler pauses. The stable distinction is whether a
+continuously-updating SwiftUI visual is present while UIKit animates the
+keyboard safe area. Moving the glow from a field modifier to a declarative
+sibling does not establish a truly independent layout/render owner.
+
+That leaves two architectural directions worth testing next:
+
+1. **Own the field's vertical motion.** Disable automatic keyboard avoidance
+   for this dashboard and animate a field offset from keyboard frame changes.
+   This removes the system safe-area animation that the glow currently disturbs.
+2. **Use a rendering surface outside this SwiftUI transaction tree.** Keep the
+   glow design, but drive its circulating paint in a UIKit/Core Animation layer
+   or another presentation-only surface rather than a continuously-updating
+   SwiftUI view.
 
 ## Attempted fix (did NOT work)
 
