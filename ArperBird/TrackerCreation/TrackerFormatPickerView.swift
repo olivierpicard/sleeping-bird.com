@@ -47,6 +47,7 @@ struct TrackerFormatPickerView: View {
 
     var body: some View {
         VStack(spacing: 24) {
+            Spacer()
             MetricView(
                 mainColor: mainColor,
                 header: {
@@ -72,6 +73,9 @@ struct TrackerFormatPickerView: View {
                     }
                 }
             }
+            
+            Spacer()
+            Spacer()
         }
         .padding(.horizontal)
         .padding(.top, 24)
