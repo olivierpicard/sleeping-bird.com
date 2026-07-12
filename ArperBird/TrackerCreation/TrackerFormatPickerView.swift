@@ -49,15 +49,20 @@ struct TrackerFormatPickerView: View {
         VStack(spacing: 24) {
             Spacer()
             MetricView(
-                mainColor: mainColor,
+                mainColor: .gray,
                 header: {
-                    MetricHeaderTextView(title: name, emoji: emoji, mainColor: mainColor)
+                    MetricHeaderTextView(
+                        title: name, 
+                        emoji: emoji,
+                        mainColor: .gray
+                    )
+                    .saturation(0)
                 },
-                // Override the metric's stored raw color so the chart renders
-                // in the same corrected shade as the rest of the card.
+                // Preview card stays neutral gray, independent of the
+                // tracker's resolved color — only the format chips below use it.
                 chart: MiniChartFactory.make(
                     from: formats[selectedIndex].metric,
-                    colorOverride: mainColor
+                    colorOverride: .gray
                 )
             )
             .animation(.snappy, value: selectedIndex)
@@ -67,13 +72,15 @@ struct TrackerFormatPickerView: View {
                     FormatChip(
                         format: formats[index],
                         isSelected: index == selectedIndex,
-                        color: mainColor
+                        color: .accentColor
                     ) {
-                        withAnimation(.snappy(duration: 0.25)) { selectedIndex = index }
+                        withAnimation(.snappy(duration: 0.25)) {
+                            selectedIndex = index
+                        }
                     }
                 }
             }
-            
+
             Spacer()
             Spacer()
         }
@@ -88,7 +95,6 @@ struct TrackerFormatPickerView: View {
             }
             .controlSize(.extraLarge)
             .buttonStyle(.glassProminent)
-            .tint(mainColor)
             .padding()
         }
         .toolbar {
@@ -98,7 +104,6 @@ struct TrackerFormatPickerView: View {
                 }
             }
         }
-        .tint(mainColor)
         .navigationTitle(String(localized: "How to track it"))
         .navigationSubtitle("How should \"\(name)\" look?")
         .navigationBarTitleDisplayMode(.large)
@@ -125,14 +130,20 @@ private struct FormatChip: View {
             .foregroundStyle(isSelected ? .white : .primary)
             .padding(.horizontal, 14)
             .padding(.vertical, 9)
-            .background(Capsule().fill(isSelected ? color : Color(.tertiarySystemFill)))
+            .background(
+                Capsule().fill(isSelected ? color : Color(.tertiarySystemFill))
+            )
             .overlay(
                 Capsule().strokeBorder(
                     isSelected ? .clear : Color.secondary.opacity(0.35),
                     lineWidth: 1
                 )
             )
-            .shadow(color: isSelected ? color.opacity(0.35) : .clear, radius: 6, y: 2)
+            .shadow(
+                color: isSelected ? color.opacity(0.35) : .clear,
+                radius: 6,
+                y: 2
+            )
         }
         .buttonStyle(ChipPressStyle())
     }
@@ -150,9 +161,15 @@ private struct ChipPressStyle: ButtonStyle {
 
 // MARK: - Previews
 
-private extension TrackerFormatPickerView.FormatOption {
-    static func duration(name: String, emoji: String, color: Color) -> Self {
-        let schema = MetricSchema.Fake.duration(title: name, emoji: emoji, chart: .bar)
+extension TrackerFormatPickerView.FormatOption {
+    fileprivate static func duration(name: String, emoji: String, color: Color)
+        -> Self
+    {
+        let schema = MetricSchema.Fake.duration(
+            title: name,
+            emoji: emoji,
+            chart: .bar
+        )
         return .init(
             label: String(localized: "Time spent"),
             icon: "clock",
@@ -165,8 +182,15 @@ private extension TrackerFormatPickerView.FormatOption {
         )
     }
 
-    static func number(name: String, emoji: String, color: Color) -> Self {
-        let schema = MetricSchema.Fake.number(title: name, emoji: emoji, goal: nil, chart: .bar)
+    fileprivate static func number(name: String, emoji: String, color: Color)
+        -> Self
+    {
+        let schema = MetricSchema.Fake.number(
+            title: name,
+            emoji: emoji,
+            goal: nil,
+            chart: .bar
+        )
         return .init(
             label: String(localized: "A number"),
             icon: "number",
@@ -179,9 +203,17 @@ private extension TrackerFormatPickerView.FormatOption {
         )
     }
 
-    static func goal(name: String, emoji: String, color: Color) -> Self {
+    fileprivate static func goal(name: String, emoji: String, color: Color)
+        -> Self
+    {
         let schema = MetricSchema.Fake.number(
-            title: name, emoji: emoji, min: 0, max: 10, granularity: 1, goal: 8, chart: .dailyGauge
+            title: name,
+            emoji: emoji,
+            min: 0,
+            max: 10,
+            granularity: 1,
+            goal: 8,
+            chart: .dailyGauge
         )
         return .init(
             label: String(localized: "Daily goal"),
@@ -208,7 +240,11 @@ private extension TrackerFormatPickerView.FormatOption {
                 color: .orange,
                 formats: [
                     .goal(name: "Glasses of Water", emoji: "💧", color: .orange),
-                    .number(name: "Glasses of Water", emoji: "💧", color: .orange),
+                    .number(
+                        name: "Glasses of Water",
+                        emoji: "💧",
+                        color: .orange
+                    ),
                 ]
             )
         }
