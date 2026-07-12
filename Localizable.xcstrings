@@ -1291,6 +1291,22 @@
     "How should \"%@\" look?" : {
 
     },
+    "How to track it" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tipo de seguimiento"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Type de suivi"
+          }
+        }
+      }
+    },
     "if I stretched today" : {
 
     },

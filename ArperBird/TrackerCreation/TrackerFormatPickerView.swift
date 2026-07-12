@@ -99,7 +99,7 @@ struct TrackerFormatPickerView: View {
             }
         }
         .tint(mainColor)
-        .navigationTitle("Choose a view")
+        .navigationTitle(String(localized: "How to track it"))
         .navigationSubtitle("How should \"\(name)\" look?")
         .navigationBarTitleDisplayMode(.large)
     }
