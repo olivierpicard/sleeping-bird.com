@@ -97,7 +97,7 @@ enum GlowStyle {
         switch self {
         case .inward:   return Knobs(outwardLeak: 0.7, outwardIntensity: 0.3, inwardLeak: 2.0, inwardIntensity: 1.0, inwardSaturation: 1.3, edgeIntensity: 0.9, edgeWidth: 0.6, ditherAmount: 9.0, backgroundWash: 0.4)
         case .outward:  return Knobs(outwardLeak: 4.0, outwardIntensity: 3.9, inwardLeak: 1.5, inwardIntensity: 0.4, inwardSaturation: 3.0, edgeIntensity: 1.5, edgeWidth: 0.7, ditherAmount: 8.3, backgroundWash: 0.2)
-        case .edgeOnly: return Knobs(outwardLeak: 0.0, outwardIntensity: 0.0, inwardLeak: 0.0, inwardIntensity: 0.0, inwardSaturation: 1.0, edgeIntensity: 0.6, edgeWidth: 0.9, ditherAmount: 8.3, backgroundWash: 0.3)
+        case .edgeOnly: return Knobs(outwardLeak: 0.0, outwardIntensity: 0.0, inwardLeak: 0.0, inwardIntensity: 0.0, inwardSaturation: 1.0, edgeIntensity: 0.6, edgeWidth: 0.9, ditherAmount: 8.3, backgroundWash: 0.5)
         }
     }
 

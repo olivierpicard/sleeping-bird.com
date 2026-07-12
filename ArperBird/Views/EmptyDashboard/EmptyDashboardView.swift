@@ -14,8 +14,9 @@ import SwiftUI
 ///
 /// Every entry point routes through `onAddMetric`: the field CTA opens the
 /// creation flow from scratch (`nil`) so a tap lands straight in typing, and a
-/// chip opens it seeded with that pick. The chips read as fillable examples of
-/// what to type — a "Try one:" label names them, and a tight sub-block binds the
+/// chip *types itself into the field* (keyboard stays down) before opening the
+/// flow seeded with that pick. The chips read as fillable examples of what to
+/// type — a "Try one:" label names them, and a tight sub-block binds the
 /// field → label → chips by proximity.
 ///
 /// Layout knobs live in `Tuning`; every piece is its own `@ViewBuilder`.
@@ -31,6 +32,18 @@ struct EmptyDashboardView: View {
     @State private var draft = ""
     @FocusState private var isFieldFocused: Bool
 
+    /// The in-flight "type a chip into the field" animation, held so a second
+    /// chip tap (or leaving the view) cleanly cancels the first.
+    @State private var typeTask: Task<Void, Never>?
+
+    /// True while a chip is typing itself in — lights the field's glow without
+    /// focusing it (which would raise the keyboard).
+    @State private var isTyping = false
+
+    /// Keeps the completed chip text on screen while its CTA changes to the
+    /// inward loading glow, immediately before opening the creation sheet.
+    @State private var isPreparingCreation = false
+
     /// All the spacings / sizes / copy in one place so the layout can be dialed
     /// in without hunting through the view tree.
     private enum Tuning {
@@ -40,6 +53,11 @@ struct EmptyDashboardView: View {
 
         static let subcopy = "Type it in plain words — we'll build the tracker for you."
         static let glyph = "📈"
+
+        /// Opacity of the neutral scrim that dims the shared background while the
+        /// field is focused (or a chip is typing itself in), so the glowing CTA
+        /// carries the eye.
+        static let focusedBackdropDim: Double = 0.6
 
         // Connective copy above the chips.
         static let examplesLabel = "Try one:"
@@ -53,6 +71,13 @@ struct EmptyDashboardView: View {
         static let chipFont: Font = .footnote
         static let chipInnerPadding: Double = 5
         static let chipCornerRadius: Double = 12
+
+        /// Timing for the chip-to-field animation. Letter timing is varied in
+        /// `typingDelay` below; these pauses make the completed phrase readable
+        /// before the tracker flow opens.
+        static let typeStartDelay: Duration = .milliseconds(300)
+        static let typeSettleDelay: Duration = .milliseconds(750)
+        static let creationLoadingDelay: Duration = .seconds(1.6)
     }
 
     /// The curated suggestion chips — the same source `TrackerIntentView` samples
@@ -67,13 +92,84 @@ struct EmptyDashboardView: View {
             // chips' taps are more specific, so they still win.
             .contentShape(Rectangle())
             .onTapGesture { isFieldFocused = false }
-            .simultaneousGesture(
-                DragGesture(minimumDistance: 20).onChanged { value in
-                    if value.translation.height > 20 { isFieldFocused = false }
-                }
-            )
             .padding()
+            // When the field lights up, knock the shared mesh background back so
+            // the glowing CTA carries the focus. The background itself lives in
+            // `ContentView`; this scrim sits between it and the content. A
+            // `systemBackground` fill mirrors how the mesh fades toward neutral
+            // (near-black in dark, near-white in light), reading as dimmed rather
+            // than a foreign overlay.
+            .background {
+                Color(.systemBackground)
+                    .opacity(isFieldFocused || isTyping ? Tuning.focusedBackdropDim : 0)
+                    .ignoresSafeArea()
+                    .animation(.easeInOut(duration: 0.35), value: isFieldFocused)
+                    .animation(.easeInOut(duration: 0.35), value: isTyping)
+            }
+            // A dismissed view must not keep mutating `draft`.
+            .onDisappear {
+                typeTask?.cancel()
+                isTyping = false
+                isPreparingCreation = false
+            }
             .trackScreen("EmptyDashboard")
+    }
+
+    // MARK: - Chip → field animation
+
+    /// Types `suggestion`'s prompt into the field character-by-character, then
+    /// opens the creation flow seeded with it. Types the fuller `localizedName`
+    /// (the prompt the intent screen itself seeds), not the short chip label.
+    /// Deliberately does *not* focus the field, so the keyboard stays down while
+    /// the text writes itself. Replaces any current draft and cancels a previous
+    /// in-flight animation.
+    private func typeSuggestion(_ suggestion: TrackerSuggestion) {
+        typeTask?.cancel()
+        typeTask = Task { @MainActor in
+            isTyping = true
+            draft = ""
+            try? await Task.sleep(for: Tuning.typeStartDelay)
+            var previousCharacter: Character?
+            for (index, character) in suggestion.localizedName.enumerated() {
+                try? await Task.sleep(for: typingDelay(
+                    for: character,
+                    previousCharacter: previousCharacter,
+                    index: index
+                ))
+                if Task.isCancelled { return }
+                draft.append(character)
+                previousCharacter = character
+            }
+            // Hold the completed text a beat, then auto-submit into the flow.
+            try? await Task.sleep(for: Tuning.typeSettleDelay)
+            if Task.isCancelled { return }
+            isTyping = false
+            isPreparingCreation = true
+            try? await Task.sleep(for: Tuning.creationLoadingDelay)
+            if Task.isCancelled { return }
+            isPreparingCreation = false
+            onAddMetric(suggestion)
+        }
+    }
+
+    /// A fixed rhythm mimics small variations in human typing without making
+    /// the interaction unpredictable. Word starts and punctuation get a little
+    /// more time, so the generated phrase is easier to read at a glance.
+    private func typingDelay(
+        for character: Character,
+        previousCharacter: Character?,
+        index: Int
+    ) -> Duration {
+        switch character {
+        case " ":
+            return .milliseconds(145)
+        case ",", ".", "!", "?", ":", ";":
+            return .milliseconds(215)
+        default:
+            let rhythm = [0, 8, -5, 12, -9, 4, -3][index % 7]
+            let wordStartPause = previousCharacter == " " ? 18 : 0
+            return .milliseconds(72 + rhythm + wordStartPause)
+        }
     }
 
     // MARK: - Layout
@@ -92,10 +188,13 @@ struct EmptyDashboardView: View {
                 TrackerInputFieldCTA(
                     draft: $draft,
                     isFocused: $isFieldFocused,
+                    isTyping: isTyping,
+                    isPreparingCreation: isPreparingCreation,
                     onSubmit: { onAddMetric(nil) }
                 )
                 labeledBadges(Tuning.examplesLabel)
             }
+            Spacer()
             Spacer()
         }
     }
@@ -138,7 +237,8 @@ struct EmptyDashboardView: View {
         }
     }
 
-    /// The kept chips. A tap seeds the creation flow with that suggestion.
+    /// The kept chips. A tap types the suggestion into the field (see
+    /// `typeSuggestion`), then opens the creation flow seeded with it.
     private var badges: some View {
         BadgesStackView(
             badges: suggestions.map(\.chipText),
@@ -147,7 +247,7 @@ struct EmptyDashboardView: View {
             cornerRadius: Tuning.chipCornerRadius,
             alignment: .center,
             maxRows: Tuning.chipRows,
-            onTap: { index in onAddMetric(suggestions[index]) }
+            onTap: { index in typeSuggestion(suggestions[index]) }
         )
         .font(Tuning.chipFont)
     }
