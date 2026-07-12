@@ -9,6 +9,10 @@ import SwiftData
 import SwiftUI
 
 enum TrackerCreationStep: Hashable {
+    /// Asks *how* to log an already-resolved intent — the entry point for a
+    /// seeded (dashboard badge) creation, in place of `TrackerIntentView`.
+    /// Only ever the first entry in `path`; see `TrackerCreationFlow.init`.
+    case formatPicker
     /// Transient spinner on the number ("Other") path: fetches the unit
     /// suggestions + behavior + emoji, then hands straight off to the reveal —
     /// the unit, max, and behavior are all editable there via the recap chips,
@@ -99,6 +103,11 @@ struct TrackerCreationFlow: View {
     init(seed: TrackerSuggestion? = nil, autofocus: Bool = false) {
         self.seed = seed
         self.autofocus = autofocus
+        // A badge tap already resolved the intent, so open straight on the
+        // format picker instead of `TrackerIntentView`. It stays pushed on
+        // top of that root screen (rather than replacing it), so a swipe
+        // back still lands on the pre-filled intent screen as a fallback.
+        _path = State(initialValue: seed != nil ? [.formatPicker] : [])
     }
 
     /// The step each kind branches into after naming — shared by the name step's
@@ -159,6 +168,39 @@ struct TrackerCreationFlow: View {
     @ViewBuilder
     private func destination(for step: TrackerCreationStep) -> some View {
         switch step {
+        case .formatPicker:
+            // Only reachable when `seed` is set — see `init`.
+            if let seed {
+                // The resolved suggestion's color follows its best-fit
+                // (first) format, mirroring `TrackerIntentView`'s own
+                // per-kind tint so a badge tap and a typed prompt land on
+                // the same shade for the same idea.
+                let resolvedColor = (seed.formats.first?.kind ?? seed.kind)
+                    .previewColor
+                TrackerFormatPickerView(
+                    name: seed.localizedName,
+                    emoji: seed.emoji,
+                    color: resolvedColor,
+                    formats: seed.formats.map {
+                        .make(
+                            for: $0,
+                            name: seed.localizedName,
+                            emoji: seed.emoji,
+                            color: resolvedColor
+                        )
+                    },
+                    onContinue: { kind in
+                        // Mirrors `TrackerIntentView`'s `onContinue`: seed the
+                        // model from the already-known name/color and jump
+                        // straight into the chosen format's step machinery.
+                        model.kind = kind
+                        model.name = seed.localizedName
+                        model.aiHint = seed.localizedName
+                        color = resolvedColor
+                        path = [Self.firstStep(for: kind)]
+                    }
+                )
+            }
         case .numberLoading:
             TrackerNumberLoadingView(model: model) {
                 // Swap this transient spinner out of the path for the reveal, so

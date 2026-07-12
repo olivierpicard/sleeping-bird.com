@@ -18,6 +18,22 @@ enum IntentFormatType: String {
     case date
 }
 
+extension IntentFormatType {
+    /// The tracker kind this format belongs to — used to tint the card, in
+    /// both `TrackerIntentView` and the seeded `TrackerFormatPickerView`
+    /// entry.
+    var kind: TrackerKind {
+        switch self {
+        case .number: .number
+        case .duration: .duration
+        case .binary: .binary
+        case .goal: .goal
+        case .choices: .choices
+        case .date: .date
+        }
+    }
+}
+
 @Generable(description: "Interpreted intent for a tracker described in free text")
 struct IntentCompletion {
     @Guide(description: "A short human title for the tracker, e.g. 'Coffee', 'Reading time'")

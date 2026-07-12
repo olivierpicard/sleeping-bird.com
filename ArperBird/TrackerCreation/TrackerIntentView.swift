@@ -457,16 +457,7 @@ struct TrackerIntentView: View {
     }
 
     /// Card tint per kind, standing in for the color the AI would pick.
-    private static func color(for kind: TrackerKind) -> Color {
-        switch kind {
-        case .number: .teal
-        case .duration: .purple
-        case .choices: .yellow
-        case .binary: .green
-        case .goal: .orange
-        case .date: .pink
-        }
-    }
+    private static func color(for kind: TrackerKind) -> Color { kind.previewColor }
 
     /// Fake resolution for a curated suggestion: builds a pill + preview card
     /// for each of the suggestion's own `formats`, seeded with its name and
@@ -596,20 +587,6 @@ struct TrackerIntentView: View {
         }
     }
 
-}
-
-private extension IntentFormatType {
-    /// The tracker kind this format belongs to — used to tint the card.
-    var kind: TrackerKind {
-        switch self {
-        case .number: .number
-        case .duration: .duration
-        case .binary: .binary
-        case .goal: .goal
-        case .choices: .choices
-        case .date: .date
-        }
-    }
 }
 
 /// Every submit fails after the usual "thinking" beat — type anything and hit

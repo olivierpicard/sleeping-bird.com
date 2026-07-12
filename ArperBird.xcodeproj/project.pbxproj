@@ -469,7 +469,6 @@
 				INFOPLIST_KEY_CFBundleDisplayName = ArperBird;
 				INFOPLIST_KEY_DEEPGRAM_API_KEY = "$(DEEPGRAM_API_KEY)";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
-				INFOPLIST_KEY_NSMicrophoneUsageDescription = "ArperBird needs microphone access to transcribe your voice";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -520,7 +519,6 @@
 				INFOPLIST_KEY_CFBundleDisplayName = ArperBird;
 				INFOPLIST_KEY_DEEPGRAM_API_KEY = "$(DEEPGRAM_API_KEY)";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
-				INFOPLIST_KEY_NSMicrophoneUsageDescription = "ArperBird needs microphone access to transcribe your voice";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;

@@ -7,16 +7,15 @@
 
 import SwiftUI
 
-/// UI-only mockup of the format-picker exploration: once the intent screen
-/// has already resolved a name/emoji/color, this screen asks *how* to view
-/// it — one big preview card plus a row of format chips below, with no text
-/// field or example chips competing for attention. Standalone for now — not
-/// wired into `TrackerCreationFlow` yet, so it's previewed on its own to
-/// evaluate the design first.
+/// Once a suggestion chip has already resolved a name/emoji/color — a
+/// dashboard badge tap — this screen asks *how* to view it: one big preview
+/// card plus a row of format chips below, with no text field or example
+/// chips competing for attention. Wired into `TrackerCreationFlow` as the
+/// entry point for a seeded (badge) creation, replacing `TrackerIntentView`
+/// since the intent is already known.
 struct TrackerFormatPickerView: View {
     /// One way this tracker can be logged — mirrors `TrackerIntentView`'s
-    /// private `IntentFormat`, duplicated here since this screen is being
-    /// evaluated independently of that view for now.
+    /// private `IntentFormat`. Built via `FormatOption.make(for:name:emoji:color:)`.
     struct FormatOption: Identifiable {
         let id = UUID()
         let label: String
@@ -30,13 +29,13 @@ struct TrackerFormatPickerView: View {
     let color: Color
     let formats: [FormatOption]
 
-    /// Not wired to the creation flow yet — a no-op default so the screen
-    /// previews standalone.
+    /// Hands the chosen format's kind off to `TrackerCreationFlow`, which
+    /// routes into that kind's step machinery — mirrors `TrackerIntentView`'s
+    /// `onContinue`. A no-op default lets the screen preview standalone.
     var onContinue: (TrackerKind) -> Void = { _ in }
 
     @State private var selectedIndex = 0
     @Environment(\.colorScheme) private var colorScheme
-    @Environment(\.dismiss) private var dismiss
 
     /// The resolved suggestion's color, passed through the readability
     /// filter so the card, its chart, and the chips all share the same
@@ -52,11 +51,10 @@ struct TrackerFormatPickerView: View {
                 mainColor: .gray,
                 header: {
                     MetricHeaderTextView(
-                        title: name, 
+                        title: name,
                         emoji: emoji,
                         mainColor: .gray
                     )
-                    .saturation(0)
                 },
                 // Preview card stays neutral gray, independent of the
                 // tracker's resolved color — only the format chips below use it.
@@ -97,13 +95,9 @@ struct TrackerFormatPickerView: View {
             .buttonStyle(.glassProminent)
             .padding()
         }
-        .toolbar {
-            ToolbarItem(placement: .cancellationAction) {
-                Button(action: { dismiss() }) {
-                    Image(systemName: "xmark")
-                }
-            }
-        }
+        // No own cancel button: this screen is a pushed step inside
+        // `TrackerCreationFlow`'s `NavigationStack`, which already supplies
+        // the xmark cancellation action for the whole stack.
         .navigationTitle(String(localized: "How to track it"))
         .navigationSubtitle("How should \"\(name)\" look?")
         .navigationBarTitleDisplayMode(.large)
@@ -162,69 +156,120 @@ private struct ChipPressStyle: ButtonStyle {
 // MARK: - Previews
 
 extension TrackerFormatPickerView.FormatOption {
-    fileprivate static func duration(name: String, emoji: String, color: Color)
-        -> Self
-    {
-        let schema = MetricSchema.Fake.duration(
-            title: name,
-            emoji: emoji,
-            chart: .bar
-        )
-        return .init(
-            label: String(localized: "Time spent"),
-            icon: "clock",
-            kind: .duration,
-            metric: Metric(
-                from: schema,
-                color: color,
-                data: Metric.fakeData(for: schema.config, days: 40)
+    /// Builds the pill + preview card for one logging format — mirrors
+    /// `TrackerIntentView`'s private `intentFormat(for:name:emoji:color:)` so
+    /// both screens render the same fake preview for a given format type.
+    /// Shared by the real `TrackerCreationFlow` wiring (a badge tap's
+    /// `TrackerSuggestion.formats`) and this file's previews.
+    static func make(
+        for type: IntentFormatType,
+        name: String,
+        emoji: String,
+        color: Color
+    ) -> Self {
+        switch type {
+        case .duration:
+            let schema = MetricSchema.Fake.duration(
+                title: name,
+                emoji: emoji,
+                chart: .bar
             )
-        )
-    }
-
-    fileprivate static func number(name: String, emoji: String, color: Color)
-        -> Self
-    {
-        let schema = MetricSchema.Fake.number(
-            title: name,
-            emoji: emoji,
-            goal: nil,
-            chart: .bar
-        )
-        return .init(
-            label: String(localized: "A number"),
-            icon: "number",
-            kind: .number,
-            metric: Metric(
-                from: schema,
-                color: color,
-                data: Metric.fakeData(for: schema.config, days: 40)
+            return .init(
+                label: String(localized: "Time spent"),
+                icon: "clock",
+                kind: .duration,
+                metric: Metric(
+                    from: schema,
+                    color: color,
+                    data: Metric.fakeData(for: schema.config, days: 40)
+                )
             )
-        )
-    }
-
-    fileprivate static func goal(name: String, emoji: String, color: Color)
-        -> Self
-    {
-        let schema = MetricSchema.Fake.number(
-            title: name,
-            emoji: emoji,
-            min: 0,
-            max: 10,
-            granularity: 1,
-            goal: 8,
-            chart: .dailyGauge
-        )
-        return .init(
-            label: String(localized: "Daily goal"),
-            icon: "target",
-            kind: .goal,
-            metric: Metric(
-                from: schema,
-                color: color,
-                data: Metric.fakeData(for: schema.config)
+        case .binary:
+            let schema = MetricSchema.Fake.binary(
+                title: name,
+                emoji: emoji,
+                chart: .calendar
             )
-        )
+            return .init(
+                label: String(localized: "Yes / No"),
+                icon: "checkmark.circle",
+                kind: .binary,
+                metric: Metric(
+                    from: schema,
+                    color: color,
+                    data: Metric.fakeData(for: schema.config)
+                )
+            )
+        case .number:
+            let schema = MetricSchema.Fake.number(
+                title: name,
+                emoji: emoji,
+                goal: nil,
+                chart: .bar
+            )
+            return .init(
+                label: String(localized: "A number"),
+                icon: "number",
+                kind: .number,
+                metric: Metric(
+                    from: schema,
+                    color: color,
+                    data: Metric.fakeData(for: schema.config, days: 40)
+                )
+            )
+        case .goal:
+            let schema = MetricSchema.Fake.number(
+                title: name,
+                emoji: emoji,
+                min: 0,
+                max: 10,
+                granularity: 1,
+                goal: 8,
+                chart: .dailyGauge
+            )
+            return .init(
+                label: String(localized: "Daily goal"),
+                icon: "target",
+                kind: .goal,
+                metric: Metric(
+                    from: schema,
+                    color: color,
+                    data: Metric.fakeData(for: schema.config)
+                )
+            )
+        case .choices:
+            let schema = MetricSchema.Fake.categorySingle(
+                title: name,
+                emoji: emoji,
+                chart: .pie
+            )
+            return .init(
+                label: String(localized: "Pick from a list"),
+                icon: "list.bullet",
+                kind: .choices,
+                metric: Metric(
+                    from: schema,
+                    color: color,
+                    data: Metric.fakeData(for: schema.config)
+                )
+            )
+        case .date:
+            let schema = MetricSchema.Fake.datetime(
+                title: name,
+                emoji: emoji,
+                chart: .calendar
+            )
+            return .init(
+                label: String(localized: "A date"),
+                icon: "calendar",
+                kind: .date,
+                metric: Metric(
+                    from: schema,
+                    color: color,
+                    data: Metric.fakeData(for: schema.config)
+                )
+            )
+        }
     }
 }
 
@@ -239,12 +284,8 @@ extension TrackerFormatPickerView.FormatOption {
                 emoji: "💧",
                 color: .orange,
                 formats: [
-                    .goal(name: "Glasses of Water", emoji: "💧", color: .orange),
-                    .number(
-                        name: "Glasses of Water",
-                        emoji: "💧",
-                        color: .orange
-                    ),
+                    .make(for: .goal, name: "Glasses of Water", emoji: "💧", color: .orange),
+                    .make(for: .number, name: "Glasses of Water", emoji: "💧", color: .orange),
                 ]
             )
         }
@@ -264,8 +305,8 @@ extension TrackerFormatPickerView.FormatOption {
                 emoji: "📖",
                 color: .purple,
                 formats: [
-                    .duration(name: "Time Reading", emoji: "📖", color: .purple),
-                    .number(name: "Time Reading", emoji: "📖", color: .purple),
+                    .make(for: .duration, name: "Time Reading", emoji: "📖", color: .purple),
+                    .make(for: .number, name: "Time Reading", emoji: "📖", color: .purple),
                 ]
             )
         }
