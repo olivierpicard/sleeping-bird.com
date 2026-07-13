@@ -35,6 +35,7 @@ struct TrackerBinaryLoadingView: View {
                 }
             default:
                 ProgressView("Setting up your tracker…")
+                    .tint(nil)
             }
             Spacer()
         }

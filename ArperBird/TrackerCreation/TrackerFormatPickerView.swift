@@ -26,8 +26,13 @@ struct TrackerFormatPickerView: View {
 
     let name: String
     let emoji: String
-    let color: Color
     let formats: [FormatOption]
+
+    /// The tracker's resolved color — mirrors `TrackerCreationFlow.controlColor`.
+    /// Only the format chips and the "Continue" CTA use it; the preview card
+    /// above stays neutral gray (see `FormatOption.make`) since the format
+    /// hasn't been confirmed yet.
+    var color: Color = .accent
 
     /// Hands the chosen format's kind off to `TrackerCreationFlow`, which
     /// routes into that kind's step machinery — mirrors `TrackerIntentView`'s
@@ -35,14 +40,6 @@ struct TrackerFormatPickerView: View {
     var onContinue: (TrackerKind) -> Void = { _ in }
 
     @State private var selectedIndex = 0
-    @Environment(\.colorScheme) private var colorScheme
-
-    /// The resolved suggestion's color, passed through the readability
-    /// filter so the card, its chart, and the chips all share the same
-    /// corrected shade — mirrors `TrackerIntentView.mainColor`.
-    private var mainColor: Color {
-        color.readableControlTint(in: colorScheme)
-    }
 
     var body: some View {
         VStack(spacing: 24) {
@@ -70,7 +67,7 @@ struct TrackerFormatPickerView: View {
                     FormatChip(
                         format: formats[index],
                         isSelected: index == selectedIndex,
-                        color: .accentColor
+                        color: color
                     ) {
                         withAnimation(.snappy(duration: 0.25)) {
                             selectedIndex = index
@@ -93,6 +90,7 @@ struct TrackerFormatPickerView: View {
             }
             .controlSize(.extraLarge)
             .buttonStyle(.glassProminent)
+            .tint(color)
             .padding()
         }
         // No own cancel button: this screen is a pushed step inside
@@ -160,12 +158,13 @@ extension TrackerFormatPickerView.FormatOption {
     /// `TrackerIntentView`'s private `intentFormat(for:name:emoji:color:)` so
     /// both screens render the same fake preview for a given format type.
     /// Shared by the real `TrackerCreationFlow` wiring (a badge tap's
-    /// `TrackerSuggestion.formats`) and this file's previews.
+    /// `TrackerSuggestion.formats`) and this file's previews. The metric's own
+    /// color is always `.gray` — this screen's card and chips never display a
+    /// per-format color, so there's nothing to carry it for.
     static func make(
         for type: IntentFormatType,
         name: String,
-        emoji: String,
-        color: Color
+        emoji: String
     ) -> Self {
         switch type {
         case .duration:
@@ -180,7 +179,7 @@ extension TrackerFormatPickerView.FormatOption {
                 kind: .duration,
                 metric: Metric(
                     from: schema,
-                    color: color,
+                    color: .gray,
                     data: Metric.fakeData(for: schema.config, days: 40)
                 )
             )
@@ -196,7 +195,7 @@ extension TrackerFormatPickerView.FormatOption {
                 kind: .binary,
                 metric: Metric(
                     from: schema,
-                    color: color,
+                    color: .gray,
                     data: Metric.fakeData(for: schema.config)
                 )
             )
@@ -213,7 +212,7 @@ extension TrackerFormatPickerView.FormatOption {
                 kind: .number,
                 metric: Metric(
                     from: schema,
-                    color: color,
+                    color: .gray,
                     data: Metric.fakeData(for: schema.config, days: 40)
                 )
             )
@@ -233,7 +232,7 @@ extension TrackerFormatPickerView.FormatOption {
                 kind: .goal,
                 metric: Metric(
                     from: schema,
-                    color: color,
+                    color: .gray,
                     data: Metric.fakeData(for: schema.config)
                 )
             )
@@ -249,7 +248,7 @@ extension TrackerFormatPickerView.FormatOption {
                 kind: .choices,
                 metric: Metric(
                     from: schema,
-                    color: color,
+                    color: .gray,
                     data: Metric.fakeData(for: schema.config)
                 )
             )
@@ -265,7 +264,7 @@ extension TrackerFormatPickerView.FormatOption {
                 kind: .date,
                 metric: Metric(
                     from: schema,
-                    color: color,
+                    color: .gray,
                     data: Metric.fakeData(for: schema.config)
                 )
             )
@@ -282,10 +281,9 @@ extension TrackerFormatPickerView.FormatOption {
             TrackerFormatPickerView(
                 name: "Glasses of Water",
                 emoji: "💧",
-                color: .orange,
                 formats: [
-                    .make(for: .goal, name: "Glasses of Water", emoji: "💧", color: .orange),
-                    .make(for: .number, name: "Glasses of Water", emoji: "💧", color: .orange),
+                    .make(for: .goal, name: "Glasses of Water", emoji: "💧"),
+                    .make(for: .number, name: "Glasses of Water", emoji: "💧"),
                 ]
             )
         }
@@ -303,10 +301,9 @@ extension TrackerFormatPickerView.FormatOption {
             TrackerFormatPickerView(
                 name: "Time Reading",
                 emoji: "📖",
-                color: .purple,
                 formats: [
-                    .make(for: .duration, name: "Time Reading", emoji: "📖", color: .purple),
-                    .make(for: .number, name: "Time Reading", emoji: "📖", color: .purple),
+                    .make(for: .duration, name: "Time Reading", emoji: "📖"),
+                    .make(for: .number, name: "Time Reading", emoji: "📖"),
                 ]
             )
         }

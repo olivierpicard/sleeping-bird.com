@@ -34,7 +34,7 @@ struct TrackerCategoryLabelsView: View {
     @FocusState private var focused: UUID?
 
     init(
-        color: Color = .accent,
+        color: Color,
         initialLabels: [String] = [],
         onNext: @escaping ([String]) -> Void = { _ in }
     ) {
@@ -86,6 +86,7 @@ struct TrackerCategoryLabelsView: View {
             }
             .controlSize(.extraLarge)
             .buttonStyle(.glassProminent)
+            .tint(color)
             .disabled(!canContinue)
             .padding()
         }
@@ -196,7 +197,7 @@ struct TrackerCategoryLabelsView: View {
     }
     .sheet(isPresented: $showSheet) {
         NavigationStack {
-            TrackerCategoryLabelsView()
+            TrackerCategoryLabelsView(color: .accent)
         }
     }
     .presentationDetents([.large])

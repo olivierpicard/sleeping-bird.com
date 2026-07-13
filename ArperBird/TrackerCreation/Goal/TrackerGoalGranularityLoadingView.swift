@@ -27,6 +27,7 @@ struct TrackerGoalGranularityLoadingView: View {
         VStack {
             Spacer()
             ProgressView("Setting up your tracker…")
+                .tint(nil)
             Spacer()
         }
         .task { await load() }

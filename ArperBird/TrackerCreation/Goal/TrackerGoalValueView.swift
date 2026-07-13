@@ -34,7 +34,7 @@ struct TrackerGoalValueView: View {
         unit: String = "glasses",
         suggestedGoal: Double = 8,
         isCustomUnit: Bool = false,
-        color: Color = .accent,
+        color: Color,
         onNext: @escaping (Double) -> Void = { _ in }
     ) {
         self.name = name
@@ -88,6 +88,7 @@ struct TrackerGoalValueView: View {
             }
             .controlSize(.extraLarge)
             .buttonStyle(.glassProminent)
+            .tint(color)
             .disabled(effectiveValue <= 0)
             .padding()
         }

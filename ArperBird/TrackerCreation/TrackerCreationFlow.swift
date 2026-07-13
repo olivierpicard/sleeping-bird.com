@@ -216,14 +216,11 @@ struct TrackerCreationFlow: View {
                     .modifier(NavChrome(isEntry: isEntry(step), dismiss: dismiss))
             }
         }
-        // Ambient tint: every pushed step, its loading spinner, the reveal, and
-        // the nav-bar chrome (back chevron, close button) inherit the tracker's
-        // color, so config chrome reads as "shaping the card you just saw"
-        // rather than the generic app accent. Applied to the whole stack — not
-        // per destination — so the bar buttons follow too. Before `onContinue`
-        // seeds `color` it *is* the app accent, so the root intent screen stays
-        // neutral pre-resolution.
-        .tint(controlColor)
+        // The nav-bar chrome (back chevron, close button) stays the plain
+        // iOS default (black/white) rather than the tracker's color — every
+        // step's own controls (chips, steppers, CTAs) still get `controlColor`
+        // explicitly, so config chrome reads as tracker-tinted without the
+        // nav bar itself following along.
     }
 
     /// Builds each pushed step. Every destination reads from / writes to `model`,
@@ -243,15 +240,15 @@ struct TrackerCreationFlow: View {
                 TrackerFormatPickerView(
                     name: seed.localizedName,
                     emoji: seed.emoji,
-                    color: resolvedColor,
                     formats: seed.formats.map {
                         .make(
                             for: $0,
                             name: seed.localizedName,
-                            emoji: seed.emoji,
-                            color: resolvedColor
+                            emoji: seed.emoji
                         )
                     },
+                    color: Self.colorfulControls
+                        ? resolvedColor.readableControlTint(in: colorScheme) : .accent,
                     onContinue: { kind in
                         // Mirrors `TrackerIntentView`'s `onContinue`: seed the
                         // model from the already-known name/color and jump
@@ -318,7 +315,7 @@ struct TrackerCreationFlow: View {
         case .name:
             // Seeding the field from the model keeps the typed (or seeded) name
             // visible when the step is re-shown after a pop.
-            TrackerNameView(initialName: model.name, onNext: { enteredName in
+            TrackerNameView(initialName: model.name, color: controlColor, onNext: { enteredName in
                 model.name = enteredName
                 if let kind = model.kind {
                     path.append(Self.firstStep(for: kind))
@@ -577,7 +574,7 @@ private struct NavChrome: ViewModifier {
                 if isEntry {
                     ToolbarItem(placement: .cancellationAction) {
                         Button(action: { dismiss() }) {
-                            Image(systemName: "xmark")
+                            Image(systemName: "xmark") 
                         }
                     }
                 }
@@ -615,7 +612,6 @@ private struct DoneRevealStep: View {
             metric: displayed,
             name: $model.name,
             emoji: $model.emoji,
-            color: color,
             onDone: onDone
         ) {
             recap

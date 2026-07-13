@@ -44,7 +44,7 @@ struct TrackerGoalUnitListView: View {
             .init(unit: "L", dailyGoal: 2),
         ],
         selectedUnit: String? = nil,
-        color: Color = .accent,
+        color: Color,
         onNext: @escaping (String) -> Void = { _ in }
     ) {
         self.name = name
@@ -98,6 +98,7 @@ struct TrackerGoalUnitListView: View {
             }
             .controlSize(.extraLarge)
             .buttonStyle(.glassProminent)
+            .tint(color)
             .disabled(selectedUnit.isEmpty)
             .padding()
         }

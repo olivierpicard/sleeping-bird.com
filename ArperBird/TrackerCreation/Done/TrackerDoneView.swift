@@ -33,7 +33,6 @@ struct TrackerDoneView<Recap: View>: View {
     /// When nil (previews) they fall back to the transient `metric`.
     var nameBinding: Binding<String>? = nil
     var emojiBinding: Binding<String>? = nil
-    let color: Color
     var onDone: () -> Void
     /// The recap content stacked beneath the card: the path's own recap line and
     /// any tappable chips. Each path supplies its own dumb view; the shell just
@@ -42,12 +41,13 @@ struct TrackerDoneView<Recap: View>: View {
 
     @Environment(\.colorScheme) private var colorScheme
 
-    /// The tracker's color passed through the readability filter — every
-    /// colored element of the reveal (glow, sparkles, card, CTA) shares this
-    /// one corrected shade, so the celebration matches the flow's controls
-    /// instead of flashing the brighter raw fill next to them.
+    /// The tracker's color, read straight off `metric` and passed through the
+    /// readability filter — every colored element of the reveal (glow, sparkles,
+    /// card, CTA) shares this one corrected shade, so the celebration always
+    /// matches the card it's celebrating rather than a separately-threaded color
+    /// that could drift out of sync with it.
     private var displayColor: Color {
-        color.readableControlTint(in: colorScheme)
+        metric.displayColor(in: colorScheme)
     }
 
     /// Drives the entrance: the card springs up from small and translucent once
@@ -61,14 +61,12 @@ struct TrackerDoneView<Recap: View>: View {
         metric: Metric,
         name: Binding<String>? = nil,
         emoji: Binding<String>? = nil,
-        color: Color = .accent,
         onDone: @escaping () -> Void = {},
         @ViewBuilder recap: @escaping () -> Recap
     ) {
         self.metric = metric
         self.nameBinding = name
         self.emojiBinding = emoji
-        self.color = color
         self.onDone = onDone
         self.recap = recap
     }
@@ -106,7 +104,6 @@ struct TrackerDoneView<Recap: View>: View {
             }
             .controlSize(.extraLarge)
             .buttonStyle(.glassProminent)
-            .tint(displayColor)
             .padding()
         }
         // Tap anywhere off the fields to dismiss the keyboard — the emoji
@@ -141,7 +138,14 @@ struct TrackerDoneView<Recap: View>: View {
         .navigationBarTitleDisplayMode(.inline)
         // Back-arrow vs. close (X) is decided by the flow's `NavChrome`, which
         // knows whether this reveal is the user's entry point (empty-dashboard
-        // single-format → X) or a pushed step (format-picker → back).
+        // single-format → X) or a pushed step (format-picker → back). It's
+        // applied by the parent as a sibling `.toolbar`, not a descendant of
+        // this body, so it doesn't inherit the ambient tint below.
+        // Ambient tint: catches anything on this screen that isn't already
+        // explicitly colored (text field cursor, menu chevrons, keyboard
+        // accessory) so the whole reveal reads as the tracker's color, not
+        // the app accent.
+        .tint(displayColor)
     }
 
     // MARK: - Headline
@@ -263,8 +267,7 @@ private struct SparkleBurst: View {
     )
     NavigationStack {
         TrackerDoneView(
-            metric: Metric(from: schema, color: .blue, data: Metric.fakeData(for: schema.config)),
-            color: .blue
+            metric: Metric(from: schema, color: .blue, data: Metric.fakeData(for: schema.config))
         ) {
             DoneGoalRecap(
                 goalValue: goal,
@@ -289,8 +292,7 @@ private struct SparkleBurst: View {
     )
     NavigationStack {
         TrackerDoneView(
-            metric: Metric(from: schema, color: .orange, data: Metric.fakeData(for: schema.config)),
-            color: .orange
+            metric: Metric(from: schema, color: .orange, data: Metric.fakeData(for: schema.config))
         ) {
             DoneDurationRecap()
         }
@@ -335,8 +337,7 @@ private func categoryRevealMetric(multiple: Bool) -> Metric {
     )
     NavigationStack {
         TrackerDoneView(
-            metric: Metric(from: schema, color: .green, data: Metric.fakeData(for: schema.config)),
-            color: .green
+            metric: Metric(from: schema, color: .green, data: Metric.fakeData(for: schema.config))
         ) {
             DoneNumberRecap(
                 maxValue: max,
@@ -364,8 +365,7 @@ private func categoryRevealMetric(multiple: Bool) -> Metric {
     @Previewable @State var multiple = false
     NavigationStack {
         TrackerDoneView(
-            metric: categoryRevealMetric(multiple: multiple),
-            color: .pink
+            metric: categoryRevealMetric(multiple: multiple)
         ) {
             DoneCategoryRecap(
                 allowsMultiple: multiple,
@@ -388,8 +388,7 @@ private func categoryRevealMetric(multiple: Bool) -> Metric {
     )
     NavigationStack {
         TrackerDoneView(
-            metric: Metric(from: schema, color: .indigo, data: [.datetime(.now)]),
-            color: .indigo
+            metric: Metric(from: schema, color: .indigo, data: [.datetime(.now)])
         ) {
             DoneDateRecap()
         }
@@ -408,8 +407,7 @@ private func categoryRevealMetric(multiple: Bool) -> Metric {
     )
     NavigationStack {
         TrackerDoneView(
-            metric: Metric(from: schema, color: .teal, data: [.binary(.now, true)]),
-            color: .teal
+            metric: Metric(from: schema, color: .teal, data: [.binary(.now, true)])
         ) {
             DoneBinaryRecap()
         }

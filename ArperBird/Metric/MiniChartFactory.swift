@@ -27,13 +27,11 @@ enum MiniChartFactory {
                 let current = metric.data.compactMap(\.numberValue).filter {
                     $0.date >= today
                 }.map(\.value).reduce(0, +)
-                if current > 0 {
-                    return LinearGaugeMiniChart(
-                        current: current,
-                        goal: goal,
-                        color: color
-                    )
-                }
+                return LinearGaugeMiniChart(
+                    current: current,
+                    goal: goal,
+                    color: color
+                )
             }
             let values = metric.data.compactMap(\.numberValue?.value)
             switch metric.visual.chart {

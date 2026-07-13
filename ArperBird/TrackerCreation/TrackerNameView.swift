@@ -11,6 +11,7 @@ struct TrackerNameView: View {
     @Environment(\.dismiss) private var dismiss
 
     var onNext: (String) -> Void = { _ in }
+    let color: Color
 
     @State private var name: String
     @State private var chart = NoDataMiniChart()
@@ -19,9 +20,11 @@ struct TrackerNameView: View {
     /// from a suggestion chip, or when the step is re-shown after a pop.
     init(
         initialName: String = "",
+        color: Color,
         onNext: @escaping (String) -> Void = { _ in }
     ) {
         _name = State(initialValue: initialName)
+        self.color = color
         self.onNext = onNext
     }
     @FocusState private var isNameFocused: Bool
@@ -33,11 +36,11 @@ struct TrackerNameView: View {
     var body: some View {
         VStack {
             MetricView(
-                mainColor: .gray,
+                mainColor: color,
                 header: {
                     MetricHeaderEditingView(
                         emoji: "🫥",
-                        mainColor: .gray,
+                        mainColor: color,
                         title: $name,
                         placeholder: "Tracker name",
                         focus: $isNameFocused
@@ -57,6 +60,7 @@ struct TrackerNameView: View {
             }
             .controlSize(.extraLarge)
             .buttonStyle(.glassProminent)
+            .tint(color)
             .disabled(!isNameValid)
             .padding()
         }
@@ -80,7 +84,7 @@ struct TrackerNameView: View {
     }
     .sheet(isPresented: $showSheet) {
         NavigationStack {
-            TrackerNameView()
+            TrackerNameView(color: .accent)
         }
     }
     .presentationDetents([.large])

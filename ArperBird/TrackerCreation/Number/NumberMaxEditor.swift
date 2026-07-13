@@ -27,7 +27,7 @@ struct NumberMaxEditor: View {
     init(
         value: Double,
         unit: String? = nil,
-        color: Color = .accent,
+        color: Color,
         onSave: @escaping (Double) -> Void = { _ in }
     ) {
         self.unit = unit
