@@ -145,6 +145,17 @@ struct TrackerCreationFlow: View {
         }
     }
 
+    /// Whether `step` is the screen the user first landed on — the entry point
+    /// that shows a close (X) instead of a back arrow. Only true for a *seeded*
+    /// flow, where the intent root is an unseen fallback and `path[0]` is the real
+    /// entry; an unseeded flow enters on the intent root, so every `path` entry is
+    /// a push. Comparing against `path.first` (the live value, post loading-swap)
+    /// keeps this correct across the in-place spinner swaps — no two distinct
+    /// steps share a value, so the match is unambiguous.
+    private func isEntry(_ step: TrackerCreationStep) -> Bool {
+        seed != nil && path.first == step
+    }
+
     /// The step each kind branches into after naming — shared by the name step's
     /// "Next" and the seeded entry path.
     private static func firstStep(for kind: TrackerKind) -> TrackerCreationStep {
@@ -191,15 +202,18 @@ struct TrackerCreationFlow: View {
                     path = [Self.firstStep(for: kind)]
                 }
             )
+            // The intent root: an entry point whenever it's the screen the user
+            // actually lands on (the "+" button, `seed == nil`). When seeded it's
+            // an unseen fallback beneath the pushed entry, so the X is harmless.
+            .modifier(NavChrome(isEntry: seed == nil, dismiss: dismiss))
             .navigationDestination(for: TrackerCreationStep.self) { step in
                 destination(for: step)
-            }
-        }
-        .toolbar {
-            ToolbarItem(placement: .cancellationAction) {
-                Button(action: { dismiss() }) {
-                    Image(systemName: "xmark")
-                }
+                    // The first screen the user lands on shows a close (X); every
+                    // screen pushed after it shows iOS's natural back arrow. The
+                    // entry is `path[0]` only for a seeded flow (badge / empty
+                    // dashboard) — an unseeded flow enters on the intent root, so
+                    // its `path` entries are all pushes.
+                    .modifier(NavChrome(isEntry: isEntry(step), dismiss: dismiss))
             }
         }
         // Ambient tint: every pushed step, its loading spinner, the reveal, and
@@ -242,11 +256,14 @@ struct TrackerCreationFlow: View {
                         // Mirrors `TrackerIntentView`'s `onContinue`: seed the
                         // model from the already-known name/color and jump
                         // straight into the chosen format's step machinery.
+                        // *Append* (not replace) so the format picker stays in the
+                        // stack beneath the kind's steps — that's what lets the
+                        // reveal offer a back arrow returning to the picker.
                         model.kind = kind
                         model.name = seed.localizedName
                         model.aiHint = seed.localizedName
                         color = resolvedColor
-                        path = [Self.firstStep(for: kind)]
+                        path.append(Self.firstStep(for: kind))
                     }
                 )
             }
@@ -542,6 +559,30 @@ struct TrackerCreationFlow: View {
         }
     }
 
+}
+
+/// The per-screen leading nav chrome for the creation flow. An *entry* screen —
+/// the first one the user lands on — hides the automatic back arrow and shows a
+/// close (X) instead; every screen pushed after it keeps iOS's natural back
+/// arrow and no X. Applied to the intent root and each pushed destination so the
+/// chrome follows the actual journey rather than raw `NavigationStack` depth.
+private struct NavChrome: ViewModifier {
+    let isEntry: Bool
+    let dismiss: DismissAction
+
+    func body(content: Content) -> some View {
+        content
+            .navigationBarBackButtonHidden(isEntry)
+            .toolbar {
+                if isEntry {
+                    ToolbarItem(placement: .cancellationAction) {
+                        Button(action: { dismiss() }) {
+                            Image(systemName: "xmark")
+                        }
+                    }
+                }
+            }
+    }
 }
 
 /// Hosts the closing reveal as its own view so the model reads that drive it are

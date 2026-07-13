@@ -74,6 +74,24 @@ struct TrackerSuggestion: Identifiable {
 
     var localizedName: String { String(localized: name) }
 
+    /// Builds a suggestion from a free-text AI intent resolution, so a typed
+    /// prompt can route through the exact same seeded creation flow the curated
+    /// chips use. The AI title is a runtime string (not a catalog key), which a
+    /// `LocalizedStringResource(stringLiteral:)` carries verbatim — `id` and
+    /// `localizedName` fall out as that raw string. The best-fit (first) format's
+    /// kind seeds the tint, matching `TrackerIntentView`'s own per-kind color.
+    init(from completion: IntentCompletion) {
+        self.init(
+            label: LocalizedStringResource(stringLiteral: completion.title),
+            emoji: completion.emoji.isEmpty ? "📊" : completion.emoji,
+            kind: completion.formats.first?.kind ?? .number,
+            // `IntentCompletion.formats` is guaranteed 1...3 by its `@Guide`, but
+            // fall back to the kind's defaults if it ever arrives empty rather
+            // than seeding a formatless (and un-routable) suggestion.
+            formats: completion.formats.isEmpty ? nil : completion.formats
+        )
+    }
+
     /// The chip text: short label plus the (possibly two-emoji) chip decoration.
     var chipText: String { "\(String(localized: label)) \(chipEmoji)" }
 

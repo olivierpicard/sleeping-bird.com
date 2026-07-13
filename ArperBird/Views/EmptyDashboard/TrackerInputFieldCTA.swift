@@ -148,18 +148,20 @@ struct TrackerInputFieldCTA: View {
         }
     }
 
-    /// A submit first runs the loading glow, then fires the parent's action.
-    /// This keeps the field on screen long enough for the inward fill to read
-    /// as a brief loading state before the creation sheet opens. Re-entrant
-    /// submits are ignored while one is already loading.
+    /// A submit fires the parent's action *immediately* and runs the loading
+    /// glow alongside it, so the parent's async work (resolving the typed intent)
+    /// overlaps the read beat rather than starting after it. The parent keeps the
+    /// glow alive past `loadingDuration` via `isPreparingCreation` while it works,
+    /// so this local pulse is just the floor. Re-entrant submits are ignored while
+    /// one is already loading.
     private func runSubmit() {
         guard !isLoading else { return }
+        onSubmit()
         Task {
             isLoading = true
             glowShowsLoading = true
             try? await Task.sleep(for: .seconds(Glow.loadingDuration))
             guard !Task.isCancelled else { return }
-            onSubmit()
             isLoading = false
             // Hold the inward geometry through the opacity fade, then release it.
             // Guard against a fresh submit having started during the hold.

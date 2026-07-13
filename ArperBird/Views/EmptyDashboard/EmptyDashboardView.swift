@@ -32,6 +32,15 @@ struct EmptyDashboardView: View {
     /// prefetch. A no-op default keeps the view previewable standalone.
     var prepareSeed: (TrackerSuggestion) async -> Void = { _ in }
 
+    /// Resolves the free-text draft into a `TrackerSuggestion` (title, emoji, and
+    /// the logging formats that fit it) via the intent AI, so a typed prompt can
+    /// route through the same seeded flow the chips use. Throws on failure, which
+    /// surfaces the inline retry state. A throwing default keeps the view
+    /// previewable standalone; callers (and previews) inject the real/fake seam.
+    var resolveIntent: (String) async throws -> TrackerSuggestion = { _ in
+        throw CancellationError()
+    }
+
     @Environment(\.colorScheme) private var colorScheme
 
     /// The real text the user types into the CTA field, owned here so the
@@ -50,6 +59,11 @@ struct EmptyDashboardView: View {
     /// Keeps the completed chip text on screen while its CTA changes to the
     /// inward loading glow, immediately before opening the creation sheet.
     @State private var isPreparingCreation = false
+
+    /// True when the last field submit couldn't reach the intent AI — surfaces a
+    /// brief inline retry message under the field. Cleared as soon as the user
+    /// edits the draft or resubmits, so it never lingers past a fresh attempt.
+    @State private var submitFailed = false
 
     /// All the spacings / sizes / copy in one place so the layout can be dialed
     /// in without hunting through the view tree.
@@ -113,6 +127,12 @@ struct EmptyDashboardView: View {
                     .animation(.easeInOut(duration: 0.35), value: isFieldFocused)
                     .animation(.easeInOut(duration: 0.35), value: isTyping)
             }
+            // Any edit to the draft clears a stale failure message, so it never
+            // lingers past a fresh attempt.
+            .onChange(of: draft) {
+                if submitFailed { submitFailed = false }
+            }
+            .animation(.easeInOut(duration: 0.25), value: submitFailed)
             // A dismissed view must not keep mutating `draft`.
             .onDisappear {
                 typeTask?.cancel()
@@ -120,6 +140,50 @@ struct EmptyDashboardView: View {
                 isPreparingCreation = false
             }
             .trackScreen("EmptyDashboard")
+    }
+
+    // MARK: - Field submit → intent resolution
+
+    /// Resolves whatever the user typed into a `TrackerSuggestion`, then opens the
+    /// creation flow seeded with it — the free-text counterpart to a chip tap. The
+    /// AI resolution runs *under* the field's inward loading glow (kept alive by
+    /// `isPreparingCreation`), overlapping the field CTA's own read beat. On
+    /// success it hands off exactly like `typeSuggestion`'s tail: a single-format
+    /// idea prefetches its first facet so the flow skips its spinner; a
+    /// multi-format idea opens on the format picker. On failure the glow drops and
+    /// the inline retry message shows, with the draft preserved so a resubmit (or
+    /// edit) tries again. Replaces any in-flight submit/typing task.
+    private func submitDraft() {
+        let text = draft.trimmingCharacters(in: .whitespaces)
+        guard !text.isEmpty else { return }
+        typeTask?.cancel()
+        submitFailed = false
+        typeTask = Task { @MainActor in
+            isPreparingCreation = true
+            do {
+                let suggestion = try await resolveIntent(text)
+                if Task.isCancelled { return }
+                await openSeeded(suggestion)
+            } catch {
+                if Task.isCancelled { return }
+                isPreparingCreation = false
+                submitFailed = true
+            }
+        }
+    }
+
+    /// The field submit's hand-off, mirroring `typeSuggestion`'s tail: a
+    /// single-format idea prefetches its first AI facet under the glow so the flow
+    /// opens past the loading spinner; a multi-format idea skips the prefetch (it
+    /// opens on the interactive format picker). Then hands the seed up to open the
+    /// creation flow.
+    private func openSeeded(_ suggestion: TrackerSuggestion) async {
+        if suggestion.formats.count == 1 {
+            await prepareSeed(suggestion)
+        }
+        if Task.isCancelled { return }
+        isPreparingCreation = false
+        onAddMetric(suggestion)
     }
 
     // MARK: - Chip → field animation
@@ -211,8 +275,11 @@ struct EmptyDashboardView: View {
                     isFocused: $isFieldFocused,
                     isTyping: isTyping,
                     isPreparingCreation: isPreparingCreation,
-                    onSubmit: { onAddMetric(nil) }
+                    onSubmit: submitDraft
                 )
+                if submitFailed {
+                    submitFailure
+                }
                 labeledBadges(Tuning.examplesLabel)
             }
             Spacer()
@@ -244,6 +311,20 @@ struct EmptyDashboardView: View {
             .fixedSize(horizontal: false, vertical: true)
             .multilineTextAlignment(.center)
             .frame(maxWidth: .infinity)
+    }
+
+    /// The inline retry message shown when a field submit couldn't reach the
+    /// intent AI. Muted on purpose — a hiccup, not a loss — mirroring the tone of
+    /// `TrackerIntentView`'s failure card. The draft is preserved, so hitting
+    /// return again (or editing) retries.
+    private var submitFailure: some View {
+        Label("Couldn't reach the AI. Check your connection and try again.",
+              systemImage: "wifi.exclamationmark")
+            .font(.footnote)
+            .foregroundStyle(.secondary)
+            .multilineTextAlignment(.center)
+            .frame(maxWidth: .infinity)
+            .transition(.opacity)
     }
 
     /// A connective label + the kept chips, stacked. The label is what ties the
@@ -303,7 +384,15 @@ struct EmptyDashboardView: View {
 }
 
 #Preview {
-    EmptyDashboardView(onAddMetric: { _ in })
-        .background { EmptyDashboardBackground() }
-        .environment(\.locale, Locale(identifier: "en_US"))
+    EmptyDashboardView(
+        onAddMetric: { _ in },
+        resolveIntent: { text in
+            try await Task.sleep(for: .seconds(0.8))
+            return TrackerSuggestion(
+                from: try await IntentAiCompletion().generateFake(for: text)
+            )
+        }
+    )
+    .background { EmptyDashboardBackground() }
+    .environment(\.locale, Locale(identifier: "en_US"))
 }

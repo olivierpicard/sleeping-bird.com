@@ -139,7 +139,9 @@ struct TrackerDoneView<Recap: View>: View {
         .trackScreen("ManualTrackerCreationDone")
         .navigationTitle("")
         .navigationBarTitleDisplayMode(.inline)
-        .navigationBarBackButtonHidden()
+        // Back-arrow vs. close (X) is decided by the flow's `NavChrome`, which
+        // knows whether this reveal is the user's entry point (empty-dashboard
+        // single-format → X) or a pushed step (format-picker → back).
     }
 
     // MARK: - Headline
