@@ -100,14 +100,49 @@ struct TrackerCreationFlow: View {
     /// entry arrives pre-resolved, so it opts out.
     private let autofocus: Bool
 
-    init(seed: TrackerSuggestion? = nil, autofocus: Bool = false) {
+    init(
+        seed: TrackerSuggestion? = nil,
+        autofocus: Bool = false,
+        preloaded: TrackerCreationModel? = nil,
+        preloadSucceeded: Bool = false
+    ) {
         self.seed = seed
         self.autofocus = autofocus
-        // A badge tap already resolved the intent, so open straight on the
-        // format picker instead of `TrackerIntentView`. It stays pushed on
-        // top of that root screen (rather than replacing it), so a swipe
-        // back still lands on the pre-filled intent screen as a fallback.
-        _path = State(initialValue: seed != nil ? [.formatPicker] : [])
+        // A badge with a single logging format has nothing to pick on the "How
+        // to track it" screen, so skip the format picker entirely: seed the
+        // model from that one format up front and open straight on the kind's
+        // first step, which runs its loading spinner into the reveal. With two
+        // or more formats the picker still leads (see `.formatPicker`).
+        if let seed, seed.formats.count == 1 {
+            let kind = seed.formats[0].kind
+            // The empty dashboard may have already run this single-format seed's
+            // first AI load during its "preparing" glow (see `preloadSeed`). When
+            // it did — and it succeeded — reuse that warmed model and open past
+            // the now-redundant loading spinner on the kind's post-load step, so
+            // the glow and the load are the *same* beat rather than two spinners
+            // back to back. Otherwise fall back to a fresh model on the loading
+            // step, which runs the load itself (and shows retry on failure).
+            let model = preloaded ?? {
+                let model = TrackerCreationModel()
+                model.kind = kind
+                model.name = seed.localizedName
+                model.aiHint = seed.localizedName
+                return model
+            }()
+            _model = State(initialValue: model)
+            _color = State(initialValue: kind.previewColor)
+            _path = State(initialValue: [
+                preloaded != nil && preloadSucceeded
+                    ? Self.postLoadStep(for: kind)
+                    : Self.firstStep(for: kind)
+            ])
+        } else {
+            // A badge tap already resolved the intent, so open straight on the
+            // format picker instead of `TrackerIntentView`. It stays pushed on
+            // top of that root screen (rather than replacing it), so a swipe
+            // back still lands on the pre-filled intent screen as a fallback.
+            _path = State(initialValue: seed != nil ? [.formatPicker] : [])
+        }
     }
 
     /// The step each kind branches into after naming — shared by the name step's
@@ -120,6 +155,20 @@ struct TrackerCreationFlow: View {
         case .binary: .binaryLoading
         case .date: .dateLoading
         case .number: .numberLoading
+        }
+    }
+
+    /// The step a *preloaded* single-format seed opens on — the one the kind's
+    /// loading step would have advanced to once its AI load finished. For the
+    /// paths that go straight to the reveal (number/binary/date/duration) that's
+    /// `.done`; the choices and goal paths land on their interactive follow-up
+    /// (labels / unit list) instead. Only used when the load already succeeded
+    /// during the empty-dashboard glow; see `init`.
+    private static func postLoadStep(for kind: TrackerKind) -> TrackerCreationStep {
+        switch kind {
+        case .number, .binary, .date, .duration: .done
+        case .choices: .categoryLabels
+        case .goal: .goalUnit
         }
     }
 

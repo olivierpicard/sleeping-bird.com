@@ -255,6 +255,45 @@ final class TrackerCreationModel {
         self.generateGranularity = generateGranularity
     }
 
+    // MARK: - Seed preload
+
+    /// Runs a seeded (badge-tapped) single-format tracker's *first* AI load up
+    /// front — while the empty dashboard still shows its "preparing" glow — so the
+    /// flow can open past the loading spinner instead of stacking a second one
+    /// behind that glow. Seeds `kind`/`name`/`aiHint` like the flow's seeded
+    /// entry would, kicks off the kind's initial completion, and reports whether
+    /// it succeeded so the caller can open on the reveal (or the interactive
+    /// follow-up) rather than a spinner. A failure returns `false`, letting the
+    /// flow fall back to the normal loading step, which shows its retry state.
+    func preloadSeed(kind: TrackerKind, name: String) async -> Bool {
+        self.kind = kind
+        self.name = name
+        // Setting `name` clears `aiHint` (see its `didSet`), so seed it after —
+        // mirroring the flow's seeded `onContinue`, where the chip name doubles
+        // as the AI context.
+        self.aiHint = name
+        switch kind {
+        case .number:
+            await loadNumberIfNeeded()
+            return numberPhase == .loaded
+        case .binary:
+            await loadBinaryEmojiIfNeeded()
+            return binaryPhase == .loaded
+        case .date:
+            await loadDateEmojiIfNeeded()
+            return datePhase == .loaded
+        case .duration:
+            await loadDurationEmojiIfNeeded()
+            return durationPhase == .loaded
+        case .choices:
+            await loadCategoryIfNeeded()
+            return categoryPhase == .loaded
+        case .goal:
+            await loadSuggestionsIfNeeded()
+            return phase == .loaded
+        }
+    }
+
     // MARK: - Goal suggestions
 
     /// Fetches goal suggestions for `name`, but only when they haven't already

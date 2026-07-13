@@ -25,6 +25,13 @@ struct EmptyDashboardView: View {
     /// scratch (`nil`) via the field CTA.
     let onAddMetric: (TrackerSuggestion?) -> Void
 
+    /// Runs a single-format chip's first AI load *during* the "preparing" glow,
+    /// so the flow it opens can skip its own loading spinner rather than stacking
+    /// a second one behind the glow. Called only for single-format suggestions;
+    /// multi-format chips open on the interactive format picker, which needs no
+    /// prefetch. A no-op default keeps the view previewable standalone.
+    var prepareSeed: (TrackerSuggestion) async -> Void = { _ in }
+
     @Environment(\.colorScheme) private var colorScheme
 
     /// The real text the user types into the CTA field, owned here so the
@@ -145,7 +152,21 @@ struct EmptyDashboardView: View {
             if Task.isCancelled { return }
             isTyping = false
             isPreparingCreation = true
-            try? await Task.sleep(for: Tuning.creationLoadingDelay)
+            // A single-format chip skips the flow's format picker and drops
+            // straight into a loading spinner — so run that AI load *now*, under
+            // the glow, and let the glow double as its read beat. The
+            // `creationLoadingDelay` floor keeps the completed phrase readable
+            // even when the load returns fast, and the flow then opens past the
+            // spinner (see `prepareSeed` / `TrackerCreationFlow`). A multi-format
+            // chip opens on the interactive picker instead, so its glow stays a
+            // plain fixed-length read beat.
+            if suggestion.formats.count == 1 {
+                async let prep: Void = prepareSeed(suggestion)
+                try? await Task.sleep(for: Tuning.creationLoadingDelay)
+                await prep
+            } else {
+                try? await Task.sleep(for: Tuning.creationLoadingDelay)
+            }
             if Task.isCancelled { return }
             isPreparingCreation = false
             onAddMetric(suggestion)

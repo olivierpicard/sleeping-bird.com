@@ -10,6 +10,19 @@ struct ContentView: View {
     /// seed state propagated, opening unseeded on the first tap.
     @State private var route: CreationRoute?
 
+    /// A single-format suggestion whose first AI load was run up front — while
+    /// the empty dashboard still showed its "preparing" glow — so the flow opens
+    /// past the loading spinner instead of stacking a second one behind that glow
+    /// (see `EmptyDashboardView.prepareSeed` and `TrackerCreationModel.preloadSeed`).
+    /// Keyed by the suggestion `id` so a stale prepare from an earlier tap is
+    /// never applied to a different chip.
+    private struct Prepared {
+        let id: String
+        let model: TrackerCreationModel
+        let succeeded: Bool
+    }
+    @State private var prepared: Prepared?
+
     /// A creation-flow open. `.scratch` for the "+" button / empty-dashboard
     /// field CTA, `.seeded` for a tapped suggestion chip. `autofocus` rides on
     /// the scratch route so only the field CTA raises the keyboard on open — the
@@ -48,12 +61,30 @@ struct ContentView: View {
         NavigationStack {
             VStack {
                 if isDashboardEmpty {
-                    EmptyDashboardView(onAddMetric: { suggestion in
-                        // Field CTA (nil) commits to typing → focus the field;
-                        // a chip arrives seeded, no keyboard.
-                        route = suggestion.map(CreationRoute.seeded)
-                            ?? .scratch(autofocus: true)
-                    })
+                    EmptyDashboardView(
+                        onAddMetric: { suggestion in
+                            // Field CTA (nil) commits to typing → focus the field;
+                            // a chip arrives seeded, no keyboard.
+                            route = suggestion.map(CreationRoute.seeded)
+                                ?? .scratch(autofocus: true)
+                        },
+                        // Runs a single-format chip's first AI load during its
+                        // "preparing" glow so the flow can skip the loading
+                        // spinner. The empty dashboard only calls this for
+                        // single-format chips (multi-format ones open on the
+                        // format picker, an interactive screen that absorbs the
+                        // glow, so there's no second spinner to fold in).
+                        prepareSeed: { suggestion in
+                            let kind = suggestion.formats[0].kind
+                            let model = TrackerCreationModel()
+                            let ok = await model.preloadSeed(
+                                kind: kind, name: suggestion.localizedName
+                            )
+                            prepared = .init(
+                                id: suggestion.id, model: model, succeeded: ok
+                            )
+                        }
+                    )
                 } else {
                     DashboardView(onAddMetric: {
                         // The "+" button opens the flow unfocused.
@@ -67,12 +98,20 @@ struct ContentView: View {
                     : EmptyDashboardBackground(intensity: 0.5)
             }
         }
-        .sheet(item: $route) { route in
+        .sheet(item: $route, onDismiss: { prepared = nil }) { route in
 //            MetricInputSheet()
 //                .presentationDetents([.large])
+            // Hand the flow the warmed model only when it belongs to *this*
+            // seed — a prepare from an earlier tap must never seed a different
+            // chip's flow.
+            let warmed = prepared.flatMap {
+                $0.id == route.seed?.id ? $0 : nil
+            }
             TrackerCreationFlow(
                 seed: route.seed,
-                autofocus: route.autofocus
+                autofocus: route.autofocus,
+                preloaded: warmed?.model,
+                preloadSucceeded: warmed?.succeeded ?? false
             )
             .presentationDetents([.large])
         }
