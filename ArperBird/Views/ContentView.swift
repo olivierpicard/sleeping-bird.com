@@ -29,19 +29,31 @@ struct ContentView: View {
     /// "+" button opens the flow unfocused.
     private enum CreationRoute: Identifiable {
         case scratch(autofocus: Bool)
-        case seeded(TrackerSuggestion)
+        // The warmed model rides *inside* the seeded route so it's captured
+        // atomically with the presentation, alongside the seed. Reading it from
+        // separate `@State` in the sheet builder let the first-ever sheet build
+        // before that state propagated — dropping the warm model and flashing
+        // the loading spinner (see `onAddMetric` / the sheet below).
+        case seeded(TrackerSuggestion, warmed: Prepared?)
 
         var id: String {
             switch self {
             case .scratch: "scratch"
-            case .seeded(let suggestion): suggestion.id
+            case .seeded(let suggestion, _): suggestion.id
             }
         }
 
         var seed: TrackerSuggestion? {
             switch self {
             case .scratch: nil
-            case .seeded(let suggestion): suggestion
+            case .seeded(let suggestion, _): suggestion
+            }
+        }
+
+        var warmed: Prepared? {
+            switch self {
+            case .scratch: nil
+            case .seeded(_, let warmed): warmed
             }
         }
 
@@ -49,7 +61,7 @@ struct ContentView: View {
             switch self {
             case .scratch(let autofocus): autofocus
             case .seeded: false
-            }
+            } 
         }
     }
 
@@ -60,13 +72,26 @@ struct ContentView: View {
     var body: some View {
         NavigationStack {
             VStack {
-                if isDashboardEmpty {
+                if isDashboardEmpty { 
                     EmptyDashboardView(
                         onAddMetric: { suggestion in
-                            // Field CTA (nil) commits to typing → focus the field;
-                            // a chip arrives seeded, no keyboard.
-                            route = suggestion.map(CreationRoute.seeded)
-                                ?? .scratch(autofocus: true)
+                            // A chip arrives seeded — bundle its warmed model into
+                            // the route *now*, while `prepared` is guaranteed set
+                            // (this fires in the same continuation right after the
+                            // preload `await`), so the model is captured atomically
+                            // with presentation rather than read as separate state
+                            // the first sheet build might miss. The field CTA (nil)
+                            // commits to typing → focus the field, no keyboard for a
+                            // chip. Match by `id` so a stale prepare from an earlier
+                            // tap is never applied to a different chip.
+                            if let suggestion {
+                                let warmed = prepared.flatMap {
+                                    $0.id == suggestion.id ? $0 : nil
+                                }
+                                route = .seeded(suggestion, warmed: warmed)
+                            } else {
+                                route = .scratch(autofocus: true)
+                            }
                         },
                         // Runs a single-format chip's first AI load during its
                         // "preparing" glow so the flow can skip the loading
@@ -83,6 +108,15 @@ struct ContentView: View {
                             prepared = .init(
                                 id: suggestion.id, model: model, succeeded: ok
                             )
+                        },
+                        // Resolves the typed draft into a seed via the intent AI,
+                        // so a field submit routes through the same seeded flow a
+                        // chip does. Kept here beside `prepareSeed` so all the AI
+                        // wiring lives at the ContentView level.
+                        resolveIntent: { text in
+                            let completion = try await IntentAiCompletion()
+                                .generate(for: text)
+                            return TrackerSuggestion(from: completion)
                         }
                     )
                 } else {
@@ -101,17 +135,15 @@ struct ContentView: View {
         .sheet(item: $route, onDismiss: { prepared = nil }) { route in
 //            MetricInputSheet()
 //                .presentationDetents([.large])
-            // Hand the flow the warmed model only when it belongs to *this*
-            // seed — a prepare from an earlier tap must never seed a different
-            // chip's flow.
-            let warmed = prepared.flatMap {
-                $0.id == route.seed?.id ? $0 : nil
-            }
+            // The warmed model rides inside `route` (bundled in `onAddMetric`), so
+            // it's captured atomically with presentation. Reading `prepared` as
+            // separate state here let the first-ever sheet build before that state
+            // propagated, dropping the warm model and flashing the loading spinner.
             TrackerCreationFlow(
                 seed: route.seed,
                 autofocus: route.autofocus,
-                preloaded: warmed?.model,
-                preloadSucceeded: warmed?.succeeded ?? false
+                preloaded: route.warmed?.model,
+                preloadSucceeded: route.warmed?.succeeded ?? false
             )
             .presentationDetents([.large])
         }
