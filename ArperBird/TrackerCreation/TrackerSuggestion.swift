@@ -101,59 +101,46 @@ struct TrackerSuggestion: Identifiable {
     static let defaults: [TrackerSuggestion] = [
         .init(
             label: "Water",
-            name: "Glasses of Water",
+            name: "Track the water I drink",
             emoji: "💧",
             kind: .number,
             formats: [.goal, .number]
         ),
         .init(
-            label: "Maintenance",
-            name: "Car Maintenance Cost",
-            emoji: "💰",
-            chipEmoji: "💰🚗",
-            kind: .number
-        ),
-        .init(
-            label: "Practice",
-            name: "Music Practice",
-            emoji: "🎸",
-            chipEmoji: "⏱️🎸",
-            kind: .duration
-        ),
-        .init(
-            label: "Pain",
-            name: "Pain Level",
-            emoji: "😖",
-            kind: .number
-        ),
-        .init(label: "Mood", emoji: "😁", kind: .choices),
-        .init(
-            label: "Proteins",
-            name: "Grams of Protein",
-            emoji: "🥩",
-            chipEmoji: "🥩🌱",
+            label: "Coffee",
+            name: "Track my coffee consumption",
+            emoji: "☕️",
             kind: .number,
-            formats: [.goal, .number]
+            formats: [.number, .binary]
+        ),
+        .init(
+            label: "Chores",
+            name: "Track my chores accomplished",
+            emoji: "🧹",
+            kind: .binary,
+            formats: [.binary, .duration, .choices]
+        ),
+        .init(
+            label: "Mood",
+            name: "Track my daily mood",
+            emoji: "😁",
+            kind: .choices,
+            formats: [.choices, .number]
         ),
         .init(
             label: "Meditation",
+            name: "Track my meditation sessions",
             emoji: "🧘",
-            chipEmoji: "⏱️🧘",
-            kind: .duration
+            kind: .duration,
+            formats: [.duration, .binary]
         ),
         .init(
-            label: "Coffee",
-            name: "Cups of Coffee",
-            emoji: "☕️",
-            kind: .number
+            label: "Time Outside",
+            name: "Track the time I spend outdoors",
+            emoji: "🌳",
+            kind: .duration,
+            formats: [.duration, .binary]
         ),
-        .init(
-            label: "Fuel Spend",
-            name: "Fuel Cost",
-            emoji: "⛽️",
-            kind: .number
-        ),
-        .init(label: "Time Outside", emoji: "🌳", kind: .duration),
     ]
 
     /// Curated ideas for one tracker type, shown as tappable chips on that
