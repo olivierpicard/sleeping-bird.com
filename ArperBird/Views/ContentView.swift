@@ -108,6 +108,7 @@ struct ContentView: View {
                             prepared = .init(
                                 id: suggestion.id, model: model, succeeded: ok
                             )
+                            return ok
                         },
                         // Resolves the typed draft into a seed via the intent AI,
                         // so a field submit routes through the same seeded flow a

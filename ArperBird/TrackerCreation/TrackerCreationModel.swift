@@ -262,9 +262,10 @@ final class TrackerCreationModel {
     /// flow can open past the loading spinner instead of stacking a second one
     /// behind that glow. Seeds `kind`/`name`/`aiHint` like the flow's seeded
     /// entry would, kicks off the kind's initial completion, and reports whether
-    /// it succeeded so the caller can open on the reveal (or the interactive
-    /// follow-up) rather than a spinner. A failure returns `false`, letting the
-    /// flow fall back to the normal loading step, which shows its retry state.
+    /// it succeeded so the caller can open on the reveal rather than a spinner.
+    /// A failure returns `false`; `EmptyDashboardView` never opens the flow in
+    /// that case — it shows its own inline retry message instead (see
+    /// `EmptyDashboardView.prepareSeed`).
     func preloadSeed(kind: TrackerKind, name: String) async -> Bool {
         self.kind = kind
         self.name = name

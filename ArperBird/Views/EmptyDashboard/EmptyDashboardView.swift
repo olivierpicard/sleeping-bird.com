@@ -29,8 +29,10 @@ struct EmptyDashboardView: View {
     /// so the flow it opens can skip its own loading spinner rather than stacking
     /// a second one behind the glow. Called only for single-format suggestions;
     /// multi-format chips open on the interactive format picker, which needs no
-    /// prefetch. A no-op default keeps the view previewable standalone.
-    var prepareSeed: (TrackerSuggestion) async -> Void = { _ in }
+    /// prefetch. Returns whether the prefetch succeeded — `false` surfaces the
+    /// same inline retry message as a failed `resolveIntent` instead of opening
+    /// the flow. A no-op `true` default keeps the view previewable standalone.
+    var prepareSeed: (TrackerSuggestion) async -> Bool = { _ in true }
 
     /// Resolves the free-text draft into a `TrackerSuggestion` (title, emoji, and
     /// the logging formats that fit it) via the intent AI, so a typed prompt can
@@ -72,16 +74,12 @@ struct EmptyDashboardView: View {
         static let glyphDash: [CGFloat] = [5, 5]
         static let chipRows = 3
 
-        static let subcopy = "Type it in plain words — we'll build the tracker for you."
         static let glyph = "📈"
 
         /// Opacity of the neutral scrim that dims the shared background while the
         /// field is focused (or a chip is typing itself in), so the glowing CTA
         /// carries the eye.
         static let focusedBackdropDim: Double = 0.6
-
-        // Connective copy above the chips.
-        static let examplesLabel = "Try one:"
 
         /// Spacing inside the tight sub-block (field → label → chips) so
         /// proximity binds them together.
@@ -176,10 +174,17 @@ struct EmptyDashboardView: View {
     /// single-format idea prefetches its first AI facet under the glow so the flow
     /// opens past the loading spinner; a multi-format idea skips the prefetch (it
     /// opens on the interactive format picker). Then hands the seed up to open the
-    /// creation flow.
+    /// creation flow — unless the prefetch failed, in which case the same inline
+    /// retry message shows instead and the flow never opens.
     private func openSeeded(_ suggestion: TrackerSuggestion) async {
         if suggestion.formats.count == 1 {
-            await prepareSeed(suggestion)
+            let seedOk = await prepareSeed(suggestion)
+            if Task.isCancelled { return }
+            guard seedOk else {
+                isPreparingCreation = false
+                submitFailed = true
+                return
+            }
         }
         if Task.isCancelled { return }
         isPreparingCreation = false
@@ -235,16 +240,23 @@ struct EmptyDashboardView: View {
             // even when the load returns fast, and the flow then opens past the
             // spinner (see `prepareSeed` / `TrackerCreationFlow`). A multi-format
             // chip opens on the interactive picker instead, so its glow stays a
-            // plain fixed-length read beat.
+            // plain fixed-length read beat — there's no prefetch to fail there.
+            var seedOk = true
             if suggestion.formats.count == 1 {
-                async let prep: Void = prepareSeed(suggestion)
+                async let prep: Bool = prepareSeed(suggestion)
                 try? await Task.sleep(for: Tuning.creationLoadingDelay)
-                await prep
+                seedOk = await prep
             } else {
                 try? await Task.sleep(for: Tuning.creationLoadingDelay)
             }
             if Task.isCancelled { return }
             isPreparingCreation = false
+            // A failed prefetch shows the same inline retry message as a failed
+            // field submit, instead of opening the flow.
+            guard seedOk else {
+                submitFailed = true
+                return
+            }
             onAddMetric(suggestion)
         }
     }
@@ -292,7 +304,7 @@ struct EmptyDashboardView: View {
                 if submitFailed {
                     submitFailure
                 }
-                labeledBadges(Tuning.examplesLabel)
+                labeledBadges("Try one:")
             }
             Spacer()
             Spacer()
@@ -317,7 +329,7 @@ struct EmptyDashboardView: View {
     }
 
     private var subcopy: some View {
-        Text(Tuning.subcopy)
+        Text("Type it in plain words — we'll build the tracker for you.")
             .font(.subheadline)
             .foregroundStyle(.secondary)
             .fixedSize(horizontal: false, vertical: true)
@@ -330,7 +342,7 @@ struct EmptyDashboardView: View {
     /// `TrackerIntentView`'s failure card. The draft is preserved, so hitting
     /// return again (or editing) retries.
     private var submitFailure: some View {
-        Label("Couldn't reach the AI. Check your connection and try again.",
+        Label("Couldn't reach the AI for now. Try again later.",
               systemImage: "wifi.exclamationmark")
             .font(.footnote)
             .foregroundStyle(.secondary)
@@ -341,7 +353,7 @@ struct EmptyDashboardView: View {
 
     /// A connective label + the kept chips, stacked. The label is what ties the
     /// chips to the field ("these are things you could type").
-    private func labeledBadges(_ label: String) -> some View {
+    private func labeledBadges(_ label: LocalizedStringKey) -> some View {
         VStack(spacing: 10) {
             Text(label)
                 .font(.footnote)
@@ -407,4 +419,22 @@ struct EmptyDashboardView: View {
     )
     .background { EmptyDashboardBackground() }
 //    .environment(\.locale, Locale(identifier: "fr_FR"))
+}
+
+/// Type anything into the field and submit, or tap a single-format chip —
+/// both `resolveIntent` and `prepareSeed` always fail, exercising the same
+/// retry-message path a real network error would from either entry point.
+#Preview("AI Failure") {
+    EmptyDashboardView(
+        onAddMetric: { _ in },
+        prepareSeed: { _ in
+            try? await Task.sleep(for: .seconds(0.8))
+            return false
+        },
+        resolveIntent: { _ in
+            try await Task.sleep(for: .seconds(0.8))
+            throw URLError(.notConnectedToInternet)
+        }
+    )
+    .background { EmptyDashboardBackground() }
 }
