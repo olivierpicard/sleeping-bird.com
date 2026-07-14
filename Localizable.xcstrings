@@ -621,7 +621,20 @@
 
     },
     "Couldn't reach the AI. Check your connection and try again." : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se pudo contactar con la IA. Comprueba tu conexión e inténtalo de nuevo."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Impossible de contacter l'IA. Vérifiez votre connexion et réessayez."
+          }
+        }
+      }
     },
     "Couldn't set up your tracker" : {
 
@@ -3330,7 +3343,20 @@
       }
     },
     "Track" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anota"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Note"
+          }
+        }
+      }
     },
     "Track anything you want." : {
       "extractionState" : "stale",
@@ -3402,6 +3428,70 @@
         }
       }
     },
+    "Track my chores accomplished" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anota mis tareas del hogar"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Note mes tâches ménagères"
+          }
+        }
+      }
+    },
+    "Track my coffee consumption" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anota mi consumo de café"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Note ma consommation de café"
+          }
+        }
+      }
+    },
+    "Track my daily mood" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anota mi estado de ánimo diario"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Note mon humeur quotidienne"
+          }
+        }
+      }
+    },
+    "Track my meditation sessions" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anota mis sesiones de meditación"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Note mes séances de méditation"
+          }
+        }
+      }
+    },
     "Track my mood — happy, neutral, sad, or anxious" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -3415,6 +3505,38 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Suis mon **humeur** : joyeux, neutre, triste ou anxieux"
+          }
+        }
+      }
+    },
+    "Track the time I spend outdoors" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anota el tiempo que paso al aire libre"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Note le temps passé dehors"
+          }
+        }
+      }
+    },
+    "Track the water I drink" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anota el agua que bebo"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Note l'eau que je bois"
           }
         }
       }
@@ -3751,6 +3873,38 @@
     "Try again" : {
 
     },
+    "Try one:" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Prueba uno:"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Essayez-en un :"
+          }
+        }
+      }
+    },
+    "Type it in plain words — we'll build the tracker for you." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Descríbelo con tus palabras, nosotros creamos el tracker."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Décrivez-le avec vos mots, on s'occupe de créer le tracker."
+          }
+        }
+      }
+    },
     "Type my own…" : {
 
     },
@@ -3909,7 +4063,20 @@
       }
     },
     "want to track?" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "seguir?"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "suivre ?"
+          }
+        }
+      }
     },
     "Water" : {
       "localizations" : {
