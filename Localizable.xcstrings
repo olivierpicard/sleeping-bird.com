@@ -395,6 +395,7 @@
       }
     },
     "Car Maintenance Cost" : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -620,18 +621,18 @@
     "Couldn't reach the AI" : {
 
     },
-    "Couldn't reach the AI. Check your connection and try again." : {
+    "Couldn't reach the AI for now. Try again later." : {
       "localizations" : {
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "No se pudo contactar con la IA. Comprueba tu conexión e inténtalo de nuevo."
+            "value" : "No se pudo contactar con la IA por ahora. Inténtalo de nuevo más tarde."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Impossible de contacter l'IA. Vérifiez votre connexion et réessayez."
+            "value" : "Impossible de contacter l'IA pour le moment. Réessayez plus tard."
           }
         }
       }
@@ -1139,6 +1140,7 @@
       }
     },
     "Grams of Protein" : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -1396,6 +1398,7 @@
 
     },
     "Maintenance" : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -2611,6 +2614,7 @@
       }
     },
     "Proteins" : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -3874,6 +3878,7 @@
 
     },
     "Try one:" : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -3890,6 +3895,7 @@
       }
     },
     "Type it in plain words — we'll build the tracker for you." : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {

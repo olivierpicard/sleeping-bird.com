@@ -261,7 +261,7 @@ struct TrackerIntentView: View {
                 .clipShape(RoundedRectangle(cornerRadius: 12))
             }
             .accessibilityElement(children: .contain)
-            .accessibilityLabel("Couldn't reach the AI. Check your connection and try again.")
+            .accessibilityLabel("Couldn't reach the AI for now. Try again later.")
     }
 
     /// One pill per way this suggestion can be logged; tapping re-shapes the
