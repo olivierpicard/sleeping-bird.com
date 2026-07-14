@@ -76,3 +76,22 @@ struct TrackerGoalLoadingView: View {
     }
     .presentationDetents([.large])
 }
+
+#Preview("Failure") {
+    @Previewable @State var showSheet = true
+    @Previewable @State var model: TrackerCreationModel = {
+        let model = TrackerCreationModel(
+            generate: { _ in throw URLError(.notConnectedToInternet) }
+        )
+        model.name = "Drink more water"
+        return model
+    }()
+    NavigationStack {
+    }
+    .sheet(isPresented: $showSheet) {
+        NavigationStack {
+            TrackerGoalLoadingView(model: model) {}
+        }
+    }
+    .presentationDetents([.large])
+} 

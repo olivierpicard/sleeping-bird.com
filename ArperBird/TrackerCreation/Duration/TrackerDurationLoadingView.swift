@@ -76,3 +76,23 @@ struct TrackerDurationLoadingView: View {
     }
     .presentationDetents([.large])
 }
+
+#Preview("Failure") {
+    @Previewable @State var showSheet = true
+    @Previewable @State var model: TrackerCreationModel = {
+        let model = TrackerCreationModel(
+            generateEmoji: { _ in throw URLError(.notConnectedToInternet) }
+        )
+        model.name = "Workout"
+        return model
+    }()
+    NavigationStack {
+    }
+    .sheet(isPresented: $showSheet) {
+        NavigationStack {
+            TrackerDurationLoadingView(model: model) {}
+        }
+    }
+    .presentationDetents([.large])
+}
+ 

@@ -91,3 +91,22 @@ struct TrackerCategoryLoadingView: View {
     }
     .presentationDetents([.large])
 }
+
+#Preview("Failure") {
+    @Previewable @State var showSheet = true
+    @Previewable @State var model: TrackerCreationModel = {
+        let model = TrackerCreationModel(
+            generateCategory: { _ in throw URLError(.notConnectedToInternet) }
+        )
+        model.name = "Mood"
+        return model
+    }()
+    NavigationStack {
+    }
+    .sheet(isPresented: $showSheet) {
+        NavigationStack {
+            TrackerCategoryLoadingView(model: model, onLoaded: {})
+        }
+    }
+    .presentationDetents([.large])
+}

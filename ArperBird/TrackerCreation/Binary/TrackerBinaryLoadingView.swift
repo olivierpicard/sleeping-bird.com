@@ -75,3 +75,22 @@ struct TrackerBinaryLoadingView: View {
     }
     .presentationDetents([.large])
 }
+
+#Preview("Failure") {
+    @Previewable @State var showSheet = true
+    @Previewable @State var model: TrackerCreationModel = {
+        let model = TrackerCreationModel(
+            generateEmoji: { _ in throw URLError(.notConnectedToInternet) }
+        )
+        model.name = "Took meds"
+        return model
+    }()
+    NavigationStack {
+    }
+    .sheet(isPresented: $showSheet) {
+        NavigationStack {
+            TrackerBinaryLoadingView(model: model) {}
+        }
+    }
+    .presentationDetents([.large])
+}

@@ -76,3 +76,22 @@ struct TrackerNumberLoadingView: View {
     }
     .presentationDetents([.large])
 }
+
+#Preview("Failure") {
+    @Previewable @State var showSheet = true
+    @Previewable @State var model: TrackerCreationModel = {
+        let model = TrackerCreationModel(
+            generateNumber: { _ in throw URLError(.notConnectedToInternet) }
+        )
+        model.name = "Body weight"
+        return model
+    }()
+    NavigationStack {
+    }
+    .sheet(isPresented: $showSheet) {
+        NavigationStack {
+            TrackerNumberLoadingView(model: model) {}
+        }
+    }
+    .presentationDetents([.large])
+}
