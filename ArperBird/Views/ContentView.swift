@@ -61,7 +61,7 @@ struct ContentView: View {
             switch self {
             case .scratch(let autofocus): autofocus
             case .seeded: false
-            } 
+            }  
         }
     }
 

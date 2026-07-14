@@ -116,7 +116,7 @@ struct TrackerSuggestion: Identifiable {
         .init(
             label: "Chores",
             name: "Track my chores accomplished",
-            emoji: "🧹",
+            emoji: "🧽",
             kind: .binary,
             formats: [.binary, .duration, .choices]
         ),
