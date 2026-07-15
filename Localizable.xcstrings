@@ -466,6 +466,22 @@
         }
       }
     },
+    "Chores Completed" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quehaceres completados"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Corvées effectuées"
+          }
+        }
+      }
+    },
     "Cigarettes" : {
       "localizations" : {
         "es" : {
@@ -729,6 +745,22 @@
     },
     "Daily goal" : {
 
+    },
+    "Daily Mood" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Estado de ánimo diario"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Humeur quotidienne"
+          }
+        }
+      }
     },
     "Data stored on your device" : {
       "localizations" : {
@@ -1496,6 +1528,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Méditation ⏱️🧘"
+          }
+        }
+      }
+    },
+    "Meditation Sessions" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sesiones de meditación"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Séances de méditation"
           }
         }
       }
@@ -3305,6 +3353,22 @@
         }
       }
     },
+    "Time Spent Outdoors" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tiempo pasado al aire libre"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Temps passé dehors"
+          }
+        }
+      }
+    },
     "Time spent" : {
 
     },
@@ -3412,8 +3476,72 @@
         }
       }
     },
+    "Track chores completed" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anota las tareas que completo"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Note mes corvées terminées"
+          }
+        }
+      }
+    },
+    "Track cigarettes smoked" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anota los cigarrillos que fumo"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Note mes cigarettes fumées"
+          }
+        }
+      }
+    },
     "Track how long it lasts" : {
 
+    },
+    "Track how many glasses of water I drink" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anota cuántos vasos de agua bebo"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Note combien de verres d'eau je bois"
+          }
+        }
+      }
+    },
+    "Track how much I spend on fuel" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anota cuánto gasto en gasolina"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Note combien je dépense en essence"
+          }
+        }
+      }
     },
     "Track how tired I feel after **working out**" : {
       "extractionState" : "stale",
@@ -3428,6 +3556,102 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Note ma **fatigue** après l'entraînement"
+          }
+        }
+      }
+    },
+    "Track how well I slept" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anota qué tan bien dormí"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Note la qualité de mon sommeil"
+          }
+        }
+      }
+    },
+    "Track if I ate healthy today" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anota si comí sano hoy"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Note si j'ai mangé sainement aujourd'hui"
+          }
+        }
+      }
+    },
+    "Track if I flossed" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anota si usé hilo dental"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Note si j'ai utilisé le fil dentaire"
+          }
+        }
+      }
+    },
+    "Track if I skipped alcohol" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anota mis días sin alcohol"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Note mes jours sans alcool"
+          }
+        }
+      }
+    },
+    "Track if I took my meds" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anota si tomé mis medicamentos"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Note si j'ai pris mes médicaments"
+          }
+        }
+      }
+    },
+    "Track if I went to the gym" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anota si fui al gimnasio"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Note si je suis allé à la salle de sport"
           }
         }
       }
@@ -3480,6 +3704,70 @@
         }
       }
     },
+    "Track my daily pushups" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anota mis flexiones diarias"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Note mes pompes quotidiennes"
+          }
+        }
+      }
+    },
+    "Track my focused work sessions" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anota mi tiempo de concentración"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Note ma durée de concentration"
+          }
+        }
+      }
+    },
+    "Track my food cravings" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anota mis antojos de comida"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Note mes envies alimentaires"
+          }
+        }
+      }
+    },
+    "Track my gaming session duration" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anota el tiempo que paso jugando"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Note le temps que je passe à jouer"
+          }
+        }
+      }
+    },
     "Track my meditation sessions" : {
       "localizations" : {
         "es" : {
@@ -3509,6 +3797,118 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Suis mon **humeur** : joyeux, neutre, triste ou anxieux"
+          }
+        }
+      }
+    },
+    "Track my music practice" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anota mis sesiones de música"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Note mes séances de musique"
+          }
+        }
+      }
+    },
+    "Track my pain level" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anota mi nivel de dolor"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Note mon niveau de douleur"
+          }
+        }
+      }
+    },
+    "Track my period" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anota mi período"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Note mes règles"
+          }
+        }
+      }
+    },
+    "Track my reading time" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anota el tiempo que paso leyendo"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Note le temps passé à lire"
+          }
+        }
+      }
+    },
+    "Track my veggie servings" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anota mis porciones de verduras"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Note mes portions de légumes"
+          }
+        }
+      }
+    },
+    "Track my waist measurement" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anota mi medida de cintura"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Note mon tour de taille"
+          }
+        }
+      }
+    },
+    "Track new words I learn" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anota las palabras nuevas que aprendo"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Note les nouveaux mots que j'apprends"
           }
         }
       }
@@ -3545,6 +3945,22 @@
         }
       }
     },
+    "Track what I ate" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anota lo que comí"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Note ce que j'ai mangé"
+          }
+        }
+      }
+    },
     "Track what matters" : {
       "localizations" : {
         "es" : {
@@ -3557,6 +3973,86 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Suivez tout ce qui vous importe."
+          }
+        }
+      }
+    },
+    "Track when I get a haircut" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anota cuándo me corto el pelo"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Note quand je me fais couper les cheveux"
+          }
+        }
+      }
+    },
+    "Track when I water my plants" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anota cuándo riego mis plantas"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Note quand j'arrose mes plantes"
+          }
+        }
+      }
+    },
+    "Track when my allergies flare up" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anota cuándo se me disparan las alergias"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Note quand mes allergies se manifestent"
+          }
+        }
+      }
+    },
+    "Track when my migraine episodes occur" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anota cuándo tengo migrañas"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Note quand j'ai des migraines"
+          }
+        }
+      }
+    },
+    "Track which people I frequent the most (for social contact)" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anota con quién paso más tiempo"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Note les personnes que je vois le plus souvent (vie sociale)"
           }
         }
       }
