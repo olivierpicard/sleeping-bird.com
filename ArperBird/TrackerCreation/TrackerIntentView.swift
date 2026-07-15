@@ -70,7 +70,7 @@ struct TrackerIntentView: View {
         // exactly as if the user had tapped an in-screen chip and it settled.
         let preresolved = preselected.map(Self.intentSuggestion(from:))
         _selected = State(initialValue: preresolved)
-        _text = State(initialValue: preresolved?.name ?? "")
+        _text = State(initialValue: preresolved?.instruction ?? "")
         _suggestions = State(initialValue: Self.makeSuggestions())
         _placeholder = State(
             initialValue: Metric(
@@ -340,13 +340,13 @@ struct TrackerIntentView: View {
     private func continueWithSelection() {
         guard let selected, !isLoading, !isFailed else { return }
         let format = selected.formats[formatIndex]
-        onContinue(format.kind, selected.name, selected.color)
+        onContinue(format.kind, selected.trackerName, selected.color)
     }
 
     // MARK: - Fake resolution (stands in for the AI classify call)
 
     private func resolve(_ suggestion: IntentSuggestion) {
-        text = suggestion.name
+        text = suggestion.instruction
         isFailed = false
         isLoading = true
         Task {
@@ -385,7 +385,8 @@ struct TrackerIntentView: View {
     private func intentSuggestion(from completion: IntentCompletion) -> IntentSuggestion {
         let color = Self.color(for: completion.formats.first?.kind ?? .number)
         return IntentSuggestion(
-            name: completion.title,
+            trackerName: completion.title,
+            instruction: completion.title,
             emoji: completion.emoji,
             chipLabel: "\(completion.title) \(completion.emoji)",
             color: color,
@@ -413,10 +414,15 @@ struct TrackerIntentView: View {
 
     private struct IntentSuggestion: Identifiable {
         let id = UUID()
-        let name: String
+        let trackerName: String
+        /// The sentence offered as the field's prompt text — distinct from
+        /// `trackerName` so the card can carry a concise name while the field
+        /// reads as a full sentence. Equal to `trackerName` when a suggestion
+        /// has no natural sentence of its own.
+        let instruction: String
         let emoji: String
-        /// Short chip text — may be shorter than `name` (e.g. "Practice" vs
-        /// "Music Practice").
+        /// Short chip text — may be shorter than `trackerName` (e.g. "Practice"
+        /// vs "Music Practice").
         let chipLabel: String
         let color: Color
         let formats: [IntentFormat]
@@ -468,14 +474,15 @@ struct TrackerIntentView: View {
     ) -> IntentSuggestion {
         let color = color(for: suggestion.formats.first?.kind ?? .number)
         return IntentSuggestion(
-            name: suggestion.localizedName,
+            trackerName: suggestion.localizedTrackerName,
+            instruction: suggestion.localizedInstruction,
             emoji: suggestion.emoji,
             chipLabel: suggestion.chipText,
             color: color,
             formats: suggestion.formats.map {
                 intentFormat(
                     for: $0,
-                    name: suggestion.localizedName,
+                    name: suggestion.localizedTrackerName,
                     emoji: suggestion.emoji,
                     color: color
                 )
@@ -612,7 +619,7 @@ struct TrackerIntentView: View {
         TrackerIntentView(
             preselected: .init(
                 label: "Water",
-                name: "Glasses of Water",
+                trackerName: "Glasses of Water",
                 emoji: "💧",
                 kind: .number,
                 formats: [.goal, .number]

@@ -125,8 +125,8 @@ struct TrackerCreationFlow: View {
             let model = preloaded ?? {
                 let model = TrackerCreationModel()
                 model.kind = kind
-                model.name = seed.localizedName
-                model.aiHint = seed.localizedName
+                model.name = seed.localizedTrackerName
+                model.aiHint = seed.localizedTrackerName
                 return model
             }()
             _model = State(initialValue: model)
@@ -238,12 +238,12 @@ struct TrackerCreationFlow: View {
                 let resolvedColor = (seed.formats.first?.kind ?? seed.kind)
                     .previewColor
                 TrackerFormatPickerView(
-                    name: seed.localizedName,
+                    name: seed.localizedTrackerName,
                     emoji: seed.emoji,
                     formats: seed.formats.map {
                         .make(
                             for: $0,
-                            name: seed.localizedName,
+                            name: seed.localizedTrackerName,
                             emoji: seed.emoji
                         )
                     },
@@ -257,8 +257,8 @@ struct TrackerCreationFlow: View {
                         // stack beneath the kind's steps — that's what lets the
                         // reveal offer a back arrow returning to the picker.
                         model.kind = kind
-                        model.name = seed.localizedName
-                        model.aiHint = seed.localizedName
+                        model.name = seed.localizedTrackerName
+                        model.aiHint = seed.localizedTrackerName
                         color = resolvedColor
                         path.append(Self.firstStep(for: kind))
                     }

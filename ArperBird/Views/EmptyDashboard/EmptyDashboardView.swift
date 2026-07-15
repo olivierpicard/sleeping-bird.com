@@ -194,13 +194,13 @@ struct EmptyDashboardView: View {
     // MARK: - Chip → field animation
 
     /// Types `suggestion`'s prompt into the field character-by-character, then
-    /// opens the creation flow seeded with it. Types the fuller `localizedName`
-    /// (the prompt the intent screen itself seeds), not the short chip label —
-    /// minus its leading "Track " word (resolved in the current locale, e.g.
-    /// "Note "/"Anota "), since the field already shows that as a static prefix
-    /// (see `TrackerInputFieldCTA`); typing it again would read "Track Track the
-    /// water I drink". The full `localizedName` (with the verb) still seeds the
-    /// creation flow / AI prompt untouched.
+    /// opens the creation flow seeded with it. Types the fuller
+    /// `localizedInstruction` (the prompt the intent screen itself seeds), not
+    /// the short chip label — minus its leading "Track " word (resolved in the
+    /// current locale, e.g. "Note "/"Anota "), since the field already shows
+    /// that as a static prefix (see `TrackerInputFieldCTA`); typing it again
+    /// would read "Track Track the water I drink". The full `localizedInstruction`
+    /// (with the verb) still seeds the creation flow / AI prompt untouched.
     /// Deliberately does *not* focus the field, so the keyboard stays down while
     /// the text writes itself. Replaces any current draft and cancels a previous
     /// in-flight animation.
@@ -214,7 +214,7 @@ struct EmptyDashboardView: View {
             // Matches the "Track" prefix Text in `TrackerInputFieldCTA` — resolve
             // it the same way so the strip tracks translations automatically.
             let trackPrefix = String(localized: "Track") + " "
-            var typedName = suggestion.localizedName
+            var typedName = suggestion.localizedInstruction
             if typedName.hasPrefix(trackPrefix) {
                 typedName.removeFirst(trackPrefix.count)
             }

@@ -103,7 +103,7 @@ struct ContentView: View {
                             let kind = suggestion.formats[0].kind
                             let model = TrackerCreationModel()
                             let ok = await model.preloadSeed(
-                                kind: kind, name: suggestion.localizedName
+                                kind: kind, name: suggestion.localizedTrackerName
                             )
                             prepared = .init(
                                 id: suggestion.id, model: model, succeeded: ok
