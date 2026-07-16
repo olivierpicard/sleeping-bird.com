@@ -85,8 +85,8 @@ struct NumberConfig: Codable {
 struct CategoryConfig: Codable {
     @Guide(
         description: "All possible values for this metric",
-        .minimumCount(2),
-        .maximumCount(15)
+        .minimumCount(CategoryLimits.min),
+        .maximumCount(CategoryLimits.max)
     )
     let labels: [String]
 }

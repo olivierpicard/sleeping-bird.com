@@ -16,8 +16,8 @@ struct CategoryAiCompletionSchema {
     @Guide(
         description:
             "The possible values the user picks from when logging this metric. E.g. for a mood tracker: Happy, Neutral, Sad, Anxious.",
-        .minimumCount(2),
-        .maximumCount(15)
+        .minimumCount(CategoryLimits.min),
+        .maximumCount(CategoryLimits.max)
     )
     let categories: [String]
 
