@@ -221,7 +221,7 @@ struct TrackerSuggestion: Identifiable {
                 ),
                 .init(
                     label: "Ate Healthy",
-                    instruction: "Track if I ate healthy today",
+                    instruction: "Track if I ate healthy",
                     emoji: "🥗",
                     kind: .binary
                 ),
@@ -255,7 +255,7 @@ struct TrackerSuggestion: Identifiable {
                 ),
                 .init(
                     label: "Social Contact",
-                    instruction: "Track which people I frequent the most (for social contact)",
+                    instruction: "Track the people I see most",
                     emoji: "👥",
                     kind: .choices
                 ),

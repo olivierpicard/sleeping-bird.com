@@ -3353,6 +3353,9 @@
         }
       }
     },
+    "Time spent" : {
+
+    },
     "Time Spent Outdoors" : {
       "localizations" : {
         "es" : {
@@ -3368,9 +3371,6 @@
           }
         }
       }
-    },
-    "Time spent" : {
-
     },
     "time spent reading" : {
 
@@ -3576,7 +3576,7 @@
         }
       }
     },
-    "Track if I ate healthy today" : {
+    "Track if I ate healthy" : {
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -3587,7 +3587,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Note si j'ai mangé sainement aujourd'hui"
+            "value" : "Note si j'ai mangé sainement"
           }
         }
       }
@@ -3651,7 +3651,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Note si je suis allé à la salle de sport"
+            "value" : "Note si je suis allé à la salle"
           }
         }
       }
@@ -3913,6 +3913,22 @@
         }
       }
     },
+    "Track the people I see most" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anota a quién veo más"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Note qui je vois le plus souvent"
+          }
+        }
+      }
+    },
     "Track the time I spend outdoors" : {
       "localizations" : {
         "es" : {
@@ -3988,7 +4004,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Note quand je me fais couper les cheveux"
+            "value" : "Note quand je vais chez le coiffeur"
           }
         }
       }
@@ -4037,22 +4053,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Note quand j'ai des migraines"
-          }
-        }
-      }
-    },
-    "Track which people I frequent the most (for social contact)" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Anota con quién paso más tiempo"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Note les personnes que je vois le plus souvent (vie sociale)"
           }
         }
       }
@@ -4374,7 +4374,6 @@
 
     },
     "Try one:" : {
-      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -4391,7 +4390,6 @@
       }
     },
     "Type it in plain words — we'll build the tracker for you." : {
-      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -4614,7 +4612,6 @@
       }
     },
     "Water Intake" : {
-      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
