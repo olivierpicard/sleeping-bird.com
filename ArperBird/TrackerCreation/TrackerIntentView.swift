@@ -48,10 +48,10 @@ struct TrackerIntentView: View {
     static let examplePrompts: [LocalizedStringKey] = [
         "how many coffees I drink",
         "time spent reading",
-        "if I stretched today",
+        "if I stretched",
         "my mood today",
-        "8 glasses of water a day",
-        "when I last watered the plants",
+        "glasses of water drunk",
+        "when I watered the plants",
     ]
 
     init(
