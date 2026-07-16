@@ -25,7 +25,20 @@
       }
     },
     "%@ per day" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ al día"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ par jour"
+          }
+        }
+      }
     },
     "%lld" : {
 
@@ -39,14 +52,37 @@
     "0" : {
 
     },
-    "8 glasses of water a day" : {
-
-    },
     "A date" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Una fecha"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Une date"
+          }
+        }
+      }
     },
     "A number" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un número"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un nombre"
+          }
+        }
+      }
     },
     "Acceptable use" : {
       "localizations" : {
@@ -81,7 +117,20 @@
       }
     },
     "Add category" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añadir categoría"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajouter une catégorie"
+          }
+        }
+      }
     },
     "Add entry" : {
       "localizations" : {
@@ -100,7 +149,20 @@
       }
     },
     "Add to dashboard" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añadir al panel"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajouter au tableau de bord"
+          }
+        }
+      }
     },
     "Add your first value" : {
       "localizations" : {
@@ -375,7 +437,20 @@
       }
     },
     "Cancel" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancelar"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Annuler"
+          }
+        }
+      }
     },
     "Car Maintenance" : {
       "extractionState" : "stale",
@@ -445,10 +520,36 @@
       }
     },
     "Check your connection and try again" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Revisa tu conexión e inténtalo de nuevo"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vérifiez votre connexion et réessayez"
+          }
+        }
+      }
     },
     "Choose the tracker's unit" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Elige la unidad del seguimiento"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choisissez l'unité du suivi"
+          }
+        }
+      }
     },
     "Chores" : {
       "localizations" : {
@@ -581,7 +682,20 @@
       }
     },
     "Confirm" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Confirmar"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Confirmer"
+          }
+        }
+      }
     },
     "Contact" : {
       "localizations" : {
@@ -616,7 +730,20 @@
       }
     },
     "Continue" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Continuar"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Continuer"
+          }
+        }
+      }
     },
     "Copy" : {
       "localizations" : {
@@ -635,7 +762,20 @@
       }
     },
     "Couldn't reach the AI" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se pudo contactar con la IA"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Impossible de joindre l'IA"
+          }
+        }
+      }
     },
     "Couldn't reach the AI for now. Try again later." : {
       "localizations" : {
@@ -654,7 +794,20 @@
       }
     },
     "Couldn't set up your tracker" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se pudo crear tu seguimiento"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Impossible de créer votre suivi"
+          }
+        }
+      }
     },
     "Cravings" : {
       "localizations" : {
@@ -673,6 +826,7 @@
       }
     },
     "Create metrics and log entries just by speaking" : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -709,7 +863,20 @@
 
     },
     "Cumulative" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Acumulativo"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cumulatif"
+          }
+        }
+      }
     },
     "Cups of Coffee" : {
       "localizations" : {
@@ -744,7 +911,20 @@
       }
     },
     "Daily goal" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Objetivo"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Objectif"
+          }
+        }
+      }
     },
     "Daily Mood" : {
       "localizations" : {
@@ -814,7 +994,20 @@
       }
     },
     "Describe what you want to track" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Describe lo que quieres anotar"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Décrivez ce que vous voulez suivre"
+          }
+        }
+      }
     },
     "Disclaimer" : {
       "localizations" : {
@@ -985,8 +1178,213 @@
         }
       }
     },
+    "Edit the tracker's maximum value" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Editar el valor máximo del seguimiento"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modifier la valeur maximale du suivi"
+          }
+        }
+      }
+    },
+    "Edit the daily goal" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Editar el objetivo diario"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modifier l'objectif quotidien"
+          }
+        }
+      }
+    },
+    "Switch between cumulative and snapshot" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cambiar entre acumulativo e independiente"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Basculer entre cumulatif et indépendant"
+          }
+        }
+      }
+    },
+    "Tracker name" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nombre del tracker"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nom du tracker"
+          }
+        }
+      }
+    },
+    "e.g. %@ per day" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ej. %@ al día"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ex. %@ par jour"
+          }
+        }
+      }
+    },
+    "Calm" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tranquilo"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Calme"
+          }
+        }
+      }
+    },
+    "Tired" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cansado"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fatigué"
+          }
+        }
+      }
+    },
+    "Energetic" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enérgico"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Énergique"
+          }
+        }
+      }
+    },
+    "Excited" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Emocionado"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enthousiaste"
+          }
+        }
+      }
+    },
+    "Bored" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aburrido"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ennuyé"
+          }
+        }
+      }
+    },
+    "Stressed" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Estresado"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stressé"
+          }
+        }
+      }
+    },
+    "Grateful" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Agradecido"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reconnaissant"
+          }
+        }
+      }
+    },
     "Expected maximum" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Máximo esperado"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Maximum attendu"
+          }
+        }
+      }
     },
     "Feedback Arper Bird version %@" : {
       "localizations" : {
@@ -1151,6 +1549,22 @@
     },
     "Glow active" : {
 
+    },
+    "glasses of water drunk" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "cuántos vasos de agua bebo"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "nombre de verres d'eau que je bois"
+          }
+        }
+      }
     },
     "Goal" : {
 
@@ -1327,13 +1741,52 @@
 
     },
     "How do you measure “%@”?" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Cómo mides “%@”?"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comment mesurez-vous « %@ » ?"
+          }
+        }
+      }
     },
     "how many coffees I drink" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "cuántos cafés tomo"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "combien de cafés je bois"
+          }
+        }
+      }
     },
     "How should \"%@\" look?" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Cómo mostrar \"%@\"?"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comment afficher \"%@\" ?"
+          }
+        }
+      }
     },
     "How to track it" : {
       "localizations" : {
@@ -1351,8 +1804,21 @@
         }
       }
     },
-    "if I stretched today" : {
-
+    "if I stretched" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "si me estiré"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "si je me suis étiré"
+          }
+        }
+      }
     },
     "If you subscribe, your purchase is processed by Apple's App Store and validated through RevenueCat. They handle billing; we don't see your payment details." : {
       "localizations" : {
@@ -1427,7 +1893,20 @@
       }
     },
     "Log your progress toward the daily goal" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anota tu progreso hacia el objetivo diario"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Note votre progression vers l'objectif quotidien"
+          }
+        }
+      }
     },
     "Maintenance" : {
       "extractionState" : "stale",
@@ -2134,7 +2613,20 @@
       }
     },
     "my mood today" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "mi estado de ánimo de hoy"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "mon humeur du jour"
+          }
+        }
+      }
     },
     "My Trackers" : {
       "localizations" : {
@@ -2564,7 +3056,20 @@
 
     },
     "Pick from a list" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lista de opciones"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Liste de choix"
+          }
+        }
+      }
     },
     "Pick one of %lld categories" : {
 
@@ -2826,7 +3331,20 @@
       }
     },
     "Save a date on calendar" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Guarda una fecha en el calendario"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enregistre une date ou un évènement"
+          }
+        }
+      }
     },
     "Set your goal" : {
 
@@ -2904,7 +3422,20 @@
       }
     },
     "Snapshot" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Independiente"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Indépendant"
+          }
+        }
+      }
     },
     "Social Contact" : {
       "localizations" : {
@@ -3354,7 +3885,20 @@
       }
     },
     "Time spent" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Duración"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Durée"
+          }
+        }
+      }
     },
     "Time Spent Outdoors" : {
       "localizations" : {
@@ -3373,7 +3917,20 @@
       }
     },
     "time spent reading" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "el tiempo que paso leyendo"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "le temps passé à lire"
+          }
+        }
+      }
     },
     "To keep analytics and subscriptions consistent across reinstalls, we store a random identifier in your device's Keychain. It contains no personal information and is never linked to your real identity." : {
       "localizations" : {
@@ -3509,7 +4066,20 @@
       }
     },
     "Track how long it lasts" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anota cuánto dura"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Note combien de temps ça dure"
+          }
+        }
+      }
     },
     "Track how many glasses of water I drink" : {
       "localizations" : {
@@ -4058,7 +4628,20 @@
       }
     },
     "Track yes or no each day" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anota sí o no cada día"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Notez oui ou non chaque jour"
+          }
+        }
+      }
     },
     "tracker_type.binary.label" : {
       "extractionState" : "stale",
@@ -4371,7 +4954,20 @@
       }
     },
     "Try again" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reintentar"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Réessayer"
+          }
+        }
+      }
     },
     "Try one:" : {
       "localizations" : {
@@ -4406,10 +5002,36 @@
       }
     },
     "Type my own…" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Personalizada…"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Personnalisée…"
+          }
+        }
+      }
     },
     "Unit" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unidad"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unité"
+          }
+        }
+      }
     },
     "Unlimited Metrics" : {
       "localizations" : {
@@ -4428,6 +5050,7 @@
       }
     },
     "Unlimited Voice Interaction" : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -4785,10 +5408,36 @@
       }
     },
     "What's your daily target for “%@”?" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Cuál es tu objetivo diario para “%@”?"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quel est votre objectif quotidien pour « %@ » ?"
+          }
+        }
+      }
     },
-    "when I last watered the plants" : {
-
+    "when I watered the plants" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "cuándo regué las plantas"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "quand j'ai arrosé les plantes"
+          }
+        }
+      }
     },
     "When you dictate a metric, your microphone audio is streamed in real time to Deepgram, our transcription provider, and turned into text. The audio is not stored by our services after it is transcribed." : {
       "localizations" : {
@@ -4832,7 +5481,20 @@
       }
     },
     "Yes / No" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sí / No"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Oui / Non"
+          }
+        }
+      }
     },
     "You are responsible for the content you create. Don't use the app to store unlawful material or to infringe the rights of others." : {
       "localizations" : {
@@ -4854,7 +5516,20 @@
 
     },
     "You're all set!" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¡Todo listo!"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "C'est prêt !"
+          }
+        }
+      }
     },
     "Your anonymous identifier" : {
       "localizations" : {
@@ -4937,7 +5612,20 @@
       }
     },
     "Your tracker is ready to go." : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tu seguimiento está listo para empezar."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Votre suivi est prêt"
+          }
+        }
+      }
     },
     "Your tracker name" : {
 
