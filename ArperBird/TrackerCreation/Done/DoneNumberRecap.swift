@@ -187,7 +187,7 @@ struct DoneNumberRecap: View {
         glyph: String,
         label: LocalizedStringKey,
         value: String?,
-        hint: String,
+        hint: LocalizedStringKey,
         trailing: String? = nil,
         action: @escaping () -> Void
     ) -> some View {

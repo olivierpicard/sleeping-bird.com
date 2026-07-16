@@ -26,7 +26,7 @@ struct TrackerCategoryLabelsView: View {
 
     /// Rotating placeholder pool so each empty row hints at a different, concrete
     /// example instead of repeating "Category".
-    private static let placeholders = [
+    private static let placeholders: [LocalizedStringKey] = [
         "Happy", "Calm", "Tired", "Anxious", "Energetic", "Sad", "Excited",
         "Bored", "Stressed", "Grateful",
     ]
@@ -110,7 +110,7 @@ struct TrackerCategoryLabelsView: View {
     }
 
     @ViewBuilder
-    private func categoryRow(at index: Int, placeholder: String) -> some View {
+    private func categoryRow(at index: Int, placeholder: LocalizedStringKey) -> some View {
         let id = categories[index].id
         let isFilled = !categories[index].text
             .trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
@@ -172,7 +172,7 @@ struct TrackerCategoryLabelsView: View {
         .buttonStyle(.plain)
     }
 
-    private func placeholder(at index: Int) -> String {
+    private func placeholder(at index: Int) -> LocalizedStringKey {
         Self.placeholders[index % Self.placeholders.count]
     }
 

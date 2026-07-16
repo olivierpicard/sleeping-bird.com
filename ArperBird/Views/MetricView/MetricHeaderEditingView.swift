@@ -13,7 +13,7 @@ struct MetricHeaderEditingView: View {
     let emoji: String
     let mainColor: Color
     @Binding var title: String
-    var placeholder: String = ""
+    var placeholder: LocalizedStringKey = ""
     var focus: FocusState<Bool>.Binding? = nil
     /// When supplied, the emoji chip becomes editable and taps open the emoji
     /// keyboard, writing the selection back through this binding.

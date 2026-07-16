@@ -130,7 +130,7 @@ struct TrackerGoalUnitListView: View {
 
     private func suggestionRow(for option: UnitOption, at index: Int) -> some View {
         let isSelected = selection == .suggested(index)
-        let caption = "e.g. \(option.dailyGoal.formatted(.number)) per day"
+        let caption: LocalizedStringKey = "e.g. \(option.dailyGoal.formatted(.number)) per day"
         return Button(action: { selection = .suggested(index) }) {
             rowLayout(isSelected: isSelected) {
                 VStack(alignment: .leading, spacing: 2) {

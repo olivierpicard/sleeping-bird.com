@@ -152,7 +152,7 @@ struct DoneGoalRecap: View {
         glyph: String,
         label: LocalizedStringKey,
         value: String,
-        hint: String,
+        hint: LocalizedStringKey,
         action: @escaping () -> Void
     ) -> some View {
         Button(action: action) {
