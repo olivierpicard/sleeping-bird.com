@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import SwiftUI
 
 /// Single source of truth for the manual tracker-creation flow.
 ///
@@ -26,6 +27,14 @@ final class TrackerCreationModel {
 
     var kind: TrackerKind?
     var behavior: MetricBehavior?
+    /// The tracker's resolved color, seeded from the intent screen's per-kind
+    /// color once the user continues. Lives on the model (not the flow's own
+    /// `@State`) so every read is against the same live class instance
+    /// regardless of which struct snapshot a `NavigationStack` destination
+    /// closure was built from — a plain `@State var` on the flow view could
+    /// otherwise still read the pre-resolution `.accent` default on the very
+    /// first push of a session. Defaults to the app accent pre-resolution.
+    var color: Color = .accent
     var name = "" {
         // The hint described the suggestion chip, not whatever the user typed —
         // editing the name invalidates it.

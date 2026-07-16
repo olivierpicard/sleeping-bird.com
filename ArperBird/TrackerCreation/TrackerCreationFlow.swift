@@ -54,14 +54,6 @@ enum TrackerCreationStep: Hashable {
 /// `NavigationStack`, mirroring the flexible pattern of `OnboardingFlow`. Each
 /// step view takes an `onNext` closure rather than owning its own navigation.
 struct TrackerCreationFlow: View {
-    /// Comparison switch for the flow's control tinting, while the design is
-    /// being decided. `true`: controls (CTAs, nav chrome, toggles) tint with a
-    /// contrast-corrected variant of the tracker color, so the color owns the
-    /// whole flow. `false`: controls stay on the app accent and the tracker
-    /// color appears only on the cards and selection pills. Flip to compare;
-    /// delete once one wins. Card fills always use the raw color either way.
-    static let colorfulControls = true
-
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var context
     @Environment(\.colorScheme) private var colorScheme
@@ -69,22 +61,18 @@ struct TrackerCreationFlow: View {
 
     /// The single source of truth for the whole flow. Owning the state here —
     /// rather than in per-step `@State` and `NavigationPath` payloads — is what
-    /// lets data survive back-navigation; see `TrackerCreationModel`.
+    /// lets data survive back-navigation; see `TrackerCreationModel`. The
+    /// tracker's color lives on `model` (not a separate `@State` here) for the
+    /// same reason — see `TrackerCreationModel.color`.
     @State private var model = TrackerCreationModel()
 
-    /// The card tint, seeded from the intent screen's per-kind color when the
-    /// user continues and then threaded through every step, the reveal, and the
-    /// persisted metric. Defaults to the app accent for the seeded `init` path.
-    @State private var color: Color = .accent
-
     /// What the step views' controls actually paint with. The raw per-kind
-    /// colors are card fills first — too bright to carry white labels or read
-    /// as text — so text-bearing controls (chips, selected rows, keypads,
-    /// steppers, nav chrome) get the contrast-corrected variant, or the app
-    /// accent under the comparison flag. Card fills always use `color` raw.
+    /// colors (`model.color`) are card fills first — too bright to carry white
+    /// labels or read as text — so text-bearing controls (chips, selected rows,
+    /// keypads, steppers, nav chrome) get the contrast-corrected variant. Card
+    /// fills always use `model.color` raw.
     private var controlColor: Color {
-        Self.colorfulControls
-            ? color.readableControlTint(in: colorScheme) : .accent
+        model.color.readableControlTint(in: colorScheme)
     }
 
     /// A dashboard badge tap arrives as a `seed`: rather than skipping the intent
@@ -129,8 +117,8 @@ struct TrackerCreationFlow: View {
                 model.aiHint = seed.localizedTrackerName
                 return model
             }()
+            model.color = kind.previewColor
             _model = State(initialValue: model)
-            _color = State(initialValue: kind.previewColor)
             _path = State(initialValue: [
                 preloaded != nil && preloadSucceeded
                     ? Self.postLoadStep(for: kind)
@@ -198,7 +186,7 @@ struct TrackerCreationFlow: View {
                     model.kind = kind
                     model.name = name
                     model.aiHint = name
-                    color = intentColor
+                    model.color = intentColor
                     path = [Self.firstStep(for: kind)]
                 }
             )
@@ -247,8 +235,7 @@ struct TrackerCreationFlow: View {
                             emoji: seed.emoji
                         )
                     },
-                    color: Self.colorfulControls
-                        ? resolvedColor.readableControlTint(in: colorScheme) : .accent,
+                    color: resolvedColor.readableControlTint(in: colorScheme),
                     onContinue: { kind in
                         // Mirrors `TrackerIntentView`'s `onContinue`: seed the
                         // model from the already-known name/color and jump
@@ -259,7 +246,7 @@ struct TrackerCreationFlow: View {
                         model.kind = kind
                         model.name = seed.localizedTrackerName
                         model.aiHint = seed.localizedTrackerName
-                        color = resolvedColor
+                        model.color = resolvedColor
                         path.append(Self.firstStep(for: kind))
                     }
                 )
@@ -406,7 +393,7 @@ struct TrackerCreationFlow: View {
             DoneRevealStep(
                 model: model,
                 metric: { doneMetric() },
-                color: color,
+                color: model.color,
                 controlColor: controlColor,
                 onDone: complete
             )
@@ -428,7 +415,7 @@ struct TrackerCreationFlow: View {
     /// the dashboard starts *empty* — the sample data in `doneMetric()` exists
     /// only to make the reveal chart look alive.
     private func persistMetric() {
-        context.insert(Metric(from: doneSchema(), color: color))
+        context.insert(Metric(from: doneSchema(), color: model.color))
     }
 
     // MARK: - Reveal card
@@ -466,7 +453,7 @@ struct TrackerCreationFlow: View {
         default:
             data = Metric.fakeData(for: schema.config)
         }
-        return Metric(from: schema, color: color, data: data)
+        return Metric(from: schema, color: model.color, data: data)
     }
 
     /// The structured tracker the finished flow describes — the single source

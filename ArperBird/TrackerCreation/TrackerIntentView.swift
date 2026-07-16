@@ -99,13 +99,6 @@ struct TrackerIntentView: View {
         return selected.color.readableControlTint(in: colorScheme)
     }
 
-    /// The resolved suggestion's color, or `nil` while the card is still the
-    /// gray ghost (unresolved, loading, or failed).
-    private var resolvedColor: Color? {
-        guard let selected, !isLoading else { return nil }
-        return selected.color
-    }
-
     var body: some View {
         // A scroll view (not a static VStack) so the large title collapses as
         // content rises and keyboard avoidance scrolls *within* the content
@@ -168,12 +161,9 @@ struct TrackerIntentView: View {
             .buttonStyle(.glassProminent)
             // The tracker's color owns the accent from the moment the card
             // resolves: the CTA picks up the card's corrected shade alongside
-            // the preview, and the flow carries it on. Neutral app accent until
-            // then — and always, under the accent-controls comparison variant.
-            .tint(
-                TrackerCreationFlow.colorfulControls && resolvedColor != nil
-                    ? mainColor : .accent
-            )
+            // the preview. `mainColor` is gray until then, matching the
+            // neutral ghost state.
+            .tint(mainColor)
             .disabled(selected == nil || isLoading || isFailed)
             .padding()
         }
