@@ -28,10 +28,12 @@ struct TrackerFormatPickerView: View {
     let emoji: String
     let formats: [FormatOption]
 
-    /// The tracker's resolved color — mirrors `TrackerCreationFlow.controlColor`.
-    /// Only the format chips and the "Continue" CTA use it; the preview card
-    /// above stays neutral gray (see `FormatOption.make`) since the format
-    /// hasn't been confirmed yet.
+    /// The tracker's raw resolved color — corrected locally via `mainColor`
+    /// for the format chips and the "Continue" CTA; the preview card above
+    /// stays neutral gray (see `FormatOption.make`) since the format hasn't
+    /// been confirmed yet. This runs before `TrackerCreationModel.color` is
+    /// set (nothing's been chosen), so it can't read the correction off the
+    /// model like the rest of the flow does — it self-corrects instead.
     var color: Color = .accent
 
     /// Hands the chosen format's kind off to `TrackerCreationFlow`, which
@@ -39,7 +41,10 @@ struct TrackerFormatPickerView: View {
     /// `onContinue`. A no-op default lets the screen preview standalone.
     var onContinue: (TrackerKind) -> Void = { _ in }
 
+    @Environment(\.colorScheme) private var colorScheme
     @State private var selectedIndex = 0
+
+    private var mainColor: Color { color.readableControlTint(in: colorScheme) }
 
     var body: some View {
         VStack(spacing: 24) {
@@ -67,7 +72,7 @@ struct TrackerFormatPickerView: View {
                     FormatChip(
                         format: formats[index],
                         isSelected: index == selectedIndex,
-                        color: color
+                        color: mainColor
                     ) {
                         withAnimation(.snappy(duration: 0.25)) {
                             selectedIndex = index
@@ -90,7 +95,7 @@ struct TrackerFormatPickerView: View {
             }
             .controlSize(.extraLarge)
             .buttonStyle(.glassProminent)
-            .tint(color)
+            .tint(mainColor)
             .padding()
         }
         // No own cancel button: this screen is a pushed step inside

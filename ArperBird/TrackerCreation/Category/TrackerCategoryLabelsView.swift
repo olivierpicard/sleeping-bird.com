@@ -18,8 +18,14 @@ struct TrackerCategoryLabelsView: View {
     private static let minLabels = 2
     private static let maxLabels = 15
 
+    @Environment(\.colorScheme) private var colorScheme
+
+    /// The tracker's raw color; `mainColor` corrects it locally for this
+    /// screen's text-bearing controls (rows, "Add category", "Next").
     let color: Color
     var onNext: ([String]) -> Void
+
+    private var mainColor: Color { color.readableControlTint(in: colorScheme) }
 
     /// Rotating placeholder pool so each empty row hints at a different, concrete
     /// example instead of repeating "Category".
@@ -86,7 +92,7 @@ struct TrackerCategoryLabelsView: View {
             }
             .controlSize(.extraLarge)
             .buttonStyle(.glassProminent)
-            .tint(color)
+            .tint(mainColor)
             .disabled(!canContinue)
             .padding()
         }
@@ -114,7 +120,7 @@ struct TrackerCategoryLabelsView: View {
 
         HStack(spacing: 12) {
             Circle()
-                .fill(isFilled ? color : Color.secondary.opacity(0.3))
+                .fill(isFilled ? mainColor : Color.secondary.opacity(0.3))
                 .frame(width: 10, height: 10)
 
             TextField(placeholder, text: $categories[index].text)
@@ -140,7 +146,7 @@ struct TrackerCategoryLabelsView: View {
         .overlay {
             RoundedRectangle(cornerRadius: 16)
                 .strokeBorder(
-                    focused == id ? color : Color.clear,
+                    focused == id ? mainColor : Color.clear,
                     lineWidth: 2
                 )
         }
@@ -155,13 +161,13 @@ struct TrackerCategoryLabelsView: View {
                     .font(.headline)
                 Spacer()
             }
-            .foregroundStyle(color)
+            .foregroundStyle(mainColor)
             .padding(.horizontal, 20)
             .frame(height: 60)
             .background {
                 RoundedRectangle(cornerRadius: 16)
                     .strokeBorder(
-                        color.opacity(0.4),
+                        mainColor.opacity(0.4),
                         style: StrokeStyle(lineWidth: 2, dash: [6])
                     )
             }

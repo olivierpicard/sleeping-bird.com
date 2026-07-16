@@ -22,12 +22,17 @@ struct TrackerGoalUnitListView: View {
 
     let name: String
     let options: [UnitOption]
+    /// The tracker's raw color; `mainColor` corrects it locally for this
+    /// screen's text-bearing controls (selected row fill, "Next" button).
     let color: Color
     var onNext: (String) -> Void
 
+    @Environment(\.colorScheme) private var colorScheme
     @State private var selection: Page
     @State private var customUnit: String
     @FocusState private var isCustomFocused: Bool
+
+    private var mainColor: Color { color.readableControlTint(in: colorScheme) }
 
     /// Which row is highlighted: one of the suggestions (by index) or the
     /// trailing custom-entry row.
@@ -98,7 +103,7 @@ struct TrackerGoalUnitListView: View {
             }
             .controlSize(.extraLarge)
             .buttonStyle(.glassProminent)
-            .tint(color)
+            .tint(mainColor)
             .disabled(selectedUnit.isEmpty)
             .padding()
         }
@@ -183,7 +188,7 @@ struct TrackerGoalUnitListView: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(
             RoundedRectangle(cornerRadius: 16)
-                .fill(isSelected ? AnyShapeStyle(color) : AnyShapeStyle(.quaternary.opacity(0.5)))
+                .fill(isSelected ? AnyShapeStyle(mainColor) : AnyShapeStyle(.quaternary.opacity(0.5)))
         )
     }
 }

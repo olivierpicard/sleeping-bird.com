@@ -22,12 +22,17 @@ struct TrackerGoalValueView: View {
     /// meaningful step or seed: the steppers are hidden and the page goes
     /// keyboard-only — the field auto-focuses and the user types the target.
     let isCustomUnit: Bool
+    /// The tracker's raw color; `mainColor` corrects it locally for this
+    /// screen's text-bearing controls (keypad glyphs, steppers, "Next").
     let color: Color
     var onNext: (Double) -> Void
 
+    @Environment(\.colorScheme) private var colorScheme
     @State private var value: Double
     @State private var draft: String
     @FocusState private var isFieldFocused: Bool
+
+    private var mainColor: Color { color.readableControlTint(in: colorScheme) }
 
     init(
         name: String = "Drink more water",
@@ -88,7 +93,7 @@ struct TrackerGoalValueView: View {
             }
             .controlSize(.extraLarge)
             .buttonStyle(.glassProminent)
-            .tint(color)
+            .tint(mainColor)
             .disabled(effectiveValue <= 0)
             .padding()
         }
@@ -189,7 +194,7 @@ struct TrackerGoalValueView: View {
     /// Color for the formatted display figure: dimmed while it's still a zero
     /// placeholder, accent once there's a real committed value.
     private var displayColor: Color {
-        effectiveValue <= 0 ? Color(.tertiaryLabel) : color
+        effectiveValue <= 0 ? Color(.tertiaryLabel) : mainColor
     }
 
     /// The big tappable figure. Both the editable field and the formatted display
@@ -208,7 +213,7 @@ struct TrackerGoalValueView: View {
                 // hierarchical style like `.tertiary`) doesn't re-color a focused
                 // TextField's input live. The empty state needs no dimming — the
                 // system renders the "0" placeholder in its own gray.
-                .foregroundStyle(color)
+                .foregroundStyle(mainColor)
 
             Text(value.formatted(.number))
                 // Roll the digits when the value changes for a polished feel.
@@ -255,7 +260,7 @@ struct TrackerGoalValueView: View {
         .labelStyle(.iconOnly)
         .buttonStyle(.bordered)
         .buttonBorderShape(.circle)
-        .tint(color)
+        .tint(mainColor)
         .disabled(!enabled)
     }
 

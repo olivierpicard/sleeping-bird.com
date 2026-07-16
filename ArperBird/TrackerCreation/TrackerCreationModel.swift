@@ -35,6 +35,17 @@ final class TrackerCreationModel {
     /// otherwise still read the pre-resolution `.accent` default on the very
     /// first push of a session. Defaults to the app accent pre-resolution.
     var color: Color = .accent
+
+    /// The corrected color for text-bearing controls (chips, CTAs, steppers),
+    /// derived from `color` the same way `Metric.displayColor(in:)` derives a
+    /// dashboard card's control color from its raw fill. Takes `colorScheme`
+    /// as a parameter — that's environment-only information the model itself
+    /// doesn't own — so each view calls this with its own
+    /// `@Environment(\.colorScheme)` rather than being handed the result.
+    func mainColor(in colorScheme: ColorScheme) -> Color {
+        color.readableControlTint(in: colorScheme)
+    }
+
     var name = "" {
         // The hint described the suggestion chip, not whatever the user typed —
         // editing the name invalidates it.

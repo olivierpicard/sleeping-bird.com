@@ -9,12 +9,17 @@ import SwiftUI
 
 struct TrackerNameView: View {
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.colorScheme) private var colorScheme
 
     var onNext: (String) -> Void = { _ in }
+    /// The tracker's raw color, corrected locally via `mainColor` for the
+    /// text-bearing "Next" button; the card preview above uses it raw.
     let color: Color
 
     @State private var name: String
     @State private var chart = NoDataMiniChart()
+
+    private var mainColor: Color { color.readableControlTint(in: colorScheme) }
 
     /// `initialName` pre-fills the field — non-empty when the flow was seeded
     /// from a suggestion chip, or when the step is re-shown after a pop.
@@ -60,7 +65,7 @@ struct TrackerNameView: View {
             }
             .controlSize(.extraLarge)
             .buttonStyle(.glassProminent)
-            .tint(color)
+            .tint(mainColor)
             .disabled(!isNameValid)
             .padding()
         }

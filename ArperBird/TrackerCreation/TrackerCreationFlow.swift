@@ -56,7 +56,6 @@ enum TrackerCreationStep: Hashable {
 struct TrackerCreationFlow: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var context
-    @Environment(\.colorScheme) private var colorScheme
     @State private var path: [TrackerCreationStep] = []
 
     /// The single source of truth for the whole flow. Owning the state here —
@@ -65,15 +64,6 @@ struct TrackerCreationFlow: View {
     /// tracker's color lives on `model` (not a separate `@State` here) for the
     /// same reason — see `TrackerCreationModel.color`.
     @State private var model = TrackerCreationModel()
-
-    /// What the step views' controls actually paint with. The raw per-kind
-    /// colors (`model.color`) are card fills first — too bright to carry white
-    /// labels or read as text — so text-bearing controls (chips, selected rows,
-    /// keypads, steppers, nav chrome) get the contrast-corrected variant. Card
-    /// fills always use `model.color` raw.
-    private var controlColor: Color {
-        model.color.readableControlTint(in: colorScheme)
-    }
 
     /// A dashboard badge tap arrives as a `seed`: rather than skipping the intent
     /// screen, it's handed to `TrackerIntentView` as a pre-resolved selection, so
@@ -206,9 +196,9 @@ struct TrackerCreationFlow: View {
         }
         // The nav-bar chrome (back chevron, close button) stays the plain
         // iOS default (black/white) rather than the tracker's color — every
-        // step's own controls (chips, steppers, CTAs) still get `controlColor`
-        // explicitly, so config chrome reads as tracker-tinted without the
-        // nav bar itself following along.
+        // step's own controls (chips, steppers, CTAs) still get the tracker's
+        // corrected `mainColor` explicitly, so config chrome reads as
+        // tracker-tinted without the nav bar itself following along.
     }
 
     /// Builds each pushed step. Every destination reads from / writes to `model`,
@@ -235,7 +225,7 @@ struct TrackerCreationFlow: View {
                             emoji: seed.emoji
                         )
                     },
-                    color: resolvedColor.readableControlTint(in: colorScheme),
+                    color: resolvedColor,
                     onContinue: { kind in
                         // Mirrors `TrackerIntentView`'s `onContinue`: seed the
                         // model from the already-known name/color and jump
@@ -274,7 +264,7 @@ struct TrackerCreationFlow: View {
             }
         case .categoryLabels:
             TrackerCategoryLabelsView(
-                color: controlColor,
+                color: model.color,
                 initialLabels: model.categoryLabels
             ) { labels in
                 // Trust the AI's single/multiple guess unless the user replaced or
@@ -302,7 +292,7 @@ struct TrackerCreationFlow: View {
         case .name:
             // Seeding the field from the model keeps the typed (or seeded) name
             // visible when the step is re-shown after a pop.
-            TrackerNameView(initialName: model.name, color: controlColor, onNext: { enteredName in
+            TrackerNameView(initialName: model.name, color: model.color, onNext: { enteredName in
                 model.name = enteredName
                 if let kind = model.kind {
                     path.append(Self.firstStep(for: kind))
@@ -324,7 +314,7 @@ struct TrackerCreationFlow: View {
                     .init(unit: $0.unit, dailyGoal: $0.dailyGoal)
                 },
                 selectedUnit: model.selectedUnit,
-                color: controlColor
+                color: model.color
             ) { unit in
                 model.chooseUnit(unit)
                 path.append(.goalValue)
@@ -339,7 +329,7 @@ struct TrackerCreationFlow: View {
                 isCustomUnit: !model.suggestions.contains {
                     $0.unit == model.selectedUnit
                 },
-                color: controlColor
+                color: model.color
             ) { value in
                 model.goalValue = value
                 // A custom unit has no AI-anchored step, so fetch one tuned to the
@@ -393,8 +383,6 @@ struct TrackerCreationFlow: View {
             DoneRevealStep(
                 model: model,
                 metric: { doneMetric() },
-                color: model.color,
-                controlColor: controlColor,
                 onDone: complete
             )
         }
@@ -579,12 +567,15 @@ private struct NavChrome: ViewModifier {
 private struct DoneRevealStep: View {
     @Bindable var model: TrackerCreationModel
     let metric: () -> Metric
-    /// The tracker's raw color — the card fill, bloom, and sparkles.
-    let color: Color
-    /// The contrast-corrected variant for text-bearing chrome: the recap chips'
-    /// colored text and strokes.
-    let controlColor: Color
     let onDone: () -> Void
+
+    @Environment(\.colorScheme) private var colorScheme
+
+    /// The contrast-corrected variant for text-bearing chrome: the recap chips'
+    /// colored text and strokes. The card itself (fill, bloom, sparkles) derives
+    /// its own raw color straight from the `metric` via `TrackerDoneView`, so
+    /// this view only needs the corrected shade.
+    private var mainColor: Color { model.mainColor(in: colorScheme) }
 
     /// The reveal card, built once and memoized so editing the name or emoji
     /// doesn't reshuffle the (randomly seeded) sample chart on every keystroke.
@@ -649,7 +640,7 @@ private struct DoneRevealStep: View {
                         )
                     }
                 },
-                color: controlColor,
+                color: mainColor,
                 onEditMax: { model.setNumberMax($0) },
                 onEditGranularity: { model.numberGranularity = $0 },
                 onToggleBehavior: {
@@ -665,7 +656,7 @@ private struct DoneRevealStep: View {
             DoneCategoryRecap(
                 allowsMultiple: model.categoryAllowsMultiple,
                 count: model.categoryLabels.count,
-                color: controlColor,
+                color: mainColor,
                 onToggleChoice: { model.categoryAllowsMultiple.toggle() }
             )
         case .binary:
@@ -683,7 +674,7 @@ private struct DoneRevealStep: View {
                 // The user's own unit, kept in the menu so they can switch back to
                 // it (and its target) after trying an AI one.
                 customUnit: model.goalMenuCustomUnit,
-                color: controlColor,
+                color: mainColor,
                 onSelectUnit: { model.selectGoalUnit($0) },
                 onEditGoal: { model.goalValue = max(0, $0) },
                 onEditGranularity: { model.goalGranularity = $0 }
