@@ -152,7 +152,7 @@ struct TrackerDoneView<Recap: View>: View {
 
     private var headline: some View {
         VStack(spacing: 6) {
-            Text("🎉")
+            Text("✅")
                 .font(.system(size: 48))
                 .scaleEffect(hasAppeared ? 1 : 0.4)
 
