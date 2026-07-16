@@ -257,7 +257,7 @@ struct TrackerIntentView: View {
     /// One pill per way this suggestion can be logged; tapping re-shapes the
     /// preview instantly (in the real flow this is a local morph, no AI).
     private var formatPills: some View {
-        HStack(spacing: 8) {
+        WrappingHStack(alignment: .center, hSpacing: 8, vSpacing: 8) {
             if let selected, !isLoading, !isFailed {
                 ForEach(selected.formats.indices, id: \.self) { index in
                     let format = selected.formats[index]

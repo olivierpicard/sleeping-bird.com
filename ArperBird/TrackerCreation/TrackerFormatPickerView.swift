@@ -67,7 +67,7 @@ struct TrackerFormatPickerView: View {
             )
             .animation(.snappy, value: selectedIndex)
 
-            HStack(spacing: 8) {
+            WrappingHStack(alignment: .center, hSpacing: 8, vSpacing: 8) {
                 ForEach(formats.indices, id: \.self) { index in
                     FormatChip(
                         format: formats[index],
@@ -289,6 +289,28 @@ extension TrackerFormatPickerView.FormatOption {
                 formats: [
                     .make(for: .goal, name: "Glasses of Water", emoji: "💧"),
                     .make(for: .number, name: "Glasses of Water", emoji: "💧"),
+                ]
+            )
+        }
+        .environment(\.locale, Locale(identifier: "en_US"))
+    }
+    .presentationDetents([.large])
+}
+
+#Preview("Mood — 4 formats, wraps") {
+    @Previewable @State var showSheet = true
+    NavigationStack {
+    }
+    .sheet(isPresented: $showSheet) {
+        NavigationStack {
+            TrackerFormatPickerView(
+                name: "Mood",
+                emoji: "🙂",
+                formats: [
+                    .make(for: .choices, name: "Mood", emoji: "🙂"),
+                    .make(for: .number, name: "Mood", emoji: "🙂"),
+                    .make(for: .goal, name: "Mood", emoji: "🙂"),
+                    .make(for: .binary, name: "Mood", emoji: "🙂"),
                 ]
             )
         }
