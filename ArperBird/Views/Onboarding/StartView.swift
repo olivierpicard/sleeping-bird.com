@@ -21,6 +21,7 @@ struct StartView: View {
     @State private var buttonAppeared = false
     @State private var footerAppeared = false
     @State private var floatPhase = false
+    @State private var isExiting = false
 
     @State private var showLegal = false
 
@@ -127,7 +128,9 @@ struct StartView: View {
         let restingX = center.x + CGFloat(offsetFromCenter) * spread
         let restingY = center.y + abs(offsetFromCenter) * 6
         let startX = center.x
-        let startY = center.y + 40
+        // Entrance rises from below center; the exit collapses toward a point
+        // slightly *above* it, so leaving reads as a departure, not a rewind.
+        let startY = center.y + (isExiting ? -30 : 40)
         let floatY: CGFloat = floatPhase
             ? CGFloat(sin(Double(index) * 1.2) * 6)
             : CGFloat(-sin(Double(index) * 1.2) * 6)
@@ -186,7 +189,7 @@ struct StartView: View {
 
     private var ctaBlock: some View {
         VStack(spacing: 16) {
-            Button(action: onStart) {
+            Button(action: startExit) {
                 Label("Get Started", systemImage: "arrow.right")
                 .font(.headline)
                 .frame(maxWidth: .infinity)
@@ -250,6 +253,48 @@ struct StartView: View {
                 .delay(2.0)
         ) {
             floatPhase = true
+        }
+    }
+
+    /// Plays the exit choreography, then hands off to `onStart`. The delay is
+    /// tuned so `RootView`'s short cross fade begins while the last (center)
+    /// bubble is still settling, covering the swap.
+    private func startExit() {
+        guard !isExiting else { return }
+        isExiting = true
+        runExitAnimation()
+        Task {
+            try? await Task.sleep(for: .milliseconds(650))
+            onStart()
+        }
+    }
+
+    /// The entrance played backward: every element is driven by the same
+    /// booleans as `runEntranceAnimation`, so flipping them inside
+    /// `withAnimation` reuses the exact same geometry in reverse — except the
+    /// bubbles, which collapse toward a point above center (see `isExiting`
+    /// in `emojiBubble`). Outermost bubbles leave first, the center 📈 last,
+    /// mirroring the center-outward reveal.
+    private func runExitAnimation() {
+        let middle = Double(emojiCards.count - 1) / 2.0
+        let exitOrder = emojiCards.indices.sorted {
+            abs(Double($0) - middle) > abs(Double($1) - middle)
+        }
+        for (rank, index) in exitOrder.enumerated() {
+            withAnimation(
+                .spring(response: 0.5, dampingFraction: 0.9)
+                    .delay(Double(rank) * 0.06)
+            ) {
+                _ = revealedEmojis.remove(index)
+            }
+        }
+        withAnimation(.easeIn(duration: 0.25)) {
+            buttonAppeared = false
+            footerAppeared = false
+        }
+        withAnimation(.easeIn(duration: 0.35).delay(0.15)) {
+            subtitleAppeared = false
+            titleAppeared = false
         }
     }
 }

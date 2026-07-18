@@ -14,20 +14,30 @@ struct RootView: View {
     @AppStorage("hasCompletedOnboarding") private var hasCompletedOnboarding = false
 //    @State private var hasCompletedOnboarding = false
 
+    /// True only when onboarding finished *this session* — lets the empty
+    /// dashboard play its entrance stagger on the hand-off from `StartView`,
+    /// without replaying it on a regular cold launch.
+    @State private var cameFromOnboarding = false
+
     var body: some View {
         ZStack {
             if hasCompletedOnboarding {
-                ContentView()
+                ContentView(animatesEmptyDashboardEntrance: cameFromOnboarding)
                     .transition(.opacity)
             } else {
                 OnboardingFlow(onComplete: {
+                    cameFromOnboarding = true
                     hasCompletedOnboarding = true
                     PostHogSDK.shared.capture("onboarding_completed")
                 })
                 .transition(.opacity)
             }
         }
-        .animation(.easeInOut(duration: 1.5), value: hasCompletedOnboarding)
+        // Kept short: `StartView` plays its exit choreography *before* calling
+        // `onComplete`, so this fade only has to cover the actual view swap —
+        // the two screens share the same static mesh background, which just
+        // "blooms" from intensity 0.6 to 1.0 underneath it.
+        .animation(.easeInOut(duration: 0.35), value: hasCompletedOnboarding)
     }
 }
 
@@ -37,3 +47,4 @@ struct RootView: View {
         .environment(Store())
         .modelContainer(for: Metric.self, inMemory: true)
 }
+

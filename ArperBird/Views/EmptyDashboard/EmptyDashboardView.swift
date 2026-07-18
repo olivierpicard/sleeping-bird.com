@@ -21,6 +21,11 @@ import SwiftUI
 ///
 /// Layout knobs live in `Tuning`; every piece is its own `@ViewBuilder`.
 struct EmptyDashboardView: View {
+    /// Plays the block-by-block entrance stagger on appear. Only `RootView`'s
+    /// onboarding hand-off sets this — a regular cold launch (or emptying the
+    /// dashboard) shows everything immediately, no replay.
+    var animatesEntrance = false
+
     /// Opens the creation flow — seeded with the tapped suggestion, or from
     /// scratch (`nil`) via the field CTA.
     let onAddMetric: (TrackerSuggestion?) -> Void
@@ -61,6 +66,11 @@ struct EmptyDashboardView: View {
     /// Keeps the completed chip text on screen while its CTA changes to the
     /// inward loading glow, immediately before opening the creation sheet.
     @State private var isPreparingCreation = false
+
+    /// How many blocks of the entrance stagger have landed (glyph → headline →
+    /// subcopy → field → chips). Only advanced when `animatesEntrance`;
+    /// otherwise `hasEntered` short-circuits and every block is visible.
+    @State private var entranceStage = 0
 
     /// True when the last field submit couldn't reach the intent AI — surfaces a
     /// brief inline retry message under the field. Cleared as soon as the user
@@ -291,8 +301,16 @@ struct EmptyDashboardView: View {
         VStack(spacing: Tuning.outerSpacing) {
             Spacer()
             softGlyph
+                .opacity(hasEntered(1) ? 1 : 0)
+                // Starts big and settles into the dashed frame — echoes the
+                // center 📈 bubble that just left `StartView`.
+                .scaleEffect(hasEntered(1) ? 1 : 1.5)
             headline
+                .opacity(hasEntered(2) ? 1 : 0)
+                .offset(y: hasEntered(2) ? 0 : 14)
             subcopy
+                .opacity(hasEntered(3) ? 1 : 0)
+                .offset(y: hasEntered(3) ? 0 : 14)
             VStack(spacing: Tuning.tightGroupSpacing) {
                 TrackerInputFieldCTA(
                     draft: $draft,
@@ -301,13 +319,44 @@ struct EmptyDashboardView: View {
                     isPreparingCreation: isPreparingCreation,
                     onSubmit: submitDraft
                 )
+                .opacity(hasEntered(4) ? 1 : 0)
+                .offset(y: hasEntered(4) ? 0 : 14)
                 if submitFailed {
                     submitFailure
                 }
                 labeledBadges("Try one:")
+                    .opacity(hasEntered(5) ? 1 : 0)
+                    .offset(y: hasEntered(5) ? 0 : 14)
             }
             Spacer()
             Spacer()
+        }
+        .onAppear(perform: runEntranceAnimation)
+    }
+
+    // MARK: - Entrance stagger
+
+    /// Whether the block at `stage` has landed. Short-circuits to `true` when
+    /// the entrance isn't animating, so a plain launch renders fully visible
+    /// on the first frame.
+    private func hasEntered(_ stage: Int) -> Bool {
+        !animatesEntrance || entranceStage >= stage
+    }
+
+    /// Staggers the five blocks in, top to bottom — same vocabulary as
+    /// `StartView`'s entrance (delayed springs on plain state), so the
+    /// onboarding hand-off reads as one continuous scene. Each delayed
+    /// `withAnimation` snapshots its own bump of `entranceStage`, so every
+    /// block animates exactly when its `hasEntered` threshold flips.
+    private func runEntranceAnimation() {
+        guard animatesEntrance, entranceStage == 0 else { return }
+        for stage in 1...5 {
+            withAnimation(
+                .spring(response: 0.7, dampingFraction: 0.8)
+                    .delay(0.1 + Double(stage - 1) * 0.12)
+            ) {
+                entranceStage = stage
+            }
         }
     }
 
@@ -419,6 +468,12 @@ struct EmptyDashboardView: View {
     )
     .background { EmptyDashboardBackground() }
 //    .environment(\.locale, Locale(identifier: "fr_FR"))
+}
+
+/// The block-by-block entrance played on the hand-off from onboarding.
+#Preview("Onboarding hand-off") {
+    EmptyDashboardView(animatesEntrance: true, onAddMetric: { _ in })
+        .background { EmptyDashboardBackground() }
 }
 
 /// Type anything into the field and submit, or tap a single-format chip —

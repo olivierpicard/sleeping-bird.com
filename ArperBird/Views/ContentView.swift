@@ -2,6 +2,11 @@ import SwiftData
 import SwiftUI
 
 struct ContentView: View {
+    /// Passed through to `EmptyDashboardView` — `RootView` sets it only when
+    /// onboarding completed this session, so the empty dashboard staggers in
+    /// on the hand-off from `StartView` but not on a regular cold launch.
+    var animatesEmptyDashboardEntrance = false
+
     @Query private var metrics: [Metric]
     @Environment(MetricGenerator.self) private var generator
     /// The active creation-flow presentation. Driven via `sheet(item:)` so the
@@ -74,6 +79,7 @@ struct ContentView: View {
             VStack {
                 if isDashboardEmpty { 
                     EmptyDashboardView(
+                        animatesEntrance: animatesEmptyDashboardEntrance,
                         onAddMetric: { suggestion in
                             // A chip arrives seeded — bundle its warmed model into
                             // the route *now*, while `prepared` is guaranteed set
