@@ -101,18 +101,18 @@ struct PaywallView: View {
 
                     // Feature rows
                     VStack(spacing: 12) {
-                        FeatureRow(
-                            icon: "mic",
-                            iconColor: .paywallAccent,
-                            iconBackground: Color(
-                                red: 0.99,
-                                green: 0.82,
-                                blue: 0.80
-                            ),
-                            title: "Unlimited Voice Interaction",
-                            description:
-                                "Create metrics and log entries just by speaking"
-                        )
+//                        FeatureRow(
+//                            icon: "mic",
+//                            iconColor: .paywallAccent,
+//                            iconBackground: Color(
+//                                red: 0.99,
+//                                green: 0.82,
+//                                blue: 0.80
+//                            ),
+//                            title: "Unlimited Voice Interaction",
+//                            description:
+//                                "Create metrics and log entries just by speaking"
+//                        )
 
                         FeatureRow(
                             icon: "arrow.2.circlepath",
@@ -281,7 +281,13 @@ struct PaywallView: View {
 
         }
         .background(Color(.systemGroupedBackground))
-        .interactiveDismissDisabled()
+        .toolbar {
+            ToolbarItem(placement: .cancellationAction) {
+                Button(action: { dismiss() }) {
+                    Image(systemName: "xmark")
+                }
+            }
+        }
         .trackScreen("Paywall")
         .task {
             // Retry if the launch-time load failed, so the paywall shows live

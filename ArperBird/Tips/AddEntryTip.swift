@@ -17,7 +17,6 @@ struct AddEntryTip: Tip {
     /// animates in only after the card has visually settled rather than
     /// appearing immediately.
     @Parameter static var hasSettled: Bool = false
-    @Parameter static var isPaywallPresented: Bool = false
 
     var title: Text {
         Text("add_entry_tip.title")
@@ -33,6 +32,5 @@ struct AddEntryTip: Tip {
 
     var rules: [Rule] {
         #Rule(Self.$hasSettled) { $0 == true }
-        #Rule(Self.$isPaywallPresented) { $0 == false }
     }
 }

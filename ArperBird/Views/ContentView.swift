@@ -122,7 +122,10 @@ struct ContentView: View {
                     )
                 } else {
                     DashboardView(onAddMetric: {
-                        // The "+" button opens the flow unfocused.
+                        // The "+" button opens the flow unfocused. The free-tier
+                        // paywall no longer gates entry here — it's enforced later,
+                        // on the creation flow's "Add to dashboard" button, so it
+                        // never blocks browsing the flow itself.
                         route = .scratch(autofocus: false)
                     })
                 }
@@ -154,6 +157,7 @@ struct ContentView: View {
 #Preview("Empty") {
     ContentView()
         .environment(MetricGenerator())
+        .environment(Store())
         .environment(\.locale, Locale(identifier: "en_US"))
         .modelContainer(for: Metric.self, inMemory: true)
 }
@@ -221,6 +225,7 @@ struct ContentView: View {
     }
     return ContentView()
         .environment(MetricGenerator())
+        .environment(Store())
         .modelContainer(container)
         .environment(\.locale, Locale(identifier: "es"))
 }

@@ -58,6 +58,13 @@ final class Store {
 
     var isPremium: Bool { !purchasedProductIDs.isEmpty }
 
+    /// There is no free allowance — every tracker save must pass the paywall
+    /// first. We wait for `hasLoadedEntitlements` so premium users are never
+    /// told they need to pay before their StoreKit entitlements have resolved.
+    var requiresPaywall: Bool {
+        hasLoadedEntitlements && !isPremium
+    }
+
     init() {
         observeTransactionUpdates()
         Task {

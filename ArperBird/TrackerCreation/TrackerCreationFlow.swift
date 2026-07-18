@@ -56,7 +56,13 @@ enum TrackerCreationStep: Hashable {
 struct TrackerCreationFlow: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var context
+    @Environment(Store.self) private var store
     @State private var path: [TrackerCreationStep] = []
+    /// Shown in place of persisting when `complete()` finds the user not yet
+    /// premium — there is no free allowance. Saving only happens once this
+    /// resolves with `store.isPremium == true` — see
+    /// `sheet(isPresented:onDismiss:)` below.
+    @State private var showPaywall = false
 
     /// The single source of truth for the whole flow. Owning the state here —
     /// rather than in per-step `@State` and `NavigationPath` payloads — is what
@@ -199,6 +205,20 @@ struct TrackerCreationFlow: View {
         // step's own controls (chips, steppers, CTAs) still get the tracker's
         // corrected `mainColor` explicitly, so config chrome reads as
         // tracker-tinted without the nav bar itself following along.
+        .sheet(isPresented: $showPaywall, onDismiss: {
+            // Fires whether the sheet closed via a purchase (`PaywallView`
+            // dismisses itself on success) or the user backing out. Only the
+            // former leaves `isPremium` true, so this is the single gate that
+            // decides whether "Add to dashboard" actually saved anything —
+            // backing out of the paywall always leaves the reveal on screen
+            // with nothing persisted.
+            if store.isPremium {
+                persistMetric()
+                dismiss()
+            }
+        }) {
+            PaywallView()
+        }
     }
 
     /// Builds each pushed step. Every destination reads from / writes to `model`,
@@ -390,12 +410,18 @@ struct TrackerCreationFlow: View {
 
     // MARK: - Persistence
 
-    /// Closes the flow once the user accepts the finished tracker on the reveal:
-    /// persist it, then dismiss ourselves — the same `@Environment(\.dismiss)` the
-    /// cancel button uses, so the flow has a single exit path.
+    /// Called when the user taps "Add to dashboard" on the reveal. A
+    /// non-premium user is interrupted with the paywall instead of saving
+    /// straight away — `sheet(isPresented:onDismiss:)` above is what actually
+    /// persists once (and only if) that resolves with the user premium, so
+    /// there's no path from this button to a saved tracker that skips it.
     private func complete() {
-        persistMetric()
-        dismiss()
+        if store.requiresPaywall {
+            showPaywall = true
+        } else {
+            persistMetric()
+            dismiss()
+        }
     }
 
     /// Inserts the finished tracker into the store. Mirrors `MetricGenerator`'s
