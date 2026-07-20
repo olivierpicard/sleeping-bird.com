@@ -5,6 +5,7 @@
 //  Created by Olivier Picard on 24/04/2026.
 //
 
+import PostHog
 import SwiftUI
 
 /// The empty-state dashboard, redesigned to the "minimal" direction in
@@ -120,7 +121,15 @@ struct EmptyDashboardView: View {
             // hang off the full-screen frame; the field's own tap (focus) and the
             // chips' taps are more specific, so they still win.
             .contentShape(Rectangle())
-            .onTapGesture { isFieldFocused = false }
+            .onTapGesture {
+                if isFieldFocused, !draft.isEmpty {
+                    PostHogSDK.shared.capture(
+                        "empty_dashboard_draft_abandoned",
+                        properties: ["length": draft.count]
+                    )
+                }
+                isFieldFocused = false
+            }
             .padding()
             // When the field lights up, knock the shared mesh background back so
             // the glowing CTA carries the focus. The background itself lives in
@@ -166,14 +175,29 @@ struct EmptyDashboardView: View {
         guard !text.isEmpty else { return }
         typeTask?.cancel()
         submitFailed = false
+        PostHogSDK.shared.capture(
+            "empty_dashboard_draft_submitted",
+            properties: [
+                "length": text.count,
+                "word_count": text.split(separator: " ").count,
+            ]
+        )
         typeTask = Task { @MainActor in
             isPreparingCreation = true
             do {
                 let suggestion = try await resolveIntent(text)
                 if Task.isCancelled { return }
-                await openSeeded(suggestion)
+                await openSeeded(suggestion, via: "typed")
             } catch {
                 if Task.isCancelled { return }
+                PostHogSDK.shared.capture(
+                    "empty_dashboard_intent_failed",
+                    properties: ["via": "typed_intent", "length": text.count]
+                )
+                PostHogSDK.shared.captureException(
+                    error,
+                    properties: ["via": "typed_intent"]
+                )
                 isPreparingCreation = false
                 submitFailed = true
             }
@@ -186,11 +210,15 @@ struct EmptyDashboardView: View {
     /// opens on the interactive format picker). Then hands the seed up to open the
     /// creation flow — unless the prefetch failed, in which case the same inline
     /// retry message shows instead and the flow never opens.
-    private func openSeeded(_ suggestion: TrackerSuggestion) async {
+    private func openSeeded(_ suggestion: TrackerSuggestion, via: String) async {
         if suggestion.formats.count == 1 {
             let seedOk = await prepareSeed(suggestion)
             if Task.isCancelled { return }
             guard seedOk else {
+                PostHogSDK.shared.capture(
+                    "empty_dashboard_intent_failed",
+                    properties: ["via": "\(via)_prefetch", "suggestion_id": suggestion.id]
+                )
                 isPreparingCreation = false
                 submitFailed = true
                 return
@@ -198,6 +226,14 @@ struct EmptyDashboardView: View {
         }
         if Task.isCancelled { return }
         isPreparingCreation = false
+        PostHogSDK.shared.capture(
+            "empty_dashboard_flow_opened",
+            properties: [
+                "via": via,
+                "suggestion_id": suggestion.id,
+                "format_count": suggestion.formats.count,
+            ]
+        )
         onAddMetric(suggestion)
     }
 
@@ -216,6 +252,13 @@ struct EmptyDashboardView: View {
     /// in-flight animation.
     private func typeSuggestion(_ suggestion: TrackerSuggestion) {
         typeTask?.cancel()
+        PostHogSDK.shared.capture(
+            "empty_dashboard_chip_tapped",
+            properties: [
+                "suggestion_id": suggestion.id,
+                "format_count": suggestion.formats.count,
+            ]
+        )
         typeTask = Task { @MainActor in
             isTyping = true
             draft = ""
@@ -264,9 +307,21 @@ struct EmptyDashboardView: View {
             // A failed prefetch shows the same inline retry message as a failed
             // field submit, instead of opening the flow.
             guard seedOk else {
+                PostHogSDK.shared.capture(
+                    "empty_dashboard_intent_failed",
+                    properties: ["via": "chip_prefetch", "suggestion_id": suggestion.id]
+                )
                 submitFailed = true
                 return
             }
+            PostHogSDK.shared.capture(
+                "empty_dashboard_flow_opened",
+                properties: [
+                    "via": "chip",
+                    "suggestion_id": suggestion.id,
+                    "format_count": suggestion.formats.count,
+                ]
+            )
             onAddMetric(suggestion)
         }
     }

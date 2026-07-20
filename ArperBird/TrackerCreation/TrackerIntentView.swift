@@ -5,6 +5,7 @@
 //  Created by Olivier Picard on 05/07/2026.
 //
 
+import PostHog
 import SwiftUI
 #if DEBUG
 import FirebaseCore
@@ -24,6 +25,11 @@ struct TrackerIntentView: View {
     @State private var isFailed = false
     @State private var text = ""
     @State private var promptIndex = 0
+    /// How the current `selected` suggestion was resolved — "chip" for a
+    /// curated tap (or a pre-resolved dashboard badge seed), "typed" for the
+    /// free-text AI path. Read by `continueWithSelection()` to tag
+    /// `tracker_kind_selected`.
+    @State private var selectionSource: String
     @FocusState private var isFieldFocused: Bool
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.colorScheme) private var colorScheme
@@ -71,6 +77,7 @@ struct TrackerIntentView: View {
         let preresolved = preselected.map(Self.intentSuggestion(from:))
         _selected = State(initialValue: preresolved)
         _text = State(initialValue: preresolved?.instruction ?? "")
+        _selectionSource = State(initialValue: preselected != nil ? "chip" : "typed")
         _suggestions = State(initialValue: Self.makeSuggestions())
         _placeholder = State(
             initialValue: Metric(
@@ -181,6 +188,7 @@ struct TrackerIntentView: View {
             try? await Task.sleep(for: .seconds(0.35))
             isFieldFocused = true
         }
+        .trackScreen("ManualTrackerCreationIntent")
     }
 
     // MARK: - Subviews
@@ -261,7 +269,7 @@ struct TrackerIntentView: View {
             if let selected, !isLoading, !isFailed {
                 ForEach(selected.formats.indices, id: \.self) { index in
                     let format = selected.formats[index]
-                    Button(action: { formatIndex = index }) {
+                    Button(action: { selectFormat(at: index, in: selected) }) {
                         Label(format.label, systemImage: format.icon)
                             .font(.footnote.weight(.medium))
                     }
@@ -284,7 +292,7 @@ struct TrackerIntentView: View {
 
     private var inputField: some View {
         HStack(spacing: 8) {
-            Image(systemName: "pencil.line")
+            Image(systemName: "sparkles")
                 .foregroundStyle(.secondary)
             TextField("", text: $text)
                 .textFieldStyle(.plain)
@@ -330,7 +338,35 @@ struct TrackerIntentView: View {
     private func continueWithSelection() {
         guard let selected, !isLoading, !isFailed else { return }
         let format = selected.formats[formatIndex]
+        var properties: [String: Any] = [
+            "kind": format.kind.rawValue,
+            "via": selectionSource,
+        ]
+        // Only a curated chip has a catalog id to attribute the pick to — an AI
+        // free-text resolution has none, so the property is omitted rather than
+        // sent as a placeholder.
+        if let suggestionID = selected.suggestionID {
+            properties["suggestion_id"] = suggestionID
+        }
+        PostHogSDK.shared.capture("tracker_kind_selected", properties: properties)
         onContinue(format.kind, selected.trackerName, selected.color)
+    }
+
+    /// Reports a format-pill switch — deliberation between how a resolved idea
+    /// should be logged (e.g. "Daily goal" vs "A number") that `tracker_kind_selected`
+    /// alone can't see, since that only fires once at the very end on "Continue".
+    /// A same-index tap (re-selecting the active pill) is a no-op, so it isn't
+    /// reported.
+    private func selectFormat(at index: Int, in suggestion: IntentSuggestion) {
+        guard index != formatIndex else { return }
+        PostHogSDK.shared.capture(
+            "tracker_format_switched",
+            properties: [
+                "from_kind": suggestion.formats[formatIndex].kind.rawValue,
+                "to_kind": suggestion.formats[index].kind.rawValue,
+            ]
+        )
+        formatIndex = index
     }
 
     // MARK: - Fake resolution (stands in for the AI classify call)
@@ -339,6 +375,17 @@ struct TrackerIntentView: View {
         text = suggestion.instruction
         isFailed = false
         isLoading = true
+        selectionSource = "chip"
+        // Reports the tap itself (not just an eventual "Continue"), mirroring
+        // `EmptyDashboardView`'s `empty_dashboard_chip_tapped` — lets a curated
+        // idea's explore rate be compared against its eventual conversion via
+        // `tracker_kind_selected`'s `suggestion_id`. `suggestion.suggestionID` is
+        // always set here since `resolve` only ever receives curated chips
+        // (never the AI free-text path).
+        PostHogSDK.shared.capture(
+            "tracker_intent_chip_tapped",
+            properties: ["suggestion_id": suggestion.suggestionID ?? "unknown"]
+        )
         Task {
             try? await Task.sleep(for: .seconds(0.7))
             formatIndex = 0
@@ -358,11 +405,30 @@ struct TrackerIntentView: View {
         isFailed = false
         isLoading = true
         Task {
+            let start = ContinuousClock.now
             do {
                 let completion = try await generateIntent(name)
+                let elapsed = ContinuousClock.now - start
+                PostHogSDK.shared.capture(
+                    "tracker_ai_completion_succeeded",
+                    properties: [
+                        "facet": "intent",
+                        "duration_s": ((elapsed / .seconds(1)) * 10).rounded() / 10,
+                    ]
+                )
                 formatIndex = 0
                 selected = intentSuggestion(from: completion)
+                selectionSource = "typed"
             } catch {
+                let elapsed = ContinuousClock.now - start
+                PostHogSDK.shared.capture(
+                    "tracker_ai_completion_failed",
+                    properties: [
+                        "facet": "intent",
+                        "duration_s": ((elapsed / .seconds(1)) * 10).rounded() / 10,
+                    ]
+                )
+                PostHogSDK.shared.captureException(error, properties: ["facet": "intent"])
                 selected = nil
                 isFailed = true
             }
@@ -375,6 +441,8 @@ struct TrackerIntentView: View {
     private func intentSuggestion(from completion: IntentCompletion) -> IntentSuggestion {
         let color = Self.color(for: completion.formats.first?.kind ?? .number)
         return IntentSuggestion(
+            // AI free-text resolution has no catalog entry to attribute to.
+            suggestionID: nil,
             trackerName: completion.title,
             instruction: completion.title,
             emoji: completion.emoji,
@@ -404,6 +472,11 @@ struct TrackerIntentView: View {
 
     private struct IntentSuggestion: Identifiable {
         let id = UUID()
+        /// The curated `TrackerSuggestion.id` this came from, for analytics —
+        /// lets `tracker_kind_selected` (and the chip-tap event) attribute a
+        /// pick to a specific curated idea. Nil for an AI free-text resolution,
+        /// which has no catalog entry to point at.
+        let suggestionID: String?
         let trackerName: String
         /// The sentence offered as the field's prompt text — distinct from
         /// `trackerName` so the card can carry a concise name while the field
@@ -464,6 +537,7 @@ struct TrackerIntentView: View {
     ) -> IntentSuggestion {
         let color = color(for: suggestion.formats.first?.kind ?? .number)
         return IntentSuggestion(
+            suggestionID: suggestion.id,
             trackerName: suggestion.localizedTrackerName,
             instruction: suggestion.localizedInstruction,
             emoji: suggestion.emoji,

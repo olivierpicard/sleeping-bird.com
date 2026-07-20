@@ -5,6 +5,7 @@
 //  Created by Olivier Picard on 22/06/2026.
 //
 
+import PostHog
 import SwiftData
 import SwiftUI
 
@@ -63,6 +64,10 @@ struct TrackerCreationFlow: View {
     /// resolves with `store.isPremium == true` — see
     /// `sheet(isPresented:onDismiss:)` below.
     @State private var showPaywall = false
+    /// Set right before a completed dismiss (direct save, or a purchase from
+    /// the paywall interrupt) so `onDisappear` below can tell a finished flow
+    /// apart from one the user backed out of.
+    @State private var didComplete = false
 
     /// The single source of truth for the whole flow. Owning the state here —
     /// rather than in per-step `@State` and `NavigationPath` payloads — is what
@@ -213,11 +218,30 @@ struct TrackerCreationFlow: View {
             // backing out of the paywall always leaves the reveal on screen
             // with nothing persisted.
             if store.isPremium {
+                didComplete = true
                 persistMetric()
                 dismiss()
+            } else {
+                // The single explicit signal for a decline — otherwise it's only
+                // inferable by joining `tracker_creation_paywall_shown` against
+                // the absence of `tracker_created` in the same session.
+                PostHogSDK.shared.capture(
+                    "tracker_creation_paywall_declined",
+                    properties: ["kind": model.kind?.rawValue ?? "unknown"]
+                )
             }
         }) {
             PaywallView()
+        }
+        .onDisappear {
+            guard !didComplete else { return }
+            PostHogSDK.shared.capture(
+                "tracker_creation_abandoned",
+                properties: [
+                    "last_step": path.last.map { String(describing: $0) } ?? "intent",
+                    "kind": model.kind?.rawValue ?? "none",
+                ]
+            )
         }
     }
 
@@ -417,8 +441,13 @@ struct TrackerCreationFlow: View {
     /// there's no path from this button to a saved tracker that skips it.
     private func complete() {
         if store.requiresPaywall {
+            PostHogSDK.shared.capture(
+                "tracker_creation_paywall_shown",
+                properties: ["kind": model.kind?.rawValue ?? "unknown"]
+            )
             showPaywall = true
         } else {
+            didComplete = true
             persistMetric()
             dismiss()
         }
@@ -430,6 +459,10 @@ struct TrackerCreationFlow: View {
     /// only to make the reveal chart look alive.
     private func persistMetric() {
         context.insert(Metric(from: doneSchema(), color: model.color))
+        PostHogSDK.shared.capture(
+            "tracker_created",
+            properties: ["kind": model.kind?.rawValue ?? "unknown"]
+        )
     }
 
     // MARK: - Reveal card
@@ -610,12 +643,58 @@ private struct DoneRevealStep: View {
     /// the card's own name/emoji stay unused here.
     @State private var card: Metric?
 
+    /// Guards `tracker_default_edited` for the header fields so a rename fires
+    /// once per reveal visit rather than once per keystroke — `nameField`/
+    /// `emojiField` wrap direct `TextField`/emoji-keyboard bindings, which write
+    /// on every character, unlike the recap chips' discrete tap actions.
+    @State private var didCaptureNameEdit = false
+    @State private var didCaptureEmojiEdit = false
+
+    /// Wraps `model.name` to report the header field overriding the AI-seeded
+    /// name — once per visit, and without the typed text itself (mirrors
+    /// `empty_dashboard_draft_submitted` logging only a length, never the
+    /// content) since a tracker name can carry sensitive personal context.
+    private var nameField: Binding<String> {
+        Binding(
+            get: { model.name },
+            set: { newValue in
+                if !didCaptureNameEdit, newValue != model.name {
+                    didCaptureNameEdit = true
+                    PostHogSDK.shared.capture(
+                        "tracker_default_edited",
+                        properties: [
+                            "kind": model.kind?.rawValue ?? "unknown",
+                            "field": "name",
+                        ]
+                    )
+                }
+                model.name = newValue
+            }
+        )
+    }
+
+    /// Wraps `model.emoji` to report the header chip overriding the AI-seeded
+    /// emoji — once per visit. Unlike the name, a single emoji glyph carries no
+    /// sensitive content, so it's logged as the chip's `value`.
+    private var emojiField: Binding<String> {
+        Binding(
+            get: { model.emoji },
+            set: { newValue in
+                if !didCaptureEmojiEdit, newValue != model.emoji {
+                    didCaptureEmojiEdit = true
+                    captureDefaultEdited(field: "emoji", value: newValue)
+                }
+                model.emoji = newValue
+            }
+        )
+    }
+
     var body: some View {
         let displayed = card ?? metric()
         return TrackerDoneView(
             metric: displayed,
-            name: $model.name,
-            emoji: $model.emoji,
+            name: nameField,
+            emoji: emojiField,
             onDone: onDone
         ) {
             recap
@@ -639,6 +718,22 @@ private struct DoneRevealStep: View {
             String(model.goalGranularity),
             model.selectedUnit,
         ].joined(separator: "|")
+    }
+
+    /// Reports a recap chip overriding one of the AI's proposed defaults —
+    /// `field` names which one (e.g. `"number_max"`), `value` its new setting.
+    /// Captured here (not inside `TrackerCreationModel`'s mutators) because
+    /// each closure below is this action's one and only call site, and already
+    /// knows which field it's touching for free.
+    private func captureDefaultEdited(field: String, value: Any) {
+        PostHogSDK.shared.capture(
+            "tracker_default_edited",
+            properties: [
+                "kind": model.kind?.rawValue ?? "unknown",
+                "field": field,
+                "value": value,
+            ]
+        )
     }
 
     /// The path's recap line and chips, picked from `model.kind`. Each branch is a
@@ -667,23 +762,40 @@ private struct DoneRevealStep: View {
                     }
                 },
                 color: mainColor,
-                onEditMax: { model.setNumberMax($0) },
-                onEditGranularity: { model.numberGranularity = $0 },
+                onEditMax: {
+                    captureDefaultEdited(field: "number_max", value: $0)
+                    model.setNumberMax($0)
+                },
+                onEditGranularity: {
+                    captureDefaultEdited(field: "number_step", value: $0)
+                    model.numberGranularity = $0
+                },
                 onToggleBehavior: {
                     // Flip cumulative ↔ snapshot in place; defaulting an unset
                     // behavior to snapshot mirrors how the reveal derives it.
-                    model.behavior =
+                    let next: MetricBehavior =
                         (model.behavior ?? .snapshot) == .cumulative
                         ? .snapshot : .cumulative
+                    captureDefaultEdited(field: "number_behavior", value: next.rawValue)
+                    model.behavior = next
                 },
-                onSelectUnit: { model.chooseNumberUnit($0) }
+                onSelectUnit: {
+                    captureDefaultEdited(field: "number_unit", value: $0)
+                    model.chooseNumberUnit($0)
+                }
             )
         case .choices:
             DoneCategoryRecap(
                 allowsMultiple: model.categoryAllowsMultiple,
                 count: model.categoryLabels.count,
                 color: mainColor,
-                onToggleChoice: { model.categoryAllowsMultiple.toggle() }
+                onToggleChoice: {
+                    model.categoryAllowsMultiple.toggle()
+                    captureDefaultEdited(
+                        field: "category_choice_mode",
+                        value: model.categoryAllowsMultiple ? "multiple" : "single"
+                    )
+                }
             )
         case .binary:
             DoneBinaryRecap()
@@ -701,9 +813,19 @@ private struct DoneRevealStep: View {
                 // it (and its target) after trying an AI one.
                 customUnit: model.goalMenuCustomUnit,
                 color: mainColor,
-                onSelectUnit: { model.selectGoalUnit($0) },
-                onEditGoal: { model.goalValue = max(0, $0) },
-                onEditGranularity: { model.goalGranularity = $0 }
+                onSelectUnit: {
+                    captureDefaultEdited(field: "goal_unit", value: $0)
+                    model.selectGoalUnit($0)
+                },
+                onEditGoal: {
+                    let value = max(0, $0)
+                    captureDefaultEdited(field: "goal_target", value: value)
+                    model.goalValue = value
+                },
+                onEditGranularity: {
+                    captureDefaultEdited(field: "goal_step", value: $0)
+                    model.goalGranularity = $0
+                }
             )
         case nil:
             EmptyView()  // unreachable: kind is set before any later step.
@@ -717,6 +839,7 @@ private struct DoneRevealStep: View {
     }
     .sheet(isPresented: $showSheet) {
         TrackerCreationFlow()
+            .environment(Store())
     }
     .presentationDetents([.large])
     .modelContainer(for: Metric.self, inMemory: true)

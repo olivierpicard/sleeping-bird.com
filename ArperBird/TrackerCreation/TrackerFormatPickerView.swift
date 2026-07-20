@@ -5,6 +5,7 @@
 //  Created by Olivier Picard on 12/07/2026.
 //
 
+import PostHog
 import SwiftUI
 
 /// Once a suggestion chip has already resolved a name/emoji/color — a
@@ -74,9 +75,7 @@ struct TrackerFormatPickerView: View {
                         isSelected: index == selectedIndex,
                         color: mainColor
                     ) {
-                        withAnimation(.snappy(duration: 0.25)) {
-                            selectedIndex = index
-                        }
+                        selectFormat(at: index)
                     }
                 }
             }
@@ -87,7 +86,14 @@ struct TrackerFormatPickerView: View {
         .padding(.horizontal)
         .padding(.top, 24)
         .safeAreaInset(edge: .bottom) {
-            Button(action: { onContinue(formats[selectedIndex].kind) }) {
+            Button(action: {
+                let kind = formats[selectedIndex].kind
+                PostHogSDK.shared.capture(
+                    "tracker_kind_selected",
+                    properties: ["kind": kind.rawValue, "via": "format_picker"]
+                )
+                onContinue(kind)
+            }) {
                 Text("Continue")
                     .font(.headline)
                     .frame(maxWidth: .infinity)
@@ -104,6 +110,27 @@ struct TrackerFormatPickerView: View {
         .navigationTitle(String(localized: "How to track it"))
         .navigationSubtitle("How should \"\(name)\" look?")
         .navigationBarTitleDisplayMode(.large)
+        .trackScreen("ManualTrackerCreationFormatPicker")
+    }
+
+    /// Reports a format-chip switch — deliberation between how this idea should
+    /// be logged that `tracker_kind_selected` alone can't see, since that only
+    /// fires once at the very end on "Continue". Mirrors
+    /// `TrackerIntentView.selectFormat(at:in:)`. A same-index tap (re-selecting
+    /// the active chip) is a no-op, so it isn't reported.
+    private func selectFormat(at index: Int) {
+        if index != selectedIndex {
+            PostHogSDK.shared.capture(
+                "tracker_format_switched",
+                properties: [
+                    "from_kind": formats[selectedIndex].kind.rawValue,
+                    "to_kind": formats[index].kind.rawValue,
+                ]
+            )
+        }
+        withAnimation(.snappy(duration: 0.25)) {
+            selectedIndex = index
+        }
     }
 }
 
@@ -292,7 +319,7 @@ extension TrackerFormatPickerView.FormatOption {
                 ]
             )
         }
-        .environment(\.locale, Locale(identifier: "en_US"))
+//        .environment(\.locale, Locale(identifier: "en_US"))
     }
     .presentationDetents([.large])
 }
@@ -314,7 +341,7 @@ extension TrackerFormatPickerView.FormatOption {
                 ]
             )
         }
-        .environment(\.locale, Locale(identifier: "en_US"))
+//        .environment(\.locale, Locale(identifier: "es_ES"))
     }
     .presentationDetents([.large])
 }
@@ -334,7 +361,7 @@ extension TrackerFormatPickerView.FormatOption {
                 ]
             )
         }
-        .environment(\.locale, Locale(identifier: "en_US"))
+//        .environment(\.locale, Locale(identifier: "en_US"))
     }
     .presentationDetents([.large])
 }

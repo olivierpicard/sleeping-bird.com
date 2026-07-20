@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import PostHog
 import SwiftUI
 
 /// Single source of truth for the manual tracker-creation flow.
@@ -275,6 +276,42 @@ final class TrackerCreationModel {
         self.generateGranularity = generateGranularity
     }
 
+    // MARK: - AI reliability
+
+    /// Times an AI completion call and reports its outcome to PostHog, tagged
+    /// with which facet of the flow it backs. Lives here (not in
+    /// `AiSchemaCompletion` or the per-facet completion types) because this is
+    /// the one layer that already knows the facet for free — the calling
+    /// method's name — without threading it in from a generic wrapper that's
+    /// also shared by the unrelated one-shot voice pipeline, or from
+    /// completion types like `EmojiAiCompletion`/`CategoryAiCompletion` that
+    /// each back more than one facet on their own.
+    private func trackedCompletion<T>(
+        facet: String,
+        _ operation: () async throws -> T
+    ) async throws -> T {
+        let start = ContinuousClock.now
+        do {
+            let result = try await operation()
+            let elapsed = ContinuousClock.now - start
+            let durationS = ((elapsed / .seconds(1)) * 10).rounded() / 10
+            PostHogSDK.shared.capture(
+                "tracker_ai_completion_succeeded",
+                properties: ["facet": facet, "duration_s": durationS]
+            )
+            return result
+        } catch {
+            let elapsed = ContinuousClock.now - start
+            let durationS = ((elapsed / .seconds(1)) * 10).rounded() / 10
+            PostHogSDK.shared.capture(
+                "tracker_ai_completion_failed",
+                properties: ["facet": facet, "duration_s": durationS]
+            )
+            PostHogSDK.shared.captureException(error, properties: ["facet": facet])
+            throw error
+        }
+    }
+
     // MARK: - Seed preload
 
     /// Runs a seeded (badge-tapped) single-format tracker's *first* AI load up
@@ -325,7 +362,9 @@ final class TrackerCreationModel {
         guard loadedName != name || phase == .failed else { return }
         phase = .loading
         do {
-            let schema = try await generate(nameInstruction)
+            let schema = try await trackedCompletion(facet: "goal") {
+                try await generate(nameInstruction)
+            }
             suggestions = schema.goals
             // The emoji is list-level, so seed it once here — it stays put as the
             // user switches units, mirroring how `loadNumberIfNeeded` handles
@@ -357,9 +396,11 @@ final class TrackerCreationModel {
         else { return }
         goalGranularityPhase = .loading
         do {
-            let schema = try await generateGranularity(
-                "- Tracker name: \(nameInstruction)\n- Unit: \(unit)"
-            )
+            let schema = try await trackedCompletion(facet: "goal_granularity") {
+                try await generateGranularity(
+                    "- Tracker name: \(nameInstruction)\n- Unit: \(unit)"
+                )
+            }
             if schema.granularity > 0 { goalGranularity = schema.granularity }
             loadedGranularityKey = key
             goalGranularityPhase = .loaded
@@ -378,7 +419,9 @@ final class TrackerCreationModel {
         guard loadedDurationName != name || durationPhase == .failed else { return }
         durationPhase = .loading
         do {
-            let schema = try await generateEmoji(nameInstruction)
+            let schema = try await trackedCompletion(facet: "duration_emoji") {
+                try await generateEmoji(nameInstruction)
+            }
             durationEmoji = schema.emoji
             loadedDurationName = name
             durationPhase = .loaded
@@ -397,7 +440,9 @@ final class TrackerCreationModel {
         guard loadedBinaryName != name || binaryPhase == .failed else { return }
         binaryPhase = .loading
         do {
-            let schema = try await generateEmoji(nameInstruction)
+            let schema = try await trackedCompletion(facet: "binary_emoji") {
+                try await generateEmoji(nameInstruction)
+            }
             binaryEmoji = schema.emoji
             loadedBinaryName = name
             binaryPhase = .loaded
@@ -416,7 +461,9 @@ final class TrackerCreationModel {
         guard loadedDateName != name || datePhase == .failed else { return }
         datePhase = .loading
         do {
-            let schema = try await generateEmoji(nameInstruction)
+            let schema = try await trackedCompletion(facet: "date_emoji") {
+                try await generateEmoji(nameInstruction)
+            }
             dateEmoji = schema.emoji
             loadedDateName = name
             datePhase = .loaded
@@ -437,7 +484,9 @@ final class TrackerCreationModel {
         guard loadedNumberName != name || numberPhase == .failed else { return }
         numberPhase = .loading
         do {
-            let schema = try await generateNumber(nameInstruction)
+            let schema = try await trackedCompletion(facet: "number") {
+                try await generateNumber(nameInstruction)
+            }
             numberSuggestions = schema.constraints
             behavior = schema.isCumulative ? .cumulative : .snapshot
             numberEmoji = schema.emoji
@@ -487,7 +536,9 @@ final class TrackerCreationModel {
         guard loadedCategoryName != name || categoryPhase == .failed else { return }
         categoryPhase = .loading
         do {
-            let schema = try await generateCategory(nameInstruction)
+            let schema = try await trackedCompletion(facet: "category") {
+                try await generateCategory(nameInstruction)
+            }
             categoryLabels = schema.categories
             categorySuggestedLabels = schema.categories
             categoryAllowsMultiple = schema.allowsMultipleSelection
@@ -522,9 +573,11 @@ final class TrackerCreationModel {
     func reclassifyChoice(for labels: [String]) async {
         categoryPhase = .loading
         do {
-            let schema = try await generateCategory(
-                "\(nameInstruction)\n- Categories: \(labels.joined(separator: ", "))"
-            )
+            let schema = try await trackedCompletion(facet: "category_reclassify") {
+                try await generateCategory(
+                    "\(nameInstruction)\n- Categories: \(labels.joined(separator: ", "))"
+                )
+            }
             categoryAllowsMultiple = schema.allowsMultipleSelection
             categoryPhase = .loaded
         } catch {
