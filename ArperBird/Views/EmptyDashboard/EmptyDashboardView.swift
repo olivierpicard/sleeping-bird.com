@@ -107,7 +107,7 @@ struct EmptyDashboardView: View {
         /// before the tracker flow opens.
         static let typeStartDelay: Duration = .milliseconds(300)
         static let typeSettleDelay: Duration = .milliseconds(750)
-        static let creationLoadingDelay: Duration = .seconds(1.6)
+        static let creationLoadingDelay: Duration = .seconds(3)
     }
 
     /// The curated suggestion chips — the same source `TrackerIntentView` samples
