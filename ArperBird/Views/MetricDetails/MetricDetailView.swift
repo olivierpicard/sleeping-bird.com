@@ -24,8 +24,6 @@ struct MetricDetailView: View {
     @State private var range: TimeRange = .month
     @State private var selectedDate: Date?
     @State private var bins: [ChartBin] = []
-    @State private var filledDays: Set<Date> = []
-    @State private var falseDays: Set<Date> = []
     @State private var categoryEntries: [StackedBarChartView.Entry] = []
     /// Day (start-of-day) → the choice labels logged that day, for the category
     /// calendar's pies. Recomputed alongside the other derived render state.
@@ -37,7 +35,6 @@ struct MetricDetailView: View {
     /// Guards the one-time seed of `activeCategoryLabels` so a re-appear never
     /// wipes the user's toggles.
     @State private var hasSeededCategory = false
-    @State private var datetimeFilledDays: Set<Date> = []
     @State private var numberFilledDays: Set<Date> = []
     /// Programmatic scroll target for the calendar — written by the chevrons to
     /// scroll to a specific month.
@@ -82,24 +79,36 @@ struct MetricDetailView: View {
         categoryDayLabels = map.mapValues { Array($0) }
     }
 
-    private func recomputeFilledDays() {
+    /// Binary "true"/"false" days, derived live from `metric.data` (not cached
+    /// `@State`) — the binary and datetime calendars are mounted unconditionally
+    /// on the first render, before `.onAppear` runs, so caching these in `@State`
+    /// left every cell showing its empty "no entry" ring until some later
+    /// transaction (e.g. tapping a cell) forced a repaint.
+    private var filledDays: Set<Date> {
         let cal = Calendar.current
-        var trueSet: Set<Date> = []
-        var falseSet: Set<Date> = []
+        var set: Set<Date> = []
         for point in metric.data {
-            if case .binary(let date, let value) = point {
-                if value {
-                    trueSet.insert(cal.startOfDay(for: date))
-                } else {
-                    falseSet.insert(cal.startOfDay(for: date))
-                }
+            if case .binary(let date, true) = point {
+                set.insert(cal.startOfDay(for: date))
             }
         }
-        filledDays = trueSet
-        falseDays = falseSet
+        return set
     }
 
-    private func recomputeDatetimeFilledDays() {
+    private var falseDays: Set<Date> {
+        let cal = Calendar.current
+        var set: Set<Date> = []
+        for point in metric.data {
+            if case .binary(let date, false) = point {
+                set.insert(cal.startOfDay(for: date))
+            }
+        }
+        return set
+    }
+
+    /// See `filledDays` — same live-derivation reasoning applies to the
+    /// datetime calendar.
+    private var datetimeFilledDays: Set<Date> {
         let cal = Calendar.current
         var set: Set<Date> = []
         for point in metric.data {
@@ -107,7 +116,7 @@ struct MetricDetailView: View {
                 set.insert(cal.startOfDay(for: date))
             }
         }
-        datetimeFilledDays = set
+        return set
     }
 
     private func recomputeNumberFilledDays() {
@@ -279,8 +288,6 @@ struct MetricDetailView: View {
         }
         .onAppear {
             recomputeBins()
-            recomputeFilledDays()
-            recomputeDatetimeFilledDays()
             recomputeNumberFilledDays()
             recomputeCategoryEntries()
             recomputeCategoryDays()
@@ -301,8 +308,6 @@ struct MetricDetailView: View {
         }
         .onChange(of: metric.data.count) { _, _ in
             recomputeBins()
-            recomputeFilledDays()
-            recomputeDatetimeFilledDays()
             recomputeNumberFilledDays()
             recomputeCategoryEntries()
             recomputeCategoryDays()
