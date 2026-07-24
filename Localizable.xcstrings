@@ -3040,6 +3040,29 @@
         }
       }
     },
+    "paywall.trial.pay_nothing_today" : {
+      "comment" : "Short reassurance line above the CTA on paywall, shown only when the user is eligible for the free trial",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pay nothing today"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hoy no pagas nada"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ne payez rien aujourd'hui"
+          }
+        }
+      }
+    },
     "paywall.unit.month" : {
       "localizations" : {
         "en" : {
