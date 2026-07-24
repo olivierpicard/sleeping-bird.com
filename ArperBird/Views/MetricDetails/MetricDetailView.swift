@@ -1038,8 +1038,12 @@ struct MetricDetailView: View {
 
     private func relativeDay(for date: Date) -> String {
         let calendar = Calendar.current
-        if calendar.isDateInToday(date) { return "Today" }
-        if calendar.isDateInYesterday(date) { return "Yesterday" }
+        if calendar.isDateInToday(date) {
+            return String(localized: "metric_detail.entry.today")
+        }
+        if calendar.isDateInYesterday(date) {
+            return String(localized: "metric_detail.entry.yesterday")
+        }
         return date.formatted(.dateTime.month(.wide).day())
     }
 }
