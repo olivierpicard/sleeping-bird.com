@@ -923,7 +923,9 @@ struct MetricDetailView: View {
             let formatted = target.formatted(
                 .dateTime.month(.abbreviated).day()
             )
-            let suffix = (selectedDate == nil) ? " · Today" : ""
+            let suffix =
+                (selectedDate == nil)
+                ? String(localized: "metric_detail.date.today_suffix") : ""
             return formatted + suffix
         }
         if isDatetime {
@@ -931,18 +933,28 @@ struct MetricDetailView: View {
             let formatted = target.formatted(
                 .dateTime.month(.abbreviated).day()
             )
-            let suffix = (selectedDate == nil) ? " · Today" : ""
+            let suffix =
+                (selectedDate == nil)
+                ? String(localized: "metric_detail.date.today_suffix") : ""
             return formatted + suffix
         }
         if isCategory {
-            guard let bucket = displayedCategoryBucket else { return "No data" }
+            guard let bucket = displayedCategoryBucket else {
+                return String(localized: "metric_detail.date.no_data")
+            }
             let formatted = formattedBucketDate(bucket)
-            let suffix = (selectedDate == nil) ? " · Latest" : ""
+            let suffix =
+                (selectedDate == nil)
+                ? String(localized: "metric_detail.date.latest_suffix") : ""
             return formatted + suffix
         }
-        guard let bin = displayedBin else { return "No data" }
+        guard let bin = displayedBin else {
+            return String(localized: "metric_detail.date.no_data")
+        }
         let formatted = formattedBucketDate(bin.date)
-        let suffix = (selectedDate == nil) ? " · Latest" : ""
+        let suffix =
+            (selectedDate == nil)
+            ? String(localized: "metric_detail.date.latest_suffix") : ""
         return formatted + suffix
     }
 
@@ -953,7 +965,7 @@ struct MetricDetailView: View {
                 .dateTime.month(.abbreviated).day().year()
             )
         case .sixMonths:
-            return "Week of "
+            return String(localized: "metric_detail.date.week_of_prefix")
                 + date.formatted(.dateTime.month(.abbreviated).day())
         case .year:
             return date.formatted(.dateTime.month(.wide).year())
