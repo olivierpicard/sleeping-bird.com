@@ -44,8 +44,12 @@
             static func categorySingle(
                 title: String = "Mood",
                 emoji: String = "😊",
+                // Generic on purpose: this default is what renders in
+                // format-picker/intent previews before any real topic is known
+                // (see TrackerIntentView/TrackerFormatPickerView), so it must
+                // never look like real data for an unrelated tracker.
                 labels: [String] = [
-                    "Great", "Good", "Neutral", "Bad", "Terrible",
+                    "Option A", "Option B", "Option C", "Option D", "Option E",
                 ],
                 chart: ChartType = .pie,
                 bucket: TemporalBucket? = .daily,
