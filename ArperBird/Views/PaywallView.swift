@@ -254,6 +254,12 @@ struct PaywallView: View {
             Divider()
 
             VStack(spacing: 12) {
+                if store.isEligibleForIntroOffer(selectedPlan) {
+                    Text("paywall.trial.pay_nothing_today")
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(Color(red: 0.20, green: 0.55, blue: 0.20))
+                }
+
                 PaywallActionButton(
                     isLoading: store.purchaseInProgress,
                     isDisabled: selectedProduct == nil
