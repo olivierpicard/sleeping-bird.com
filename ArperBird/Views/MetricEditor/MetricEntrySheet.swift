@@ -33,6 +33,7 @@ struct MetricEntrySheet: View {
     /// the wheel into an endless spin.
     private static let maxDaysBack = 365
     private static let rowHeight: CGFloat = 56
+    private static let topPadding: CGFloat = 30
     private static let wheelHeight: CGFloat = 180
 
     /// Drum labels, built once per presentation: the text depends on today's
@@ -73,13 +74,14 @@ struct MetricEntrySheet: View {
                 mainColor: mainColor
             )
             .frame(height: Self.rowHeight)
+            .padding(.top, Self.topPadding)
 
             if isPickingDay {
                 dayWheel
             }
 
-            Divider()
-                .padding(.horizontal)
+//            Divider()
+//                .padding(.horizontal)
 
             MetricInputFactory.make(
                 from: metric,
@@ -177,7 +179,7 @@ struct MetricEntrySheet: View {
     }
 
     private static func collapsedHeight(for metric: Metric) -> CGFloat {
-        MetricInputFactory.editorHeight(for: metric) + rowHeight
+        MetricInputFactory.editorHeight(for: metric) + rowHeight + topPadding
     }
 
     private static func expandedHeight(for metric: Metric) -> CGFloat {
@@ -220,9 +222,9 @@ private struct _EntryDateRow: View {
                     }
                     Image(systemName: isPickingDay ? "chevron.up" : "chevron.down")
                         .font(.caption2.weight(.semibold))
-                        .foregroundStyle(mainColor)
+                        .foregroundStyle(.secondary)
                 }
-                .frame(maxWidth: .infinity)
+                .padding(.horizontal, 4)
                 .contentShape(.rect)
             }
             .buttonStyle(.plain)
@@ -235,7 +237,17 @@ private struct _EntryDateRow: View {
                 daysBack -= 1
             }
         }
-        .padding(.horizontal)
+        .padding(.horizontal, 8)
+        .padding(.vertical, 6)
+        .background(
+            Capsule()
+                .fill(.thinMaterial)
+        )
+        .overlay(
+            Capsule()
+                .strokeBorder(Color.primary.opacity(0.12), lineWidth: 1)
+        )
+        .frame(maxWidth: .infinity)
         .animation(.snappy, value: daysBack)
         .sensoryFeedback(.selection, trigger: daysBack)
         // One control to VoiceOver, adjustable by swiping up/down, rather than
