@@ -83,6 +83,31 @@ enum DataPoint: Codable, Equatable {
     case datetime(Date)
     case duration(Date, TimeInterval)
 
+    /// When the point was recorded. Every case carries one, so this is always
+    /// available — unlike the per-case value accessors below.
+    var date: Date {
+        switch self {
+        case .number(let date, _),
+            .category(let date, _),
+            .binary(let date, _),
+            .duration(let date, _),
+            .datetime(let date):
+            return date
+        }
+    }
+
+    /// Whole days between this point's day and today. `0` for a same-day entry,
+    /// which is what the entry sheet defaults to — so it doubles as "was this
+    /// backdated, and by how much".
+    var daysBack: Int {
+        let calendar = Calendar.current
+        return calendar.dateComponents(
+            [.day],
+            from: calendar.startOfDay(for: date),
+            to: calendar.startOfDay(for: Date())
+        ).day ?? 0
+    }
+
     var numberValue: (date: Date, value: Double)? {
         guard case .number(let date, let value) = self else { return nil }
         return (date, value)

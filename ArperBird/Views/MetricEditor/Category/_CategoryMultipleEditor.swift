@@ -81,7 +81,6 @@ struct _CategoryMultipleEditor: View {
         }
         .padding(.vertical, 24)
         .presentationBackground(.windowBackground)
-        .presentationDetents([.height(300), .medium])
     }
 }
 
@@ -94,6 +93,7 @@ struct _CategoryMultipleEditor: View {
                 mainColor: .orange,
                 onAdd: { _ in }
             )
+            .presentationDetents([.height(MetricInputFactory.EditorHeight.category), .medium])
         }
 }
 
@@ -106,6 +106,7 @@ struct _CategoryMultipleEditor: View {
                 mainColor: .orange,
                 onAdd: { _ in }
             )
+            .presentationDetents([.height(MetricInputFactory.EditorHeight.category), .medium])
         }
 }
 
@@ -121,5 +122,6 @@ struct _CategoryMultipleEditor: View {
                 mainColor: .orange,
                 onAdd: { _ in }
             )
+            .presentationDetents([.height(MetricInputFactory.EditorHeight.category), .medium])
         } 
 }

@@ -64,7 +64,6 @@ struct _StepperEditor: View {
         .padding(.vertical, 32)
         .animation(.snappy, value: value)
         .sensoryFeedback(.impact(weight: .light), trigger: value)
-        .presentationDetents([.height(250)])
     }
 
     private func stepButton(systemName: String, enabled: Bool, action: @escaping () -> Void) -> some View {
@@ -87,6 +86,7 @@ struct _StepperEditor: View {
     NavigationStack { Text("") }
     .sheet(isPresented: $isSheetPresented) {
         _StepperEditor(min: 0, max: 20, defaultValue: 8, step: 1, unit: "glasses", mainColor: .blue) { _ in } 
+        .presentationDetents([.height(MetricInputFactory.EditorHeight.stepper)])
     }
 }
 

@@ -80,12 +80,15 @@ struct DashboardView: View {
             MetricDetailView(metric: metric)
         }
         .sheet(item: $editingMetric) { metric in
-            MetricInputFactory.make(from: metric, in: colorScheme) { point in
+            MetricEntrySheet(metric: metric) { point in
                 try? metric.append(point)
                 editingMetric = nil
                 PostHogSDK.shared.capture(
                     "entry_added",
-                    properties: ["via": "dashboard"]
+                    properties: [
+                        "via": "dashboard",
+                        "days_back": point.daysBack,
+                    ]
                 )
             }
             .trackScreen("AddEntry")

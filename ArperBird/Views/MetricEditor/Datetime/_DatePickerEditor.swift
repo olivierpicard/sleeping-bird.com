@@ -43,7 +43,6 @@ struct _DatePickerEditor: View {
         }
         .padding(.vertical, 24)
         .onAppear { now = Date() }
-        .presentationDetents([.height(360)])
     }
 }
 
@@ -56,5 +55,6 @@ struct _DatePickerEditor: View {
                 mainColor: .blue,
                 onAdd: { _ in }
             )
+            .presentationDetents([.height(MetricInputFactory.EditorHeight.datetime)])
         }
 }

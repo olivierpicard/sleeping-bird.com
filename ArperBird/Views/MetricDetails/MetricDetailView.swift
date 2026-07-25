@@ -276,12 +276,15 @@ struct MetricDetailView: View {
             MetricEditSheet(metric: metric) 
         }
         .sheet(isPresented: $isAddingEntry) {
-            MetricInputFactory.make(from: metric, in: colorScheme) { point in
+            MetricEntrySheet(metric: metric) { point in
                 try? metric.append(point)
                 isAddingEntry = false
                 PostHogSDK.shared.capture(
                     "entry_added",
-                    properties: ["via": "details"]
+                    properties: [
+                        "via": "details",
+                        "days_back": point.daysBack,
+                    ]
                 )
             }
             .trackScreen("AddEntry")
@@ -1014,16 +1017,7 @@ struct MetricDetailView: View {
         }
     }
 
-    private func date(of point: DataPoint) -> Date {
-        switch point {
-        case .number(let d, _), .duration(let d, _):
-            return d
-        case .category(let d, _), .binary(let d, _):
-            return d
-        case .datetime(let d):
-            return d
-        }
-    }
+    private func date(of point: DataPoint) -> Date { point.date }
 
     private func axisLabel(for date: Date) -> String {
         switch range {

@@ -40,7 +40,6 @@ struct _BinaryEditor: View {
         }
         .padding(.vertical, 24)
         .presentationBackground(.windowBackground)
-        .presentationDetents([.height(280)])
     }
 
     @ViewBuilder
@@ -98,6 +97,7 @@ struct _BinaryEditor: View {
                 mainColor: .orange,
                 onAdd: { _ in }
             )
+            .presentationDetents([.height(MetricInputFactory.EditorHeight.binary)])
         }
 }
 
@@ -111,5 +111,6 @@ struct _BinaryEditor: View {
                 mainColor: .green,
                 onAdd: { _ in }
             )
+            .presentationDetents([.height(MetricInputFactory.EditorHeight.binary)])
         }
 }

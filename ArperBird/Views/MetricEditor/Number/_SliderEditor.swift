@@ -54,7 +54,6 @@ struct _SliderEditor: View {
         .padding(.vertical, 32)
         .animation(.snappy, value: value)
         .sensoryFeedback(.impact(weight: .light), trigger: value)
-        .presentationDetents([.height(280)])
     }
 }
 
@@ -63,5 +62,6 @@ struct _SliderEditor: View {
     NavigationStack { Text("") }
     .sheet(isPresented: $isSheetPresented) {
         _SliderEditor(min: 0, max: 20, defaultValue: 8, step: 1, unit: "glasses", mainColor: .blue) { _ in }
+        .presentationDetents([.height(MetricInputFactory.EditorHeight.slider)])
     }
 }

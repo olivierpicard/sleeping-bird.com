@@ -94,7 +94,6 @@ struct _NumberInputEditor: View {
         .animation(.snappy, value: isValid)
         .sensoryFeedback(.warning, trigger: isValid) { old, new in old && !new }
         .onAppear { isFocused = true }
-        .presentationDetents([.height(280)])
     }
 }
 
@@ -111,6 +110,7 @@ struct _NumberInputEditor: View {
                 mainColor: .blue
             ) { _ in }
 
+            .presentationDetents([.height(MetricInputFactory.EditorHeight.numberInput)])
         }
         .environment(\.locale, Locale(identifier: "es"))
 }

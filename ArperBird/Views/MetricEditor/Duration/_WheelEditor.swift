@@ -46,7 +46,6 @@ struct _WheelEditor: View {
         }
         .padding(.vertical, 24)
 //        .presentationBackground(.windowBackground)
-        .presentationDetents([.height(320)])
     }
 
     @ViewBuilder
@@ -85,6 +84,7 @@ struct _WheelEditor: View {
                 mainColor: .indigo,
                 onAdd: { _ in }
             )
+            .presentationDetents([.height(MetricInputFactory.EditorHeight.duration)])
         }
 }
 
@@ -97,5 +97,6 @@ struct _WheelEditor: View {
                 mainColor: .orange,
                 onAdd: { _ in }
             )
+            .presentationDetents([.height(MetricInputFactory.EditorHeight.duration)])
         }
 }
