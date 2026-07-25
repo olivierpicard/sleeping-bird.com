@@ -6,8 +6,8 @@ enum MetricInputFactory {
     ///   evaluated when the user saves rather than when the editor is built —
     ///   so a sheet left open, or a day picked after the fact, still records the
     ///   right moment. Defaults to "now". `MetricEntrySheet` passes the day
-    ///   chosen in its date row. Ignored by `.datetime`, where the date the user
-    ///   picks *is* the value.
+    ///   chosen in its date row. `.datetime` uses it only as the picker's
+    ///   starting point — the date the user then picks *is* the value.
     @ViewBuilder
     static func make(
         from metric: Metric,
@@ -61,7 +61,7 @@ enum MetricInputFactory {
 
         case .datetime(_):
             MetricEditor.Datetime(
-                defaultValue: Date.now,
+                defaultValue: date(),
                 mainColor: mainColor,
                 onAdd: { onAdd(.datetime( $0 )) }
             )

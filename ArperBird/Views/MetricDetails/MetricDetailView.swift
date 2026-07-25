@@ -276,7 +276,7 @@ struct MetricDetailView: View {
             MetricEditSheet(metric: metric) 
         }
         .sheet(isPresented: $isAddingEntry) {
-            MetricEntrySheet(metric: metric) { point in
+            MetricEntrySheet(metric: metric, initialDate: selectedDate ?? Date()) { point in
                 try? metric.append(point)
                 isAddingEntry = false
                 PostHogSDK.shared.capture(

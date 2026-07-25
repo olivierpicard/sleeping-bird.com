@@ -21,11 +21,16 @@ struct MetricEntrySheet: View {
     let metric: Metric
     let onAdd: (DataPoint) -> Void
 
+    /// The day the entry defaults to — "today" unless the caller seeded it
+    /// from an already-selected day, e.g. a tapped calendar cell in
+    /// `MetricDetailView`.
+    private let initialDate: Date
+
     @Environment(\.colorScheme) private var colorScheme
 
     /// Whole days before today. `0` is today — the default, and the path almost
     /// every entry takes.
-    @State private var daysBack: Int = 0
+    @State private var daysBack: Int
     @State private var isPickingDay = false
     @State private var detent: PresentationDetent
 
@@ -40,10 +45,12 @@ struct MetricEntrySheet: View {
     /// date, and formatting 366 of them on every re-render would be wasteful.
     private let dayLabels: [String]
 
-    init(metric: Metric, onAdd: @escaping (DataPoint) -> Void) {
+    init(metric: Metric, initialDate: Date = Date(), onAdd: @escaping (DataPoint) -> Void) {
         self.metric = metric
+        self.initialDate = initialDate
         self.onAdd = onAdd
         self.dayLabels = (0...Self.maxDaysBack).map(Self.dayLabel(daysBack:))
+        _daysBack = State(initialValue: Self.daysBack(for: initialDate))
         _detent = State(initialValue: .height(Self.collapsedHeight(for: metric)))
     }
 
@@ -54,10 +61,15 @@ struct MetricEntrySheet: View {
             // `.datetime` metrics already choose an arbitrary date *and* time as
             // their value, so a day row above would be a second, conflicting
             // date control.
-            MetricInputFactory.make(from: metric, in: colorScheme, onAdd: onAdd)
-                .presentationDetents([
-                    .height(MetricInputFactory.editorHeight(for: metric))
-                ])
+            MetricInputFactory.make(
+                from: metric,
+                in: colorScheme,
+                date: { initialDate },
+                onAdd: onAdd
+            )
+            .presentationDetents([
+                .height(MetricInputFactory.editorHeight(for: metric))
+            ])
         } else {
             datedEditor
         }
@@ -141,6 +153,17 @@ struct MetricEntrySheet: View {
         let calendar = Calendar.current
         let today = calendar.startOfDay(for: Date())
         return calendar.date(byAdding: .day, value: -daysBack, to: today) ?? today
+    }
+
+    /// Inverse of `day(daysBack:)`: how many whole days before today `date`
+    /// falls on, clamped to the wheel's range. A future date (shouldn't
+    /// happen, but the calendar can't rule it out) clamps to today.
+    private static func daysBack(for date: Date) -> Int {
+        let calendar = Calendar.current
+        let today = calendar.startOfDay(for: Date())
+        let day = calendar.startOfDay(for: date)
+        let offset = calendar.dateComponents([.day], from: day, to: today).day ?? 0
+        return min(max(offset, 0), maxDaysBack)
     }
 
     /// Shortest text that still identifies the day: words for the two most
