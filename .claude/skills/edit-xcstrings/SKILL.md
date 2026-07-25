@@ -13,6 +13,8 @@ description: Read, navigate, and edit the String Catalog (Localizable.xcstrings)
 
 ## Workflow
 
+3 happens here in chat, on whatever model is running this session. Steps 1, 2, 4, 5 are mechanical (grep, narrow read, surgical edit, JSON validate) and get delegated to a **Haiku** subagent via the `Agent` tool once wording is confirmed — pass it the exact key(s) and confirmed value(s) per language, plus the Golden rule, the four steps below, and the Entry shape section verbatim, since a fresh agent has none of this context.
+
 1. **Locate** the key — don't read the whole file:
    ```sh
    grep -n '"the exact key"' Localizable.xcstrings
@@ -24,7 +26,7 @@ description: Read, navigate, and edit the String Catalog (Localizable.xcstrings)
 
 2. **Read narrowly** — `Read` with `offset`/`limit` around the line(s) `grep` reported. Never slurp the full file into context.
 
-3. **Iterate in chat first** — propose and refine the wording with the user. Touch no file until they confirm the final text.
+3. **Iterate in chat first** — propose and refine the wording with the user. Touch no file until they confirm the final text. This step is never delegated — it needs the user in the loop.
 
 4. **Edit surgically** — once confirmed, use the `Edit` tool per key. Include enough surrounding context to match exactly one location.
    - **Watch for duplicate values.** Different keys can share an English/translated string (e.g. the literal `"Add a metric"` key vs `empty_dashboard.add_metric`). If `Edit` reports multiple matches, add more context to disambiguate — do **not** blindly `replace_all`.
