@@ -158,9 +158,18 @@ struct TrackerGoalUnitListView: View {
                         .submitLabel(.done)
                 } else {
                     let trimmed = customUnit.trimmingCharacters(in: .whitespaces)
-                    Text(trimmed.isEmpty ? "Type my own…" : trimmed)
-                        .font(.headline)
-                        .foregroundStyle(trimmed.isEmpty ? .secondary : .primary)
+                    if trimmed.isEmpty {
+                        // A plain-`String` ternary here would strip the
+                        // `LocalizedStringKey` type off this literal and make
+                        // `Text` render it verbatim, unlocalized.
+                        Text("Type my own…")
+                            .font(.headline)
+                            .foregroundStyle(.secondary)
+                    } else {
+                        Text(trimmed)
+                            .font(.headline)
+                            .foregroundStyle(.primary)
+                    }
                 }
             }
         }
