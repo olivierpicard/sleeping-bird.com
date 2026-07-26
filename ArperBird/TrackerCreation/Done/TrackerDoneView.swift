@@ -378,9 +378,9 @@ private func categoryRevealMetric(multiple: Bool) -> Metric {
 }
 
 #Preview("Date") {
-    // Seeded with a single real point — today — not `Metric.fakeData`, so the
-    // calendar reveals five dashed empty slots leading into one filled "today"
-    // cell, mirroring how `TrackerCreationFlow.doneMetric()` seeds the date path.
+    // Seeded with `Metric.fakeData` like every other path — a spread of dates
+    // the user never picked reads as an example, where a lone real "today" cell
+    // read as data the tracker already held (decision 0010).
     let schema = MetricSchema.Fake.datetime(
         title: "Anniversary",
         emoji: "📅",
@@ -388,7 +388,8 @@ private func categoryRevealMetric(multiple: Bool) -> Metric {
     )
     NavigationStack {
         TrackerDoneView(
-            metric: Metric(from: schema, color: .indigo, data: [.datetime(.now)])
+            metric: Metric(
+                from: schema, color: .indigo, data: Metric.fakeData(for: schema.config))
         ) {
             DoneDateRecap()
         }
@@ -396,10 +397,9 @@ private func categoryRevealMetric(multiple: Bool) -> Metric {
 }
 
 #Preview("Binary") {
-    // Seeded with a single real point — today — not `Metric.fakeData`, so the
-    // trailing calendar reveals six dashed empty days leading into one filled
-    // "today" cell, mirroring how `TrackerCreationFlow.doneMetric()` seeds the
-    // binary path. Avoids inventing "yes" days the user never logged.
+    // Seeded with `Metric.fakeData` like every other path — a week of mixed
+    // yes/no days reads as an example, where a lone real "today" cell read as
+    // data the tracker already held (decision 0010).
     let schema = MetricSchema.Fake.binary(
         title: "Quit smoking",
         emoji: "🚭",
@@ -407,7 +407,8 @@ private func categoryRevealMetric(multiple: Bool) -> Metric {
     )
     NavigationStack {
         TrackerDoneView(
-            metric: Metric(from: schema, color: .teal, data: [.binary(.now, true)])
+            metric: Metric(
+                from: schema, color: .teal, data: Metric.fakeData(for: schema.config))
         ) {
             DoneBinaryRecap()
         }

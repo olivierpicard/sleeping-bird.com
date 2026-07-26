@@ -1,7 +1,8 @@
 # 0001 — Date reveal card: dashed empties over a faked history
 
 - **Date:** 2026-06-28
-- **Status:** Accepted
+- **Status:** Superseded by [0010](0010-fake-data-on-every-reveal-card.md) — testing
+  showed the single real "today" cell reads as data the tracker already holds
 - **Area:** Tracker creation reveal (`TrackerDoneView`, `EventCalendarMiniChart`)
 
 ## Context

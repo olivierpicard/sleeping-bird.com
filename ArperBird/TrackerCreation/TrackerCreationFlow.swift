@@ -473,19 +473,15 @@ struct TrackerCreationFlow: View {
     /// though the metric that lands on the dashboard (see `persistMetric`) starts
     /// empty.
     ///
-    /// The date and binary paths are the exception: their calendars have no value
-    /// to fake, so a row of invented past entries would read as days the user never
-    /// logged. Instead each is seeded with a single *real* point — today — so the
-    /// reveal shows dashed empty slots leading into one filled "today" cell, exactly
-    /// where the user's first entry will land. Honest, and it previews the affordance.
+    /// The date and binary calendars are seeded the same way (see
+    /// [decision 0010](../../docs/decisions/0010-fake-data-on-every-reveal-card.md),
+    /// which supersedes 0001): a lone "today" cell tested as *more* confusing than
+    /// a filled calendar, because one real entry reads as data the tracker already
+    /// holds. A spread of dates the user never picked reads as an example.
     private func doneMetric() -> Metric {
         let schema = doneSchema()
         let data: [DataPoint]
         switch model.kind {
-        case .date:
-            data = [.datetime(.now)]
-        case .binary:
-            data = [.binary(.now, true)]
         case .duration, .number where model.behavior == .cumulative:
             // Both reveal as a bar chart, which drops older values to fit the
             // card width — seed enough days to fill it. Days passed explicitly so
