@@ -1,0 +1,190 @@
+//
+//  MetricSchema.swift
+//  ArperBird
+//
+//  Created by Olivier Picard on 20/04/2026.
+//
+
+import FoundationModels
+
+// MARK: - Metric Schema
+
+@Generable(description: "A metric description and configuration")
+struct MetricSchema {
+    @Guide(
+        description:
+            "Concise title name. E.g., 'Deep Sleep Duration'"
+    )
+    let name: String
+
+    @Guide(description: "A single emoji that fit the metric")
+    let emoji: String
+
+    @Guide(
+        description: "Confidence score. 1.0 means a clear match.",
+        .range(0...1)
+    )
+    let fitPercentage: Double
+
+    @Guide(description: "The config that best suite the metric need")
+    let config: MetricConfig
+
+    let visual: MetricVisual
+}
+
+// MARK: - Metric Type Config
+
+@Generable(description: "Types of metrics that can be tracked")
+enum MetricConfig: Codable {
+    case number(NumberConfig)
+    case categorySingleChoice(CategoryConfig)
+    case categoryMultipleChoice(CategoryConfig)
+    case binary(BinaryConfig)
+    case duration(DurationConfig)
+    case datetime(DatetimeConfig)
+
+    var analyticsName: String {
+        switch self {
+        case .number: return "number"
+        case .categorySingleChoice: return "category_single"
+        case .categoryMultipleChoice: return "category_multiple"
+        case .binary: return "binary"
+        case .duration: return "duration"
+        case .datetime: return "datetime"
+        }
+    }
+}
+
+@Generable(description: "Match with a number metric type")
+struct NumberConfig: Codable {
+    let min, max: Double
+
+    @Guide(
+        description:
+            "Increment step natural to the metric. E.g., 1 for counts, 0.1 for precise weight, or 0.5, 0.01, 5, 10, ... for other metrics"
+    )
+    let granularity: Double
+
+    @Guide(
+        description:
+            "Display unit. E.g., 'kg', 'steps', 'kcal'. Unit must be natural and fit naturally don't force it"
+    )
+    let unit: String?
+
+    @Guide(
+        description:
+            "Optional target value. Only define it when user say it explicitly"
+    )
+    let goal: Double?
+
+    @Guide(description: "Defines how the number behaves over time")
+    let behavior: MetricBehavior
+}
+
+@Generable(description: "Match with a category metric type")
+struct CategoryConfig: Codable {
+    @Guide(
+        description: "All possible values for this metric",
+        .minimumCount(CategoryLimits.min),
+        .maximumCount(CategoryLimits.max)
+    )
+    let labels: [String]
+}
+
+@Generable(description: "Match a binary metric type")
+struct BinaryConfig: Codable {
+    let trueLabel: String
+    let falseLabel: String
+}
+
+@Generable(description: "Match a duration metric type")
+struct DurationConfig: Codable {
+    @Guide(description: "Defines how the duration behaves over time")
+    let behavior: MetricBehavior
+}
+
+@Generable(description: "Match a pure datetime or date event")
+struct DatetimeConfig: Codable {
+    var format = "date and/or time "  // This is a random value. Without it Dashboad preview using fake crash. This line is not related to generation behaviour
+}
+
+// MARK: - Metric Behaviour
+
+@Generable(
+    description: """
+            How the metric behaves over time. 
+            Cumulative: values that make sense when sum up. E.g., Water intake, steps counter, time spend...
+            Snapshot: measurements that loose sense when cumulated over time. E.g., temperature, how long it take... 
+        """
+)
+enum MetricBehavior: String, Codable {
+    case cumulative
+    case snapshot
+}
+
+// MARK: - Metric Visual
+
+@Generable()
+struct MetricVisual: Codable {
+    let chart: ChartType
+    let aggregation: AggregationConfig
+}
+
+// I kept heatmap rather than dotmap
+// because it is well known by the LLM. No need extra description
+@Generable()
+enum ChartType: String, Codable {
+    case line  // Best for continuous trends over time (Weight, duration)
+    case bar  // Best for discrete, summed, or counted data (Calories, steps)
+    case pie  // Best for proportions (Categories)
+    case calendar  // Best for binary and datetime
+    case dailyGauge  // Good if the metric has a specific daily `goal` limit
+}
+
+// MARK: - Metric Grouping
+
+@Generable(description: "Rules for grouping multiple data points over time.")
+struct AggregationConfig: Codable {
+
+    @Guide(description: "How data should be groupped (or not) by time.")
+    let bucket: TemporalBucket?
+
+    let method: AggregationMethod
+}
+
+@Generable()
+enum TemporalBucket: String, Codable {
+    case hourly
+    case daily
+    case weekly
+    case monthly
+    case yearly
+}
+
+@Generable()
+enum AggregationMethod: Codable {
+    case numerical(NumericMethod)
+    case categorical(CategoricalMethod)
+}
+
+@Generable()
+enum NumericMethod: String, Codable {
+    case sum  // e.g., Water intake
+    case average  // e.g., Heart rate, Weight
+    case min  // e.g., Lowest temperature
+    case max  // e.g., Top speed
+    case latest  // e.g., Current balance
+}
+
+@Generable(
+    description: """
+        count: total number of entries
+        mostFrequent: 
+        """
+)
+enum CategoricalMethod: String, Codable {
+    case count  // Total number of entries
+    case mostFrequent  // The "Mode" (e.g., most frequent mood)
+    case distribution  // Percentage breakdown (required for Pie charts)
+    case uniqueCount  // How many different categories were logged
+}

@@ -1,0 +1,136 @@
+//
+//  Metric.swift
+//  ArperBird
+//
+//  Created by Olivier Picard on 24/04/2026.
+//
+
+import Foundation
+import SwiftUI
+import SwiftData
+
+@Model
+class Metric: Identifiable {
+    @Attribute(.unique) var id: UUID
+    var name: String
+    var emoji: String
+    var colorHex: String
+    var config: MetricConfig
+    var visual: MetricVisual
+    var data: [DataPoint] = []
+    var createdAt: Date = Date()
+
+    enum AppendError: Error {
+        case typeMismatch(expected: String, got: String)
+    }
+
+    func append(_ point: DataPoint) throws {
+        let valid: Bool
+        switch (config, point) {
+        case (.number, .number): valid = true
+        case (.categorySingleChoice, .category), (.categoryMultipleChoice, .category): valid = true
+        case (.binary, .binary): valid = true
+        case (.duration, .duration): valid = true
+        case (.datetime, .datetime): valid = true
+        default: valid = false
+        }
+        guard valid else {
+            throw AppendError.typeMismatch(
+                expected: "\(config)",
+                got: "\(point)"
+            )
+        }
+        data.append(point)
+    }
+
+    @Transient
+    var color: Color {
+        get { Color(hex: colorHex) }
+        set { colorHex = newValue.hexString }
+    }
+
+    /// The stored color passed through the readability filter, so the card glow,
+    /// chart, editor controls, and detail view all share the same corrected
+    /// shade the tracker-creation flow settled on. Scheme-dependent (the filter
+    /// lifts near-black colors in dark mode), so it takes the environment's
+    /// `ColorScheme`. Idempotent — safe to apply to an already-corrected color.
+    func displayColor(in scheme: ColorScheme) -> Color {
+        color.readableControlTint(in: scheme)
+    }
+
+    init(
+        from schema: MetricSchema,
+        id: UUID = UUID(),
+        color: Color = .randomMetricColor(),
+        data: [DataPoint] = [],
+        createdAt: Date = Date()
+    ) {
+        self.id = id
+        self.name = schema.name
+        self.emoji = schema.emoji.isEmpty ? "🫥" : schema.emoji
+        self.colorHex = color.hexString
+        self.config = schema.config
+        self.visual = schema.visual
+        self.data = data
+        self.createdAt = createdAt
+    }
+}
+
+enum DataPoint: Codable, Equatable {
+    case number(Date, Double)
+    case category(Date, [String])
+    case binary(Date, Bool)
+    case datetime(Date)
+    case duration(Date, TimeInterval)
+
+    /// When the point was recorded. Every case carries one, so this is always
+    /// available — unlike the per-case value accessors below.
+    var date: Date {
+        switch self {
+        case .number(let date, _),
+            .category(let date, _),
+            .binary(let date, _),
+            .duration(let date, _),
+            .datetime(let date):
+            return date
+        }
+    }
+
+    /// Whole days between this point's day and today. `0` for a same-day entry,
+    /// which is what the entry sheet defaults to — so it doubles as "was this
+    /// backdated, and by how much".
+    var daysBack: Int {
+        let calendar = Calendar.current
+        return calendar.dateComponents(
+            [.day],
+            from: calendar.startOfDay(for: date),
+            to: calendar.startOfDay(for: Date())
+        ).day ?? 0
+    }
+
+    var numberValue: (date: Date, value: Double)? {
+        guard case .number(let date, let value) = self else { return nil }
+        return (date, value)
+    }
+
+    var categoryValue: (date: Date, labels: [String])? {
+        guard case .category(let date, let labels) = self else { return nil }
+        return (date, labels)
+    }
+
+    var binaryValue: (date: Date, value: Bool)? {
+        guard case .binary(let date, let value) = self else { return nil }
+        return (date, value)
+    }
+
+    var datetimeValue: Date? {
+        guard case .datetime(let date) = self else { return nil }
+        return date
+    }
+
+    var durationValue: (date: Date, interval: TimeInterval)? {
+        guard case .duration(let date, let interval) = self else { return nil }
+        return (date, interval)
+    }
+}
+

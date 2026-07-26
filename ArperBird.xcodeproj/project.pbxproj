@@ -1,0 +1,656 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		810156502FA5283200E02CC5 /* Inject in Frameworks */ = {isa = PBXBuildFile; productRef = 8101564F2FA5283200E02CC5 /* Inject */; };
+		8116F4162FB494C200E703A6 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 8116F4152FB494C100E703A6 /* Localizable.xcstrings */; };
+		81195CF22FD2AE8900D74692 /* RevenueCat in Frameworks */ = {isa = PBXBuildFile; productRef = 81195CF12FD2AE8900D74692 /* RevenueCat */; };
+		8152B34D2F91B3E100D421C2 /* .gitignore in Resources */ = {isa = PBXBuildFile; fileRef = 8152B34C2F91B3E100D421C2 /* .gitignore */; };
+		8152B3672F91C55700D421C2 /* ArkanaKeys in Frameworks */ = {isa = PBXBuildFile; productRef = 8152B3662F91C55700D421C2 /* ArkanaKeys */; };
+		8159B9532FD09CAD00AC3BFF /* PostHog in Frameworks */ = {isa = PBXBuildFile; productRef = 8159B9522FD09CAD00AC3BFF /* PostHog */; };
+		81BB91BE2F95603F00E4A4C5 /* FirebaseAILogic in Frameworks */ = {isa = PBXBuildFile; productRef = 81BB91BD2F95603F00E4A4C5 /* FirebaseAILogic */; };
+		81BB91C12F95609700E4A4C5 /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 81BB91C02F95609700E4A4C5 /* FirebaseAnalytics */; };
+		81E2ADCA2FC766DB0024AC56 /* InAppPurchases.storekit in Resources */ = {isa = PBXBuildFile; fileRef = 81E2ADC92FC766DB0024AC56 /* InAppPurchases.storekit */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		8104B75A2FA76EAD0087967B /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 81F8D8302F8DEA6600E96BF9 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 81F8D8372F8DEA6600E96BF9;
+			remoteInfo = SleepingBird;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		8104B7562FA76EAD0087967B /* ArperBirdTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ArperBirdTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		8116F4152FB494C100E703A6 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
+		8152B34C2F91B3E100D421C2 /* .gitignore */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
+		8152B36A2F91CB9B00D421C2 /* .arkana.yml */ = {isa = PBXFileReference; lastKnownFileType = text.yaml; path = .arkana.yml; sourceTree = "<group>"; };
+		81E2ADC92FC766DB0024AC56 /* InAppPurchases.storekit */ = {isa = PBXFileReference; lastKnownFileType = text; path = InAppPurchases.storekit; sourceTree = "<group>"; };
+		81F8D8382F8DEA6600E96BF9 /* ArperBird.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ArperBird.app; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		8159B9502FD09C8B00AC3BFF /* Exceptions for "ArperBird" folder in "ArperBird" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 81F8D8372F8DEA6600E96BF9 /* ArperBird */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		8104B76B2FA770680087967B /* ArperBirdTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = ArperBirdTests;
+			sourceTree = "<group>";
+		};
+		8159B9562FD1493700AC3BFF /* docs */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = docs;
+			sourceTree = "<group>";
+		};
+		81F8D83A2F8DEA6600E96BF9 /* ArperBird */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				8159B9502FD09C8B00AC3BFF /* Exceptions for "ArperBird" folder in "ArperBird" target */,
+			);
+			path = ArperBird;
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		8104B7532FA76EAD0087967B /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		81F8D8352F8DEA6600E96BF9 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				81BB91BE2F95603F00E4A4C5 /* FirebaseAILogic in Frameworks */,
+				81BB91C12F95609700E4A4C5 /* FirebaseAnalytics in Frameworks */,
+				81195CF22FD2AE8900D74692 /* RevenueCat in Frameworks */,
+				8159B9532FD09CAD00AC3BFF /* PostHog in Frameworks */,
+				8152B3672F91C55700D421C2 /* ArkanaKeys in Frameworks */,
+				810156502FA5283200E02CC5 /* Inject in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		81F8D82F2F8DEA6600E96BF9 = {
+			isa = PBXGroup;
+			children = (
+				81E2ADC92FC766DB0024AC56 /* InAppPurchases.storekit */,
+				8116F4152FB494C100E703A6 /* Localizable.xcstrings */,
+				8152B34C2F91B3E100D421C2 /* .gitignore */,
+				81F8D8392F8DEA6600E96BF9 /* Products */,
+				8152B36A2F91CB9B00D421C2 /* .arkana.yml */,
+				81F8D83A2F8DEA6600E96BF9 /* ArperBird */,
+				8104B76B2FA770680087967B /* ArperBirdTests */,
+				8159B9562FD1493700AC3BFF /* docs */,
+			);
+			sourceTree = "<group>";
+		};
+		81F8D8392F8DEA6600E96BF9 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				81F8D8382F8DEA6600E96BF9 /* ArperBird.app */,
+				8104B7562FA76EAD0087967B /* ArperBirdTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		8104B7552FA76EAD0087967B /* ArperBirdTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 8104B75E2FA76EAD0087967B /* Build configuration list for PBXNativeTarget "ArperBirdTests" */;
+			buildPhases = (
+				8104B7522FA76EAD0087967B /* Sources */,
+				8104B7532FA76EAD0087967B /* Frameworks */,
+				8104B7542FA76EAD0087967B /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				8104B75B2FA76EAD0087967B /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				8104B76B2FA770680087967B /* ArperBirdTests */,
+			);
+			name = ArperBirdTests;
+			packageProductDependencies = (
+			);
+			productName = SleepingBirdTests;
+			productReference = 8104B7562FA76EAD0087967B /* ArperBirdTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		81F8D8372F8DEA6600E96BF9 /* ArperBird */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 81F8D8452F8DEA6800E96BF9 /* Build configuration list for PBXNativeTarget "ArperBird" */;
+			buildPhases = (
+				81F8D8342F8DEA6600E96BF9 /* Sources */,
+				81F8D8352F8DEA6600E96BF9 /* Frameworks */,
+				81F8D8362F8DEA6600E96BF9 /* Resources */,
+				8159B9542FD09D2000AC3BFF /* ShellScript */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				81F8D83A2F8DEA6600E96BF9 /* ArperBird */,
+			);
+			name = ArperBird;
+			packageProductDependencies = (
+				8152B3662F91C55700D421C2 /* ArkanaKeys */,
+				81BB91BD2F95603F00E4A4C5 /* FirebaseAILogic */,
+				81BB91C02F95609700E4A4C5 /* FirebaseAnalytics */,
+				8101564F2FA5283200E02CC5 /* Inject */,
+				8159B9522FD09CAD00AC3BFF /* PostHog */,
+				81195CF12FD2AE8900D74692 /* RevenueCat */,
+			);
+			productName = SleepingBird;
+			productReference = 81F8D8382F8DEA6600E96BF9 /* ArperBird.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		81F8D8302F8DEA6600E96BF9 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 2640;
+				LastUpgradeCheck = 2640;
+				TargetAttributes = {
+					8104B7552FA76EAD0087967B = {
+						CreatedOnToolsVersion = 26.4.1;
+						TestTargetID = 81F8D8372F8DEA6600E96BF9;
+					};
+					81F8D8372F8DEA6600E96BF9 = {
+						CreatedOnToolsVersion = 26.4;
+					};
+				};
+			};
+			buildConfigurationList = 81F8D8332F8DEA6600E96BF9 /* Build configuration list for PBXProject "ArperBird" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+				fr,
+			);
+			mainGroup = 81F8D82F2F8DEA6600E96BF9;
+			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				8152B3652F91C55700D421C2 /* XCLocalSwiftPackageReference "ArkanaKeys/ArkanaKeys" */,
+				81BB91BC2F95603F00E4A4C5 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+				8101564E2FA5283200E02CC5 /* XCRemoteSwiftPackageReference "Inject" */,
+				8159B9512FD09CAD00AC3BFF /* XCRemoteSwiftPackageReference "posthog-ios" */,
+				81195CF02FD2AE8900D74692 /* XCRemoteSwiftPackageReference "purchases-ios-spm" */,
+			);
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 81F8D8392F8DEA6600E96BF9 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				81F8D8372F8DEA6600E96BF9 /* ArperBird */,
+				8104B7552FA76EAD0087967B /* ArperBirdTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		8104B7542FA76EAD0087967B /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		81F8D8362F8DEA6600E96BF9 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				81E2ADCA2FC766DB0024AC56 /* InAppPurchases.storekit in Resources */,
+				8152B34D2F91B3E100D421C2 /* .gitignore in Resources */,
+				8116F4162FB494C200E703A6 /* Localizable.xcstrings in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		8159B9542FD09D2000AC3BFF /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"$(DWARF_DSYM_FOLDER_PATH)/$(DWARF_DSYM_FILE_NAME)/Contents/Resources/DWARF/$(EXECUTABLE_NAME)",
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "POSTHOG_INCLUDE_SOURCE=1 ${BUILD_DIR%/Build/*}/SourcePackages/checkouts/posthog-ios/build-tools/upload-symbols.sh\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		8104B7522FA76EAD0087967B /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		81F8D8342F8DEA6600E96BF9 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		8104B75B2FA76EAD0087967B /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 81F8D8372F8DEA6600E96BF9 /* ArperBird */;
+			targetProxy = 8104B75A2FA76EAD0087967B /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		8104B75C2FA76EAD0087967B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 5MSAR5N3G6;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.alizetech.arperbirdTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/ArperBird.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/ArperBird";
+			};
+			name = Debug;
+		};
+		8104B75D2FA76EAD0087967B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 5MSAR5N3G6;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.alizetech.arperbirdTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/ArperBird.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/ArperBird";
+			};
+			name = Release;
+		};
+		81F8D8432F8DEA6800E96BF9 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = 5MSAR5N3G6;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.4;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		81F8D8442F8DEA6800E96BF9 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = 5MSAR5N3G6;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.4;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		81F8D8462F8DEA6800E96BF9 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
+				CODE_SIGN_ENTITLEMENTS = ArperBird/ArperBird.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 5MSAR5N3G6;
+				EMIT_FRONTEND_COMMAND_LINES = YES;
+				ENABLE_PREVIEWS = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = ArperBird/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = ArperBird;
+				INFOPLIST_KEY_DEEPGRAM_API_KEY = "$(DEEPGRAM_API_KEY)";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = (
+					"-Xlinker",
+					"-interposable",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.alizetech.arperbird;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		81F8D8472F8DEA6800E96BF9 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
+				CODE_SIGN_ENTITLEMENTS = ArperBird/ArperBird.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 5MSAR5N3G6;
+				EMIT_FRONTEND_COMMAND_LINES = YES;
+				ENABLE_PREVIEWS = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = ArperBird/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = ArperBird;
+				INFOPLIST_KEY_DEEPGRAM_API_KEY = "$(DEEPGRAM_API_KEY)";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.alizetech.arperbird;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		8104B75E2FA76EAD0087967B /* Build configuration list for PBXNativeTarget "ArperBirdTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8104B75C2FA76EAD0087967B /* Debug */,
+				8104B75D2FA76EAD0087967B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		81F8D8332F8DEA6600E96BF9 /* Build configuration list for PBXProject "ArperBird" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				81F8D8432F8DEA6800E96BF9 /* Debug */,
+				81F8D8442F8DEA6800E96BF9 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		81F8D8452F8DEA6800E96BF9 /* Build configuration list for PBXNativeTarget "ArperBird" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				81F8D8462F8DEA6800E96BF9 /* Debug */,
+				81F8D8472F8DEA6800E96BF9 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		8152B3652F91C55700D421C2 /* XCLocalSwiftPackageReference "ArkanaKeys/ArkanaKeys" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ArkanaKeys/ArkanaKeys;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		8101564E2FA5283200E02CC5 /* XCRemoteSwiftPackageReference "Inject" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/krzysztofzablocki/Inject.git";
+			requirement = {
+				kind = upToNextMinorVersion;
+				minimumVersion = 1.6.0;
+			};
+		};
+		81195CF02FD2AE8900D74692 /* XCRemoteSwiftPackageReference "purchases-ios-spm" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/RevenueCat/purchases-ios-spm.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.77.0;
+			};
+		};
+		8159B9512FD09CAD00AC3BFF /* XCRemoteSwiftPackageReference "posthog-ios" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/PostHog/posthog-ios.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 3.59.2;
+			};
+		};
+		81BB91BC2F95603F00E4A4C5 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
+			requirement = {
+				kind = upToNextMinorVersion;
+				minimumVersion = 12.12.1;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		8101564F2FA5283200E02CC5 /* Inject */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8101564E2FA5283200E02CC5 /* XCRemoteSwiftPackageReference "Inject" */;
+			productName = Inject;
+		};
+		81195CF12FD2AE8900D74692 /* RevenueCat */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 81195CF02FD2AE8900D74692 /* XCRemoteSwiftPackageReference "purchases-ios-spm" */;
+			productName = RevenueCat;
+		};
+		8152B3662F91C55700D421C2 /* ArkanaKeys */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = ArkanaKeys;
+		};
+		8159B9522FD09CAD00AC3BFF /* PostHog */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8159B9512FD09CAD00AC3BFF /* XCRemoteSwiftPackageReference "posthog-ios" */;
+			productName = PostHog;
+		};
+		81BB91BD2F95603F00E4A4C5 /* FirebaseAILogic */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 81BB91BC2F95603F00E4A4C5 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAILogic;
+		};
+		81BB91C02F95609700E4A4C5 /* FirebaseAnalytics */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 81BB91BC2F95603F00E4A4C5 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAnalytics;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = 81F8D8302F8DEA6600E96BF9 /* Project object */;
+}

@@ -1,0 +1,161 @@
+//
+//  DeepgramNova3Transcriber.swift
+//  ArperBird
+//
+//  Created by Olivier Picard on 17/04/2026.
+//
+
+import ArkanaKeys
+import Foundation
+
+/// Streams microphone audio to Deepgram nova-3 and forwards transcript text as it arrives.
+/// Supports both interim and final results.
+///
+/// Usage:
+/// ```swift
+/// let t = DeepgramNova3Transcriber()
+/// t.start { text in state = text }
+/// t.stop()
+/// ```
+final class DeepgramNova3Transcriber: Transcriber {
+
+    // MARK: - Configuration
+
+    struct Config {
+        var apiKey: String
+        var endpoint: URL
+        /// When `true`, the `onText` callback fires for interim results too.
+        /// When `false`, only final (committed) transcripts are delivered.
+        var interimResults: Bool
+
+        /// Builds a config for the given Deepgram `language` param (a BCP-47
+        /// code such as `"en"`, `"fr"`, `"es-419"`). Pass `"multi"` for
+        /// automatic multilingual detection.
+        static func make(
+            language: String = "multi",
+            interimResults: Bool = true
+        ) -> Config {
+            Config(
+                apiKey: ArkanaKeys.Global().deepgramApiKey,
+                endpoint: URL(
+                    string:
+                        "wss://api.deepgram.com/v1/listen?endpointing=10&interim_results=true&smart_format=true&language=\(language)&model=nova-3&encoding=linear16&sample_rate=16000"
+                )!,
+                interimResults: interimResults
+            )
+        }
+
+        static let `default` = make()
+    }
+
+    // MARK: - Private state
+
+    private let config: Config
+    private let broker: MicBroker
+    private let streamer = AudioWebSocketStreamer()
+    private var onText: ((String) -> Void)?
+    private var subscriptionToken: UUID?
+
+    /// All finalized (`is_final`) transcript segments accumulated since `start()`.
+    private var committedText = ""
+    /// The latest interim transcript for the in-progress utterance (not yet finalized).
+    private var interimText = ""
+
+    // MARK: - Init
+
+    init(broker: MicBroker = .shared, config: Config = .default) {
+        self.broker = broker
+        self.config = config
+    }
+
+    // MARK: - Transcriber
+
+    var hasMicPermission: Bool { broker.hasPermission }
+
+    func start(onText: @escaping (String) -> Void) {
+        self.onText = onText
+        committedText = ""
+        interimText = ""
+
+        let language =
+            URLComponents(url: config.endpoint, resolvingAgainstBaseURL: false)?
+            .queryItems?.first { $0.name == "language" }?.value ?? "?"
+
+        var request = URLRequest(url: config.endpoint)
+        request.setValue(
+            "Token \(config.apiKey)",
+            forHTTPHeaderField: "Authorization"
+        )
+
+        streamer.connect(with: request)
+
+        streamer.onMessageReceived = { [weak self] message in
+            self?.handleMessage(message)
+        }
+
+        subscriptionToken = broker.subscribe { [weak self] data in
+            self?.streamer.send(data)
+        }
+    }
+
+    func stop() {
+        if let token = subscriptionToken {
+            broker.unsubscribe(token)
+            subscriptionToken = nil
+        }
+        streamer.disconnect()
+        onText = nil
+    }
+
+    // MARK: - Message parsing
+
+    /// Nova-3 response shape:
+    /// ```json
+    /// {
+    ///   "is_final": true,
+    ///   "channel": { "alternatives": [{ "transcript": "hello world" }] }
+    /// }
+    /// ```
+    private func handleMessage(_ message: URLSessionWebSocketTask.Message) {
+        let jsonData: Data?
+        switch message {
+        case .string(let text):
+            jsonData = text.data(using: .utf8)
+        case .data(let data):
+            jsonData = data
+        @unknown default:
+            return
+        }
+
+        guard
+            let jsonData,
+            let json = try? JSONSerialization.jsonObject(with: jsonData)
+                as? [String: Any],
+            let channel = json["channel"] as? [String: Any],
+            let alternatives = channel["alternatives"] as? [[String: Any]],
+            let transcript = alternatives.first?["transcript"] as? String,
+            !transcript.isEmpty
+        else { return }
+
+        let isFinal = json["is_final"] as? Bool ?? false
+
+        if isFinal {
+            committedText =
+                committedText.isEmpty
+                ? transcript : committedText + " " + transcript
+            interimText = ""
+        } else {
+            guard config.interimResults else { return }
+            interimText = transcript
+        }
+
+        let fullText =
+            interimText.isEmpty
+            ? committedText
+            : committedText + (committedText.isEmpty ? "" : " ") + interimText
+
+        DispatchQueue.main.async { [weak self] in
+            self?.onText?(fullText)
+        }
+    }
+}
