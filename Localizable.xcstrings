@@ -1269,6 +1269,7 @@
       }
     },
     "Edit the step between entries" : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -1285,6 +1286,7 @@
       }
     },
     "Edit the tracker's maximum value" : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -1981,6 +1983,7 @@
       }
     },
     "Max" : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -2078,28 +2081,6 @@
         }
       }
     },
-    "metric_detail.date.today_suffix" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : " · Today"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : " · Hoy"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : " · Aujourd’hui"
-          }
-        }
-      }
-    },
     "metric_detail.date.latest_suffix" : {
       "localizations" : {
         "en" : {
@@ -2144,6 +2125,28 @@
         }
       }
     },
+    "metric_detail.date.today_suffix" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : " · Today"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : " · Hoy"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : " · Aujourd’hui"
+          }
+        }
+      }
+    },
     "metric_detail.date.week_of_prefix" : {
       "localizations" : {
         "en" : {
@@ -2162,50 +2165,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Semaine du "
-          }
-        }
-      }
-    },
-    "metric_detail.entry.today" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Today"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Hoy"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Aujourd’hui"
-          }
-        }
-      }
-    },
-    "metric_detail.entry.yesterday" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Yesterday"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ayer"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Hier"
           }
         }
       }
@@ -2250,6 +2209,50 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Rien ici pour l'instant"
+          }
+        }
+      }
+    },
+    "metric_detail.entry.today" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Today"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hoy"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aujourd’hui"
+          }
+        }
+      }
+    },
+    "metric_detail.entry.yesterday" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Yesterday"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ayer"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hier"
           }
         }
       }
@@ -3929,6 +3932,7 @@
       }
     },
     "Step" : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -4214,6 +4218,7 @@
       }
     },
     "Switch between cumulative and snapshot" : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -6170,34 +6175,18 @@
         }
       }
     },
-    "Your entries add up through the day" : {
+    "Track a number over time" : {
       "localizations" : {
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tus entradas se suman a lo largo del día"
+            "value" : "Sigue un número a lo largo del tiempo"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Vos entrées s'additionnent au fil de la journée"
-          }
-        }
-      }
-    },
-    "Your entries are independent of each other" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tus entradas son independientes entre sí"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Vos entrées sont indépendantes les unes des autres"
+            "value" : "Suivez un nombre au fil du temps"
           }
         }
       }

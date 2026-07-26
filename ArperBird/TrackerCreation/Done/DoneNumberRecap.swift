@@ -61,16 +61,12 @@ struct DoneNumberRecap: View {
     /// chosen step leaves through `onEditGranularity`.
     @State private var editingGranularity = false
 
-    private var recap: LocalizedStringKey {
-        switch behavior {
-        case .cumulative: "Your entries add up through the day"
-        case .snapshot: "Your entries are independent of each other"
-        }
-    }
-
     var body: some View {
         VStack(spacing: 12) {
-            DoneRecapText(recap)
+            // Deliberately silent on cumulative vs. snapshot: the behavior chip is
+            // hidden (see `chipRow`), so the line describes what the tracker does
+            // rather than a distinction the user can neither see nor change.
+            DoneRecapText("Track a number over time")
             chipRow
         }
         // The Max chip raises this compact editor; committing writes the new bound
