@@ -106,32 +106,35 @@ struct DoneNumberRecap: View {
                 unitChip
             }
 
-            // A bounded number's max is fixed by the metric itself, so there's
-            // nothing for the user to dial — drop the chip rather than show a
-            // dead one.
-            if !isBounded {
-                facetChip(
-                    glyph: "arrow.up.to.line.compact",
-                    label: "Max",
-                    value: maxValue.formatted(.number),
-                    hint: "Edit the tracker's maximum value"
-                ) { editingMax = true }
-            }
-
-            facetChip(
-                glyph: "plusminus",
-                label: "Step",
-                value: granularity.formatted(.number),
-                hint: "Edit the step between entries"
-            ) { editingGranularity = true }
-
-            facetChip(
-                glyph: behavior.glyph,
-                label: behavior.title,
-                value: nil,
-                hint: "Switch between cumulative and snapshot",
-                trailing: "arrow.left.arrow.right"
-            ) { onToggleBehavior() }
+            // Hidden for now: the reveal surfaces only the unit, so the max, the
+            // step and the cumulative/snapshot behavior stay as the AI resolved
+            // them and can't be changed here. The wiring below is kept intact.
+            //            // A bounded number's max is fixed by the metric itself, so there's
+            //            // nothing for the user to dial — drop the chip rather than show a
+            //            // dead one.
+            //            if !isBounded {
+            //                facetChip(
+            //                    glyph: "arrow.up.to.line.compact",
+            //                    label: "Max",
+            //                    value: maxValue.formatted(.number),
+            //                    hint: "Edit the tracker's maximum value"
+            //                ) { editingMax = true }
+            //            }
+            //
+            //            facetChip(
+            //                glyph: "plusminus",
+            //                label: "Step",
+            //                value: granularity.formatted(.number),
+            //                hint: "Edit the step between entries"
+            //            ) { editingGranularity = true }
+            //
+            //            facetChip(
+            //                glyph: behavior.glyph,
+            //                label: behavior.title,
+            //                value: nil,
+            //                hint: "Switch between cumulative and snapshot",
+            //                trailing: "arrow.left.arrow.right"
+            //            ) { onToggleBehavior() }
         }
         .padding(.horizontal)
     }

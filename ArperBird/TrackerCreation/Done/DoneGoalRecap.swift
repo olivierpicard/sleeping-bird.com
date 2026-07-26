@@ -98,12 +98,15 @@ struct DoneGoalRecap: View {
                 hint: "Edit the daily goal"
             ) { editingGoal = true }
 
-            facetChip(
-                glyph: "plusminus",
-                label: "Step",
-                value: granularity.formatted(.number),
-                hint: "Edit the step between entries"
-            ) { editingGranularity = true }
+            // Hidden for now: the reveal surfaces only the unit and the goal, so
+            // the step stays as the AI resolved it and can't be changed here. The
+            // wiring below is kept intact.
+            //            facetChip(
+            //                glyph: "plusminus",
+            //                label: "Step",
+            //                value: granularity.formatted(.number),
+            //                hint: "Edit the step between entries"
+            //            ) { editingGranularity = true }
         }
         .padding(.horizontal)
     }
