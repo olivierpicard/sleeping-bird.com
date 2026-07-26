@@ -1316,6 +1316,22 @@
         }
       }
     },
+    "Example %lld" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ejemplo %lld"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Exemple %lld"
+          }
+        }
+      }
+    },
     "Excited" : {
       "localizations" : {
         "es" : {
