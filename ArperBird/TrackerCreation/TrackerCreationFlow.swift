@@ -59,10 +59,10 @@ struct TrackerCreationFlow: View {
     @Environment(\.modelContext) private var context
     @Environment(Store.self) private var store
     @State private var path: [TrackerCreationStep] = []
-    /// Shown in place of persisting when `complete()` finds the user not yet
-    /// premium — there is no free allowance. Saving only happens once this
-    /// resolves with `store.isPremium == true` — see
-    /// `sheet(isPresented:onDismiss:)` below.
+    /// Shown in place of persisting when `complete()` finds a non-premium user
+    /// who already has a tracker — the free tier is one tracker at a time.
+    /// Saving then only happens once this resolves with `store.isPremium ==
+    /// true` — see `sheet(isPresented:onDismiss:)` below.
     @State private var showPaywall = false
     /// Set right before a completed dismiss (direct save, or a purchase from
     /// the paywall interrupt) so `onDisappear` below can tell a finished flow
@@ -434,13 +434,18 @@ struct TrackerCreationFlow: View {
 
     // MARK: - Persistence
 
-    /// Called when the user taps "Add to dashboard" on the reveal. A
-    /// non-premium user is interrupted with the paywall instead of saving
-    /// straight away — `sheet(isPresented:onDismiss:)` above is what actually
-    /// persists once (and only if) that resolves with the user premium, so
-    /// there's no path from this button to a saved tracker that skips it.
+    /// Called when the user taps "Add to dashboard" on the reveal. The first
+    /// tracker saves straight away; a non-premium user who already has one is
+    /// interrupted with the paywall instead — `sheet(isPresented:onDismiss:)`
+    /// above is what actually persists once (and only if) that resolves with
+    /// the user premium, so there's no path from this button to a second saved
+    /// tracker that skips it.
     private func complete() {
-        if store.requiresPaywall {
+        // Counted here rather than held in a `@Query` so the check reflects the
+        // dashboard at the moment of the tap, without the sheet re-rendering on
+        // every store change behind it.
+        let existing = (try? context.fetchCount(FetchDescriptor<Metric>())) ?? 0
+        if store.requiresPaywall(existingTrackerCount: existing) {
             PostHogSDK.shared.capture(
                 "tracker_creation_paywall_shown",
                 properties: ["kind": model.kind?.rawValue ?? "unknown"]

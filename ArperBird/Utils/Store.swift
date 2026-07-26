@@ -58,11 +58,14 @@ final class Store {
 
     var isPremium: Bool { !purchasedProductIDs.isEmpty }
 
-    /// There is no free allowance — every tracker save must pass the paywall
-    /// first. We wait for `hasLoadedEntitlements` so premium users are never
+    /// Whether saving a *new* tracker has to pass the paywall first. The free
+    /// tier allows exactly one tracker at a time: the first save goes through
+    /// untouched, and only a second one (`existingTrackerCount >= 1`) is
+    /// interrupted — so a free user who deletes their tracker can create
+    /// another. We wait for `hasLoadedEntitlements` so premium users are never
     /// told they need to pay before their StoreKit entitlements have resolved.
-    var requiresPaywall: Bool {
-        hasLoadedEntitlements && !isPremium
+    func requiresPaywall(existingTrackerCount: Int) -> Bool {
+        existingTrackerCount >= 1 && hasLoadedEntitlements && !isPremium
     }
 
     init() {
