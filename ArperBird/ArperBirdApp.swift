@@ -99,7 +99,15 @@ struct ArperBirdApp: App {
         .modelContainer(modelContainer)
         .onChange(of: scenePhase) { _, newPhase in
             if newPhase == .active {
-                Task { await store.refreshPurchased() }
+                // Both are pull-only snapshots, and a foreground is exactly when
+                // they may have gone stale: the user could have subscribed,
+                // cancelled, refunded or redeemed an offer in the App Store while
+                // away. Refreshing entitlements alone would leave the paywall
+                // offering a free trial the user has since consumed.
+                Task {
+                    await store.refreshPurchased()
+                    await store.refreshIntroEligibility()
+                }
             }
         }
     }

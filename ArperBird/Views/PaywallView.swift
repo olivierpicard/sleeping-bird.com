@@ -297,13 +297,14 @@ struct PaywallView: View {
         .trackScreen("Paywall")
         .task {
             // Retry if the launch-time load failed, so the paywall shows live
-            // prices instead of stale placeholders. Resolve eligibility too if it
-            // never ran (no products at launch), so the CTA settles on its final
-            // label once products arrive.
+            // prices instead of stale placeholders. Eligibility is then re-pulled
+            // unconditionally — a launch-time answer can be stale by now (trial
+            // consumed, subscription refunded, offer redeemed), and a stale
+            // "eligible" makes this screen promise a free trial that the App
+            // Store's own sheet then refuses. The refresh keeps the current label
+            // until a different answer lands, so a correct one never flickers.
             if store.products.isEmpty { await store.loadProducts() }
-            if !store.hasResolvedIntroEligibility {
-                await store.refreshIntroEligibility()
-            }
+            await store.refreshIntroEligibility()
         }
         .alert(
             "store.error.title",
