@@ -5,6 +5,8 @@
 //  Created by Olivier Picard on 20/04/2026.
 //
 
+import Foundation
+
     extension MetricSchema {
         enum Fake {
             static func number(
@@ -48,10 +50,9 @@
                 // format-picker/intent previews before any real topic is known
                 // (see TrackerIntentView/TrackerFormatPickerView), so it must
                 // never look like real data for an unrelated tracker.
-                labels: [String] = [
-                    "Example 1", "Example 2", "Example 3", "Example 4",
-                    "Example 5",
-                ],
+                labels: [String] = (1...5).map {
+                    String(localized: "Example \($0)")
+                },
                 chart: ChartType = .pie,
                 bucket: TemporalBucket? = .daily,
                 method: AggregationMethod = .categorical(.mostFrequent)
