@@ -21,3 +21,4 @@ and link back — don't edit history.
 - [0008 — Neon glow border: a conic-gradient mockup, stopped at MVP depth](0008-neon-glow-conic-mockup.md)
 - [0009 — Backdated entries: a nudge-arrow date row, expanding to a day wheel](0009-backdated-entries.md)
 - [0010 — Fake data on every reveal card, date and binary included](0010-fake-data-on-every-reveal-card.md)
+- [0011 — The unit is fixed at creation, not editable afterwards](0011-unit-is-immutable.md)
