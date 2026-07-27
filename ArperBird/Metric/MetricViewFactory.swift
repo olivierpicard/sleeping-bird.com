@@ -36,18 +36,25 @@ enum MetricViewFactory {
     /// bucket and reduced by its method (falling back to a type-appropriate
     /// placeholder when empty). Exposed so the tracker-creation reveal can label
     /// its sample card the same way the dashboard does.
+    ///
+    /// The window is anchored on the **most recent data point**, not on `now`,
+    /// so a metric whose last entry was backdated still shows that entry's
+    /// value instead of an empty "today".
     static func value(for metric: Metric) -> String {
         guard !metric.data.isEmpty else {
             return placeholder(for: metric.config)
         }
         let agg = metric.visual.aggregation
-        let start = windowStart(for: agg.bucket)
 
         switch metric.config {
         case .number(let cfg):
-            let points = metric.data.compactMap { $0.numberValue }.filter {
-                $0.date >= start
+            let all = metric.data.compactMap { $0.numberValue }
+            guard let anchor = all.map({ $0.date }).max() else {
+                return placeholder(for: metric.config)
             }
+            let start = windowStart(for: agg.bucket, endingAt: anchor)
+            let points = all.filter { $0.date >= start }
+                .sorted { $0.date < $1.date }
             guard !points.isEmpty else {
                 return placeholder(for: metric.config)
             }
@@ -60,9 +67,13 @@ enum MetricViewFactory {
             )
 
         case .duration:
-            let points = metric.data.compactMap { $0.durationValue }.filter {
-                $0.date >= start
+            let all = metric.data.compactMap { $0.durationValue }
+            guard let anchor = all.map({ $0.date }).max() else {
+                return placeholder(for: metric.config)
             }
+            let start = windowStart(for: agg.bucket, endingAt: anchor)
+            let points = all.filter { $0.date >= start }
+                .sorted { $0.date < $1.date }
             guard !points.isEmpty else {
                 return placeholder(for: metric.config)
             }
@@ -74,28 +85,36 @@ enum MetricViewFactory {
             )
 
         case .categorySingleChoice, .categoryMultipleChoice:
-            guard case .category(_, let v) = metric.data.last else {
+            guard case .category(_, let v) = latestPoint(of: metric) else {
                 return placeholder(for: metric.config)
             }
             return v.first ?? "—"
 
         case .binary:
-            guard case .binary(_, let flag) = metric.data.last,
+            guard case .binary(_, let flag) = latestPoint(of: metric),
                 case .binary(let cfg) = metric.config
             else { return placeholder(for: metric.config) }
             return flag ? cfg.trueLabel : cfg.falseLabel
 
         case .datetime:
-            guard case .datetime(let d) = metric.data.last else {
+            guard case .datetime(let d) = latestPoint(of: metric) else {
                 return placeholder(for: metric.config)
             }
             return d.formatted(date: .abbreviated, time: .shortened)
         }
     }
 
-    private static func windowStart(for bucket: TemporalBucket?) -> Date {
+    /// The data point with the newest date — `data` is in insertion order, so a
+    /// backdated entry added last must not win over a more recent one.
+    private static func latestPoint(of metric: Metric) -> DataPoint? {
+        metric.data.max { $0.date < $1.date }
+    }
+
+    private static func windowStart(
+        for bucket: TemporalBucket?,
+        endingAt now: Date
+    ) -> Date {
         guard let bucket else { return .distantPast }
-        let now = Date()
         let cal = Calendar.current
         switch bucket {
         case .hourly:
