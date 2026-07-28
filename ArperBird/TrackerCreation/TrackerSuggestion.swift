@@ -46,6 +46,14 @@ struct TrackerSuggestion: Identifiable {
     /// leads with `.goal`, a pure cost offers only `.number`.
     let formats: [IntentFormatType]
 
+    /// True only for a suggestion built from a free-text AI resolution (see
+    /// `init(from:)`) — false for every curated catalog entry (`defaults`,
+    /// `examples(for:)`). Lets the seeded `TrackerFormatPickerView` know
+    /// whether it's safe to fetch real AI categories for a "choices" format:
+    /// a curated idea's name is hand-picked and paired with its own generic
+    /// placeholder on purpose, so only the AI path fetches real labels.
+    private(set) var isAiResolved = false
+
     init(
         label: LocalizedStringResource,
         trackerName: LocalizedStringResource? = nil,
@@ -102,6 +110,7 @@ struct TrackerSuggestion: Identifiable {
             // than seeding a formatless (and un-routable) suggestion.
             formats: completion.formats.isEmpty ? nil : completion.formats
         )
+        self.isAiResolved = true
     }
 
     /// The chip text: short label plus the (possibly two-emoji) chip decoration.

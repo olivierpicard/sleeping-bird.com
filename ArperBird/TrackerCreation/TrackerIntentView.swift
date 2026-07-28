@@ -25,6 +25,11 @@ struct TrackerIntentView: View {
     @State private var isFailed = false
     @State private var text = ""
     @State private var promptIndex = 0
+    /// True while a real category fetch is in flight for the typed/free-text
+    /// path's "choices" format — see `loadRealCategoriesIfNeeded`. Drives the
+    /// redacted look on that one format's preview without holding up the rest
+    /// of the resolved suggestion.
+    @State private var categoriesLoading = false
     /// How the current `selected` suggestion was resolved — "chip" for a
     /// curated tap (or a pre-resolved dashboard badge seed), "typed" for the
     /// free-text AI path. Read by `continueWithSelection()` to tag
@@ -37,6 +42,15 @@ struct TrackerIntentView: View {
     /// AI seam: interprets the free-text field into a titled intent + formats.
     /// Injected so previews drive the fake without a network round-trip.
     private let generateIntent: (String) async throws -> IntentCompletion
+
+    /// The flow's shared state — only reached for here to fetch real
+    /// categories (via `TrackerCreationModel.loadCategoryIfNeeded()`) once the
+    /// typed/free-text path resolves to a "choices" format, so the preview
+    /// shows real labels instead of "Example 1, 2…". The same memoized fetch
+    /// backs the later category-config step, so continuing into it never
+    /// re-hits the AI for the same name. Defaults to a scratch model for
+    /// previews / the curated-chip path, which never touches it.
+    private let model: TrackerCreationModel
 
     /// Hands the resolved pick to the creation flow: the chosen format's kind,
     /// the intent name, and the per-kind color the preview showed. The flow
@@ -60,15 +74,20 @@ struct TrackerIntentView: View {
         "when I watered the plants",
     ]
 
+    @MainActor
     init(
         preselected: TrackerSuggestion? = nil,
         autofocusField: Bool = false,
+        model: TrackerCreationModel? = nil,
         generateIntent: @escaping (String) async throws -> IntentCompletion = {
             try await IntentAiCompletion().generate(for: $0)
         },
         onContinue: @escaping (TrackerKind, String, Color) -> Void = { _, _, _ in }
     ) {
         self.autofocusField = autofocusField
+        // Nil (the curated-chip path and every preview but the flow's own)
+        // just means "no reuse target" — a scratch model that's never touched.
+        self.model = model ?? TrackerCreationModel()
         self.generateIntent = generateIntent
         self.onContinue = onContinue
         // A dashboard badge tap arrives pre-resolved: build the curated
@@ -219,9 +238,18 @@ struct TrackerIntentView: View {
             )
         )
         // The ghost is a promise, not a dead widget — keep it quiet.
-        .opacity(selected == nil || isLoading ? 0.55 : 1)
-        .redacted(reason: isLoading ? .placeholder : [])
+        .opacity(selected == nil || isLoading || isChoicesPreviewLoading ? 0.55 : 1)
+        .redacted(reason: isLoading || isChoicesPreviewLoading ? .placeholder : [])
         .animation(.snappy, value: isLoading)
+        .animation(.snappy, value: isChoicesPreviewLoading)
+    }
+
+    /// True while the *displayed* format is "choices" and its real categories
+    /// are still being fetched — redacts just that one preview instead of
+    /// holding up the whole resolved suggestion.
+    private var isChoicesPreviewLoading: Bool {
+        guard let selected, !isLoading else { return false }
+        return categoriesLoading && selected.formats[formatIndex].kind == .choices
     }
 
     /// Dedicated failure state for the card slot: replaces the preview card in
@@ -375,6 +403,7 @@ struct TrackerIntentView: View {
         text = suggestion.instruction
         isFailed = false
         isLoading = true
+        categoriesLoading = false
         selectionSource = "chip"
         // Reports the tap itself (not just an eventual "Continue"), mirroring
         // `EmptyDashboardView`'s `empty_dashboard_chip_tapped` — lets a curated
@@ -404,6 +433,7 @@ struct TrackerIntentView: View {
         isFieldFocused = false
         isFailed = false
         isLoading = true
+        categoriesLoading = false
         Task {
             let start = ContinuousClock.now
             do {
@@ -417,8 +447,10 @@ struct TrackerIntentView: View {
                     ]
                 )
                 formatIndex = 0
-                selected = intentSuggestion(from: completion)
+                let suggestion = intentSuggestion(from: completion)
+                selected = suggestion
                 selectionSource = "typed"
+                loadRealCategoriesIfNeeded(for: suggestion)
             } catch {
                 let elapsed = ContinuousClock.now - start
                 PostHogSDK.shared.capture(
@@ -433,6 +465,36 @@ struct TrackerIntentView: View {
                 isFailed = true
             }
             isLoading = false
+        }
+    }
+
+    /// Fires a real category fetch for `suggestion`'s "choices" format, if it
+    /// has one — replacing its generic "Example 1, 2…" preview once real
+    /// labels land, without holding up the number/duration/etc. pills that
+    /// already show. Reuses `TrackerCreationModel.loadCategoryIfNeeded()`, the
+    /// same memoized call the later category-config step makes, so nothing is
+    /// re-fetched if the user actually continues into "Pick from a list". A
+    /// failure here is silent — the generic placeholder just stays put, since
+    /// this is a preview nicety, not a step the user can retry.
+    private func loadRealCategoriesIfNeeded(for suggestion: IntentSuggestion) {
+        guard let index = suggestion.formats.firstIndex(where: { $0.kind == .choices })
+        else { return }
+        categoriesLoading = true
+        Task {
+            model.name = suggestion.trackerName
+            await model.loadCategoryIfNeeded()
+            // The user may have typed something else while this was in
+            // flight — only apply the result if it's still on screen.
+            guard selected?.id == suggestion.id else { return }
+            categoriesLoading = false
+            guard model.categoryPhase == .loaded else { return }
+            selected?.formats[index] = Self.choicesIntentFormat(
+                name: suggestion.trackerName,
+                emoji: suggestion.emoji,
+                color: suggestion.color,
+                labels: model.categoryLabels,
+                allowsMultiple: model.categoryAllowsMultiple
+            )
         }
     }
 
@@ -488,7 +550,9 @@ struct TrackerIntentView: View {
         /// vs "Music Practice").
         let chipLabel: String
         let color: Color
-        let formats: [IntentFormat]
+        /// `var`, not `let` — `loadRealCategoriesIfNeeded` replaces the
+        /// "choices" entry in place once its real categories land.
+        var formats: [IntentFormat]
     }
 
     /// A calm, slow swell for the ghost card — deliberately unlike real data so
@@ -551,6 +615,39 @@ struct TrackerIntentView: View {
                     color: color
                 )
             }
+        )
+    }
+
+    /// Rebuilds the "choices" format's pill + preview card with real,
+    /// AI-fetched category labels (and the matching single/multiple chart) —
+    /// what `loadRealCategoriesIfNeeded` swaps in once the fetch lands, in
+    /// place of `intentFormat(for: .choices, …)`'s generic placeholder.
+    private static func choicesIntentFormat(
+        name: String,
+        emoji: String,
+        color: Color,
+        labels: [String],
+        allowsMultiple: Bool
+    ) -> IntentFormat {
+        let schema =
+            allowsMultiple
+            ? MetricSchema.Fake.categoryMultiple(
+                title: name,
+                emoji: emoji,
+                labels: labels,
+                chart: .bar
+            )
+            : MetricSchema.Fake.categorySingle(
+                title: name,
+                emoji: emoji,
+                labels: labels,
+                chart: .pie
+            )
+        return IntentFormat(
+            label: String(localized: "Pick from a list"),
+            icon: "list.bullet",
+            kind: .choices,
+            metric: metric(schema, color: color)
         )
     }
 

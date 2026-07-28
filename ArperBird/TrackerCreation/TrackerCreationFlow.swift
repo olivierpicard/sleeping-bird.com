@@ -177,6 +177,7 @@ struct TrackerCreationFlow: View {
             TrackerIntentView(
                 preselected: seed,
                 autofocusField: autofocus,
+                model: model,
                 onContinue: { kind, name, intentColor in
                     // The intent screen already captured the name and picked a
                     // format (kind), so seed the model and jump straight into the
@@ -259,17 +260,30 @@ struct TrackerCreationFlow: View {
                 // the same shade for the same idea.
                 let resolvedColor = (seed.formats.first?.kind ?? seed.kind)
                     .previewColor
+                // Only a free-text AI resolution fetches real categories for
+                // its "choices" format — a curated suggestion's placeholder
+                // is intentional (see `TrackerSuggestion.isAiResolved`).
+                let fetchesCategories = seed.isAiResolved && seed.formats.contains(.choices)
                 TrackerFormatPickerView(
                     name: seed.localizedTrackerName,
                     emoji: seed.emoji,
-                    formats: seed.formats.map {
-                        .make(
-                            for: $0,
+                    formats: seed.formats.map { type in
+                        if type == .choices, fetchesCategories, model.categoryPhase == .loaded {
+                            return .makeChoices(
+                                name: seed.localizedTrackerName,
+                                emoji: seed.emoji,
+                                labels: model.categoryLabels,
+                                allowsMultiple: model.categoryAllowsMultiple
+                            )
+                        }
+                        return .make(
+                            for: type,
                             name: seed.localizedTrackerName,
                             emoji: seed.emoji
                         )
                     },
                     color: resolvedColor,
+                    isCategoryLoading: fetchesCategories && model.categoryPhase == .loading,
                     onContinue: { kind in
                         // Mirrors `TrackerIntentView`'s `onContinue`: seed the
                         // model from the already-known name/color and jump
@@ -284,6 +298,14 @@ struct TrackerCreationFlow: View {
                         path.append(Self.firstStep(for: kind))
                     }
                 )
+                .task {
+                    // Fires once per seed: `loadCategoryIfNeeded()` memoizes
+                    // by name, so a re-render (e.g. once the fetch itself
+                    // lands and this destination rebuilds) is a no-op.
+                    guard fetchesCategories else { return }
+                    model.name = seed.localizedTrackerName
+                    await model.loadCategoryIfNeeded()
+                }
             }
         case .numberLoading:
             TrackerNumberLoadingView(model: model) {

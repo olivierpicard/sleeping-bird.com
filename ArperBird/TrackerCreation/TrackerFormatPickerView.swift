@@ -37,6 +37,14 @@ struct TrackerFormatPickerView: View {
     /// model like the rest of the flow does — it self-corrects instead.
     var color: Color = .accent
 
+    /// True while a real category fetch is in flight for this suggestion's
+    /// "choices" format — set by `TrackerCreationFlow`, which fires the fetch
+    /// (via `TrackerCreationModel.loadCategoryIfNeeded()`) and rebuilds that
+    /// one format once it lands, only for a free-text AI resolution (see
+    /// `TrackerSuggestion.isAiResolved`). Redacts just the choices tile so the
+    /// other formats aren't held up. Always false for a curated suggestion.
+    var isCategoryLoading: Bool = false
+
     /// Hands the chosen format's kind off to `TrackerCreationFlow`, which
     /// routes into that kind's step machinery — mirrors `TrackerIntentView`'s
     /// `onContinue`. A no-op default lets the screen preview standalone.
@@ -46,6 +54,13 @@ struct TrackerFormatPickerView: View {
     @State private var selectedIndex = 0
 
     private var mainColor: Color { color.readableControlTint(in: colorScheme) }
+
+    /// True while the *displayed* format is "choices" and its real categories
+    /// are still being fetched — mirrors `TrackerIntentView`'s own
+    /// `isChoicesPreviewLoading`.
+    private var isChoicesPreviewLoading: Bool {
+        isCategoryLoading && formats[selectedIndex].kind == .choices
+    }
 
     var body: some View {
         VStack(spacing: 24) {
@@ -66,7 +81,10 @@ struct TrackerFormatPickerView: View {
                     colorOverride: .gray
                 )
             )
+            .redacted(reason: isChoicesPreviewLoading ? .placeholder : [])
+            .opacity(isChoicesPreviewLoading ? 0.55 : 1)
             .animation(.snappy, value: selectedIndex)
+            .animation(.snappy, value: isChoicesPreviewLoading)
 
             WrappingHStack(alignment: .center, hSpacing: 8, vSpacing: 8) {
                 ForEach(formats.indices, id: \.self) { index in
@@ -193,6 +211,39 @@ extension TrackerFormatPickerView.FormatOption {
     /// `TrackerSuggestion.formats`) and this file's previews. The metric's own
     /// color is always `.gray` — this screen's card and chips never display a
     /// per-format color, so there's nothing to carry it for.
+    /// Rebuilds the "choices" option with real, AI-fetched category labels
+    /// (and the matching single/multiple chart) — what `TrackerCreationFlow`
+    /// swaps in once its fetch lands, in place of `make(for: .choices, …)`'s
+    /// generic placeholder. Mirrors `TrackerIntentView`'s
+    /// `choicesIntentFormat`.
+    static func makeChoices(
+        name: String,
+        emoji: String,
+        labels: [String],
+        allowsMultiple: Bool
+    ) -> Self {
+        let schema =
+            allowsMultiple
+            ? MetricSchema.Fake.categoryMultiple(
+                title: name,
+                emoji: emoji,
+                labels: labels,
+                chart: .bar
+            )
+            : MetricSchema.Fake.categorySingle(
+                title: name,
+                emoji: emoji,
+                labels: labels,
+                chart: .pie
+            )
+        return .init(
+            label: String(localized: "Pick from a list"),
+            icon: "list.bullet",
+            kind: .choices,
+            metric: Metric(from: schema, color: .gray, data: Metric.fakeData(for: schema.config))
+        )
+    }
+
     static func make(
         for type: IntentFormatType,
         name: String,
@@ -342,6 +393,29 @@ extension TrackerFormatPickerView.FormatOption {
             )
         }
 //        .environment(\.locale, Locale(identifier: "es_ES"))
+    }
+    .presentationDetents([.large])
+}
+
+/// Opens on "choices" while its real categories are still being fetched (see
+/// `TrackerCreationFlow`'s `.formatPicker` case) — the card redacts and dims
+/// instead of showing the generic "Example 1, 2…" placeholder outright.
+#Preview("Mood — categories loading") {
+    @Previewable @State var showSheet = true
+    NavigationStack {
+    }
+    .sheet(isPresented: $showSheet) {
+        NavigationStack {
+            TrackerFormatPickerView(
+                name: "Daily Mood",
+                emoji: "😁",
+                formats: [
+                    .make(for: .choices, name: "Daily Mood", emoji: "😁"),
+                    .make(for: .number, name: "Daily Mood", emoji: "😁"),
+                ],
+                isCategoryLoading: true
+            )
+        }
     }
     .presentationDetents([.large])
 }
