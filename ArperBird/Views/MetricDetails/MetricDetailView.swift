@@ -910,7 +910,9 @@ struct MetricDetailView: View {
         if isBinary { return "" }
         if isDatetime {
             guard let count = displayedDatetimeCount else { return "" }
-            return count == 1 ? "event" : "events"
+            return count == 1
+                ? String(localized: "metric_detail.unit.event")
+                : String(localized: "metric_detail.unit.events")
         }
         if isCategory {
             guard let summary = displayedCategorySummary else { return "" }
