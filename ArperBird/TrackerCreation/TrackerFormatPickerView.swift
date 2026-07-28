@@ -62,27 +62,43 @@ struct TrackerFormatPickerView: View {
         isCategoryLoading && formats[selectedIndex].kind == .choices
     }
 
+    private var previewCard: some View {
+        MetricView(
+            mainColor: .gray,
+            header: {
+                MetricHeaderTextView(
+                    title: name,
+                    emoji: emoji,
+                    mainColor: .gray
+                )
+            },
+            // Preview card stays neutral gray, independent of the
+            // tracker's resolved color — only the format chips below use it.
+            chart: MiniChartFactory.make(
+                from: formats[selectedIndex].metric,
+                colorOverride: .gray
+            )
+        )
+        .redacted(reason: isChoicesPreviewLoading ? .placeholder : [])
+    }
+
     var body: some View {
         VStack(spacing: 24) {
             Spacer()
-            MetricView(
-                mainColor: .gray,
-                header: {
-                    MetricHeaderTextView(
-                        title: name,
-                        emoji: emoji,
-                        mainColor: .gray
-                    )
-                },
-                // Preview card stays neutral gray, independent of the
-                // tracker's resolved color — only the format chips below use it.
-                chart: MiniChartFactory.make(
-                    from: formats[selectedIndex].metric,
-                    colorOverride: .gray
-                )
-            )
-            .redacted(reason: isChoicesPreviewLoading ? .placeholder : [])
-            .opacity(isChoicesPreviewLoading ? 0.55 : 1)
+            Group {
+                if isChoicesPreviewLoading {
+                    // A `TimelineView` clock drives the pulse directly, frame
+                    // by frame — unlike `withAnimation(.repeatForever())`,
+                    // it can't leak into unrelated state-driven animations
+                    // elsewhere on screen (e.g. the CTA button, which visibly
+                    // started swinging when the pulse was done that way).
+                    TimelineView(.animation) { context in
+                        previewCard.opacity(Self.pulseOpacity(at: context.date))
+                    }
+                } else {
+                    previewCard.opacity(1)
+                }
+            }
             .animation(.snappy, value: selectedIndex)
             .animation(.snappy, value: isChoicesPreviewLoading)
 
@@ -91,7 +107,12 @@ struct TrackerFormatPickerView: View {
                     FormatChip(
                         format: formats[index],
                         isSelected: index == selectedIndex,
-                        color: mainColor
+                        color: mainColor,
+                        // True only for the "choices" chip while its real
+                        // categories are still in flight — swaps its icon for
+                        // a spinner so the wait is legible at the chip
+                        // itself, not just on the card.
+                        isLoading: isCategoryLoading && formats[index].kind == .choices
                     ) {
                         selectFormat(at: index)
                     }
@@ -120,6 +141,7 @@ struct TrackerFormatPickerView: View {
             .controlSize(.extraLarge)
             .buttonStyle(.glassProminent)
             .tint(mainColor)
+            .disabled(isChoicesPreviewLoading)
             .padding()
         }
         // No own cancel button: this screen is a pushed step inside
@@ -136,6 +158,15 @@ struct TrackerFormatPickerView: View {
     /// fires once at the very end on "Continue". Mirrors
     /// `TrackerIntentView.selectFormat(at:in:)`. A same-index tap (re-selecting
     /// the active chip) is a no-op, so it isn't reported.
+    /// A smooth 0.4–0.7 sine pulse, ~1.8s period — driven directly off the
+    /// `TimelineView` clock rather than SwiftUI's implicit animation system,
+    /// so it can't leak into unrelated state-driven animations elsewhere.
+    private static func pulseOpacity(at date: Date) -> Double {
+        let t = date.timeIntervalSinceReferenceDate
+        let phase = (sin(t * 2 * .pi / 1.8) + 1) / 2
+        return 0.4 + phase * 0.3
+    }
+
     private func selectFormat(at index: Int) {
         if index != selectedIndex {
             PostHogSDK.shared.capture(
@@ -159,6 +190,7 @@ private struct FormatChip: View {
     let format: TrackerFormatPickerView.FormatOption
     let isSelected: Bool
     let color: Color
+    var isLoading: Bool = false
     let action: () -> Void
 
     var body: some View {
@@ -166,7 +198,13 @@ private struct FormatChip: View {
             Label {
                 Text(format.label)
             } icon: {
-                Image(systemName: isSelected ? "checkmark" : format.icon)
+                if isLoading {
+                    ProgressView()
+                        .controlSize(.mini)
+                        .tint(isSelected ? .white : .primary)
+                } else {
+                    Image(systemName: isSelected ? "checkmark" : format.icon)
+                }
             }
             .font(.footnote.weight(.semibold))
             .foregroundStyle(isSelected ? .white : .primary)

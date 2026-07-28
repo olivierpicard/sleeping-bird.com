@@ -197,7 +197,7 @@ struct TrackerIntentView: View {
             // the preview. `mainColor` is gray until then, matching the
             // neutral ghost state.
             .tint(mainColor)
-            .disabled(selected == nil || isLoading || isFailed)
+            .disabled(selected == nil || isLoading || isFailed || isChoicesPreviewLoading)
             .padding()
         }
         // Let the keyboard cover the CTA while typing: the whole layout ignores
@@ -227,7 +227,7 @@ struct TrackerIntentView: View {
             : "You, three weeks from now"
     }
  
-    private var previewCard: some View {
+    private var cardBody: some View {
         MetricView(
             mainColor: mainColor,
             header: {
@@ -244,11 +244,36 @@ struct TrackerIntentView: View {
                 colorOverride: mainColor
             )
         )
-        // The ghost is a promise, not a dead widget — keep it quiet.
-        .opacity(selected == nil || isLoading || isChoicesPreviewLoading ? 0.55 : 1)
         .redacted(reason: isLoading || isChoicesPreviewLoading ? .placeholder : [])
+    }
+
+    private var previewCard: some View {
+        Group {
+            if isChoicesPreviewLoading {
+                // A `TimelineView` clock drives the pulse directly, frame by
+                // frame — unlike `withAnimation(.repeatForever())`, it can't
+                // leak into unrelated state-driven animations elsewhere on
+                // screen (e.g. the CTA button, which visibly started
+                // swinging when the pulse was done that way).
+                TimelineView(.animation) { context in
+                    cardBody.opacity(Self.pulseOpacity(at: context.date))
+                }
+            } else {
+                // The ghost is a promise, not a dead widget — keep it quiet.
+                cardBody.opacity(selected == nil || isLoading ? 0.55 : 1)
+            }
+        }
         .animation(.snappy, value: isLoading)
         .animation(.snappy, value: isChoicesPreviewLoading)
+    }
+
+    /// A smooth 0.4–0.7 sine pulse, ~1.8s period — driven directly off the
+    /// `TimelineView` clock rather than SwiftUI's implicit animation system,
+    /// so it can't leak into unrelated state-driven animations elsewhere.
+    private static func pulseOpacity(at date: Date) -> Double {
+        let t = date.timeIntervalSinceReferenceDate
+        let phase = (sin(t * 2 * .pi / 1.8) + 1) / 2
+        return 0.4 + phase * 0.3
     }
 
     /// True while the *displayed* format is "choices" and its real categories
@@ -304,9 +329,22 @@ struct TrackerIntentView: View {
             if let selected, !isLoading, !isFailed {
                 ForEach(selected.formats.indices, id: \.self) { index in
                     let format = selected.formats[index]
+                    // True only for the "choices" pill while its real
+                    // categories are still in flight — swaps its icon for a
+                    // spinner so the wait is legible at the pill itself, not
+                    // just on the card.
+                    let isPillLoading = categoriesLoading && format.kind == .choices
                     Button(action: { selectFormat(at: index, in: selected) }) {
-                        Label(format.label, systemImage: format.icon)
-                            .font(.footnote.weight(.medium))
+                        Label {
+                            Text(format.label)
+                        } icon: {
+                            if isPillLoading {
+                                ProgressView().controlSize(.mini)
+                            } else {
+                                Image(systemName: format.icon)
+                            }
+                        }
+                        .font(.footnote.weight(.medium))
                     }
                     .buttonStyle(.bordered)
                     .buttonBorderShape(.capsule)
