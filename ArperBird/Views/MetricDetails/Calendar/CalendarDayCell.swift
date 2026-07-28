@@ -38,6 +38,37 @@ struct CalendarDayCell<Fill: View>: View {
     private let backingScale: Double = 0.6
 
     var body: some View {
+        cellContent
+            .contentShape(Circle())
+            .animation(.snappy(duration: 0.2), value: isSelected)
+            .contextMenu {
+                Button {
+                    // TODO: wire up
+                } label: {
+                    Label("Add a note", systemImage: "note.text.badge.plus")
+                }
+                Button(role: .destructive) {
+                    // TODO: wire up
+                } label: {
+                    Label("Delete notes", systemImage: "trash")
+                }
+            } preview: {
+                cellContent
+                    .frame(width: 60, height: 60)
+            }
+            // Forces a distinct identity per day. Without it, the List's
+            // lazy row/grid recycling can pin the context-menu interaction
+            // to whichever cell was created first, so every long press
+            // shows the same (wrong) day's menu and preview.
+            .id(date)
+    }
+
+    /// The cell's plain visuals, with no interaction modifiers — reused both
+    /// as the live cell and as the `.contextMenu` preview, so the lift-off
+    /// snapshots just this day rather than the enclosing List row (which,
+    /// without an explicit preview, is what UIKit's context-menu interaction
+    /// falls back to snapshotting).
+    private var cellContent: some View {
         GeometryReader { geo in
             ZStack {
                 // The single outline: tint when selected, a gray "no entry" ring
@@ -53,8 +84,6 @@ struct CalendarDayCell<Fill: View>: View {
         }
         .opacity(isFuture ? 0.35 : 1)
         .aspectRatio(1, contentMode: .fit)
-        .contentShape(Circle())
-        .animation(.snappy(duration: 0.2), value: isSelected)
     }
 
     /// The day's single outline color: the selection tint takes priority, then a

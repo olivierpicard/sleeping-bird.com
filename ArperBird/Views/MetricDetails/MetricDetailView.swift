@@ -323,65 +323,95 @@ struct MetricDetailView: View {
 
     // MARK: - Populated List
 
-    private var populatedList: some View { 
-        List {
-            Section {
-                VStack(spacing: 24) {
-                    header
+    /// The header/calendar section lives in a plain `ScrollView` rather than
+    /// a `List` row. A `List` row is backed by a single `UITableViewCell`,
+    /// and the calendar packs ~35 `CalendarDayCell`s — each with its own
+    /// native `.contextMenu` — into that one row; iOS only reliably honors
+    /// one context-menu interaction per cell, so every long press fell back
+    /// to the row's own bounds/first-registered menu. Only "Recent Entries"
+    /// still needs `List` (for `.swipeActions`), so it's nested below,
+    /// scroll-disabled and sized to its content so the whole page scrolls
+    /// as one continuous unit.
+    private var populatedList: some View {
+        ScrollView {
+            VStack(spacing: 24) {
+                header
 
-                    Group {
-                        if isBinary {
-                            binaryCalendarSection
-                                .padding(.top)
-                        } else if isDatetime {
-                            datetimeCalendarSection
-                                .padding(.top)
-                        } else if isCategory {
-                            HStack(spacing: 12) {
-                                if chartMode == .calendar {
-                                    monthSelector
-                                } else {
-                                    rangePicker
-                                }
-                                chartModeToggle
-                            }
+                Group {
+                    if isBinary {
+                        binaryCalendarSection
+                            .padding(.top)
+                    } else if isDatetime {
+                        datetimeCalendarSection
+                            .padding(.top)
+                    } else if isCategory {
+                        HStack(spacing: 12) {
                             if chartMode == .calendar {
-                                categoryCalendarSection
-                                CategoryLegend(
-                                    items: categoryLegendItems,
-                                    active: activeCategoryLabels,
-                                    onToggle: toggleCategory
-                                )
+                                monthSelector
                             } else {
-                                categoryChartSection
+                                rangePicker
                             }
+                            chartModeToggle
+                        }
+                        if chartMode == .calendar {
+                            categoryCalendarSection
+                            CategoryLegend(
+                                items: categoryLegendItems,
+                                active: activeCategoryLabels,
+                                onToggle: toggleCategory
+                            )
                         } else {
-                            HStack(spacing: 12) {
-                                if chartMode == .calendar {
-                                    monthSelector
-                                } else {
-                                    rangePicker
-                                }
-                                chartModeToggle
-                            }
+                            categoryChartSection
+                        }
+                    } else {
+                        HStack(spacing: 12) {
                             if chartMode == .calendar {
-                                numberCalendarSection
+                                monthSelector
                             } else {
-                                chartSection
+                                rangePicker
                             }
+                            chartModeToggle
+                        }
+                        if chartMode == .calendar {
+                            numberCalendarSection
+                        } else {
+                            chartSection
                         }
                     }
                 }
-                .listRowInsets(
-                    EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16)
-                )
-                .listRowSeparator(.hidden)
-                .listRowBackground(Color.clear)
             }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 8)
 
+            recentEntriesList
+        }
+    }
+
+    // MARK: - Recent Entries (nested, self-sizing List)
+
+    /// Per-row measured height, keyed by index — summed to size the nested
+    /// `List` to its content since a `List` inside a `ScrollView` doesn't
+    /// otherwise report an intrinsic height.
+    @State private var recentEntryRowHeights: [Int: CGFloat] = [:]
+
+    private var recentEntriesHeight: CGFloat {
+        let rowsHeight = recentEntryRowHeights.values.reduce(0, +)
+        let headerHeight: CGFloat = 34
+        let sectionChrome: CGFloat = 16
+        return rowsHeight + headerHeight + sectionChrome
+    }
+
+    private var recentEntriesList: some View {
+        List {
             recentEntries
         }
         .listStyle(.insetGrouped)
+        .scrollDisabled(true)
+        .scrollContentBackground(.hidden)
+        .onPreferenceChange(RecentEntryRowHeightKey.self) {
+            recentEntryRowHeights = $0
+        }
+        .frame(height: recentEntriesHeight)
     }
 
     // MARK: - Empty State
@@ -833,6 +863,14 @@ struct MetricDetailView: View {
             ForEach(visible.indices, id: \.self) { index in
                 entryRow(for: visible[index])
                     .listRowInsets(EdgeInsets())
+                    .background(
+                        GeometryReader { geo in
+                            Color.clear.preference(
+                                key: RecentEntryRowHeightKey.self,
+                                value: [index: geo.size.height]
+                            )
+                        }
+                    )
                     .swipeActions(edge: .trailing, allowsFullSwipe: true) {
                         Button(role: .destructive) {
                             delete(visible[index])
@@ -1041,6 +1079,17 @@ struct MetricDetailView: View {
             return String(localized: "metric_detail.entry.yesterday")
         }
         return date.formatted(.dateTime.month(.wide).day())
+    }
+}
+
+// MARK: - Recent entry row height measurement
+
+/// Reports each recent-entry row's rendered height, keyed by index, so the
+/// nested `List` in `recentEntriesList` can size itself to content.
+private struct RecentEntryRowHeightKey: PreferenceKey {
+    static var defaultValue: [Int: CGFloat] = [:]
+    static func reduce(value: inout [Int: CGFloat], nextValue: () -> [Int: CGFloat]) {
+        value.merge(nextValue()) { _, new in new }
     }
 }
 
