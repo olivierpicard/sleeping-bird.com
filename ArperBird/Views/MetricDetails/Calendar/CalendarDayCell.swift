@@ -83,7 +83,7 @@ struct CalendarDayCell<Fill: View>: View {
             }
     }
 
-    private var deleteConfirmationTitle: String {
+    private var deleteConfirmationTitle: Text {
         let cal = Calendar.current
         let day: String
         if cal.isDateInToday(date) {
@@ -93,7 +93,7 @@ struct CalendarDayCell<Fill: View>: View {
         } else {
             day = date.formatted(.dateTime.month(.wide).day())
         }
-        return "Delete all notes from \(day)?"
+        return Text("Delete all notes from \(day)?")
     }
 
     /// The cell's plain visuals, with no interaction modifiers — reused both
