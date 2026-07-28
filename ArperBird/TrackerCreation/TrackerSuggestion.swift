@@ -51,8 +51,13 @@ struct TrackerSuggestion: Identifiable {
     /// category fetch — unlike the free-text path, a curated idea's topic is
     /// already known, so there's a real fixed set to offer instead of the
     /// generic "Example 1, 2…" placeholder. Empty for a suggestion whose
-    /// `formats` doesn't include `.choices`.
-    let categoryLabels: [String]
+    /// `formats` doesn't include `.choices`. Stored localized (unlike the AI
+    /// path's categories, which are locale-aware at generation time, these are
+    /// a static catalog resolved through `Localizable.xcstrings`).
+    private let categoryLabelResources: [LocalizedStringResource]
+
+    var categoryLabels: [String] { categoryLabelResources.map { String(localized: $0) } }
+
     /// Whether `categoryLabels` should render as a multi-select (bar chart) or
     /// single-select (pie chart) — mirrors `CategoryAiCompletionSchema.allowsMultipleSelection`.
     let categoryAllowsMultiple: Bool
@@ -73,7 +78,7 @@ struct TrackerSuggestion: Identifiable {
         chipEmoji: String? = nil,
         kind: TrackerKind,
         formats: [IntentFormatType]? = nil,
-        categoryLabels: [String] = [],
+        categoryLabels: [LocalizedStringResource] = [],
         categoryAllowsMultiple: Bool = false
     ) {
         self.label = label
@@ -83,7 +88,7 @@ struct TrackerSuggestion: Identifiable {
         self.chipEmoji = chipEmoji ?? emoji
         self.kind = kind
         self.formats = formats ?? Self.defaultFormats(for: kind)
-        self.categoryLabels = categoryLabels
+        self.categoryLabelResources = categoryLabels
         self.categoryAllowsMultiple = categoryAllowsMultiple
     }
 
@@ -302,7 +307,7 @@ struct TrackerSuggestion: Identifiable {
                     instruction: "Track my food cravings",
                     emoji: "🍫",
                     kind: .choices,
-                    categoryLabels: ["Sweet", "Salty", "Savory", "Spicy", "Fatty"],
+                    categoryLabels: ["Sweet", "Salty", "Spicy", "Fatty"],
                     categoryAllowsMultiple: true
                 ),
             ]
