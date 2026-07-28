@@ -32,8 +32,10 @@ struct CalendarDayCell<Fill: View>: View {
     var numeralColor: Color = .primary
     /// Called when "Add a note" is chosen from the cell's long-press menu.
     var onAddNote: (() -> Void)? = nil
-    /// Called when "Delete notes" is chosen from the cell's long-press menu.
-    /// The caller decides whether the day actually has anything to delete.
+    /// Called once the "Delete notes" confirmation has actually been
+    /// accepted — the cell owns asking for confirmation (see
+    /// `isConfirmingDelete`) so the dialog anchors to this specific day
+    /// rather than wherever the modifier happens to be attached higher up.
     var onDeleteNotes: (() -> Void)? = nil
     /// The visual behind the numeral. Injected per metric type.
     @ViewBuilder var fill: () -> Fill
@@ -41,6 +43,8 @@ struct CalendarDayCell<Fill: View>: View {
     /// Backing-disc diameter as a fraction of the cell, sized off the cell so it
     /// stays constant whether the day is one or two digits.
     private let backingScale: Double = 0.6
+
+    @State private var isConfirmingDelete = false
 
     var body: some View {
         cellContent
@@ -53,7 +57,8 @@ struct CalendarDayCell<Fill: View>: View {
                     Label("Add a note", systemImage: "note.text.badge.plus")
                 }
                 Button(role: .destructive) {
-                    onDeleteNotes?()
+                    guard hasData else { return }
+                    isConfirmingDelete = true
                 } label: {
                     Label("Delete notes", systemImage: "trash")
                 }
@@ -66,6 +71,29 @@ struct CalendarDayCell<Fill: View>: View {
             // to whichever cell was created first, so every long press
             // shows the same (wrong) day's menu and preview.
             .id(date)
+            .confirmationDialog(
+                deleteConfirmationTitle,
+                isPresented: $isConfirmingDelete,
+                titleVisibility: .visible
+            ) {
+                Button("Delete", role: .destructive) {
+                    onDeleteNotes?()
+                }
+                Button("Cancel", role: .cancel) {}
+            }
+    }
+
+    private var deleteConfirmationTitle: String {
+        let cal = Calendar.current
+        let day: String
+        if cal.isDateInToday(date) {
+            day = String(localized: "metric_detail.entry.today")
+        } else if cal.isDateInYesterday(date) {
+            day = String(localized: "metric_detail.entry.yesterday")
+        } else {
+            day = date.formatted(.dateTime.month(.wide).day())
+        }
+        return "Delete all notes from \(day)?"
     }
 
     /// The cell's plain visuals, with no interaction modifiers — reused both

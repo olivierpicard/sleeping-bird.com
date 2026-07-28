@@ -45,9 +45,6 @@ struct MetricDetailView: View {
     @State private var monthProgress: Double = 0
     @State private var isEditing: Bool = false
     @State private var isAddingEntry: Bool = false
-    /// The day pending confirmation for "Delete notes" — non-nil drives the
-    /// confirmation dialog.
-    @State private var pendingDeleteDate: Date?
 
     /// Chart vs. calendar view for number, duration, and category metrics.
     private enum ChartMode { case chart, calendar }
@@ -291,21 +288,6 @@ struct MetricDetailView: View {
                 )
             }
             .trackScreen("AddEntry")
-        }
-        .confirmationDialog(
-            deleteNotesTitle,
-            isPresented: isPresentingDeleteConfirmation,
-            titleVisibility: .visible
-        ) {
-            Button("Delete", role: .destructive) {
-                if let pendingDeleteDate {
-                    deleteNotes(on: pendingDeleteDate)
-                }
-                pendingDeleteDate = nil
-            }
-            Button("Cancel", role: .cancel) {
-                pendingDeleteDate = nil
-            }
         }
         .onAppear {
             recomputeBins()
@@ -733,9 +715,7 @@ struct MetricDetailView: View {
                 tint: tint,
                 hasData: !colors.isEmpty,
                 onAddNote: { presentAddNote(for: ctx.date) },
-                onDeleteNotes: {
-                    presentDeleteNotes(for: ctx.date, hasData: !colors.isEmpty)
-                }
+                onDeleteNotes: { deleteNotes(on: ctx.date) }
             ) {
                 DayPieFillView(colors: colors)
             }
@@ -766,11 +746,7 @@ struct MetricDetailView: View {
                 tint: tint,
                 hasData: isTrue || isFalse,
                 onAddNote: { presentAddNote(for: ctx.date) },
-                onDeleteNotes: {
-                    presentDeleteNotes(
-                        for: ctx.date, hasData: isTrue || isFalse
-                    )
-                }
+                onDeleteNotes: { deleteNotes(on: ctx.date) }
             ) {
                 DaySolidFillView(
                     style: isTrue ? .filled : (isFalse ? .muted : .empty),
@@ -804,9 +780,7 @@ struct MetricDetailView: View {
                 tint: tint,
                 hasData: hasEvent,
                 onAddNote: { presentAddNote(for: ctx.date) },
-                onDeleteNotes: {
-                    presentDeleteNotes(for: ctx.date, hasData: hasEvent)
-                }
+                onDeleteNotes: { deleteNotes(on: ctx.date) }
             ) {
                 DaySolidFillView(style: hasEvent ? .filled : .empty, tint: tint)
             }
@@ -851,9 +825,7 @@ struct MetricDetailView: View {
                 tint: tint,
                 hasData: isLogged,
                 onAddNote: { presentAddNote(for: ctx.date) },
-                onDeleteNotes: {
-                    presentDeleteNotes(for: ctx.date, hasData: isLogged)
-                }
+                onDeleteNotes: { deleteNotes(on: ctx.date) }
             ) {
                 DaySolidFillView(style: isLogged ? .filled : .empty, tint: tint)
             }
@@ -938,27 +910,9 @@ struct MetricDetailView: View {
         isAddingEntry = true
     }
 
-    /// Arms the delete-confirmation dialog for a day — the "Delete notes"
-    /// action from a `CalendarDayCell`'s long-press menu. A no-op on empty
-    /// days, since there's nothing to confirm deleting.
-    private func presentDeleteNotes(for date: Date, hasData: Bool) {
-        guard hasData else { return }
-        pendingDeleteDate = date
-    }
-
-    private var isPresentingDeleteConfirmation: Binding<Bool> {
-        Binding(
-            get: { pendingDeleteDate != nil },
-            set: { if !$0 { pendingDeleteDate = nil } }
-        )
-    }
-
-    private var deleteNotesTitle: String {
-        guard let pendingDeleteDate else { return "" }
-        return "Delete all notes from \(relativeDay(for: pendingDeleteDate))?"
-    }
-
-    /// Removes every data point logged on `date`, regardless of time of day.
+    /// Removes every data point logged on `date`, regardless of time of day
+    /// — called once `CalendarDayCell` has confirmed the "Delete notes"
+    /// action locally (its dialog anchors to the tapped cell).
     private func deleteNotes(on date: Date) {
         let calendar = Calendar.current
         metric.data.removeAll {
