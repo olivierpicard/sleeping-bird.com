@@ -119,9 +119,21 @@ struct TrackerCreationFlow: View {
                 return model
             }()
             model.color = kind.previewColor
+            // A curated `.choices` suggestion carries its own premade
+            // categories — seed them directly (no AI) when `preloadSeed`
+            // wasn't the one to warm this model, so the fallback path still
+            // skips straight to the post-load step below.
+            if preloaded == nil, kind == .choices, !seed.categoryLabels.isEmpty {
+                model.seedCategory(
+                    labels: seed.categoryLabels,
+                    allowsMultiple: seed.categoryAllowsMultiple,
+                    emoji: seed.emoji,
+                    name: seed.localizedTrackerName
+                )
+            }
             _model = State(initialValue: model)
             _path = State(initialValue: [
-                preloaded != nil && preloadSucceeded
+                (preloaded != nil && preloadSucceeded) || model.categoryPhase == .loaded
                     ? Self.postLoadStep(for: kind)
                     : Self.firstStep(for: kind)
             ])
@@ -178,7 +190,7 @@ struct TrackerCreationFlow: View {
                 preselected: seed,
                 autofocusField: autofocus,
                 model: model,
-                onContinue: { kind, name, intentColor in
+                onContinue: { kind, name, intentColor, categoryLabels, categoryAllowsMultiple, categoryEmoji in
                     // The intent screen already captured the name and picked a
                     // format (kind), so seed the model and jump straight into the
                     // kind's step machinery — no `.name` step. The typed prompt /
@@ -189,7 +201,20 @@ struct TrackerCreationFlow: View {
                     model.name = name
                     model.aiHint = name
                     model.color = intentColor
-                    path = [Self.firstStep(for: kind)]
+                    // A curated suggestion's "choices" format carries its own
+                    // premade categories — seed them directly (no AI) and skip
+                    // straight past the loading spinner to the editable labels.
+                    if kind == .choices, !categoryLabels.isEmpty {
+                        model.seedCategory(
+                            labels: categoryLabels,
+                            allowsMultiple: categoryAllowsMultiple,
+                            emoji: categoryEmoji,
+                            name: name
+                        )
+                        path = [.categoryLabels]
+                    } else {
+                        path = [Self.firstStep(for: kind)]
+                    }
                 }
             )
             // The intent root: an entry point whenever it's the screen the user
@@ -276,6 +301,17 @@ struct TrackerCreationFlow: View {
                                 allowsMultiple: model.categoryAllowsMultiple
                             )
                         }
+                        // A curated suggestion carries its own premade
+                        // categories — show them directly, no AI fetch needed
+                        // (see `TrackerSuggestion.categoryLabels`).
+                        if type == .choices, !seed.categoryLabels.isEmpty {
+                            return .makeChoices(
+                                name: seed.localizedTrackerName,
+                                emoji: seed.emoji,
+                                labels: seed.categoryLabels,
+                                allowsMultiple: seed.categoryAllowsMultiple
+                            )
+                        }
                         return .make(
                             for: type,
                             name: seed.localizedTrackerName,
@@ -295,7 +331,21 @@ struct TrackerCreationFlow: View {
                         model.name = seed.localizedTrackerName
                         model.aiHint = seed.localizedTrackerName
                         model.color = resolvedColor
-                        path.append(Self.firstStep(for: kind))
+                        // A curated suggestion's "choices" format carries its
+                        // own premade categories — seed them directly (no AI)
+                        // and skip straight past the loading spinner, same as
+                        // the free-text path does once its real fetch lands.
+                        if kind == .choices, !seed.categoryLabels.isEmpty {
+                            model.seedCategory(
+                                labels: seed.categoryLabels,
+                                allowsMultiple: seed.categoryAllowsMultiple,
+                                emoji: seed.emoji,
+                                name: seed.localizedTrackerName
+                            )
+                            path.append(.categoryLabels)
+                        } else {
+                            path.append(Self.firstStep(for: kind))
+                        }
                     }
                 )
                 .task {

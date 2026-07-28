@@ -46,6 +46,17 @@ struct TrackerSuggestion: Identifiable {
     /// leads with `.goal`, a pure cost offers only `.number`.
     let formats: [IntentFormatType]
 
+    /// Premade category labels for a "choices" format, hand-picked per idea so
+    /// its preview (and, once picked, its actual categories) never needs an AI
+    /// category fetch — unlike the free-text path, a curated idea's topic is
+    /// already known, so there's a real fixed set to offer instead of the
+    /// generic "Example 1, 2…" placeholder. Empty for a suggestion whose
+    /// `formats` doesn't include `.choices`.
+    let categoryLabels: [String]
+    /// Whether `categoryLabels` should render as a multi-select (bar chart) or
+    /// single-select (pie chart) — mirrors `CategoryAiCompletionSchema.allowsMultipleSelection`.
+    let categoryAllowsMultiple: Bool
+
     /// True only for a suggestion built from a free-text AI resolution (see
     /// `init(from:)`) — false for every curated catalog entry (`defaults`,
     /// `examples(for:)`). Lets the seeded `TrackerFormatPickerView` know
@@ -61,7 +72,9 @@ struct TrackerSuggestion: Identifiable {
         emoji: String,
         chipEmoji: String? = nil,
         kind: TrackerKind,
-        formats: [IntentFormatType]? = nil
+        formats: [IntentFormatType]? = nil,
+        categoryLabels: [String] = [],
+        categoryAllowsMultiple: Bool = false
     ) {
         self.label = label
         self.trackerName = trackerName ?? label
@@ -70,6 +83,8 @@ struct TrackerSuggestion: Identifiable {
         self.chipEmoji = chipEmoji ?? emoji
         self.kind = kind
         self.formats = formats ?? Self.defaultFormats(for: kind)
+        self.categoryLabels = categoryLabels
+        self.categoryAllowsMultiple = categoryAllowsMultiple
     }
 
     /// The logging formats offered for a kind when a suggestion doesn't spell
@@ -142,7 +157,9 @@ struct TrackerSuggestion: Identifiable {
             instruction: "Track my chores accomplished",
             emoji: "🧽",
             kind: .binary,
-            formats: [.binary, .duration, .choices]
+            formats: [.binary, .duration, .choices],
+            categoryLabels: ["Cleaning", "Laundry", "Dishes", "Cooking", "Shopping", "Yard Work"],
+            categoryAllowsMultiple: true
         ),
         .init(
             label: "Mood",
@@ -150,7 +167,8 @@ struct TrackerSuggestion: Identifiable {
             instruction: "Track my daily mood",
             emoji: "😁",
             kind: .choices,
-            formats: [.choices, .number]
+            formats: [.choices, .number],
+            categoryLabels: ["Happy", "Calm", "Tired", "Anxious", "Sad", "Excited", "Stressed"]
         ),
         .init(
             label: "Meditation",
@@ -254,31 +272,38 @@ struct TrackerSuggestion: Identifiable {
                     label: "Mood",
                     instruction: "Track my daily mood",
                     emoji: "😁",
-                    kind: .choices
+                    kind: .choices,
+                    categoryLabels: ["Happy", "Calm", "Tired", "Anxious", "Sad", "Excited", "Stressed"]
                 ),
                 .init(
                     label: "Sleep Quality",
                     instruction: "Track how well I slept",
                     emoji: "😴",
-                    kind: .choices
+                    kind: .choices,
+                    categoryLabels: ["Great", "Good", "Okay", "Poor", "Terrible"]
                 ),
                 .init(
                     label: "Social Contact",
                     instruction: "Track the people I see most",
                     emoji: "👥",
-                    kind: .choices
+                    kind: .choices,
+                    categoryLabels: ["Family", "Friends", "Partner", "Coworkers", "Strangers", "Alone"],
+                    categoryAllowsMultiple: true
                 ),
                 .init(
                     label: "Meal Type",
                     instruction: "Track what I ate",
                     emoji: "🍽️",
-                    kind: .choices
+                    kind: .choices,
+                    categoryLabels: ["Breakfast", "Lunch", "Dinner", "Snack", "Dessert"]
                 ),
                 .init(
                     label: "Cravings",
                     instruction: "Track my food cravings",
                     emoji: "🍫",
-                    kind: .choices
+                    kind: .choices,
+                    categoryLabels: ["Sweet", "Salty", "Savory", "Spicy", "Fatty"],
+                    categoryAllowsMultiple: true
                 ),
             ]
         case .date:

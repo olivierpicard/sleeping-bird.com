@@ -53,9 +53,14 @@ struct TrackerIntentView: View {
     private let model: TrackerCreationModel
 
     /// Hands the resolved pick to the creation flow: the chosen format's kind,
-    /// the intent name, and the per-kind color the preview showed. The flow
-    /// routes into the kind's step machinery from here.
-    private let onContinue: (TrackerKind, String, Color) -> Void
+    /// the intent name, the per-kind color the preview showed, and — only for
+    /// a "choices" format with a premade set (a curated suggestion) — its
+    /// category labels, single/multiple flag, and emoji, so the flow can seed
+    /// the choices path directly instead of firing its own AI fetch. Empty
+    /// labels for every other format, and for the free-text AI path (which has
+    /// no premade set of its own). The flow routes into the kind's step
+    /// machinery from here.
+    private let onContinue: (TrackerKind, String, Color, [String], Bool, String) -> Void
 
     /// When true, raise the keyboard and focus the field as the screen appears
     /// — used by the empty-dashboard launcher so a tap lands straight in typing.
@@ -82,7 +87,9 @@ struct TrackerIntentView: View {
         generateIntent: @escaping (String) async throws -> IntentCompletion = {
             try await IntentAiCompletion().generate(for: $0)
         },
-        onContinue: @escaping (TrackerKind, String, Color) -> Void = { _, _, _ in }
+        onContinue: @escaping (TrackerKind, String, Color, [String], Bool, String) -> Void = {
+            _, _, _, _, _, _ in
+        }
     ) {
         self.autofocusField = autofocusField
         // Nil (the curated-chip path and every preview but the flow's own)
@@ -362,7 +369,9 @@ struct TrackerIntentView: View {
     }
 
     /// Hands the current pick off to the creation flow: the selected format's
-    /// kind (which path to route into), the intent name, and its color.
+    /// kind (which path to route into), the intent name, its color, and — for
+    /// a "choices" format with a premade set — the categories themselves, so
+    /// the flow can seed them directly instead of firing its own AI fetch.
     private func continueWithSelection() {
         guard let selected, !isLoading, !isFailed else { return }
         let format = selected.formats[formatIndex]
@@ -377,7 +386,14 @@ struct TrackerIntentView: View {
             properties["suggestion_id"] = suggestionID
         }
         PostHogSDK.shared.capture("tracker_kind_selected", properties: properties)
-        onContinue(format.kind, selected.trackerName, selected.color)
+        onContinue(
+            format.kind,
+            selected.trackerName,
+            selected.color,
+            format.categoryLabels,
+            format.categoryAllowsMultiple,
+            selected.emoji
+        )
     }
 
     /// Reports a format-pill switch — deliberation between how a resolved idea
@@ -530,6 +546,13 @@ struct TrackerIntentView: View {
         /// the creation flow knows which path to route into.
         let kind: TrackerKind
         let metric: Metric
+        /// Premade categories for a "choices" format, carried through from
+        /// `TrackerSuggestion.categoryLabels` — handed to `onContinue` so the
+        /// creation flow can seed the choices path directly instead of firing
+        /// its own AI fetch. Empty for every other format, and for the
+        /// free-text AI path (which has no premade set of its own).
+        var categoryLabels: [String] = []
+        var categoryAllowsMultiple = false
     }
 
     private struct IntentSuggestion: Identifiable {
@@ -612,7 +635,9 @@ struct TrackerIntentView: View {
                     for: $0,
                     name: suggestion.localizedTrackerName,
                     emoji: suggestion.emoji,
-                    color: color
+                    color: color,
+                    categoryLabels: suggestion.categoryLabels,
+                    categoryAllowsMultiple: suggestion.categoryAllowsMultiple
                 )
             }
         )
@@ -658,7 +683,9 @@ struct TrackerIntentView: View {
         for type: IntentFormatType,
         name: String,
         emoji: String,
-        color: Color
+        color: Color,
+        categoryLabels: [String] = [],
+        categoryAllowsMultiple: Bool = false
     ) -> IntentFormat {
         switch type {
         case .duration:
@@ -725,18 +752,41 @@ struct TrackerIntentView: View {
                 )
             )
         case .choices:
+            // A curated suggestion carries its own premade `categoryLabels` —
+            // shown as-is, no AI fetch needed (see `TrackerSuggestion.categoryLabels`).
+            // The free-text AI path has none yet, so it still falls back to the
+            // generic placeholder until `loadRealCategoriesIfNeeded` lands.
             IntentFormat(
                 label: String(localized: "Pick from a list"),
                 icon: "list.bullet",
                 kind: type.kind,
-                metric: metric(
-                    MetricSchema.Fake.categorySingle(
-                        title: name,
-                        emoji: emoji,
-                        chart: .pie
+                metric: categoryLabels.isEmpty
+                    ? metric(
+                        MetricSchema.Fake.categorySingle(
+                            title: name,
+                            emoji: emoji,
+                            chart: .pie
+                        ),
+                        color: color
+                    )
+                    : metric(
+                        categoryAllowsMultiple
+                            ? MetricSchema.Fake.categoryMultiple(
+                                title: name,
+                                emoji: emoji,
+                                labels: categoryLabels,
+                                chart: .bar
+                            )
+                            : MetricSchema.Fake.categorySingle(
+                                title: name,
+                                emoji: emoji,
+                                labels: categoryLabels,
+                                chart: .pie
+                            ),
+                        color: color
                     ),
-                    color: color
-                )
+                categoryLabels: categoryLabels,
+                categoryAllowsMultiple: categoryAllowsMultiple
             )
         case .date:
             IntentFormat(
