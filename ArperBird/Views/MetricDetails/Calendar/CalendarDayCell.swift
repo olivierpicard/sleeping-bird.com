@@ -30,6 +30,11 @@ struct CalendarDayCell<Fill: View>: View {
     /// Numeral color. Defaults to `.primary` — legible over the backing disc for
     /// every metric type.
     var numeralColor: Color = .primary
+    /// Called when "Add a note" is chosen from the cell's long-press menu.
+    var onAddNote: (() -> Void)? = nil
+    /// Called when "Delete notes" is chosen from the cell's long-press menu.
+    /// The caller decides whether the day actually has anything to delete.
+    var onDeleteNotes: (() -> Void)? = nil
     /// The visual behind the numeral. Injected per metric type.
     @ViewBuilder var fill: () -> Fill
 
@@ -43,12 +48,12 @@ struct CalendarDayCell<Fill: View>: View {
             .animation(.snappy(duration: 0.2), value: isSelected)
             .contextMenu {
                 Button {
-                    // TODO: wire up
+                    onAddNote?()
                 } label: {
                     Label("Add a note", systemImage: "note.text.badge.plus")
                 }
                 Button(role: .destructive) {
-                    // TODO: wire up
+                    onDeleteNotes?()
                 } label: {
                     Label("Delete notes", systemImage: "trash")
                 }
