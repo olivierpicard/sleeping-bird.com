@@ -102,7 +102,7 @@ struct TrackerIntentView: View {
         // exactly as if the user had tapped an in-screen chip and it settled.
         let preresolved = preselected.map(Self.intentSuggestion(from:))
         _selected = State(initialValue: preresolved)
-        _text = State(initialValue: preresolved?.instruction ?? "")
+        _text = State(initialValue: Self.stripTrackPrefix(preresolved?.instruction ?? ""))
         _selectionSource = State(initialValue: preselected != nil ? "chip" : "typed")
         _suggestions = State(initialValue: Self.makeSuggestions())
         _placeholder = State(
@@ -366,35 +366,40 @@ struct TrackerIntentView: View {
     private var inputField: some View {
         HStack(spacing: 8) {
             Image(systemName: "sparkles")
-                .foregroundStyle(.secondary)
-            TextField("", text: $text)
-                .textFieldStyle(.plain)
-                .focused($isFieldFocused)
-                .submitLabel(.done)
-                .onSubmit { resolveCustom() }
-                .accessibilityLabel("Describe what you want to track")
-                .overlay(alignment: .leading) {
-                    if text.isEmpty {
-                        HStack(spacing: 4) {
-                            Text("Track")
-                            Text(Self.examplePrompts[promptIndex])
-                                .id(promptIndex)
-                                .transition(
-                                    reduceMotion
-                                        ? .opacity : .push(from: .bottom)
-                                )
-                        }
+                .foregroundStyle(inputFieldLitTint)
+            // "Track" is its own view, so it's inherently non-deletable —
+            // mirrors `TrackerInputFieldCTA`'s split-field layout, forcing
+            // every typed prompt to read as "Track …". Dimmed to placeholder
+            // tint at rest, lights up to real-text tint on focus or once
+            // something's typed — same cue as the CTA field.
+            Text("Track")
+                .foregroundStyle(inputFieldLitTint)
+            ZStack(alignment: .leading) {
+                if text.isEmpty {
+                    Text(Self.examplePrompts[promptIndex])
+                        .id(promptIndex)
                         .foregroundStyle(Color(.placeholderText))
+                        .transition(
+                            reduceMotion ? .opacity : .push(from: .bottom)
+                        )
                         .allowsHitTesting(false)
-                    }
                 }
-                .clipped()
+                TextField("", text: $text)
+                    .textFieldStyle(.plain)
+                    .focused($isFieldFocused)
+                    .submitLabel(.done)
+                    .onSubmit { resolveCustom() }
+                    .accessibilityLabel("Describe what you want to track")
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .clipped()
         }
         .padding(12)
         .background(
             RoundedRectangle(cornerRadius: 12)
                 .fill(Color(.tertiarySystemFill))
         )
+        .animation(.easeInOut(duration: 0.35), value: isFieldFocused)
         .task {
             while !Task.isCancelled {
                 try? await Task.sleep(for: .seconds(3))
@@ -404,6 +409,13 @@ struct TrackerIntentView: View {
                 }
             }
         }
+    }
+
+    /// "Track" + sparkles tint for `inputField`: real-text color when focused
+    /// or once something's typed, placeholder gray otherwise — the same "lit"
+    /// cue as `TrackerInputFieldCTA.litTint`.
+    private var inputFieldLitTint: Color {
+        isFieldFocused || !text.isEmpty ? .primary : Color(.placeholderText)
     }
 
     /// Hands the current pick off to the creation flow: the selected format's
@@ -454,7 +466,7 @@ struct TrackerIntentView: View {
     // MARK: - Fake resolution (stands in for the AI classify call)
 
     private func resolve(_ suggestion: IntentSuggestion) {
-        text = suggestion.instruction
+        text = Self.stripTrackPrefix(suggestion.instruction)
         isFailed = false
         isLoading = true
         categoriesLoading = false
@@ -652,6 +664,17 @@ struct TrackerIntentView: View {
 
     /// Card tint per kind, standing in for the color the AI would pick.
     private static func color(for kind: TrackerKind) -> Color { kind.previewColor }
+
+    /// Strips a leading "Track " (resolved in the current locale, e.g.
+    /// "Note "/"Anota ") from a curated suggestion's instruction before it
+    /// seeds the field's editable text — the field itself now supplies that
+    /// word as a static, non-deletable prefix (see `inputField`), so keeping
+    /// it in `text` too would read "Track Track the water I drink".
+    private static func stripTrackPrefix(_ instruction: String) -> String {
+        let trackPrefix = String(localized: "Track") + " "
+        guard instruction.hasPrefix(trackPrefix) else { return instruction }
+        return String(instruction.dropFirst(trackPrefix.count))
+    }
 
     /// Fake resolution for a curated suggestion: builds a pill + preview card
     /// for each of the suggestion's own `formats`, seeded with its name and
