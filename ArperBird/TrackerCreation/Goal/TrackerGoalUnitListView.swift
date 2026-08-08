@@ -10,8 +10,7 @@ import SwiftUI
 /// Page 1 of the goal "Edit" sub-flow: choose the unit. Every AI-suggested unit
 /// is shown at once as a tappable row, so nothing hides behind a swipe and there
 /// is no dead space to scroll past. The selected row fills with the accent
-/// color; a trailing "Type my own" row reveals an inline field and raises the
-/// keyboard.
+/// color.
 struct TrackerGoalUnitListView: View {
     /// A suggested unit plus the daily goal the AI proposed for it, used to show
     /// a sample value ("e.g. 8 per day") that anchors the unit as a measurement.
@@ -28,18 +27,9 @@ struct TrackerGoalUnitListView: View {
     var onNext: (String) -> Void
 
     @Environment(\.colorScheme) private var colorScheme
-    @State private var selection: Page
-    @State private var customUnit: String
-    @FocusState private var isCustomFocused: Bool
+    @State private var selectedIndex: Int
 
     private var mainColor: Color { color.readableControlTint(in: colorScheme) }
-
-    /// Which row is highlighted: one of the suggestions (by index) or the
-    /// trailing custom-entry row.
-    private enum Page: Hashable {
-        case suggested(Int)
-        case custom
-    }
 
     init(
         name: String = "Drink more water",
@@ -56,28 +46,18 @@ struct TrackerGoalUnitListView: View {
         self.options = options
         self.color = color
         self.onNext = onNext
-        // Land on the incoming unit: a matching suggestion if there is one,
-        // otherwise seed the custom row with it.
+        // Land on the incoming unit if it matches a suggestion, otherwise the
+        // first suggestion.
         if let selectedUnit, let index = options.firstIndex(where: { $0.unit == selectedUnit }) {
-            _selection = State(initialValue: .suggested(index))
-            _customUnit = State(initialValue: "")
-        } else if let selectedUnit, !selectedUnit.isEmpty {
-            _selection = State(initialValue: .custom)
-            _customUnit = State(initialValue: selectedUnit)
+            _selectedIndex = State(initialValue: index)
         } else {
-            _selection = State(initialValue: options.isEmpty ? .custom : .suggested(0))
-            _customUnit = State(initialValue: "")
+            _selectedIndex = State(initialValue: 0)
         }
     }
 
-    /// The unit the highlighted row represents, trimmed for the custom case.
+    /// The unit the highlighted row represents.
     private var selectedUnit: String {
-        switch selection {
-        case .suggested(let index):
-            options.indices.contains(index) ? options[index].unit : ""
-        case .custom:
-            customUnit.trimmingCharacters(in: .whitespaces)
-        }
+        options.indices.contains(selectedIndex) ? options[selectedIndex].unit : ""
     }
 
     var body: some View {
@@ -90,7 +70,6 @@ struct TrackerGoalUnitListView: View {
                     ForEach(Array(options.enumerated()), id: \.offset) { index, option in
                         suggestionRow(for: option, at: index)
                     }
-                    customRow
                 }
                 .padding(.horizontal)
             }
@@ -106,9 +85,6 @@ struct TrackerGoalUnitListView: View {
             .tint(mainColor)
             .disabled(selectedUnit.isEmpty)
             .padding()
-        }
-        .onChange(of: selection) { _, newValue in
-            isCustomFocused = newValue == .custom
         }
         .trackScreen("ManualTrackerCreationGoalUnit")
         .navigationTitle("Add a tracker")
@@ -129,9 +105,9 @@ struct TrackerGoalUnitListView: View {
     // MARK: - Rows
 
     private func suggestionRow(for option: UnitOption, at index: Int) -> some View {
-        let isSelected = selection == .suggested(index)
+        let isSelected = selectedIndex == index
         let caption: LocalizedStringKey = "e.g. \(option.dailyGoal.formatted(.number)) per day"
-        return Button(action: { selection = .suggested(index) }) {
+        return Button(action: { selectedIndex = index }) {
             rowLayout(isSelected: isSelected) {
                 VStack(alignment: .leading, spacing: 2) {
                     Text(option.unit)
@@ -139,37 +115,6 @@ struct TrackerGoalUnitListView: View {
                     Text(caption)
                         .font(.subheadline)
                         .foregroundStyle(isSelected ? Color.white.opacity(0.8) : Color.secondary)
-                }
-            }
-        }
-        .buttonStyle(.plain)
-    }
-
-    private var customRow: some View {
-        let isSelected = selection == .custom
-        return Button(action: { selection = .custom }) {
-            rowLayout(isSelected: isSelected) {
-                if isSelected {
-                    TextField("Type my own…", text: $customUnit)
-                        .font(.headline)
-                        .foregroundStyle(.white)
-                        .tint(.white)
-                        .focused($isCustomFocused)
-                        .submitLabel(.done)
-                } else {
-                    let trimmed = customUnit.trimmingCharacters(in: .whitespaces)
-                    if trimmed.isEmpty {
-                        // A plain-`String` ternary here would strip the
-                        // `LocalizedStringKey` type off this literal and make
-                        // `Text` render it verbatim, unlocalized.
-                        Text("Type my own…")
-                            .font(.headline)
-                            .foregroundStyle(.secondary)
-                    } else {
-                        Text(trimmed)
-                            .font(.headline)
-                            .foregroundStyle(.primary)
-                    }
                 }
             }
         }
