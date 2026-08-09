@@ -511,6 +511,7 @@ struct EmptyDashboardView: View {
     }
 }
 
+#if DEBUG
 #Preview {
     EmptyDashboardView(
         onAddMetric: { _ in },
@@ -524,6 +525,7 @@ struct EmptyDashboardView: View {
     .background { EmptyDashboardBackground() }
 //    .environment(\.locale, Locale(identifier: "fr_FR"))
 }
+#endif
 
 /// The block-by-block entrance played on the hand-off from onboarding.
 #Preview("Onboarding hand-off") {

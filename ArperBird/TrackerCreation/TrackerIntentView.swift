@@ -901,6 +901,7 @@ struct TrackerIntentView: View {
     .environment(\.locale, Locale(identifier: "en_US"))
 }
 
+#if DEBUG
 #Preview("Fake AI") {
     @Previewable @State var showSheet = true
     NavigationStack {
@@ -916,7 +917,6 @@ struct TrackerIntentView: View {
     .presentationDetents([.large])
 }
 
-#if DEBUG
 /// Drives the real Firebase AI completion on submit. Configures Firebase
 /// itself since the AppDelegate doesn't run in previews.
 #Preview("Real AI") {

@@ -58,6 +58,7 @@ struct TrackerGoalLoadingView: View {
     }
 }
 
+#if DEBUG
 #Preview {
     @Previewable @State var showSheet = true
     @Previewable @State var model: TrackerCreationModel = {
@@ -76,6 +77,7 @@ struct TrackerGoalLoadingView: View {
     }
     .presentationDetents([.large])
 }
+#endif
 
 #Preview("Failure") {
     @Previewable @State var showSheet = true

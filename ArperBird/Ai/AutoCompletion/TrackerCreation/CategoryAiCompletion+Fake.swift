@@ -5,7 +5,6 @@
 //  DEBUG-only fake category completion for previews — no Firebase AI call.
 //
 
-#if DEBUG
 import Foundation
 
 extension CategoryAiCompletion {
@@ -21,4 +20,3 @@ extension CategoryAiCompletion {
         )
     }
 }
-#endif
