@@ -22,3 +22,4 @@ and link back — don't edit history.
 - [0009 — Backdated entries: a nudge-arrow date row, expanding to a day wheel](0009-backdated-entries.md)
 - [0010 — Fake data on every reveal card, date and binary included](0010-fake-data-on-every-reveal-card.md)
 - [0011 — The unit is fixed at creation, not editable afterwards](0011-unit-is-immutable.md)
+- [0012 — App Check: debug provider in Debug, App Attest in Release](0012-app-check-debug-vs-attest.md)
