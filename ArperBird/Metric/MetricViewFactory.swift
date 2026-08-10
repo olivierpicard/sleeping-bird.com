@@ -101,8 +101,25 @@ enum MetricViewFactory {
             guard case .datetime(let d) = latestPoint(of: metric) else {
                 return placeholder(for: metric.config)
             }
-            return d.formatted(date: .abbreviated, time: .shortened)
+            return relativeDay(for: d)
         }
+    }
+
+    /// "Today" / "Yesterday" / "N days ago", forced to day granularity so an
+    /// older entry never collapses into "last week" — matches the phrasing
+    /// discussed for fr/es, which `RelativeDateTimeFormatter` already
+    /// localizes correctly ("Hier"/"Il y a N jours", "Ayer"/"Hace N días").
+    private static func relativeDay(for date: Date) -> String {
+        let cal = Calendar.current
+        let days =
+            cal.dateComponents(
+                [.day],
+                from: cal.startOfDay(for: date),
+                to: cal.startOfDay(for: .now)
+            ).day ?? 0
+        let formatter = RelativeDateTimeFormatter()
+        formatter.dateTimeStyle = .named
+        return formatter.localizedString(from: DateComponents(day: -days))
     }
 
     /// The data point with the newest date — `data` is in insertion order, so a
