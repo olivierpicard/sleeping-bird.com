@@ -89,6 +89,7 @@ extension MetricView where Header == MetricHeaderValueView {
         title: String,
         emoji: String,
         value: String,
+        stat: MetricStatKind? = nil,
         mainColor: Color,
         onAddTapped: @escaping () -> Void = {},
         onCardTapped: @escaping () -> Void = {},
@@ -102,6 +103,7 @@ extension MetricView where Header == MetricHeaderValueView {
                     title: title,
                     emoji: emoji,
                     value: value,
+                    stat: stat,
                     mainColor: mainColor,
                     onAddTapped: onAddTapped
                 )
@@ -203,21 +205,17 @@ extension MetricView where Header == MetricHeaderValueView {
     .padding()
 }
 
-#Preview("Header stat mockup") {
-    // Static mockup only — not wired to real trend data yet.
+#Preview("Stat badges") {
+    // Badges passed in directly. What a real metric resolves to lives in
+    // `MetricStatCalculator` — see docs/decisions/0013-metric-stat-badge.md.
     ScrollView {
         VStack(spacing: 16) {
             MetricView(
+                title: "Daily Steps",
+                emoji: "👟",
+                value: "8,432",
+                stat: .increase(percent: 50),
                 mainColor: .green,
-                header: {
-                    MockStatHeader(
-                        title: "Daily Steps",
-                        emoji: "👟",
-                        value: "8,432",
-                        stat: .increase(percent: 50),
-                        mainColor: .green
-                    )
-                },
                 chart: LineMiniChart(
                     data: [3000, 5000, 4000, 6500, 5500, 7000, 4500, 8000, 6000, 9000, 7500, 8432],
                     color: .green
@@ -225,16 +223,11 @@ extension MetricView where Header == MetricHeaderValueView {
             )
 
             MetricView(
+                title: "Calories",
+                emoji: "🔥",
+                value: "1,840 kcal",
+                stat: .decrease(percent: 12),
                 mainColor: .orange,
-                header: {
-                    MockStatHeader(
-                        title: "Calories",
-                        emoji: "🔥",
-                        value: "1,840 kcal",
-                        stat: .decrease(percent: 12),
-                        mainColor: .orange
-                    )
-                },
                 chart: BarMiniChart(
                     data: [
                         1200, 1500, 1800, 1400, 2000, 1700, 1840, 1200, 1500, 1800,
@@ -244,18 +237,12 @@ extension MetricView where Header == MetricHeaderValueView {
                 )
             )
 
+            // Category metrics never carry a badge, whatever their data does.
             MetricView(
+                title: "Sleep Stages",
+                emoji: "🌙",
+                value: "7h 30m",
                 mainColor: .indigo,
-                header: {
-                    MockStatHeader(
-                        title: "Sleep Stages",
-                        emoji: "🌙",
-                        value: "7h 30m",
-                        // Negligible change vs. last week — "stable" is dropped, not shown.
-                        stat: nil,
-                        mainColor: .indigo
-                    )
-                },
                 chart: DividerBarMiniChart(entries: [
                     .init(category: "Deep", value: 90),
                     .init(category: "Light", value: 150),
@@ -265,16 +252,11 @@ extension MetricView where Header == MetricHeaderValueView {
             )
 
             MetricView(
+                title: "Did I take my medication",
+                emoji: "💊",
+                value: "Good",
+                stat: .streak(days: 3),
                 mainColor: .pink,
-                header: {
-                    MockStatHeader(
-                        title: "Did I take my medication",
-                        emoji: "💊",
-                        value: "Good",
-                        stat: .streak(days: 3),
-                        mainColor: .pink
-                    )
-                },
                 chart: TrailingCalendarMiniChart(
                     data: (0..<14).compactMap { Calendar.current.date(byAdding: .day, value: -$0, to: .now) }.filter { _ in Bool.random() },
                     color: .pink
@@ -282,30 +264,20 @@ extension MetricView where Header == MetricHeaderValueView {
             )
 
             MetricView(
+                title: "Water Intake",
+                emoji: "💧",
+                value: "1.8 L",
+                stat: .missing(days: 3),
                 mainColor: .blue,
-                header: {
-                    MockStatHeader(
-                        title: "Water Intake",
-                        emoji: "💧",
-                        value: "1.8 L",
-                        stat: .missing(days: 3),
-                        mainColor: .blue
-                    )
-                },
                 chart: LinearGaugeMiniChart(current: 1.8, goal: 2.5, color: .blue)
             )
 
             MetricView(
+                title: "Screen Time",
+                emoji: "📱",
+                value: "3h 12m",
+                stat: .decrease(percent: 8),
                 mainColor: .teal,
-                header: {
-                    MockStatHeader(
-                        title: "Screen Time",
-                        emoji: "📱",
-                        value: "3h 12m",
-                        stat: .decrease(percent: 8),
-                        mainColor: .teal
-                    )
-                },
                 chart: BarMiniChart(
                     data: [
                         220, 195, 240, 180, 210, 160, 192, 175, 205, 190,
@@ -315,17 +287,12 @@ extension MetricView where Header == MetricHeaderValueView {
                 )
             )
 
+            // Snapshot metric: no percent branch, so only idle can ever badge it.
             MetricView(
+                title: "Weight",
+                emoji: "⚖️",
+                value: "72.4 kg",
                 mainColor: .brown,
-                header: {
-                    MockStatHeader(
-                        title: "Weight",
-                        emoji: "⚖️",
-                        value: "72.4 kg",
-                        stat: .increase(percent: 2),
-                        mainColor: .brown
-                    )
-                },
                 chart: LineMiniChart(
                     data: [71.0, 71.2, 71.5, 71.3, 71.8, 72.0, 71.9, 72.1, 72.4],
                     color: .brown
@@ -333,16 +300,11 @@ extension MetricView where Header == MetricHeaderValueView {
             )
 
             MetricView(
+                title: "Meditation",
+                emoji: "🧘",
+                value: "10 min",
+                stat: .streak(days: 5),
                 mainColor: .purple,
-                header: {
-                    MockStatHeader(
-                        title: "Meditation",
-                        emoji: "🧘",
-                        value: "10 min",
-                        stat: .streak(days: 5),
-                        mainColor: .purple
-                    )
-                },
                 chart: TrailingCalendarMiniChart(
                     data: (0..<14).compactMap { Calendar.current.date(byAdding: .day, value: -$0, to: .now) }.filter { _ in Bool.random() },
                     color: .purple
@@ -350,53 +312,15 @@ extension MetricView where Header == MetricHeaderValueView {
             )
 
             MetricView(
+                title: "Journaling",
+                emoji: "📓",
+                value: "—",
+                stat: .missing(days: 5),
                 mainColor: .cyan,
-                header: {
-                    MockStatHeader(
-                        title: "Journaling",
-                        emoji: "📓",
-                        value: "—",
-                        stat: .missing(days: 5),
-                        mainColor: .cyan
-                    )
-                },
                 chart: LinearGaugeMiniChart(current: 0, goal: 1, color: .cyan)
             )
         }
         .padding()
-    }
-}
-
-/// Mockup only: a copy of `MetricHeaderValueView`'s layout with `MetricStatBadge`
-/// under the value, to preview where the badge would sit.
-private struct MockStatHeader: View {
-    let title: String
-    let emoji: String
-    let value: String
-    /// `nil` renders no badge at all — the "stable" case is dropped, not shown.
-    let stat: MetricStatKind?
-    let mainColor: Color
-
-    var body: some View {
-        HStack {
-            MetricHeaderEmoji(emoji: emoji, mainColor: mainColor)
-
-            VStack(alignment: .leading, spacing: 0) {
-                Text(title.uppercased())
-                    .font(.caption)
-                    .fontWeight(.medium)
-                    .foregroundStyle(.secondary)
-                Text(value)
-                    .font(.title2)
-                    .fontWeight(.semibold)
-                if let stat {
-                    MetricStatBadge(kind: stat, mainColor: mainColor)
-                        .padding(.top, 5)
-                }
-            }
-
-            Spacer()
-        }
     }
 }
 

@@ -23,6 +23,7 @@ enum MetricViewFactory {
             title: metric.name,
             emoji: metric.emoji,
             value: value(for: metric),
+            stat: MetricStatCalculator.stat(for: metric),
             mainColor: color,
             onAddTapped: onAddTapped,
             onCardTapped: onCardTapped,

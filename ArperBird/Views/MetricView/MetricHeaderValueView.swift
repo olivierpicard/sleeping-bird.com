@@ -16,6 +16,9 @@ struct MetricHeaderValueView: View {
     let title: String
     let emoji: String
     let value: String
+    /// `nil` renders no badge at all — a metric with nothing worth reporting
+    /// shows none, rather than a "stable" pill that says nothing.
+    var stat: MetricStatKind? = nil
     let mainColor: Color
     var onAddTapped: () -> Void = {}
     var showAddButton = true
@@ -71,6 +74,10 @@ struct MetricHeaderValueView: View {
                     .fontWeight(.semibold)
                     .contentTransition(.numericText())
                     .animation(.snappy, value: value)
+                if let stat {
+                    MetricStatBadge(kind: stat, mainColor: mainColor)
+                        .padding(.top, 5)
+                }
             }
 
             Spacer()

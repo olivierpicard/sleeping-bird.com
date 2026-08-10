@@ -7,16 +7,6 @@
 
 import SwiftUI
 
-/// The four glanceable states a metric's trend badge can show. Each case
-/// carries its own raw number — `MetricStatBadge` composes and localizes the
-/// text itself, so callers never build display strings by hand.
-enum MetricStatKind {
-    case increase(percent: Int)
-    case decrease(percent: Int)
-    case streak(days: Int)
-    case missing(days: Int)
-}
-
 /// A small pill under a metric's value summarizing its recent trend, e.g.
 /// "+50%" or "3d streak". Entirely on the tracker's own `mainColor` — no
 /// red/green good/bad judgment, since whether an increase is "good" depends
