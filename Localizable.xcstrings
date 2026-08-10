@@ -119,6 +119,38 @@
         }
       }
     },
+    "+%lld%% vs. the previous 7 days" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "+%lld %% respecto a los 7 días anteriores"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "+%lld %% par rapport aux 7 derniers jours"
+          }
+        }
+      }
+    },
+    "-%lld%% vs. the previous 7 days" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "-%lld %% respecto a los 7 días anteriores"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "-%lld %% par rapport aux 7 derniers jours"
+          }
+        }
+      }
+    },
     "✅" : {
 
     },
@@ -3433,6 +3465,22 @@
         }
       }
     },
+    "Nothing logged in %lld days" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nada registrado en %lld días"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rien enregistré depuis %lld jours"
+          }
+        }
+      }
+    },
     "Note the **dates** I fill up **gas**" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -3490,6 +3538,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Plage : %1$@ – %2$@"
+          }
+        }
+      }
+    },
+    "On a %lld-day streak" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Racha de %lld días"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld jours d'affilée"
           }
         }
       }
