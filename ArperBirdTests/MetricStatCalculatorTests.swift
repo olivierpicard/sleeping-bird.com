@@ -62,34 +62,60 @@ struct MetricStatCalculatorTests {
         #expect(Self.stat(Self.cumulative([])) == nil)
     }
 
-    @Test("Category and datetime metrics never badge")
-    func categoryAndDatetimeShowNothing() {
-        let category = Metric(
-            from: .Fake.categorySingle(),
-            data: [.category(Self.day(0), ["Happy"])]
-        )
+    @Test("Datetime metrics never badge")
+    func datetimeShowsNothing() {
         let datetime = Metric(
             from: .Fake.datetime(),
             data: [.datetime(Self.day(0))]
         )
-        #expect(Self.stat(category) == nil)
         #expect(Self.stat(datetime) == nil)
     }
 
-    @Test("Idle doesn't sneak a badge onto category or datetime")
-    func idleDoesNotReachBlankTypes() {
+    @Test("Idle doesn't sneak a badge onto an event tracker")
+    func idleDoesNotReachDatetime() {
         // An event tracker's long gaps are its normal rhythm — a gas fill-up
         // twelve days ago is not neglect.
         let gasFillUps = Metric(
             from: .Fake.datetime(),
             data: [.datetime(Self.day(12)), .datetime(Self.day(28))]
         )
-        let mood = Metric(
-            from: .Fake.categorySingle(),
-            data: [.category(Self.day(12), ["Happy"])]
-        )
         #expect(Self.stat(gasFillUps) == nil)
-        #expect(Self.stat(mood) == nil)
+    }
+
+    // MARK: - Category
+
+    @Test("A logged category never forms a streak, whichever choice was picked")
+    func categoryNeverStreaks() {
+        let metric = Metric(
+            from: .Fake.categorySingle(),
+            data: [
+                .category(Self.day(0), ["Happy"]),
+                .category(Self.day(1), ["Sad"]),
+                .category(Self.day(2), ["Happy"]),
+            ]
+        )
+        #expect(Self.stat(metric) == nil)
+    }
+
+    @Test("Multiple-choice categories don't streak either")
+    func categoryMultipleChoiceNeverStreaks() {
+        let metric = Metric(
+            from: .Fake.categoryMultiple(),
+            data: [
+                .category(Self.day(0), ["Headache", "Nausea"]),
+                .category(Self.day(1), ["Headache"]),
+            ]
+        )
+        #expect(Self.stat(metric) == nil)
+    }
+
+    @Test("Three days without a category entry reports idle")
+    func categoryGoesIdle() {
+        let metric = Metric(
+            from: .Fake.categorySingle(),
+            data: [.category(Self.day(3), ["Happy"])]
+        )
+        #expect(Self.stat(metric) == .missing(days: 3))
     }
 
     // MARK: - Idle

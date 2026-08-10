@@ -88,21 +88,24 @@ enum MetricStatCalculator {
             )
 
         case .categorySingleChoice, .categoryMultipleChoice, .datetime:
-            return nil  // Already refused by `canBadge`.
+            return nil  // Idle already handled above; no streak or percent applies.
         }
     }
 
-    /// Whether this kind of tracker carries a badge at all.
+    /// Whether this kind of tracker reaches the idle check at all.
     ///
-    /// A percent over category labels means nothing, and for an event tracker
-    /// the long gaps *are* the data — a gas fill-up four days ago is a normal
-    /// fortnightly rhythm, not neglect, so even idle would be a false alarm.
-    /// Checked before idle so those two never badge by that route either.
+    /// A percent over category labels means nothing, and a streak of "logged
+    /// *something*" — any choice counts the same — measures app usage rather than
+    /// the thing being tracked, the same problem that keeps `.datetime` out. Idle
+    /// is different: a mood/symptom tracker going quiet for three days is a real
+    /// signal regardless of what the values would have been, so category reaches
+    /// idle while `.datetime` still doesn't (an event tracker's long gaps are its
+    /// normal rhythm). See `docs/decisions/0014-category-stat-badge.md`.
     private static func canBadge(_ config: MetricConfig) -> Bool {
         switch config {
-        case .binary, .number, .duration:
+        case .binary, .number, .duration, .categorySingleChoice, .categoryMultipleChoice:
             return true
-        case .categorySingleChoice, .categoryMultipleChoice, .datetime:
+        case .datetime:
             return false
         }
     }
