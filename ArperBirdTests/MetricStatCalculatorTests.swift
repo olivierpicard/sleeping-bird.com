@@ -169,6 +169,17 @@ struct MetricStatCalculatorTests {
         #expect(Self.stat(metric) == nil)
     }
 
+    @Test("A single yes-day doesn't badge, even when it's today")
+    func binarySingleDayDoesNotBadge() {
+        // One day isn't a "streak" yet — it takes yesterday and today
+        // together before the badge is worth showing.
+        let metric = Metric(
+            from: .Fake.binary(),
+            data: [.binary(Self.day(0), true)]
+        )
+        #expect(Self.stat(metric) == nil)
+    }
+
     // MARK: - Goal streaks
 
     @Test("Days reaching the goal form a streak")
@@ -190,13 +201,14 @@ struct MetricStatCalculatorTests {
         let metric = Metric(
             from: .Fake.number(goal: 2.0, behavior: .cumulative),
             data: [
+                .number(Self.day(1), 2.0),
                 .number(Self.day(0, hour: 8), 0.5),
                 .number(Self.day(0, hour: 12), 0.5),
                 .number(Self.day(0, hour: 16), 0.5),
                 .number(Self.day(0, hour: 20), 0.5),
             ]
         )
-        #expect(Self.stat(metric) == .streak(days: 1))
+        #expect(Self.stat(metric) == .streak(days: 2))
     }
 
     @Test("A goal metric shows nothing rather than falling back to a percent")

@@ -159,6 +159,9 @@ enum MetricStatCalculator {
     /// would look broken from midnight until the day's entry lands.
     ///
     /// Any day that doesn't qualify ends the count, an unlogged one included.
+    ///
+    /// A single qualifying day doesn't read as a "streak," so it's swallowed
+    /// rather than badged — two days back to back is the floor.
     private static func streak(
         over qualifyingDays: Set<Date>,
         now: Date,
@@ -178,7 +181,7 @@ enum MetricStatCalculator {
             cursor = previous
         }
 
-        guard count > 0 else { return nil }
+        guard count >= 2 else { return nil }
         return .streak(days: count)
     }
 
