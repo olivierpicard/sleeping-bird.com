@@ -13,8 +13,17 @@ import SwiftUI
 /// on the metric (steps vs. coffee). States are told apart by icon shape
 /// alone (up/down triangle, bolt, moon), not color.
 struct MetricStatBadge: View {
+    /// `compact` is the card's terse pill ("+50%"); `detailed` spells out the
+    /// comparison for the metric detail screen ("+50% vs. the previous 7
+    /// days"), where there's room and the extra context is worth it.
+    enum Style {
+        case compact
+        case detailed
+    }
+
     let kind: MetricStatKind
     let mainColor: Color
+    var style: Style = .compact
 
     var body: some View {
         HStack(spacing: 4) {
@@ -41,15 +50,29 @@ struct MetricStatBadge: View {
     }
 
     private var text: String {
-        switch kind {
-        case .increase(let percent):
-            String(localized: "+\(percent)%")
-        case .decrease(let percent):
-            String(localized: "-\(percent)%")
-        case .streak(let days):
-            String(localized: "\(days)d streak")
-        case .missing(let days):
-            String(localized: "\(days)d idle")
+        switch style {
+        case .compact:
+            switch kind {
+            case .increase(let percent):
+                String(localized: "+\(percent)%")
+            case .decrease(let percent):
+                String(localized: "-\(percent)%")
+            case .streak(let days):
+                String(localized: "\(days)d streak")
+            case .missing(let days):
+                String(localized: "\(days)d idle")
+            }
+        case .detailed:
+            switch kind {
+            case .increase(let percent):
+                String(localized: "+\(percent)% vs. the previous 7 days")
+            case .decrease(let percent):
+                String(localized: "-\(percent)% vs. the previous 7 days")
+            case .streak(let days):
+                String(localized: "On a \(days)-day streak")
+            case .missing(let days):
+                String(localized: "Nothing logged in \(days) days")
+            }
         }
     }
 }
@@ -60,6 +83,32 @@ struct MetricStatBadge: View {
         MetricStatBadge(kind: .decrease(percent: 12), mainColor: .orange)
         MetricStatBadge(kind: .streak(days: 3), mainColor: .pink)
         MetricStatBadge(kind: .missing(days: 3), mainColor: .blue)
+    }
+    .padding()
+}
+
+#Preview("Detailed") {
+    VStack(alignment: .leading, spacing: 12) {
+        MetricStatBadge(
+            kind: .increase(percent: 50),
+            mainColor: .green,
+            style: .detailed
+        )
+        MetricStatBadge(
+            kind: .decrease(percent: 12),
+            mainColor: .orange,
+            style: .detailed
+        )
+        MetricStatBadge(
+            kind: .streak(days: 3),
+            mainColor: .pink,
+            style: .detailed
+        )
+        MetricStatBadge(
+            kind: .missing(days: 3),
+            mainColor: .blue,
+            style: .detailed
+        )
     }
     .padding()
 }

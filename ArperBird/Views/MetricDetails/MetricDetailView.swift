@@ -233,6 +233,14 @@ struct MetricDetailView: View {
         }
     }
 
+    /// The dashboard card's own trend badge, reused as-is so the two views
+    /// never disagree — computed from `metric.data` and `now`, not from the
+    /// currently displayed bin/range, so it doesn't move as the chart is
+    /// scrubbed.
+    private var stat: MetricStatKind? {
+        MetricStatCalculator.stat(for: metric)
+    }
+
     private var displayedBin: ChartBin? {
         if let selectedDate {
             let calendar = Calendar.current
@@ -513,6 +521,10 @@ struct MetricDetailView: View {
                 }
             }
             .padding(.bottom, -10)
+
+            if let stat {
+                MetricStatBadge(kind: stat, mainColor: tint, style: .detailed)
+            }
 
             Text(displayedDateText)
                 .font(.headline)
