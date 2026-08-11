@@ -2515,28 +2515,6 @@
         }
       }
     },
-    "metric_detail.date.today_suffix" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : " · Today"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : " · Hoy"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : " · Aujourd’hui"
-          }
-        }
-      }
-    },
     "metric_detail.date.week_of_prefix" : {
       "localizations" : {
         "en" : {
