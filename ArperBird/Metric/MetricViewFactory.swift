@@ -119,7 +119,12 @@ enum MetricViewFactory {
             ).day ?? 0
         let formatter = RelativeDateTimeFormatter()
         formatter.dateTimeStyle = .named
-        return formatter.localizedString(from: DateComponents(day: -days))
+        let label = formatter.localizedString(from: DateComponents(day: -days))
+        // The formatter returns sentence-lowercase ("today", "il y a 5 jours"),
+        // but this is the card's headline value. Uppercase only the first
+        // character — `localizedCapitalized` would title-case the whole phrase
+        // ("Il Y A 5 Jours").
+        return label.prefix(1).localizedUppercase + label.dropFirst()
     }
 
     /// The data point with the newest date — `data` is in insertion order, so a
