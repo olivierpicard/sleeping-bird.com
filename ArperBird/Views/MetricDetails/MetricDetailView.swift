@@ -1010,39 +1010,62 @@ struct MetricDetailView: View {
     private var displayedDateText: String {
         if isBinary || isDatetime {
             let target = calendarAnchorDay
-            let formatted = target.formatted(
-                .dateTime.month(.abbreviated).day()
-            )
-            // Unselected, the header shows the latest logged day — so it's only
-            // "today" when that day happens to be today, otherwise "latest".
-            let suffix: String
-            if selectedDate != nil {
-                suffix = ""
-            } else if Calendar.current.isDateInToday(target) {
-                suffix = String(localized: "metric_detail.date.today_suffix")
-            } else {
-                suffix = String(localized: "metric_detail.date.latest_suffix")
-            }
-            return formatted + suffix
+            return target.formatted(.dateTime.month(.abbreviated).day())
+                + dateSuffix(for: target)
         }
         if isCategory {
             guard let bucket = displayedCategoryBucket else {
                 return String(localized: "metric_detail.date.no_data")
             }
-            let formatted = formattedBucketDate(bucket)
-            let suffix =
-                (selectedDate == nil)
-                ? String(localized: "metric_detail.date.latest_suffix") : ""
-            return formatted + suffix
+            return formattedBucketDate(bucket) + dateSuffix(for: bucket)
         }
         guard let bin = displayedBin else {
             return String(localized: "metric_detail.date.no_data")
         }
-        let formatted = formattedBucketDate(bin.date)
-        let suffix =
-            (selectedDate == nil)
-            ? String(localized: "metric_detail.date.latest_suffix") : ""
-        return formatted + suffix
+        return formattedBucketDate(bin.date) + dateSuffix(for: bin.date)
+    }
+
+    /// The tail after the header's date — " · Today", " · Yesterday",
+    /// " · 5 days ago". It's permanent now: it used to be a " · Latest" marker
+    /// that vanished the moment a day was tapped, which is exactly when knowing
+    /// how far back you're looking matters most.
+    ///
+    /// Two cases still fall back: a week/month bucket isn't a single day, so a
+    /// day count would misdescribe it, and a future day gets nothing at all —
+    /// there's no entry there yet, so "in 3 days" would read as a plan rather
+    /// than a record.
+    private func dateSuffix(for date: Date) -> String {
+        let isDayGranular = isBinary || isDatetime
+            || range.bucketComponent == .day
+        guard isDayGranular else {
+            return selectedDate == nil
+                ? String(localized: "metric_detail.date.latest_suffix") : ""
+        }
+        guard let label = relativeDayLabel(for: date) else { return "" }
+        return " · " + label
+    }
+
+    /// "Today" / "Yesterday" / "5 days ago" for `date`, or `nil` if it's in the
+    /// future. Forced to day granularity so an older day never collapses into
+    /// "last week"; `RelativeDateTimeFormatter` already localizes the phrasing
+    /// for fr/es. Mirrors the dashboard card's label in `MetricViewFactory`.
+    private func relativeDayLabel(for date: Date) -> String? {
+        let cal = Calendar.current
+        let days =
+            cal.dateComponents(
+                [.day],
+                from: cal.startOfDay(for: .now),
+                to: cal.startOfDay(for: date)
+            ).day ?? 0
+        guard days <= 0 else { return nil }
+        let formatter = RelativeDateTimeFormatter()
+        formatter.dateTimeStyle = .named
+        let label = formatter.localizedString(from: DateComponents(day: days))
+        // The formatter returns sentence-lowercase ("today", "il y a 5 jours"),
+        // but this sits beside the capitalized " · Latest" suffix. Uppercase
+        // only the first character — `localizedCapitalized` would title-case
+        // the whole phrase ("Il Y A 5 Jours").
+        return label.prefix(1).localizedUppercase + label.dropFirst()
     }
 
     private func formattedBucketDate(_ date: Date) -> String {
