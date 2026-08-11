@@ -22,7 +22,9 @@ Tests live in `ArperBirdTests/`. Run via Xcode's test navigator or:
 xcodebuild test -scheme ArperBird -destination 'platform=iOS Simulator,name=iPhone 16'
 ```
 
-The suite uses both Swift Testing (`@Suite`, `#expect`) and XCTest (`XCTestCase`) — both are in the same target. Current coverage focuses on the pure logic: `MetricAggregatorTests` (binning/aggregation) and `MiniChartFactoryTests` (chart selection). Run a single Swift Testing suite/test with `-only-testing:ArperBirdTests/MetricAggregator`.
+The suite uses both Swift Testing (`@Suite`, `#expect`) and XCTest (`XCTestCase`) — both are in the same target. Current coverage focuses on the pure logic: `MetricAggregatorTests` (binning/aggregation), `MiniChartFactoryTests` (chart selection), and `MetricStatCalculatorTests` (trend badge). Run a single Swift Testing suite/test with `-only-testing:ArperBirdTests/MetricAggregator`. (The test plan file is still named `SleepingBird.xctestplan` from before the rename.)
+
+Per `AGENTS.md`: don't run the suite for ordinary production-code changes — run tests when changing tests, when the change concerns test behavior, or when validation is explicitly requested.
 
 ### Secret Management (Arkana)
 
@@ -90,24 +92,33 @@ Once a metric exists, users add points by hand. **`MetricInputFactory`** (`Metri
 - `MetricEditor.Category` (`.single`/`.multiple`), `MetricEditor.Binary`, `MetricEditor.Duration` (wheel), `MetricEditor.Datetime` (date picker).
 Each editor takes the metric's color and an `onAdd` closure that produces the matching `DataPoint`.
 
+**`MetricEntrySheet`** (`Views/MetricEditor/MetricEntrySheet.swift`) is what actually gets presented: it wraps the factory's editor with the backdating date row ([decision 0009](docs/decisions/0009-backdated-entries.md)). The editors stay date-unaware — the sheet owns the chosen day and `MetricInputFactory` stamps it onto the `DataPoint`. The day wheel *expands* the sheet instead of replacing its body on purpose: each editor holds its in-progress value in its own `@State`, so swapping it out of the tree would reset what the user dialled in.
+
+`CategoryLimits` (`Metric/CategoryLimits.swift`) holds the shared min/max choice count (2–7) used by AI-generated category schemas and the manual label UI alike.
+
 ### Rendering Pipeline
 
 6. **`MiniChartFactory`** (`Metric/MiniChartFactory.swift`) — maps a `Metric` to a concrete `MiniChart` (`Views/MiniCharts/`) based on `config` and `visual.chart`. Returns `NoDataMiniChart` when `data` is empty.
 
 7. **`MetricViewFactory`** (`Metric/MetricViewFactory.swift`) — constructs a `MetricView` from a `Metric`. Computes the display value by windowing `data` to the current `TemporalBucket` and applying the `AggregationMethod`.
 
-8. **`MetricView`** (`Views/MetricView/MetricView.swift`) — card UI with emoji header, value display, and a `MiniChart` slot. Takes plain value types — no direct dependency on `Metric`.
+8. **`MetricView`** (`Views/MetricView/MetricView.swift`) — card UI with emoji header, value display, and a `MiniChart` slot. Takes plain value types — no direct dependency on `Metric`. The header pieces live alongside it (`MetricHeader*`, `EmojiInputField` for inline rename/emoji editing).
+
+8b. **`MetricStatCalculator`** (`Metric/MetricStatCalculator.swift`) — pure, stateless derivation of the trend badge: `MetricStatKind` is `.increase`/`.decrease` (percent, 7-day block vs. previous 7-day block, ±5% noise floor), `.streak`, or `.missing` (idle after 3 days). `now` is injected so it's testable. **`MetricStatBadge`** (`Views/MetricView/MetricStatBadge.swift`) renders it in `.compact` (card) or `.detailed` (detail screen) style, always in the tracker's own color — states are distinguished by icon shape, never red/green. See decisions [0013](docs/decisions/0013-metric-stat-badge.md) and [0014](docs/decisions/0014-category-stat-badge.md).
 
 9. **`MetricAggregator`** (`Metric/MetricAggregator.swift`) — stateless enum used by `MetricDetailView`:
    - `bins(from:range:method:behavior:)` → `[ChartBin]` for numeric/duration data
    - `categoryEntries(from:range:)` → `[StackedBarChartView.Entry]`
    - Cumulative behavior gap-fills missing buckets with zero.
 
-10. **`MetricDetailView`** (`Views/MetricDetailView.swift`) — full-screen detail. Scrollable chart (bar for numeric, stacked bar for category, `BinaryCalendarView` for binary/datetime) with a 1M / 6M / 1Y `TimeRange` picker and a "Recent Entries" list. Recomputes bins/entries imperatively in `onAppear`/`onChange(of: metric.data.count)` — there is no reactive binding to `metric.data`.
+10. **`MetricDetailView`** (`Views/MetricDetails/MetricDetailView.swift`) — full-screen detail. Scrollable chart (bar for numeric, stacked bar for category, calendar for binary/datetime) with a 1M / 6M / 1Y `TimeRange` picker (`Metric/TimeRange.swift` owns the bucket component and visible domain per range) and a "Recent Entries" list. Recomputes bins/entries imperatively in `onAppear`/`onChange(of: range)`/`onChange(of: metric.data.count)` — there is no reactive binding to `metric.data`.
+    - `Views/MetricDetails/Calendar/` holds the calendar surface ([decision 0005](docs/decisions/0005-calendar-in-detail.md)): `CalendarScrollView`, `CalendarDayCell`, and the fills (`DayPieFillView` for multi-category days, `DaySolidFillView`) plus `CategoryPalette`/`CategoryLegend`.
+    - `MetricEditSheet` (same folder) edits name, emoji, and palette color. The **unit is read-only** — fixed at creation, since changing it would mean converting every historic point ([decision 0011](docs/decisions/0011-unit-is-immutable.md)).
 
 ### App Shell, Onboarding & Gating
 
 - **`ArperBirdApp`** — sets up `AppDelegate` (PostHog + Firebase + RevenueCat init), injects `MetricGenerator` and `Store` environments, declares the `Metric` model container, and refreshes purchases on `scenePhase == .active`.
+- **Firebase App Check** — protects the Firebase AI Logic backend. `AppCheckReleaseProviderFactory` (in `ArperBirdApp.swift`) vends `AppCheckDebugProvider` in Debug and App Attest in Release, because App Attest never works on the Simulator and the attestation environment is baked into the entitlements (`ArperBird.entitlements` vs `ArperBird-Release.entitlements`). Read [decision 0012](docs/decisions/0012-app-check-debug-vs-attest.md) before touching it — a wrong provider silently breaks all AI generation.
 - **`RootView`** — gates on `@AppStorage("hasCompletedOnboarding")`: shows `OnboardingFlow` (StartView → language → mic authorization → guided animation) or `ContentView`. **Free-tier limit**: the app presents `PaywallView` as a non-dismissible sheet once `metrics.count >= 1 && !store.isPremium` — but only after `store.hasLoadedEntitlements`, to avoid a paywall flash for premium users on launch.
 - **`ContentView`** — `NavigationStack` showing `EmptyDashboardView` or `DashboardView` (`@Query`-driven cards + pending placeholders). The add-metric "+" now presents `TrackerCreationFlow` as a sheet; the old `MetricInputSheet` presentation is commented out here and in `EmptyDashboardView`.
 - **Onboarding tip (TipKit)** — `Tips/AddEntryTip.swift` points the user at a card's "+" button after they create their first metric. `TipKit` is configured in `ArperBirdApp`; the tip is gated by `@Parameter` flags (`hasSettled`, `isPaywallPresented`) set from `RootView`/`MetricView` so it animates in only after the card settles and never over the paywall, and is invalidated once the button is tapped.
@@ -148,6 +159,6 @@ UI strings live in `Localizable.xcstrings` (String Catalog) and are referenced b
 - Fake/preview data comes from `Metric.fakeData(for:days:)` and `MetricSchema.Fake.*`, not inline in views.
 - Sub-editor files prefixed with `_` (e.g. `_SliderEditor`) are private implementations of a public `MetricEditor` type — don't use them directly; go through `MetricInputFactory` / `MetricEditor`.
 - Commit style is Conventional Commits (see the `commit` skill).
-- **Decision log** (`docs/decisions/`) — append-only ADRs (`NNNN-short-slug.md`) capturing reasoning that doesn't survive in code or commits (the decision, the options, why the others lost). Add a new entry to supersede an old one rather than editing history; reference renders go in `assets/`.
+- **Decision log** (`docs/decisions/`) — append-only ADRs (`NNNN-short-slug.md`) capturing reasoning that doesn't survive in code or commits (the decision, the options, why the others lost). Add a new entry to supersede an old one rather than editing history; add it to `docs/decisions/README.md`'s index too; reference renders go in `assets/`. Check the highest existing number before adding — `0005` was accidentally used twice (`calendar-in-detail` and `remove-colorful-controls-flag`).
 - **Proposals** (`docs/proposals/`) — "for later" design directions not yet implemented (e.g. the metric-detail redesign). When a slice ships, record the actual decision as a new ADR and link back to the proposal.
 - **Investigations** (`docs/investigations/`) — write-ups of stubborn bugs: the symptom, the evidence gathered, the root cause, and what's been tried (including fixes that *didn't* work). Unlike ADRs these are living notes on an open problem — update the `Status` line and cross-link the relevant ADRs (e.g. the glow-border keyboard snap).
