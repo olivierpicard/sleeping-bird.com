@@ -219,9 +219,19 @@ struct MetricDetailView: View {
         return nil
     }
 
+    /// The day the header reads from when nothing is selected: the most recent
+    /// day that actually has data. Numeric and category kinds get this for free
+    /// (`bins.last` / the latest bucket), but the binary and datetime paths have
+    /// no bins — they used to fall back to *today*, so a metric last logged a
+    /// few days ago opened on an empty "—" instead of its latest entry.
+    private var calendarAnchorDay: Date {
+        if let selectedDate { return selectedDate }
+        return metric.data.map(\.date).max() ?? Date()
+    }
+
     private var displayedBinaryValue: Bool? {
         let cal = Calendar.current
-        let target = cal.startOfDay(for: selectedDate ?? Date())
+        let target = cal.startOfDay(for: calendarAnchorDay)
         let entries = metric.data.compactMap { $0.binaryValue }
             .filter { cal.isDate($0.date, inSameDayAs: target) }
         return entries.max(by: { $0.date < $1.date })?.value
@@ -846,7 +856,7 @@ struct MetricDetailView: View {
 
     private var displayedDatetimeCount: Int? {
         let cal = Calendar.current
-        let target = cal.startOfDay(for: selectedDate ?? Date())
+        let target = cal.startOfDay(for: calendarAnchorDay)
         let count = metric.data.filter {
             if case .datetime(let d) = $0 {
                 return cal.isDate(d, inSameDayAs: target)
@@ -998,24 +1008,21 @@ struct MetricDetailView: View {
     }
 
     private var displayedDateText: String {
-        if isBinary {
-            let target = selectedDate ?? Date()
+        if isBinary || isDatetime {
+            let target = calendarAnchorDay
             let formatted = target.formatted(
                 .dateTime.month(.abbreviated).day()
             )
-            let suffix =
-                (selectedDate == nil)
-                ? String(localized: "metric_detail.date.today_suffix") : ""
-            return formatted + suffix
-        }
-        if isDatetime {
-            let target = selectedDate ?? Date()
-            let formatted = target.formatted(
-                .dateTime.month(.abbreviated).day()
-            )
-            let suffix =
-                (selectedDate == nil)
-                ? String(localized: "metric_detail.date.today_suffix") : ""
+            // Unselected, the header shows the latest logged day — so it's only
+            // "today" when that day happens to be today, otherwise "latest".
+            let suffix: String
+            if selectedDate != nil {
+                suffix = ""
+            } else if Calendar.current.isDateInToday(target) {
+                suffix = String(localized: "metric_detail.date.today_suffix")
+            } else {
+                suffix = String(localized: "metric_detail.date.latest_suffix")
+            }
             return formatted + suffix
         }
         if isCategory {
