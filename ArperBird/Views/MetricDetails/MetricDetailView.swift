@@ -671,14 +671,70 @@ struct MetricDetailView: View {
 
     // MARK: - Chart
 
+    /// The daily target of a goal tracker. Goal trackers are `.number` metrics
+    /// that carry a `goal`; the plain number path creates them with `goal: nil`,
+    /// so a non-nil goal is what identifies the kind here.
+    private var dailyGoal: Double? {
+        guard case .number(let cfg) = metric.config,
+            let goal = cfg.goal,
+            goal > 0
+        else { return nil }
+        return goal
+    }
+
+    /// The goal line is drawn on 1M only, where one bar is one day. On 6M/1Y a
+    /// bar sums a whole week or month, so a *daily* target would sit just above
+    /// the baseline and read as "reached every time".
+    private var visibleGoal: Double? {
+        range == .month ? dailyGoal : nil
+    }
+
+    /// "Goal: 30" — the same key (and so the same wording) as the dashboard
+    /// gauge card's label, without the unit, which the header already shows.
+    private func goalLabel(for goal: Double) -> String {
+        String(
+            format: String(localized: "Goal: %@"),
+            valueText(value: goal)
+        )
+    }
+
     private var chartSection: some View {
-        Chart(bins, id: \.date) { bin in
-            BarMark(
-                x: .value("Date", bin.date, unit: range.bucketComponent),
-                y: .value("Value", bin.value)
-            )
-            .clipShape(RoundedRectangle(cornerRadius: 4))
-            .foregroundStyle(barGradient(for: bin))
+        Chart {
+            ForEach(bins, id: \.date) { bin in
+                BarMark(
+                    x: .value("Date", bin.date, unit: range.bucketComponent),
+                    y: .value("Value", bin.value)
+                )
+                .clipShape(RoundedRectangle(cornerRadius: 4))
+                .foregroundStyle(barGradient(for: bin))
+            }
+
+            if let goal = visibleGoal {
+                RuleMark(y: .value("Goal", goal))
+                    .lineStyle(
+                        StrokeStyle(lineWidth: 1.5, dash: [5, 4])
+                    )
+                    .foregroundStyle(tint.opacity(0.7))
+                    // The rule spans the whole scrollable domain, so a plain
+                    // trailing annotation would park itself off-screen as soon
+                    // as the chart is scrolled back — `overflowResolution`
+                    // keeps the label inside the visible chart bounds.
+                    .annotation(
+                        position: .top,
+                        alignment: .trailing,
+                        spacing: 2,
+                        overflowResolution: .init(
+                            x: .fit(to: .chart),
+                            y: .fit(to: .chart)
+                        )
+                    ) {
+                        Text(goalLabel(for: goal))
+                            .font(.caption2)
+                            .fontWeight(.semibold)
+                            .foregroundStyle(tint)
+                    }
+                    .accessibilityLabel(goalLabel(for: goal))
+            }
         }
         .id(range)  // recreates chart when range changes → re-applies initialX
         .chartScrollableAxes(.horizontal)
