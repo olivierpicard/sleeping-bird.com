@@ -299,7 +299,6 @@ private struct SparkleBurst: View {
     }
 }
 
-#if DEBUG
 /// A category reveal card whose chart matches the selection mode — pie for single,
 /// bar for multiple — so toggling the choice link in the preview below re-reveals
 /// the right chart, mirroring `TrackerCreationFlow.doneSchema()`.
@@ -313,7 +312,6 @@ private func categoryRevealMetric(multiple: Bool) -> Metric {
             title: "Mood", emoji: "🎭", labels: labels, chart: .pie)
     return Metric(from: schema, color: .pink, data: Metric.fakeData(for: schema.config))
 }
-#endif
 
 #Preview("Number facets") {
     // Drive the max and behavior from state so editing the Max chip and tapping

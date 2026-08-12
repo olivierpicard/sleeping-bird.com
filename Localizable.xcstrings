@@ -55,6 +55,102 @@
     "%lld" : {
 
     },
+    "%lldd idle" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld d inactivo"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lldj d'inactivité"
+          }
+        }
+      }
+    },
+    "%lldd streak" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld d seguidos"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lldj d'affilée"
+          }
+        }
+      }
+    },
+    "+%lld%%" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "+%lld%%"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "+%lld%%"
+          }
+        }
+      }
+    },
+    "-%lld%%" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "-%lld%%"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "-%lld%%"
+          }
+        }
+      }
+    },
+    "+%lld%% vs. the previous 7 days" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "+%lld %% respecto a los 7 días anteriores"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "+%lld %% par rapport aux 7 derniers jours"
+          }
+        }
+      }
+    },
+    "-%lld%% vs. the previous 7 days" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "-%lld %% respecto a los 7 días anteriores"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "-%lld %% par rapport aux 7 derniers jours"
+          }
+        }
+      }
+    },
     "✅" : {
 
     },
@@ -108,6 +204,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Utilisation acceptable"
+          }
+        }
+      }
+    },
+    "Add a note" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añadir una nota"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajouter une note"
           }
         }
       }
@@ -316,6 +428,22 @@
         }
       }
     },
+    "Alone" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Solo"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seul"
+          }
+        }
+      }
+    },
     "An idea? A bug?" : {
       "localizations" : {
         "es" : {
@@ -380,6 +508,9 @@
         }
       }
     },
+    "Arper Bird is free to use for your first tracker. Creating more trackers requires Premium, which unlocks unlimited trackers." : {
+
+    },
     "Arper Bird is provided “as is.” It is not a medical, financial, or professional advice tool. Decisions you make based on your tracked data are your own." : {
       "localizations" : {
         "es" : {
@@ -427,6 +558,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ennuyé"
+          }
+        }
+      }
+    },
+    "Breakfast" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Desayuno"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Petit-déj"
           }
         }
       }
@@ -642,6 +789,22 @@
         }
       }
     },
+    "Cleaning" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Limpieza"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ménage"
+          }
+        }
+      }
+    },
     "Close" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -788,6 +951,22 @@
         }
       }
     },
+    "Cooking" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cocina"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cuisine"
+          }
+        }
+      }
+    },
     "Copy" : {
       "localizations" : {
         "es" : {
@@ -848,6 +1027,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Impossible de créer votre suivi"
+          }
+        }
+      }
+    },
+    "Coworkers" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Compañeros"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Collègues"
           }
         }
       }
@@ -1068,6 +1263,38 @@
         }
       }
     },
+    "Delete all notes from %@?" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Eliminar todas las notas del %@?"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Supprimer toutes les notes du %@ ?"
+          }
+        }
+      }
+    },
+    "Delete notes" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eliminar notas"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Supprimer les notes"
+          }
+        }
+      }
+    },
     "Describe what you want to track" : {
       "localizations" : {
         "es" : {
@@ -1084,6 +1311,38 @@
         }
       }
     },
+    "Dessert" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Postre"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dessert"
+          }
+        }
+      }
+    },
+    "Dinner" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cena"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dîner"
+          }
+        }
+      }
+    },
     "Disclaimer" : {
       "localizations" : {
         "es" : {
@@ -1096,6 +1355,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Avertissement"
+          }
+        }
+      }
+    },
+    "Dishes" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Platos"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vaisselle"
           }
         }
       }
@@ -1366,6 +1641,38 @@
         }
       }
     },
+    "Family" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Familia"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Famille"
+          }
+        }
+      }
+    },
+    "Fatty" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Graso"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gras"
+          }
+        }
+      }
+    },
     "Feedback Arper Bird version %@" : {
       "localizations" : {
         "es" : {
@@ -1410,6 +1717,25 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Concentration"
+          }
+        }
+      }
+    },
+    "Free and Premium" : {
+
+    },
+    "Friends" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Amigos"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Amis"
           }
         }
       }
@@ -1578,6 +1904,22 @@
         }
       }
     },
+    "Good" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bien"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bon"
+          }
+        }
+      }
+    },
     "Grams of Protein" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -1640,6 +1982,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Gratitudes"
+          }
+        }
+      }
+    },
+    "Great" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Excelente"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Excellent"
           }
         }
       }
@@ -1932,6 +2290,22 @@
         }
       }
     },
+    "Laundry" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Colada"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lessive"
+          }
+        }
+      }
+    },
     "Log your progress toward the daily goal" : {
       "localizations" : {
         "es" : {
@@ -1944,6 +2318,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Note votre progression vers l'objectif quotidien"
+          }
+        }
+      }
+    },
+    "Lunch" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Almuerzo"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Déjeuner"
           }
         }
       }
@@ -2125,28 +2515,6 @@
         }
       }
     },
-    "metric_detail.date.today_suffix" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : " · Today"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : " · Hoy"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : " · Aujourd’hui"
-          }
-        }
-      }
-    },
     "metric_detail.date.week_of_prefix" : {
       "localizations" : {
         "en" : {
@@ -2257,6 +2625,50 @@
         }
       }
     },
+    "metric_detail.unit.event" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "event"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "evento"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "événement"
+          }
+        }
+      }
+    },
+    "metric_detail.unit.events" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "events"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "eventos"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "événements"
+          }
+        }
+      }
+    },
     "metric_edit_sheet.field.name" : {
       "localizations" : {
         "en" : {
@@ -2279,50 +2691,6 @@
         }
       }
     },
-    "metric_edit_sheet.field.unit" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "UNIT"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "UNIDAD"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "UNITÉ"
-          }
-        }
-      }
-    },
-    "metric_edit_sheet.no_unit" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "No unit"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sin unidad"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sans unité"
-          }
-        }
-      }
-    },
     "metric_edit_sheet.placeholder.name" : {
       "localizations" : {
         "en" : {
@@ -2341,28 +2709,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Nom de la métrique"
-          }
-        }
-      }
-    },
-    "metric_edit_sheet.placeholder.unit" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "e.g. kg, steps, kcal"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ej. kg, pasos, kcal"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ex. kg, pas, kcal"
           }
         }
       }
@@ -3097,6 +3443,22 @@
         }
       }
     },
+    "Nothing logged in %lld days" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nada registrado en %lld días"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rien enregistré depuis %lld jours"
+          }
+        }
+      }
+    },
     "Note the **dates** I fill up **gas**" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -3154,6 +3516,38 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Plage : %1$@ – %2$@"
+          }
+        }
+      }
+    },
+    "On a %lld-day streak" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Racha de %lld días"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld jours d'affilée"
+          }
+        }
+      }
+    },
+    "Okay" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Regular"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Correct"
           }
         }
       }
@@ -3219,6 +3613,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Niveau de douleur"
+          }
+        }
+      }
+    },
+    "Partner" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pareja"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Partenaire"
           }
         }
       }
@@ -3510,6 +3920,22 @@
     "Placeholder" : {
 
     },
+    "Poor" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mal"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mauvais"
+          }
+        }
+      }
+    },
     "Practice" : {
       "localizations" : {
         "es" : {
@@ -3543,6 +3969,7 @@
       }
     },
     "Premium features are offered as an auto-renewing subscription billed through your App Store account. You can manage or cancel it anytime in your device settings." : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -3557,6 +3984,9 @@
           }
         }
       }
+    },
+    "Premium is an auto-renewing subscription billed through your App Store account. New subscribers start with a 1-week free trial: unless you cancel at least 24 hours before it ends, it turns into a paid subscription at the price shown at checkout, and renews each period until you cancel. You can view, change, or cancel it anytime in your device's App Store settings." : {
+
     },
     "Previous month" : {
 
@@ -3756,6 +4186,22 @@
         }
       }
     },
+    "Salty" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Salado"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Salé"
+          }
+        }
+      }
+    },
     "Save a date on calendar" : {
       "localizations" : {
         "es" : {
@@ -3837,6 +4283,22 @@
         }
       }
     },
+    "Shopping" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Compras"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Courses"
+          }
+        }
+      }
+    },
     "SHOWING %lld OF %lld" : {
       "localizations" : {
         "en" : {
@@ -3899,6 +4361,22 @@
         }
       }
     },
+    "Snack" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Merienda"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Collation"
+          }
+        }
+      }
+    },
     "Snapshot" : {
       "localizations" : {
         "es" : {
@@ -3927,6 +4405,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Contact social"
+          }
+        }
+      }
+    },
+    "Spicy" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Picante"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Épicé"
           }
         }
       }
@@ -4125,6 +4619,22 @@
         }
       }
     },
+    "Strangers" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Desconocidos"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inconnus"
+          }
+        }
+      }
+    },
     "Stressed" : {
       "localizations" : {
         "es" : {
@@ -4142,6 +4652,7 @@
       }
     },
     "Subscriptions" : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -4172,6 +4683,9 @@
           }
         }
       }
+    },
+    "Subscriptions and free trial" : {
+
     },
     "support.email.body %@ %@ %@ %@" : {
       "localizations" : {
@@ -4213,6 +4727,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Assistance ArperBird"
+          }
+        }
+      }
+    },
+    "Sweet" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dulce"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sucré"
           }
         }
       }
@@ -4316,6 +4846,22 @@
         }
       }
     },
+    "Terrible" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Terrible"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Terrible"
+          }
+        }
+      }
+    },
     "Thanks for trusting us with your data." : {
       "localizations" : {
         "es" : {
@@ -4349,6 +4895,7 @@
       }
     },
     "The text of your description is sent to Google's Gemini model via Firebase AI to interpret it into a chart configuration. Only the description you write or dictate is sent — not your recorded data points. AI interpretation isn't perfect and may occasionally misread your description." : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -4507,6 +5054,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Note"
+          }
+        }
+      }
+    },
+    "Track a number over time" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sigue un número a lo largo del tiempo"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Suivez un nombre au fil du temps"
           }
         }
       }
@@ -5546,6 +6109,7 @@
       }
     },
     "Type my own…" : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -5681,6 +6245,7 @@
       }
     },
     "Voice transcription (Deepgram)" : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -5842,7 +6407,11 @@
         }
       }
     },
+    "We use PostHog, hosted in the EU, to understand how the app is used and to receive crash reports so we can fix bugs. This covers how you move through the app — which suggestions you tap, how far you get while creating a tracker, which defaults you change — and the shape of the trackers you create: their type, chart, units, and any category labels you define. It never includes the values you log, your tracker names, or the text you type; where the length of what you typed is useful, only that number is sent. Events are tied to a random identifier generated on your device — not to your name, email, or Apple ID." : {
+
+    },
     "We use PostHog, hosted in the EU, to understand how the app is used and to receive crash reports so we can fix bugs. This includes the structure of the metrics you create — their type, chart, units, and any category labels you define — but never the values you log against them, your metric names, or your descriptions. Events are tied to a random identifier generated on your device — not to your name, email, or Apple ID." : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -6022,7 +6591,11 @@
         }
       }
     },
+    "When you describe what you want to track, that text is sent to Google's Gemini model via Firebase AI, which turns it into a tracker: a name, emoji, format, unit, and suggested options. Only what you type and the tracker settings you're editing are sent — never the values you log. AI suggestions aren't perfect and may occasionally misread you, so everything it proposes stays editable before you save." : {
+
+    },
     "When you dictate a metric, your microphone audio is streamed in real time to Deepgram, our transcription provider, and turned into text. The audio is not stored by our services after it is transcribed." : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -6046,6 +6619,22 @@
     },
     "y" : {
 
+    },
+    "Yard Work" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jardín"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jardinage"
+          }
+        }
+      }
     },
     "Yearly" : {
       "localizations" : {
@@ -6171,22 +6760,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Vos données restent toujours privées"
-          }
-        }
-      }
-    },
-    "Track a number over time" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sigue un número a lo largo del tiempo"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Suivez un nombre au fil du temps"
           }
         }
       }

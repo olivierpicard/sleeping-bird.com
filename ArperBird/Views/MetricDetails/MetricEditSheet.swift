@@ -10,14 +10,15 @@ struct MetricEditSheet: View {
     @Bindable var metric: Metric
 
     @State private var name: String
-    @State private var unit: String
     @State private var emoji: String
     @State private var color: Color
     @FocusState private var focused: Field?
 
-    private let supportsUnit: Bool
+    /// Read-only: the unit is fixed at creation time, since changing it would
+    /// require converting every historic data point.
+    private let unit: String?
 
-    enum Field { case name, unit }
+    enum Field { case name }
 
     private static let palette: [Color] = [
         Color(hex: "FF453A"), // red
@@ -42,12 +43,10 @@ struct MetricEditSheet: View {
         _name = State(initialValue: metric.name)
         _emoji = State(initialValue: metric.emoji)
         _color = State(initialValue: metric.color)
-        if case .number(let cfg) = metric.config {
-            _unit = State(initialValue: cfg.unit ?? "")
-            self.supportsUnit = true
+        if case .number(let cfg) = metric.config, let unit = cfg.unit, !unit.isEmpty {
+            self.unit = unit
         } else {
-            _unit = State(initialValue: "")
-            self.supportsUnit = false
+            self.unit = nil
         }
     }
 
@@ -115,16 +114,10 @@ struct MetricEditSheet: View {
                     .font(.headline)
                     .foregroundStyle(.primary)
                     .lineLimit(1)
-                if supportsUnit {
-                    Group {
-                        if unit.isEmpty {
-                            Text("metric_edit_sheet.no_unit")
-                        } else {
-                            Text(verbatim: unit)
-                        }
-                    }
-                    .font(.subheadline)
-                    .foregroundStyle(unit.isEmpty ? .secondary : color)
+                if let unit {
+                    Text(verbatim: unit)
+                        .font(.subheadline)
+                        .foregroundStyle(color)
                 }
             }
             Spacer(minLength: 0)
@@ -138,64 +131,26 @@ struct MetricEditSheet: View {
     // MARK: - Fields card
 
     private var fieldsCard: some View {
-        VStack(spacing: 0) {
-            fieldRow(
-                label: "metric_edit_sheet.field.name",
-                placeholder: "metric_edit_sheet.placeholder.name",
-                text: $name,
-                field: .name,
-                submitLabel: supportsUnit ? .next : .done,
-                autocapitalization: .sentences,
-                onSubmit: {
-                    if supportsUnit { focused = .unit } else { save() }
-                }
-            )
-
-            if supportsUnit {
-                Divider().padding(.leading, 16)
-                fieldRow(
-                    label: "metric_edit_sheet.field.unit",
-                    placeholder: "metric_edit_sheet.placeholder.unit",
-                    text: $unit,
-                    field: .unit,
-                    submitLabel: .done,
-                    autocapitalization: .never,
-                    onSubmit: save
-                )
-            }
-        }
-        .background(Color(.secondarySystemGroupedBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 20))
-    }
-
-    private func fieldRow(
-        label: LocalizedStringKey,
-        placeholder: LocalizedStringKey,
-        text: Binding<String>,
-        field: Field,
-        submitLabel: SubmitLabel,
-        autocapitalization: TextInputAutocapitalization,
-        onSubmit: @escaping () -> Void
-    ) -> some View {
         VStack(alignment: .leading, spacing: 6) {
-            Text(label)
+            Text("metric_edit_sheet.field.name")
                 .font(.caption2)
                 .fontWeight(.semibold)
                 .tracking(1.2)
                 .foregroundStyle(.secondary)
-            TextField(placeholder, text: text)
+            TextField("metric_edit_sheet.placeholder.name", text: $name)
                 .font(.body)
                 .textFieldStyle(.plain)
-                .focused($focused, equals: field)
-                .submitLabel(submitLabel)
-                .textInputAutocapitalization(autocapitalization)
-                .autocorrectionDisabled(field == .unit)
-                .onSubmit(onSubmit)
+                .focused($focused, equals: .name)
+                .submitLabel(.done)
+                .textInputAutocapitalization(.sentences)
+                .onSubmit(save)
                 .tint(color)
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 14)
         .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Color(.secondarySystemGroupedBackground))
+        .clipShape(RoundedRectangle(cornerRadius: 20))
     }
 
     // MARK: - Color card
@@ -256,10 +211,6 @@ struct MetricEditSheet: View {
         name.trimmingCharacters(in: .whitespacesAndNewlines)
     }
 
-    private var trimmedUnit: String {
-        unit.trimmingCharacters(in: .whitespacesAndNewlines)
-    }
-
     private var displayedName: String {
         trimmedName.isEmpty ? metric.name : trimmedName
     }
@@ -274,9 +225,6 @@ struct MetricEditSheet: View {
         if trimmedName != metric.name { return true }
         if displayedEmoji != metric.emoji { return true }
         if color.hexString != metric.colorHex { return true }
-        if supportsUnit, case .number(let cfg) = metric.config {
-            if trimmedUnit != (cfg.unit ?? "") { return true }
-        }
         return false
     }
 
@@ -290,18 +238,6 @@ struct MetricEditSheet: View {
         metric.name = trimmedName
         metric.emoji = displayedEmoji
         metric.color = color
-        if supportsUnit, case .number(let cfg) = metric.config {
-            metric.config = .number(
-                NumberConfig(
-                    min: cfg.min,
-                    max: cfg.max,
-                    granularity: cfg.granularity,
-                    unit: trimmedUnit.isEmpty ? nil : trimmedUnit,
-                    goal: cfg.goal,
-                    behavior: cfg.behavior
-                )
-            )
-        }
         dismiss()
     }
 }

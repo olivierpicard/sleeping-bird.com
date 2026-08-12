@@ -323,7 +323,13 @@ final class TrackerCreationModel {
     /// A failure returns `false`; `EmptyDashboardView` never opens the flow in
     /// that case — it shows its own inline retry message instead (see
     /// `EmptyDashboardView.prepareSeed`).
-    func preloadSeed(kind: TrackerKind, name: String) async -> Bool {
+    func preloadSeed(
+        kind: TrackerKind,
+        name: String,
+        categoryLabels: [String] = [],
+        categoryAllowsMultiple: Bool = false,
+        categoryEmoji: String = ""
+    ) async -> Bool {
         self.kind = kind
         self.name = name
         // Setting `name` clears `aiHint` (see its `didSet`), so seed it after —
@@ -344,7 +350,18 @@ final class TrackerCreationModel {
             await loadDurationEmojiIfNeeded()
             return durationPhase == .loaded
         case .choices:
-            await loadCategoryIfNeeded()
+            // A curated suggestion carries its own premade categories — seed
+            // them directly, no AI fetch needed.
+            if !categoryLabels.isEmpty {
+                seedCategory(
+                    labels: categoryLabels,
+                    allowsMultiple: categoryAllowsMultiple,
+                    emoji: categoryEmoji,
+                    name: name
+                )
+            } else {
+                await loadCategoryIfNeeded()
+            }
             return categoryPhase == .loaded
         case .goal:
             await loadSuggestionsIfNeeded()
@@ -548,6 +565,21 @@ final class TrackerCreationModel {
         } catch {
             categoryPhase = .failed
         }
+    }
+
+    /// Seeds the choices path directly from a curated suggestion's premade
+    /// categories (`TrackerSuggestion.categoryLabels`) — skips
+    /// `loadCategoryIfNeeded()`'s AI fetch entirely, since the topic (and its
+    /// fixed set of labels) is already known. Marks the fetch as memoized for
+    /// `name` the same way a real load would, so a later reappearance of the
+    /// loading/labels step is a no-op rather than re-fetching.
+    func seedCategory(labels: [String], allowsMultiple: Bool, emoji: String, name: String) {
+        categoryLabels = labels
+        categorySuggestedLabels = labels
+        categoryAllowsMultiple = allowsMultiple
+        categoryEmoji = emoji
+        loadedCategoryName = name
+        categoryPhase = .loaded
     }
 
     /// Whether the user's final labels diverge enough from the AI's suggestion to

@@ -21,3 +21,6 @@ and link back — don't edit history.
 - [0008 — Neon glow border: a conic-gradient mockup, stopped at MVP depth](0008-neon-glow-conic-mockup.md)
 - [0009 — Backdated entries: a nudge-arrow date row, expanding to a day wheel](0009-backdated-entries.md)
 - [0010 — Fake data on every reveal card, date and binary included](0010-fake-data-on-every-reveal-card.md)
+- [0011 — The unit is fixed at creation, not editable afterwards](0011-unit-is-immutable.md)
+- [0012 — App Check: debug provider in Debug, App Attest in Release](0012-app-check-debug-vs-attest.md)
+- [0013 — Metric stat badge: what it says and how it's derived](0013-metric-stat-badge.md)

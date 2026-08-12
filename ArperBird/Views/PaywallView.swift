@@ -7,6 +7,7 @@ struct PaywallView: View {
     @Environment(\.openURL) private var openURL
     @State private var selectedPlan: Store.Plan = .yearly
     @State private var showNothingToRestore = false
+    @State private var showLegal = false
     @Environment(\.dismiss) private var dismiss
 
     private let userId = UniqueIdentityStore().get()
@@ -280,6 +281,16 @@ struct PaywallView: View {
 
                 Text(footerText)
                     .font(.callout)
+
+                // App Review expects the subscription terms to be reachable
+                // from the screen that sells them. This is also the only route
+                // to the document once onboarding is behind the user, since
+                // `StartView`'s link is gone by then.
+                Button(action: { showLegal = true }) {
+                    Label("Terms & Privacy", systemImage: "doc.text")
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                }
             }
             .padding(.horizontal, 16)
             .padding(.top, 16)
@@ -295,6 +306,9 @@ struct PaywallView: View {
             }
         }
         .trackScreen("Paywall")
+        .sheet(isPresented: $showLegal) {
+            TermsAndPrivacyView()
+        }
         .task {
             // Retry if the launch-time load failed, so the paywall shows live
             // prices instead of stale placeholders. Eligibility is then re-pulled

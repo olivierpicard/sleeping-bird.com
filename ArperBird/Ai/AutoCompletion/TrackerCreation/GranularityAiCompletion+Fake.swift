@@ -5,7 +5,6 @@
 //  DEBUG-only fake granularity completion for previews — no Firebase AI call.
 //
 
-#if DEBUG
 import Foundation
 
 extension GranularityAiCompletion {
@@ -17,4 +16,3 @@ extension GranularityAiCompletion {
         GranularityAiCompletionSchema(granularity: 0.5)
     }
 }
-#endif

@@ -25,6 +25,11 @@ struct TrackerIntentView: View {
     @State private var isFailed = false
     @State private var text = ""
     @State private var promptIndex = 0
+    /// True while a real category fetch is in flight for the typed/free-text
+    /// path's "choices" format — see `loadRealCategoriesIfNeeded`. Drives the
+    /// redacted look on that one format's preview without holding up the rest
+    /// of the resolved suggestion.
+    @State private var categoriesLoading = false
     /// How the current `selected` suggestion was resolved — "chip" for a
     /// curated tap (or a pre-resolved dashboard badge seed), "typed" for the
     /// free-text AI path. Read by `continueWithSelection()` to tag
@@ -38,10 +43,24 @@ struct TrackerIntentView: View {
     /// Injected so previews drive the fake without a network round-trip.
     private let generateIntent: (String) async throws -> IntentCompletion
 
+    /// The flow's shared state — only reached for here to fetch real
+    /// categories (via `TrackerCreationModel.loadCategoryIfNeeded()`) once the
+    /// typed/free-text path resolves to a "choices" format, so the preview
+    /// shows real labels instead of "Example 1, 2…". The same memoized fetch
+    /// backs the later category-config step, so continuing into it never
+    /// re-hits the AI for the same name. Defaults to a scratch model for
+    /// previews / the curated-chip path, which never touches it.
+    private let model: TrackerCreationModel
+
     /// Hands the resolved pick to the creation flow: the chosen format's kind,
-    /// the intent name, and the per-kind color the preview showed. The flow
-    /// routes into the kind's step machinery from here.
-    private let onContinue: (TrackerKind, String, Color) -> Void
+    /// the intent name, the per-kind color the preview showed, and — only for
+    /// a "choices" format with a premade set (a curated suggestion) — its
+    /// category labels, single/multiple flag, and emoji, so the flow can seed
+    /// the choices path directly instead of firing its own AI fetch. Empty
+    /// labels for every other format, and for the free-text AI path (which has
+    /// no premade set of its own). The flow routes into the kind's step
+    /// machinery from here.
+    private let onContinue: (TrackerKind, String, Color, [String], Bool, String) -> Void
 
     /// When true, raise the keyboard and focus the field as the screen appears
     /// — used by the empty-dashboard launcher so a tap lands straight in typing.
@@ -60,15 +79,22 @@ struct TrackerIntentView: View {
         "when I watered the plants",
     ]
 
+    @MainActor
     init(
         preselected: TrackerSuggestion? = nil,
         autofocusField: Bool = false,
+        model: TrackerCreationModel? = nil,
         generateIntent: @escaping (String) async throws -> IntentCompletion = {
             try await IntentAiCompletion().generate(for: $0)
         },
-        onContinue: @escaping (TrackerKind, String, Color) -> Void = { _, _, _ in }
+        onContinue: @escaping (TrackerKind, String, Color, [String], Bool, String) -> Void = {
+            _, _, _, _, _, _ in
+        }
     ) {
         self.autofocusField = autofocusField
+        // Nil (the curated-chip path and every preview but the flow's own)
+        // just means "no reuse target" — a scratch model that's never touched.
+        self.model = model ?? TrackerCreationModel()
         self.generateIntent = generateIntent
         self.onContinue = onContinue
         // A dashboard badge tap arrives pre-resolved: build the curated
@@ -76,7 +102,7 @@ struct TrackerIntentView: View {
         // exactly as if the user had tapped an in-screen chip and it settled.
         let preresolved = preselected.map(Self.intentSuggestion(from:))
         _selected = State(initialValue: preresolved)
-        _text = State(initialValue: preresolved?.instruction ?? "")
+        _text = State(initialValue: Self.stripTrackPrefix(preresolved?.instruction ?? ""))
         _selectionSource = State(initialValue: preselected != nil ? "chip" : "typed")
         _suggestions = State(initialValue: Self.makeSuggestions())
         _placeholder = State(
@@ -171,7 +197,7 @@ struct TrackerIntentView: View {
             // the preview. `mainColor` is gray until then, matching the
             // neutral ghost state.
             .tint(mainColor)
-            .disabled(selected == nil || isLoading || isFailed)
+            .disabled(selected == nil || isLoading || isFailed || isChoicesPreviewLoading)
             .padding()
         }
         // Let the keyboard cover the CTA while typing: the whole layout ignores
@@ -201,7 +227,7 @@ struct TrackerIntentView: View {
             : "You, three weeks from now"
     }
  
-    private var previewCard: some View {
+    private var cardBody: some View {
         MetricView(
             mainColor: mainColor,
             header: {
@@ -218,10 +244,44 @@ struct TrackerIntentView: View {
                 colorOverride: mainColor
             )
         )
-        // The ghost is a promise, not a dead widget — keep it quiet.
-        .opacity(selected == nil || isLoading ? 0.55 : 1)
-        .redacted(reason: isLoading ? .placeholder : [])
+        .redacted(reason: isLoading || isChoicesPreviewLoading ? .placeholder : [])
+    }
+
+    private var previewCard: some View {
+        Group {
+            if isChoicesPreviewLoading {
+                // A `TimelineView` clock drives the pulse directly, frame by
+                // frame — unlike `withAnimation(.repeatForever())`, it can't
+                // leak into unrelated state-driven animations elsewhere on
+                // screen (e.g. the CTA button, which visibly started
+                // swinging when the pulse was done that way).
+                TimelineView(.animation) { context in
+                    cardBody.opacity(Self.pulseOpacity(at: context.date))
+                }
+            } else {
+                // The ghost is a promise, not a dead widget — keep it quiet.
+                cardBody.opacity(selected == nil || isLoading ? 0.55 : 1)
+            }
+        }
         .animation(.snappy, value: isLoading)
+        .animation(.snappy, value: isChoicesPreviewLoading)
+    }
+
+    /// A smooth 0.4–0.7 sine pulse, ~1.8s period — driven directly off the
+    /// `TimelineView` clock rather than SwiftUI's implicit animation system,
+    /// so it can't leak into unrelated state-driven animations elsewhere.
+    private static func pulseOpacity(at date: Date) -> Double {
+        let t = date.timeIntervalSinceReferenceDate
+        let phase = (sin(t * 2 * .pi / 1.8) + 1) / 2
+        return 0.4 + phase * 0.3
+    }
+
+    /// True while the *displayed* format is "choices" and its real categories
+    /// are still being fetched — redacts just that one preview instead of
+    /// holding up the whole resolved suggestion.
+    private var isChoicesPreviewLoading: Bool {
+        guard let selected, !isLoading else { return false }
+        return categoriesLoading && selected.formats[formatIndex].kind == .choices
     }
 
     /// Dedicated failure state for the card slot: replaces the preview card in
@@ -269,9 +329,22 @@ struct TrackerIntentView: View {
             if let selected, !isLoading, !isFailed {
                 ForEach(selected.formats.indices, id: \.self) { index in
                     let format = selected.formats[index]
+                    // True only for the "choices" pill while its real
+                    // categories are still in flight — swaps its icon for a
+                    // spinner so the wait is legible at the pill itself, not
+                    // just on the card.
+                    let isPillLoading = categoriesLoading && format.kind == .choices
                     Button(action: { selectFormat(at: index, in: selected) }) {
-                        Label(format.label, systemImage: format.icon)
-                            .font(.footnote.weight(.medium))
+                        Label {
+                            Text(format.label)
+                        } icon: {
+                            if isPillLoading {
+                                ProgressView().controlSize(.mini)
+                            } else {
+                                Image(systemName: format.icon)
+                            }
+                        }
+                        .font(.footnote.weight(.medium))
                     }
                     .buttonStyle(.bordered)
                     .buttonBorderShape(.capsule)
@@ -293,35 +366,40 @@ struct TrackerIntentView: View {
     private var inputField: some View {
         HStack(spacing: 8) {
             Image(systemName: "sparkles")
-                .foregroundStyle(.secondary)
-            TextField("", text: $text)
-                .textFieldStyle(.plain)
-                .focused($isFieldFocused)
-                .submitLabel(.done)
-                .onSubmit { resolveCustom() }
-                .accessibilityLabel("Describe what you want to track")
-                .overlay(alignment: .leading) {
-                    if text.isEmpty {
-                        HStack(spacing: 4) {
-                            Text("Track")
-                            Text(Self.examplePrompts[promptIndex])
-                                .id(promptIndex)
-                                .transition(
-                                    reduceMotion
-                                        ? .opacity : .push(from: .bottom)
-                                )
-                        }
+                .foregroundStyle(inputFieldLitTint)
+            // "Track" is its own view, so it's inherently non-deletable —
+            // mirrors `TrackerInputFieldCTA`'s split-field layout, forcing
+            // every typed prompt to read as "Track …". Dimmed to placeholder
+            // tint at rest, lights up to real-text tint on focus or once
+            // something's typed — same cue as the CTA field.
+            Text("Track")
+                .foregroundStyle(inputFieldLitTint)
+            ZStack(alignment: .leading) {
+                if text.isEmpty {
+                    Text(Self.examplePrompts[promptIndex])
+                        .id(promptIndex)
                         .foregroundStyle(Color(.placeholderText))
+                        .transition(
+                            reduceMotion ? .opacity : .push(from: .bottom)
+                        )
                         .allowsHitTesting(false)
-                    }
                 }
-                .clipped()
+                TextField("", text: $text)
+                    .textFieldStyle(.plain)
+                    .focused($isFieldFocused)
+                    .submitLabel(.done)
+                    .onSubmit { resolveCustom() }
+                    .accessibilityLabel("Describe what you want to track")
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .clipped()
         }
         .padding(12)
         .background(
             RoundedRectangle(cornerRadius: 12)
                 .fill(Color(.tertiarySystemFill))
         )
+        .animation(.easeInOut(duration: 0.35), value: isFieldFocused)
         .task {
             while !Task.isCancelled {
                 try? await Task.sleep(for: .seconds(3))
@@ -333,8 +411,17 @@ struct TrackerIntentView: View {
         }
     }
 
+    /// "Track" + sparkles tint for `inputField`: real-text color when focused
+    /// or once something's typed, placeholder gray otherwise — the same "lit"
+    /// cue as `TrackerInputFieldCTA.litTint`.
+    private var inputFieldLitTint: Color {
+        isFieldFocused || !text.isEmpty ? .primary : Color(.placeholderText)
+    }
+
     /// Hands the current pick off to the creation flow: the selected format's
-    /// kind (which path to route into), the intent name, and its color.
+    /// kind (which path to route into), the intent name, its color, and — for
+    /// a "choices" format with a premade set — the categories themselves, so
+    /// the flow can seed them directly instead of firing its own AI fetch.
     private func continueWithSelection() {
         guard let selected, !isLoading, !isFailed else { return }
         let format = selected.formats[formatIndex]
@@ -349,7 +436,14 @@ struct TrackerIntentView: View {
             properties["suggestion_id"] = suggestionID
         }
         PostHogSDK.shared.capture("tracker_kind_selected", properties: properties)
-        onContinue(format.kind, selected.trackerName, selected.color)
+        onContinue(
+            format.kind,
+            selected.trackerName,
+            selected.color,
+            format.categoryLabels,
+            format.categoryAllowsMultiple,
+            selected.emoji
+        )
     }
 
     /// Reports a format-pill switch — deliberation between how a resolved idea
@@ -372,9 +466,10 @@ struct TrackerIntentView: View {
     // MARK: - Fake resolution (stands in for the AI classify call)
 
     private func resolve(_ suggestion: IntentSuggestion) {
-        text = suggestion.instruction
+        text = Self.stripTrackPrefix(suggestion.instruction)
         isFailed = false
         isLoading = true
+        categoriesLoading = false
         selectionSource = "chip"
         // Reports the tap itself (not just an eventual "Continue"), mirroring
         // `EmptyDashboardView`'s `empty_dashboard_chip_tapped` — lets a curated
@@ -404,6 +499,7 @@ struct TrackerIntentView: View {
         isFieldFocused = false
         isFailed = false
         isLoading = true
+        categoriesLoading = false
         Task {
             let start = ContinuousClock.now
             do {
@@ -417,8 +513,10 @@ struct TrackerIntentView: View {
                     ]
                 )
                 formatIndex = 0
-                selected = intentSuggestion(from: completion)
+                let suggestion = intentSuggestion(from: completion)
+                selected = suggestion
                 selectionSource = "typed"
+                loadRealCategoriesIfNeeded(for: suggestion)
             } catch {
                 let elapsed = ContinuousClock.now - start
                 PostHogSDK.shared.capture(
@@ -433,6 +531,36 @@ struct TrackerIntentView: View {
                 isFailed = true
             }
             isLoading = false
+        }
+    }
+
+    /// Fires a real category fetch for `suggestion`'s "choices" format, if it
+    /// has one — replacing its generic "Example 1, 2…" preview once real
+    /// labels land, without holding up the number/duration/etc. pills that
+    /// already show. Reuses `TrackerCreationModel.loadCategoryIfNeeded()`, the
+    /// same memoized call the later category-config step makes, so nothing is
+    /// re-fetched if the user actually continues into "Pick from a list". A
+    /// failure here is silent — the generic placeholder just stays put, since
+    /// this is a preview nicety, not a step the user can retry.
+    private func loadRealCategoriesIfNeeded(for suggestion: IntentSuggestion) {
+        guard let index = suggestion.formats.firstIndex(where: { $0.kind == .choices })
+        else { return }
+        categoriesLoading = true
+        Task {
+            model.name = suggestion.trackerName
+            await model.loadCategoryIfNeeded()
+            // The user may have typed something else while this was in
+            // flight — only apply the result if it's still on screen.
+            guard selected?.id == suggestion.id else { return }
+            categoriesLoading = false
+            guard model.categoryPhase == .loaded else { return }
+            selected?.formats[index] = Self.choicesIntentFormat(
+                name: suggestion.trackerName,
+                emoji: suggestion.emoji,
+                color: suggestion.color,
+                labels: model.categoryLabels,
+                allowsMultiple: model.categoryAllowsMultiple
+            )
         }
     }
 
@@ -468,6 +596,13 @@ struct TrackerIntentView: View {
         /// the creation flow knows which path to route into.
         let kind: TrackerKind
         let metric: Metric
+        /// Premade categories for a "choices" format, carried through from
+        /// `TrackerSuggestion.categoryLabels` — handed to `onContinue` so the
+        /// creation flow can seed the choices path directly instead of firing
+        /// its own AI fetch. Empty for every other format, and for the
+        /// free-text AI path (which has no premade set of its own).
+        var categoryLabels: [String] = []
+        var categoryAllowsMultiple = false
     }
 
     private struct IntentSuggestion: Identifiable {
@@ -488,7 +623,9 @@ struct TrackerIntentView: View {
         /// vs "Music Practice").
         let chipLabel: String
         let color: Color
-        let formats: [IntentFormat]
+        /// `var`, not `let` — `loadRealCategoriesIfNeeded` replaces the
+        /// "choices" entry in place once its real categories land.
+        var formats: [IntentFormat]
     }
 
     /// A calm, slow swell for the ghost card — deliberately unlike real data so
@@ -528,6 +665,17 @@ struct TrackerIntentView: View {
     /// Card tint per kind, standing in for the color the AI would pick.
     private static func color(for kind: TrackerKind) -> Color { kind.previewColor }
 
+    /// Strips a leading "Track " (resolved in the current locale, e.g.
+    /// "Note "/"Anota ") from a curated suggestion's instruction before it
+    /// seeds the field's editable text — the field itself now supplies that
+    /// word as a static, non-deletable prefix (see `inputField`), so keeping
+    /// it in `text` too would read "Track Track the water I drink".
+    private static func stripTrackPrefix(_ instruction: String) -> String {
+        let trackPrefix = String(localized: "Track") + " "
+        guard instruction.hasPrefix(trackPrefix) else { return instruction }
+        return String(instruction.dropFirst(trackPrefix.count))
+    }
+
     /// Fake resolution for a curated suggestion: builds a pill + preview card
     /// for each of the suggestion's own `formats`, seeded with its name and
     /// emoji. The card tint follows the first (best-fit) format so a goal-led
@@ -548,9 +696,44 @@ struct TrackerIntentView: View {
                     for: $0,
                     name: suggestion.localizedTrackerName,
                     emoji: suggestion.emoji,
-                    color: color
+                    color: color,
+                    categoryLabels: suggestion.categoryLabels,
+                    categoryAllowsMultiple: suggestion.categoryAllowsMultiple
                 )
             }
+        )
+    }
+
+    /// Rebuilds the "choices" format's pill + preview card with real,
+    /// AI-fetched category labels (and the matching single/multiple chart) —
+    /// what `loadRealCategoriesIfNeeded` swaps in once the fetch lands, in
+    /// place of `intentFormat(for: .choices, …)`'s generic placeholder.
+    private static func choicesIntentFormat(
+        name: String,
+        emoji: String,
+        color: Color,
+        labels: [String],
+        allowsMultiple: Bool
+    ) -> IntentFormat {
+        let schema =
+            allowsMultiple
+            ? MetricSchema.Fake.categoryMultiple(
+                title: name,
+                emoji: emoji,
+                labels: labels,
+                chart: .bar
+            )
+            : MetricSchema.Fake.categorySingle(
+                title: name,
+                emoji: emoji,
+                labels: labels,
+                chart: .pie
+            )
+        return IntentFormat(
+            label: String(localized: "Pick from a list"),
+            icon: "list.bullet",
+            kind: .choices,
+            metric: metric(schema, color: color)
         )
     }
 
@@ -561,7 +744,9 @@ struct TrackerIntentView: View {
         for type: IntentFormatType,
         name: String,
         emoji: String,
-        color: Color
+        color: Color,
+        categoryLabels: [String] = [],
+        categoryAllowsMultiple: Bool = false
     ) -> IntentFormat {
         switch type {
         case .duration:
@@ -628,18 +813,41 @@ struct TrackerIntentView: View {
                 )
             )
         case .choices:
+            // A curated suggestion carries its own premade `categoryLabels` —
+            // shown as-is, no AI fetch needed (see `TrackerSuggestion.categoryLabels`).
+            // The free-text AI path has none yet, so it still falls back to the
+            // generic placeholder until `loadRealCategoriesIfNeeded` lands.
             IntentFormat(
                 label: String(localized: "Pick from a list"),
                 icon: "list.bullet",
                 kind: type.kind,
-                metric: metric(
-                    MetricSchema.Fake.categorySingle(
-                        title: name,
-                        emoji: emoji,
-                        chart: .pie
+                metric: categoryLabels.isEmpty
+                    ? metric(
+                        MetricSchema.Fake.categorySingle(
+                            title: name,
+                            emoji: emoji,
+                            chart: .pie
+                        ),
+                        color: color
+                    )
+                    : metric(
+                        categoryAllowsMultiple
+                            ? MetricSchema.Fake.categoryMultiple(
+                                title: name,
+                                emoji: emoji,
+                                labels: categoryLabels,
+                                chart: .bar
+                            )
+                            : MetricSchema.Fake.categorySingle(
+                                title: name,
+                                emoji: emoji,
+                                labels: categoryLabels,
+                                chart: .pie
+                            ),
+                        color: color
                     ),
-                    color: color
-                )
+                categoryLabels: categoryLabels,
+                categoryAllowsMultiple: categoryAllowsMultiple
             )
         case .date:
             IntentFormat(
@@ -693,6 +901,7 @@ struct TrackerIntentView: View {
     .environment(\.locale, Locale(identifier: "en_US"))
 }
 
+#if DEBUG
 #Preview("Fake AI") {
     @Previewable @State var showSheet = true
     NavigationStack {
@@ -708,7 +917,6 @@ struct TrackerIntentView: View {
     .presentationDetents([.large])
 }
 
-#if DEBUG
 /// Drives the real Firebase AI completion on submit. Configures Firebase
 /// itself since the AppDelegate doesn't run in previews.
 #Preview("Real AI") {

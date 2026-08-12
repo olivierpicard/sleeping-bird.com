@@ -89,6 +89,7 @@ extension MetricView where Header == MetricHeaderValueView {
         title: String,
         emoji: String,
         value: String,
+        stat: MetricStatKind? = nil,
         mainColor: Color,
         onAddTapped: @escaping () -> Void = {},
         onCardTapped: @escaping () -> Void = {},
@@ -102,6 +103,7 @@ extension MetricView where Header == MetricHeaderValueView {
                     title: title,
                     emoji: emoji,
                     value: value,
+                    stat: stat,
                     mainColor: mainColor,
                     onAddTapped: onAddTapped
                 )
@@ -201,6 +203,125 @@ extension MetricView where Header == MetricHeaderValueView {
         chart: nil
     )
     .padding()
+}
+
+#Preview("Stat badges") {
+    // Badges passed in directly. What a real metric resolves to lives in
+    // `MetricStatCalculator` — see docs/decisions/0013-metric-stat-badge.md.
+    ScrollView {
+        VStack(spacing: 16) {
+            MetricView(
+                title: "Daily Steps",
+                emoji: "👟",
+                value: "8,432",
+                stat: .increase(percent: 50),
+                mainColor: .green,
+                chart: LineMiniChart(
+                    data: [3000, 5000, 4000, 6500, 5500, 7000, 4500, 8000, 6000, 9000, 7500, 8432],
+                    color: .green
+                )
+            )
+
+            MetricView(
+                title: "Calories",
+                emoji: "🔥",
+                value: "1,840 kcal",
+                stat: .decrease(percent: 12),
+                mainColor: .orange,
+                chart: BarMiniChart(
+                    data: [
+                        1200, 1500, 1800, 1400, 2000, 1700, 1840, 1200, 1500, 1800,
+                        1400, 2000, 1700, 1840,
+                    ],
+                    color: .orange
+                )
+            )
+
+            // Category metrics never carry a badge, whatever their data does.
+            MetricView(
+                title: "Sleep Stages",
+                emoji: "🌙",
+                value: "7h 30m",
+                mainColor: .indigo,
+                chart: DividerBarMiniChart(entries: [
+                    .init(category: "Deep", value: 90),
+                    .init(category: "Light", value: 150),
+                    .init(category: "REM", value: 45),
+                    .init(category: "Awake", value: 165),
+                ])
+            )
+
+            MetricView(
+                title: "Did I take my medication",
+                emoji: "💊",
+                value: "Good",
+                stat: .streak(days: 3),
+                mainColor: .pink,
+                chart: TrailingCalendarMiniChart(
+                    data: (0..<14).compactMap { Calendar.current.date(byAdding: .day, value: -$0, to: .now) }.filter { _ in Bool.random() },
+                    color: .pink
+                )
+            )
+
+            MetricView(
+                title: "Water Intake",
+                emoji: "💧",
+                value: "1.8 L",
+                stat: .missing(days: 3),
+                mainColor: .blue,
+                chart: LinearGaugeMiniChart(current: 1.8, goal: 2.5, color: .blue)
+            )
+
+            MetricView(
+                title: "Screen Time",
+                emoji: "📱",
+                value: "3h 12m",
+                stat: .decrease(percent: 8),
+                mainColor: .teal,
+                chart: BarMiniChart(
+                    data: [
+                        220, 195, 240, 180, 210, 160, 192, 175, 205, 190,
+                        165, 198, 172, 192,
+                    ],
+                    color: .teal
+                )
+            )
+
+            // Snapshot metric: no percent branch, so only idle can ever badge it.
+            MetricView(
+                title: "Weight",
+                emoji: "⚖️",
+                value: "72.4 kg",
+                mainColor: .brown,
+                chart: LineMiniChart(
+                    data: [71.0, 71.2, 71.5, 71.3, 71.8, 72.0, 71.9, 72.1, 72.4],
+                    color: .brown
+                )
+            )
+
+            MetricView(
+                title: "Meditation",
+                emoji: "🧘",
+                value: "10 min",
+                stat: .streak(days: 5),
+                mainColor: .purple,
+                chart: TrailingCalendarMiniChart(
+                    data: (0..<14).compactMap { Calendar.current.date(byAdding: .day, value: -$0, to: .now) }.filter { _ in Bool.random() },
+                    color: .purple
+                )
+            )
+
+            MetricView(
+                title: "Journaling",
+                emoji: "📓",
+                value: "—",
+                stat: .missing(days: 5),
+                mainColor: .cyan,
+                chart: LinearGaugeMiniChart(current: 0, goal: 1, color: .cyan)
+            )
+        }
+        .padding()
+    }
 }
 
 #Preview("Editable header") {

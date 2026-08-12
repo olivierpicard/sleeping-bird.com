@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		810156502FA5283200E02CC5 /* Inject in Frameworks */ = {isa = PBXBuildFile; productRef = 8101564F2FA5283200E02CC5 /* Inject */; };
+		810B26873028E2E000629C81 /* FirebaseAppCheck in Frameworks */ = {isa = PBXBuildFile; productRef = 810B26863028E2E000629C81 /* FirebaseAppCheck */; };
 		8116F4162FB494C200E703A6 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 8116F4152FB494C100E703A6 /* Localizable.xcstrings */; };
 		81195CF22FD2AE8900D74692 /* RevenueCat in Frameworks */ = {isa = PBXBuildFile; productRef = 81195CF12FD2AE8900D74692 /* RevenueCat */; };
 		8152B34D2F91B3E100D421C2 /* .gitignore in Resources */ = {isa = PBXBuildFile; fileRef = 8152B34C2F91B3E100D421C2 /* .gitignore */; };
@@ -84,6 +85,7 @@
 				81BB91C12F95609700E4A4C5 /* FirebaseAnalytics in Frameworks */,
 				81195CF22FD2AE8900D74692 /* RevenueCat in Frameworks */,
 				8159B9532FD09CAD00AC3BFF /* PostHog in Frameworks */,
+				810B26873028E2E000629C81 /* FirebaseAppCheck in Frameworks */,
 				8152B3672F91C55700D421C2 /* ArkanaKeys in Frameworks */,
 				810156502FA5283200E02CC5 /* Inject in Frameworks */,
 			);
@@ -92,6 +94,13 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		810B26853028E2E000629C81 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		81F8D82F2F8DEA6600E96BF9 = {
 			isa = PBXGroup;
 			children = (
@@ -103,6 +112,7 @@
 				81F8D83A2F8DEA6600E96BF9 /* ArperBird */,
 				8104B76B2FA770680087967B /* ArperBirdTests */,
 				8159B9562FD1493700AC3BFF /* docs */,
+				810B26853028E2E000629C81 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -165,6 +175,7 @@
 				8101564F2FA5283200E02CC5 /* Inject */,
 				8159B9522FD09CAD00AC3BFF /* PostHog */,
 				81195CF12FD2AE8900D74692 /* RevenueCat */,
+				810B26863028E2E000629C81 /* FirebaseAppCheck */,
 			);
 			productName = SleepingBird;
 			productReference = 81F8D8382F8DEA6600E96BF9 /* ArperBird.app */;
@@ -506,7 +517,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
-				CODE_SIGN_ENTITLEMENTS = ArperBird/ArperBird.entitlements;
+				CODE_SIGN_ENTITLEMENTS = "ArperBird/ArperBird-Release.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -625,6 +636,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 8101564E2FA5283200E02CC5 /* XCRemoteSwiftPackageReference "Inject" */;
 			productName = Inject;
+		};
+		810B26863028E2E000629C81 /* FirebaseAppCheck */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 81BB91BC2F95603F00E4A4C5 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAppCheck;
 		};
 		81195CF12FD2AE8900D74692 /* RevenueCat */ = {
 			isa = XCSwiftPackageProductDependency;

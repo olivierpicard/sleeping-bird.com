@@ -109,7 +109,11 @@ struct ContentView: View {
                             let kind = suggestion.formats[0].kind
                             let model = TrackerCreationModel()
                             let ok = await model.preloadSeed(
-                                kind: kind, name: suggestion.localizedTrackerName
+                                kind: kind,
+                                name: suggestion.localizedTrackerName,
+                                categoryLabels: suggestion.categoryLabels,
+                                categoryAllowsMultiple: suggestion.categoryAllowsMultiple,
+                                categoryEmoji: suggestion.emoji
                             )
                             prepared = .init(
                                 id: suggestion.id, model: model, succeeded: ok
@@ -229,9 +233,13 @@ struct ContentView: View {
     for (schema, data) in schemas {
         container.mainContext.insert(Metric(from: schema, data: data))
     }
+    // The dashboard's own seed, inserted last on purpose: `DashboardView` sorts
+    // by `createdAt` descending, so the newest cards land on top — this puts the
+    // dashboard preview's cards first, in the same order they show there.
+    _ = seedContainer(container)
     return ContentView()
         .environment(MetricGenerator())
         .environment(Store())
         .modelContainer(container)
-        .environment(\.locale, Locale(identifier: "es"))
+        .environment(\.locale, Locale(identifier: "en"))
 }

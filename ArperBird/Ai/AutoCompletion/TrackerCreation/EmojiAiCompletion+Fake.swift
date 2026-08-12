@@ -5,7 +5,6 @@
 //  DEBUG-only fake emoji completion for previews — no Firebase AI call.
 //
 
-#if DEBUG
 import Foundation
 
 extension EmojiAiCompletion {
@@ -17,4 +16,3 @@ extension EmojiAiCompletion {
         EmojiAiCompletionSchema(emoji: "💪")
     }
 }
-#endif

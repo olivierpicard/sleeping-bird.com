@@ -11,6 +11,17 @@ import RevenueCat
 import SwiftData
 import SwiftUI
 import TipKit
+import FirebaseAppCheck
+
+class AppCheckReleaseProviderFactory: NSObject, AppCheckProviderFactory {
+  func createProvider(with app: FirebaseApp) -> AppCheckProvider? {
+    #if DEBUG
+      return AppCheckDebugProvider(app: app)
+    #else
+      return AppAttestProvider(app: app)
+    #endif
+  }
+}
 
 class AppDelegate: NSObject, UIApplicationDelegate {
     func application(
@@ -42,10 +53,14 @@ class AppDelegate: NSObject, UIApplicationDelegate {
             PostHogSDK.shared.register(["environment": "prod"])
         #endif
 
+        let providerFactory = AppCheckReleaseProviderFactory()
+        AppCheck.setAppCheckProviderFactory(providerFactory)
+        
         FirebaseApp.configure()
         return true
     }
 }
+
 
 @main
 struct ArperBirdApp: App {

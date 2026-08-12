@@ -30,6 +30,13 @@ struct CalendarDayCell<Fill: View>: View {
     /// Numeral color. Defaults to `.primary` — legible over the backing disc for
     /// every metric type.
     var numeralColor: Color = .primary
+    /// Called when "Add a note" is chosen from the cell's long-press menu.
+    var onAddNote: (() -> Void)? = nil
+    /// Called once the "Delete notes" confirmation has actually been
+    /// accepted — the cell owns asking for confirmation (see
+    /// `isConfirmingDelete`) so the dialog anchors to this specific day
+    /// rather than wherever the modifier happens to be attached higher up.
+    var onDeleteNotes: (() -> Void)? = nil
     /// The visual behind the numeral. Injected per metric type.
     @ViewBuilder var fill: () -> Fill
 
@@ -37,7 +44,64 @@ struct CalendarDayCell<Fill: View>: View {
     /// stays constant whether the day is one or two digits.
     private let backingScale: Double = 0.6
 
+    @State private var isConfirmingDelete = false
+
     var body: some View {
+        cellContent
+            .contentShape(Circle())
+            .animation(.snappy(duration: 0.2), value: isSelected)
+            .contextMenu {
+                Button {
+                    onAddNote?()
+                } label: {
+                    Label("Add a note", systemImage: "note.text.badge.plus")
+                }
+                Button(role: .destructive) {
+                    guard hasData else { return }
+                    isConfirmingDelete = true
+                } label: {
+                    Label("Delete notes", systemImage: "trash")
+                }
+            } preview: {
+                cellContent
+                    .frame(width: 60, height: 60)
+            }
+            // Forces a distinct identity per day. Without it, the List's
+            // lazy row/grid recycling can pin the context-menu interaction
+            // to whichever cell was created first, so every long press
+            // shows the same (wrong) day's menu and preview.
+            .id(date)
+            .confirmationDialog(
+                deleteConfirmationTitle,
+                isPresented: $isConfirmingDelete,
+                titleVisibility: .visible
+            ) {
+                Button("Delete", role: .destructive) {
+                    onDeleteNotes?()
+                }
+                Button("Cancel", role: .cancel) {}
+            }
+    }
+
+    private var deleteConfirmationTitle: Text {
+        let cal = Calendar.current
+        let day: String
+        if cal.isDateInToday(date) {
+            day = String(localized: "metric_detail.entry.today")
+        } else if cal.isDateInYesterday(date) {
+            day = String(localized: "metric_detail.entry.yesterday")
+        } else {
+            day = date.formatted(.dateTime.month(.wide).day())
+        }
+        return Text("Delete all notes from \(day)?")
+    }
+
+    /// The cell's plain visuals, with no interaction modifiers — reused both
+    /// as the live cell and as the `.contextMenu` preview, so the lift-off
+    /// snapshots just this day rather than the enclosing List row (which,
+    /// without an explicit preview, is what UIKit's context-menu interaction
+    /// falls back to snapshotting).
+    private var cellContent: some View {
         GeometryReader { geo in
             ZStack {
                 // The single outline: tint when selected, a gray "no entry" ring
@@ -53,8 +117,6 @@ struct CalendarDayCell<Fill: View>: View {
         }
         .opacity(isFuture ? 0.35 : 1)
         .aspectRatio(1, contentMode: .fit)
-        .contentShape(Circle())
-        .animation(.snappy(duration: 0.2), value: isSelected)
     }
 
     /// The day's single outline color: the selection tint takes priority, then a

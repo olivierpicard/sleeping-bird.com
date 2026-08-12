@@ -126,10 +126,10 @@ struct TrackerCategoryLabelsView: View {
                 .submitLabel(.next)
 
             if categories.count > 2 {
-                Button(action: { remove(id: id) }) {
+                Button(role: .destructive, action: { remove(id: id) }) {
                     Image(systemName: "minus.circle.fill")
-                        .font(.title3)
-                        .foregroundStyle(.secondary.opacity(0.5))
+                        .font(.title2)
+                        .foregroundStyle(.white, .red)
                 }
                 .buttonStyle(.plain)
             }
@@ -205,3 +205,19 @@ struct TrackerCategoryLabelsView: View {
     }
     .presentationDetents([.large])
 }
+
+#Preview("Predefined categories") {
+    @Previewable @State var showSheet = true
+    NavigationStack {
+    }
+    .sheet(isPresented: $showSheet) {
+        NavigationStack {
+            TrackerCategoryLabelsView(
+                color: .accent,
+                initialLabels: ["Happy", "Calm", "Tired", "Anxious", "Energetic"]
+            )
+        }
+    }
+    .presentationDetents([.large])
+}
+ 

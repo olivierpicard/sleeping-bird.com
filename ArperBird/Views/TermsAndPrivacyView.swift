@@ -113,8 +113,13 @@ struct TermsAndPrivacyView: View {
             )
 
             subsection(
-                "Subscriptions",
-                "Premium features are offered as an auto-renewing subscription billed through your App Store account. You can manage or cancel it anytime in your device settings."
+                "Free and Premium",
+                "Arper Bird is free to use for your first tracker. Creating more trackers requires Premium, which unlocks unlimited trackers."
+            )
+
+            subsection(
+                "Subscriptions and free trial",
+                "Premium is an auto-renewing subscription billed through your App Store account. New subscribers start with a 1-week free trial: unless you cancel at least 24 hours before it ends, it turns into a paid subscription at the price shown at checkout, and renews each period until you cancel. You can view, change, or cancel it anytime in your device's App Store settings."
             )
 
             subsection(
@@ -140,13 +145,8 @@ struct TermsAndPrivacyView: View {
             )
 
             subsection(
-                "Voice transcription (Deepgram)",
-                "When you dictate a metric, your microphone audio is streamed in real time to Deepgram, our transcription provider, and turned into text. The audio is not stored by our services after it is transcribed."
-            )
-
-            subsection(
                 "AI interpretation (Google Firebase / Gemini)",
-                "The text of your description is sent to Google's Gemini model via Firebase AI to interpret it into a chart configuration. Only the description you write or dictate is sent — not your recorded data points. AI interpretation isn't perfect and may occasionally misread your description."
+                "When you describe what you want to track, that text is sent to Google's Gemini model via Firebase AI, which turns it into a tracker: a name, emoji, format, unit, and suggested options. Only what you type and the tracker settings you're editing are sent — never the values you log. AI suggestions aren't perfect and may occasionally misread you, so everything it proposes stays editable before you save."
             )
 
             subsection(
@@ -156,7 +156,7 @@ struct TermsAndPrivacyView: View {
 
             subsection(
                 "Analytics & crash reports (PostHog)",
-                "We use PostHog, hosted in the EU, to understand how the app is used and to receive crash reports so we can fix bugs. This includes the structure of the metrics you create — their type, chart, units, and any category labels you define — but never the values you log against them, your metric names, or your descriptions. Events are tied to a random identifier generated on your device — not to your name, email, or Apple ID."
+                "We use PostHog, hosted in the EU, to understand how the app is used and to receive crash reports so we can fix bugs. This covers how you move through the app — which suggestions you tap, how far you get while creating a tracker, which defaults you change — and the shape of the trackers you create: their type, chart, units, and any category labels you define. It never includes the values you log, your tracker names, or the text you type; where the length of what you typed is useful, only that number is sent. Events are tied to a random identifier generated on your device — not to your name, email, or Apple ID."
             )
 
             subsection(
@@ -219,8 +219,8 @@ struct TermsAndPrivacyView: View {
         formatter.dateStyle = .long
         formatter.timeStyle = .none
         return formatter.string(
-            from: Date(timeIntervalSince1970: 1_781_308_800)
-        )  // 2026-06-13
+            from: Date(timeIntervalSince1970: 1_785_024_000)
+        )  // 2026-07-26
     }()
 }
 

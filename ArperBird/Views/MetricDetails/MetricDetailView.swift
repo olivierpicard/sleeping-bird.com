@@ -219,9 +219,19 @@ struct MetricDetailView: View {
         return nil
     }
 
+    /// The day the header reads from when nothing is selected: the most recent
+    /// day that actually has data. Numeric and category kinds get this for free
+    /// (`bins.last` / the latest bucket), but the binary and datetime paths have
+    /// no bins — they used to fall back to *today*, so a metric last logged a
+    /// few days ago opened on an empty "—" instead of its latest entry.
+    private var calendarAnchorDay: Date {
+        if let selectedDate { return selectedDate }
+        return metric.data.map(\.date).max() ?? Date()
+    }
+
     private var displayedBinaryValue: Bool? {
         let cal = Calendar.current
-        let target = cal.startOfDay(for: selectedDate ?? Date())
+        let target = cal.startOfDay(for: calendarAnchorDay)
         let entries = metric.data.compactMap { $0.binaryValue }
             .filter { cal.isDate($0.date, inSameDayAs: target) }
         return entries.max(by: { $0.date < $1.date })?.value
@@ -231,6 +241,14 @@ struct MetricDetailView: View {
         metric.data.sorted { lhs, rhs in
             date(of: lhs) > date(of: rhs)
         }
+    }
+
+    /// The dashboard card's own trend badge, reused as-is so the two views
+    /// never disagree — computed from `metric.data` and `now`, not from the
+    /// currently displayed bin/range, so it doesn't move as the chart is
+    /// scrubbed.
+    private var stat: MetricStatKind? {
+        MetricStatCalculator.stat(for: metric)
     }
 
     private var displayedBin: ChartBin? {
@@ -323,65 +341,95 @@ struct MetricDetailView: View {
 
     // MARK: - Populated List
 
-    private var populatedList: some View { 
-        List {
-            Section {
-                VStack(spacing: 24) {
-                    header
+    /// The header/calendar section lives in a plain `ScrollView` rather than
+    /// a `List` row. A `List` row is backed by a single `UITableViewCell`,
+    /// and the calendar packs ~35 `CalendarDayCell`s — each with its own
+    /// native `.contextMenu` — into that one row; iOS only reliably honors
+    /// one context-menu interaction per cell, so every long press fell back
+    /// to the row's own bounds/first-registered menu. Only "Recent Entries"
+    /// still needs `List` (for `.swipeActions`), so it's nested below,
+    /// scroll-disabled and sized to its content so the whole page scrolls
+    /// as one continuous unit.
+    private var populatedList: some View {
+        ScrollView {
+            VStack(spacing: 24) {
+                header
 
-                    Group {
-                        if isBinary {
-                            binaryCalendarSection
-                                .padding(.top)
-                        } else if isDatetime {
-                            datetimeCalendarSection
-                                .padding(.top)
-                        } else if isCategory {
-                            HStack(spacing: 12) {
-                                if chartMode == .calendar {
-                                    monthSelector
-                                } else {
-                                    rangePicker
-                                }
-                                chartModeToggle
-                            }
+                Group {
+                    if isBinary {
+                        binaryCalendarSection
+                            .padding(.top)
+                    } else if isDatetime {
+                        datetimeCalendarSection
+                            .padding(.top)
+                    } else if isCategory {
+                        HStack(spacing: 12) {
                             if chartMode == .calendar {
-                                categoryCalendarSection
-                                CategoryLegend(
-                                    items: categoryLegendItems,
-                                    active: activeCategoryLabels,
-                                    onToggle: toggleCategory
-                                )
+                                monthSelector
                             } else {
-                                categoryChartSection
+                                rangePicker
                             }
+                            chartModeToggle
+                        }
+                        if chartMode == .calendar {
+                            categoryCalendarSection
+                            CategoryLegend(
+                                items: categoryLegendItems,
+                                active: activeCategoryLabels,
+                                onToggle: toggleCategory
+                            )
                         } else {
-                            HStack(spacing: 12) {
-                                if chartMode == .calendar {
-                                    monthSelector
-                                } else {
-                                    rangePicker
-                                }
-                                chartModeToggle
-                            }
+                            categoryChartSection
+                        }
+                    } else {
+                        HStack(spacing: 12) {
                             if chartMode == .calendar {
-                                numberCalendarSection
+                                monthSelector
                             } else {
-                                chartSection
+                                rangePicker
                             }
+                            chartModeToggle
+                        }
+                        if chartMode == .calendar {
+                            numberCalendarSection
+                        } else {
+                            chartSection
                         }
                     }
                 }
-                .listRowInsets(
-                    EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16)
-                )
-                .listRowSeparator(.hidden)
-                .listRowBackground(Color.clear)
             }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 8)
 
+            recentEntriesList
+        }
+    }
+
+    // MARK: - Recent Entries (nested, self-sizing List)
+
+    /// Per-row measured height, keyed by index — summed to size the nested
+    /// `List` to its content since a `List` inside a `ScrollView` doesn't
+    /// otherwise report an intrinsic height.
+    @State private var recentEntryRowHeights: [Int: CGFloat] = [:]
+
+    private var recentEntriesHeight: CGFloat {
+        let rowsHeight = recentEntryRowHeights.values.reduce(0, +)
+        let headerHeight: CGFloat = 34
+        let sectionChrome: CGFloat = 16
+        return rowsHeight + headerHeight + sectionChrome
+    }
+
+    private var recentEntriesList: some View {
+        List {
             recentEntries
         }
         .listStyle(.insetGrouped)
+        .scrollDisabled(true)
+        .scrollContentBackground(.hidden)
+        .onPreferenceChange(RecentEntryRowHeightKey.self) {
+            recentEntryRowHeights = $0
+        }
+        .frame(height: recentEntriesHeight)
     }
 
     // MARK: - Empty State
@@ -483,6 +531,10 @@ struct MetricDetailView: View {
                 }
             }
             .padding(.bottom, -10)
+
+            if let stat {
+                MetricStatBadge(kind: stat, mainColor: tint, style: .detailed)
+            }
 
             Text(displayedDateText)
                 .font(.headline)
@@ -619,14 +671,70 @@ struct MetricDetailView: View {
 
     // MARK: - Chart
 
+    /// The daily target of a goal tracker. Goal trackers are `.number` metrics
+    /// that carry a `goal`; the plain number path creates them with `goal: nil`,
+    /// so a non-nil goal is what identifies the kind here.
+    private var dailyGoal: Double? {
+        guard case .number(let cfg) = metric.config,
+            let goal = cfg.goal,
+            goal > 0
+        else { return nil }
+        return goal
+    }
+
+    /// The goal line is drawn on 1M only, where one bar is one day. On 6M/1Y a
+    /// bar sums a whole week or month, so a *daily* target would sit just above
+    /// the baseline and read as "reached every time".
+    private var visibleGoal: Double? {
+        range == .month ? dailyGoal : nil
+    }
+
+    /// "Goal: 30" — the same key (and so the same wording) as the dashboard
+    /// gauge card's label, without the unit, which the header already shows.
+    private func goalLabel(for goal: Double) -> String {
+        String(
+            format: String(localized: "Goal: %@"),
+            valueText(value: goal)
+        )
+    }
+
     private var chartSection: some View {
-        Chart(bins, id: \.date) { bin in
-            BarMark(
-                x: .value("Date", bin.date, unit: range.bucketComponent),
-                y: .value("Value", bin.value)
-            )
-            .clipShape(RoundedRectangle(cornerRadius: 4))
-            .foregroundStyle(barGradient(for: bin))
+        Chart {
+            ForEach(bins, id: \.date) { bin in
+                BarMark(
+                    x: .value("Date", bin.date, unit: range.bucketComponent),
+                    y: .value("Value", bin.value)
+                )
+                .clipShape(RoundedRectangle(cornerRadius: 4))
+                .foregroundStyle(barGradient(for: bin))
+            }
+
+            if let goal = visibleGoal {
+                RuleMark(y: .value("Goal", goal))
+                    .lineStyle(
+                        StrokeStyle(lineWidth: 1.5, dash: [5, 4])
+                    )
+                    .foregroundStyle(tint.opacity(0.7))
+                    // The rule spans the whole scrollable domain, so a plain
+                    // trailing annotation would park itself off-screen as soon
+                    // as the chart is scrolled back — `overflowResolution`
+                    // keeps the label inside the visible chart bounds.
+                    .annotation(
+                        position: .top,
+                        alignment: .trailing,
+                        spacing: 2,
+                        overflowResolution: .init(
+                            x: .fit(to: .chart),
+                            y: .fit(to: .chart)
+                        )
+                    ) {
+                        Text(goalLabel(for: goal))
+                            .font(.caption2)
+                            .fontWeight(.semibold)
+                            .foregroundStyle(tint)
+                    }
+                    .accessibilityLabel(goalLabel(for: goal))
+            }
         }
         .id(range)  // recreates chart when range changes → re-applies initialX
         .chartScrollableAxes(.horizontal)
@@ -683,7 +791,9 @@ struct MetricDetailView: View {
                 isToday: ctx.isToday,
                 isFuture: ctx.isFuture,
                 tint: tint,
-                hasData: !colors.isEmpty
+                hasData: !colors.isEmpty,
+                onAddNote: { presentAddNote(for: ctx.date) },
+                onDeleteNotes: { deleteNotes(on: ctx.date) }
             ) {
                 DayPieFillView(colors: colors)
             }
@@ -712,7 +822,9 @@ struct MetricDetailView: View {
                 isToday: ctx.isToday,
                 isFuture: ctx.isFuture,
                 tint: tint,
-                hasData: isTrue || isFalse
+                hasData: isTrue || isFalse,
+                onAddNote: { presentAddNote(for: ctx.date) },
+                onDeleteNotes: { deleteNotes(on: ctx.date) }
             ) {
                 DaySolidFillView(
                     style: isTrue ? .filled : (isFalse ? .muted : .empty),
@@ -744,7 +856,9 @@ struct MetricDetailView: View {
                 isToday: ctx.isToday,
                 isFuture: ctx.isFuture,
                 tint: tint,
-                hasData: hasEvent
+                hasData: hasEvent,
+                onAddNote: { presentAddNote(for: ctx.date) },
+                onDeleteNotes: { deleteNotes(on: ctx.date) }
             ) {
                 DaySolidFillView(style: hasEvent ? .filled : .empty, tint: tint)
             }
@@ -787,7 +901,9 @@ struct MetricDetailView: View {
                 isToday: ctx.isToday,
                 isFuture: ctx.isFuture,
                 tint: tint,
-                hasData: isLogged
+                hasData: isLogged,
+                onAddNote: { presentAddNote(for: ctx.date) },
+                onDeleteNotes: { deleteNotes(on: ctx.date) }
             ) {
                 DaySolidFillView(style: isLogged ? .filled : .empty, tint: tint)
             }
@@ -796,7 +912,7 @@ struct MetricDetailView: View {
 
     private var displayedDatetimeCount: Int? {
         let cal = Calendar.current
-        let target = cal.startOfDay(for: selectedDate ?? Date())
+        let target = cal.startOfDay(for: calendarAnchorDay)
         let count = metric.data.filter {
             if case .datetime(let d) = $0 {
                 return cal.isDate(d, inSameDayAs: target)
@@ -833,6 +949,14 @@ struct MetricDetailView: View {
             ForEach(visible.indices, id: \.self) { index in
                 entryRow(for: visible[index])
                     .listRowInsets(EdgeInsets())
+                    .background(
+                        GeometryReader { geo in
+                            Color.clear.preference(
+                                key: RecentEntryRowHeightKey.self,
+                                value: [index: geo.size.height]
+                            )
+                        }
+                    )
                     .swipeActions(edge: .trailing, allowsFullSwipe: true) {
                         Button(role: .destructive) {
                             delete(visible[index])
@@ -854,6 +978,23 @@ struct MetricDetailView: View {
     private func delete(_ point: DataPoint) {
         if let index = metric.data.firstIndex(of: point) {
             metric.data.remove(at: index)
+        }
+    }
+
+    /// Opens the entry sheet pre-dated to a specific calendar day — the
+    /// "Add a note" action from a `CalendarDayCell`'s long-press menu.
+    private func presentAddNote(for date: Date) {
+        selectedDate = date
+        isAddingEntry = true
+    }
+
+    /// Removes every data point logged on `date`, regardless of time of day
+    /// — called once `CalendarDayCell` has confirmed the "Delete notes"
+    /// action locally (its dialog anchors to the tapped cell).
+    private func deleteNotes(on date: Date) {
+        let calendar = Calendar.current
+        metric.data.removeAll {
+            calendar.isDate(self.date(of: $0), inSameDayAs: date)
         }
     }
 
@@ -910,7 +1051,9 @@ struct MetricDetailView: View {
         if isBinary { return "" }
         if isDatetime {
             guard let count = displayedDatetimeCount else { return "" }
-            return count == 1 ? "event" : "events"
+            return count == 1
+                ? String(localized: "metric_detail.unit.event")
+                : String(localized: "metric_detail.unit.events")
         }
         if isCategory {
             guard let summary = displayedCategorySummary else { return "" }
@@ -921,44 +1064,64 @@ struct MetricDetailView: View {
     }
 
     private var displayedDateText: String {
-        if isBinary {
-            let target = selectedDate ?? Date()
-            let formatted = target.formatted(
-                .dateTime.month(.abbreviated).day()
-            )
-            let suffix =
-                (selectedDate == nil)
-                ? String(localized: "metric_detail.date.today_suffix") : ""
-            return formatted + suffix
-        }
-        if isDatetime {
-            let target = selectedDate ?? Date()
-            let formatted = target.formatted(
-                .dateTime.month(.abbreviated).day()
-            )
-            let suffix =
-                (selectedDate == nil)
-                ? String(localized: "metric_detail.date.today_suffix") : ""
-            return formatted + suffix
+        if isBinary || isDatetime {
+            let target = calendarAnchorDay
+            return target.formatted(.dateTime.month(.abbreviated).day())
+                + dateSuffix(for: target)
         }
         if isCategory {
             guard let bucket = displayedCategoryBucket else {
                 return String(localized: "metric_detail.date.no_data")
             }
-            let formatted = formattedBucketDate(bucket)
-            let suffix =
-                (selectedDate == nil)
-                ? String(localized: "metric_detail.date.latest_suffix") : ""
-            return formatted + suffix
+            return formattedBucketDate(bucket) + dateSuffix(for: bucket)
         }
         guard let bin = displayedBin else {
             return String(localized: "metric_detail.date.no_data")
         }
-        let formatted = formattedBucketDate(bin.date)
-        let suffix =
-            (selectedDate == nil)
-            ? String(localized: "metric_detail.date.latest_suffix") : ""
-        return formatted + suffix
+        return formattedBucketDate(bin.date) + dateSuffix(for: bin.date)
+    }
+
+    /// The tail after the header's date — " · Today", " · Yesterday",
+    /// " · 5 days ago". It's permanent now: it used to be a " · Latest" marker
+    /// that vanished the moment a day was tapped, which is exactly when knowing
+    /// how far back you're looking matters most.
+    ///
+    /// Two cases still fall back: a week/month bucket isn't a single day, so a
+    /// day count would misdescribe it, and a future day gets nothing at all —
+    /// there's no entry there yet, so "in 3 days" would read as a plan rather
+    /// than a record.
+    private func dateSuffix(for date: Date) -> String {
+        let isDayGranular = isBinary || isDatetime
+            || range.bucketComponent == .day
+        guard isDayGranular else {
+            return selectedDate == nil
+                ? String(localized: "metric_detail.date.latest_suffix") : ""
+        }
+        guard let label = relativeDayLabel(for: date) else { return "" }
+        return " · " + label
+    }
+
+    /// "Today" / "Yesterday" / "5 days ago" for `date`, or `nil` if it's in the
+    /// future. Forced to day granularity so an older day never collapses into
+    /// "last week"; `RelativeDateTimeFormatter` already localizes the phrasing
+    /// for fr/es. Mirrors the dashboard card's label in `MetricViewFactory`.
+    private func relativeDayLabel(for date: Date) -> String? {
+        let cal = Calendar.current
+        let days =
+            cal.dateComponents(
+                [.day],
+                from: cal.startOfDay(for: .now),
+                to: cal.startOfDay(for: date)
+            ).day ?? 0
+        guard days <= 0 else { return nil }
+        let formatter = RelativeDateTimeFormatter()
+        formatter.dateTimeStyle = .named
+        let label = formatter.localizedString(from: DateComponents(day: days))
+        // The formatter returns sentence-lowercase ("today", "il y a 5 jours"),
+        // but this sits beside the capitalized " · Latest" suffix. Uppercase
+        // only the first character — `localizedCapitalized` would title-case
+        // the whole phrase ("Il Y A 5 Jours").
+        return label.prefix(1).localizedUppercase + label.dropFirst()
     }
 
     private func formattedBucketDate(_ date: Date) -> String {
@@ -1039,6 +1202,17 @@ struct MetricDetailView: View {
             return String(localized: "metric_detail.entry.yesterday")
         }
         return date.formatted(.dateTime.month(.wide).day())
+    }
+}
+
+// MARK: - Recent entry row height measurement
+
+/// Reports each recent-entry row's rendered height, keyed by index, so the
+/// nested `List` in `recentEntriesList` can size itself to content.
+private struct RecentEntryRowHeightKey: PreferenceKey {
+    static var defaultValue: [Int: CGFloat] = [:]
+    static func reduce(value: inout [Int: CGFloat], nextValue: () -> [Int: CGFloat]) {
+        value.merge(nextValue()) { _, new in new }
     }
 }
 
