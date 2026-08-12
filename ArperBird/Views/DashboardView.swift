@@ -116,7 +116,9 @@ private func daysAgo(_ days: Int) -> Date {
     Calendar.current.date(byAdding: .day, value: -days, to: Date()) ?? Date()
 }
 
-private func seedContainer(_ container: ModelContainer) -> ModelContainer {
+/// Preview seed shared with `ContentView`'s "With data" preview — non-private so
+/// both dashboards show the exact same set of cards.
+func seedContainer(_ container: ModelContainer) -> ModelContainer {
     // Defined winner: Sugar (9), then Period (6), with the rest trailing.
     let breakoutEntries: [(Int, [String])] = [
         (13, ["Sugar", "Dairy"]),
@@ -211,7 +213,10 @@ private func seedContainer(_ container: ModelContainer) -> ModelContainer {
         DataPoint.number(daysAgo(offset), litres)
     }
 
-    let schemas: [(MetricSchema, [DataPoint])] = [
+    // The third element pins the card's color. `Metric(from:)` otherwise picks a
+    // random hue, so previews reshuffle on every rebuild — nil keeps that, a
+    // color makes the card recognizable (brown coffee, red pills).
+    let schemas: [(MetricSchema, [DataPoint], Color?)] = [
         // number + gauge → LinearGaugeMiniChart · ⚡ 6d streak
         (
             MetricSchema.Fake.number(
@@ -224,7 +229,8 @@ private func seedContainer(_ container: ModelContainer) -> ModelContainer {
                 goal: 10_000,
                 chart: .dailyGauge
             ),
-            stepsData
+            stepsData,
+            nil
         ),
         // number + line → LineMiniChart · no badge: a snapshot metric has no
         // percent branch, and bpm is a reading rather than something to total.
@@ -243,7 +249,8 @@ private func seedContainer(_ container: ModelContainer) -> ModelContainer {
             Metric.fakeData(
                 for: MetricSchema.Fake.number(chart: .line).config,
                 days: 21
-            )
+            ),
+            nil
         ),
 
         // number + bar → BarMiniChart · 🌙 6d idle
@@ -258,20 +265,23 @@ private func seedContainer(_ container: ModelContainer) -> ModelContainer {
                 goal: 2.5,
                 chart: .bar
             ),
-            waterData
+            waterData,
+            nil
         ),
 
         // duration + bar → BarMiniChart · ▼ -15%
         (
             MetricSchema.Fake.duration(title: "Sleep", emoji: "🌙", chart: .bar),
-            sleepData
+            sleepData,
+            nil
         ),
         // categorySingleChoice → DividerBarMiniChart · never badges, and left
         // deliberately short (13 days) along with the breakout card below, so
         // the dashboard isn't uniformly badged.
         (
             MetricSchema.Fake.categorySingle(title: "Mood", emoji: "😊"),
-            Metric.fakeData(for: MetricSchema.Fake.categorySingle().config)
+            Metric.fakeData(for: MetricSchema.Fake.categorySingle().config),
+            nil
         ),
         
         
@@ -284,7 +294,8 @@ private func seedContainer(_ container: ModelContainer) -> ModelContainer {
                 title: "When I put gas",
                 emoji: "⛽️"
             ),
-            gasData
+            gasData,
+            nil
         ),
 
         // categoryMultipleChoice → DividerBarMiniChart
@@ -294,13 +305,15 @@ private func seedContainer(_ container: ModelContainer) -> ModelContainer {
                 emoji: "🧴",
                 labels: ["Dairy", "Sugar", "Stress", "Period", "Lack of sleep"]
             ),
-            breakoutData
+            breakoutData,
+            nil
         ),
         
         // binary → TrailingCalendarMiniChart · ⚡ 5d streak
         (
             MetricSchema.Fake.binary(title: "Medication Taken", emoji: "💊"),
-            medicationData
+            medicationData,
+            .red
         ),
 
         // number + bar → BarMiniChart · ▲ +56%
@@ -315,15 +328,22 @@ private func seedContainer(_ container: ModelContainer) -> ModelContainer {
                 goal: nil,
                 chart: .bar
             ),
-            coffeeData
+            coffeeData,
+            .brown
         ),
 //        (
 //            MetricSchema.Fake.binary(title: "Medication taken", emoji: "💊"),
 //            []
 //        ),
     ]
-    for (schema, data) in schemas {
-        container.mainContext.insert(Metric(from: schema, data: data))
+    for (schema, data, color) in schemas {
+        container.mainContext.insert(
+            Metric(
+                from: schema,
+                color: color ?? .randomMetricColor(),
+                data: data
+            )
+        )
     }
     return container
 }
