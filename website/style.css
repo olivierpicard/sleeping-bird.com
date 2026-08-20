@@ -144,3 +144,27 @@ code {
   padding: 0.1em 0.35em;
   font-size: 0.9em;
 }
+
+header.site .langs {
+  margin-left: auto;
+  display: flex;
+  gap: 0.4rem;
+}
+
+header.site .langs a {
+  font-size: 0.85rem;
+  text-decoration: none;
+  color: var(--muted);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 0.15rem 0.7rem;
+}
+
+header.site .langs a:hover {
+  color: var(--fg);
+}
+
+header.site .langs a[aria-current="true"] {
+  color: var(--fg);
+  border-color: var(--fg);
+}
